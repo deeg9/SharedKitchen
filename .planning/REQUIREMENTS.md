@@ -67,12 +67,12 @@
 
 ### Profile & Settings
 
-- [ ] **PROF-01**: User can view and edit profile (avatar, name)
+- [x] **PROF-01**: User can view and edit profile (avatar, name)
 - [ ] **PROF-02**: User can view cooking stats (times cooked this month, distribution chart)
 - [ ] **PROF-03**: User can set dietary preferences (vegetarian, gluten-free, dairy-free, etc.)
 - [ ] **PROF-04**: User can toggle dark mode
 - [ ] **PROF-05**: User can configure notifications (cooking reminders, leftover alerts, budget warnings, household activity)
-- [ ] **PROF-06**: User can sign out
+- [x] **PROF-06**: User can sign out
 
 ### Leftovers
 
@@ -94,12 +94,12 @@
 
 ### Design System
 
-- [ ] **DSGN-01**: App follows "Culinary Curator" design system — tonal layering, no-line rule, ambient shadows, ghost borders
-- [ ] **DSGN-02**: Consistent Material Design 3 color tokens (olive green primary, burnt orange accent, warm cream surfaces)
-- [ ] **DSGN-03**: Plus Jakarta Sans for headlines, Inter for body/labels, Material Symbols Outlined icons
-- [ ] **DSGN-04**: 5-tab bottom navigation with glassmorphic background (Plan, Recipes, Grocery, Budget, Profile)
-- [ ] **DSGN-05**: All modals/bottom sheets have slide-up animations with drag handles
-- [ ] **DSGN-06**: Skeleton loading states for lists and optimistic UI updates for checkboxes/forms
+- [x] **DSGN-01**: App follows "Culinary Curator" design system — tonal layering, no-line rule, ambient shadows, ghost borders
+- [x] **DSGN-02**: Consistent Material Design 3 color tokens (olive green primary, burnt orange accent, warm cream surfaces)
+- [x] **DSGN-03**: Plus Jakarta Sans for headlines, Inter for body/labels, Material Symbols Outlined icons
+- [x] **DSGN-04**: 5-tab bottom navigation with glassmorphic background (Plan, Recipes, Grocery, Budget, Profile)
+- [x] **DSGN-05**: All modals/bottom sheets have slide-up animations with drag handles
+- [x] **DSGN-06**: Skeleton loading states for lists and optimistic UI updates for checkboxes/forms
 
 ## v2 Requirements
 
@@ -142,14 +142,14 @@
 | HOUS-03 | Phase 1 | Complete |
 | HOUS-04 | Phase 1 | Complete |
 | HOUS-05 | Phase 1 | Complete |
-| DSGN-01 | Phase 1 | Pending |
-| DSGN-02 | Phase 1 | Pending |
-| DSGN-03 | Phase 1 | Pending |
-| DSGN-04 | Phase 1 | Pending |
-| DSGN-05 | Phase 1 | Pending |
-| DSGN-06 | Phase 1 | Pending |
-| PROF-01 | Phase 1 | Pending |
-| PROF-06 | Phase 1 | Pending |
+| DSGN-01 | Phase 1 | Complete |
+| DSGN-02 | Phase 1 | Complete |
+| DSGN-03 | Phase 1 | Complete |
+| DSGN-04 | Phase 1 | Complete |
+| DSGN-05 | Phase 1 | Complete |
+| DSGN-06 | Phase 1 | Complete |
+| PROF-01 | Phase 1 | Complete |
+| PROF-06 | Phase 1 | Complete |
 | RECP-01 | Phase 2 | Pending |
 | RECP-02 | Phase 2 | Pending |
 | RECP-03 | Phase 2 | Pending |
