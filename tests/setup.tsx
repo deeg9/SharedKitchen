@@ -126,6 +126,7 @@ jest.mock('../src/lib/supabase', () => {
         subscribe: jest.fn().mockReturnThis(),
         unsubscribe: jest.fn(),
       })),
+      removeChannel: jest.fn(),
       storage: {
         from: jest.fn(() => ({
           upload: jest.fn(() => Promise.resolve({ data: { path: 'mock-path' }, error: null })),
