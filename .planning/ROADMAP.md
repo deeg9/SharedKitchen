@@ -76,11 +76,11 @@ Plans:
   1. First-time user completes a multi-step onboarding flow: welcome, create household, invite members, add recipes, plan first meals, and sees confetti on completion
   2. Premium badge displays on subscribed user profiles and upgrade prompts appear at gated features
   3. User can view subscription management UI showing current plan and upgrade button (no real payment)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 04-01: Onboarding flow
-- [ ] 04-02: Freemium gating and premium UI
+- [ ] 04-01-PLAN.md — 6-step first-run onboarding flow (welcome, create household, invite members, add recipes, plan week, confetti completion)
+- [ ] 04-02-PLAN.md — Freemium gating with premium badge, upgrade prompts at gated features, and subscription management UI
 
 ## Progress
 
