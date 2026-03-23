@@ -298,6 +298,58 @@ export interface Database {
           created_at?: string;
         };
       };
+      expenses: {
+        Row: {
+          id: string;
+          household_id: string;
+          amount: number;
+          category: 'Groceries' | 'Dining Out' | 'Takeout';
+          description: string | null;
+          expense_date: string;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          household_id: string;
+          amount: number;
+          category: 'Groceries' | 'Dining Out' | 'Takeout';
+          description?: string | null;
+          expense_date?: string;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          household_id?: string;
+          amount?: number;
+          category?: 'Groceries' | 'Dining Out' | 'Takeout';
+          description?: string | null;
+          expense_date?: string;
+          created_by?: string | null;
+          created_at?: string;
+        };
+      };
+      budget_settings: {
+        Row: {
+          id: string;
+          household_id: string;
+          monthly_target: number;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          household_id: string;
+          monthly_target?: number;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          household_id?: string;
+          monthly_target?: number;
+          updated_at?: string;
+        };
+      };
     };
     Views: {
       [_ in never]: never;
@@ -329,6 +381,11 @@ export interface MealPlanWithRecipe extends MealPlan {
 export type GroceryList = Database['public']['Tables']['grocery_lists']['Row'];
 export type GroceryItem = Database['public']['Tables']['grocery_items']['Row'];
 export type GroceryItemInsert = Database['public']['Tables']['grocery_items']['Insert'];
+
+export type Expense = Database['public']['Tables']['expenses']['Row'];
+export type ExpenseInsert = Database['public']['Tables']['expenses']['Insert'];
+export type ExpenseUpdate = Database['public']['Tables']['expenses']['Update'];
+export type BudgetSettings = Database['public']['Tables']['budget_settings']['Row'];
 
 /** Summary statistics for a grocery list */
 export interface GrocerySummary {
