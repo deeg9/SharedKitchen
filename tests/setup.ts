@@ -28,6 +28,7 @@ jest.mock('expo-router', () => ({
   },
   Link: 'Link',
   Redirect: 'Redirect',
+  useLocalSearchParams: jest.fn(() => ({})),
 }));
 
 // Mock Google Sign-In
@@ -83,6 +84,12 @@ jest.mock('../src/lib/supabase', () => {
       })
     ),
     signOut: jest.fn(() => Promise.resolve({ error: null })),
+    getUser: jest.fn(() =>
+      Promise.resolve({
+        data: { user: { id: 'mock-user-id', email: 'test@example.com' } },
+        error: null,
+      })
+    ),
     getSession: jest.fn(() =>
       Promise.resolve({
         data: { session: null },
@@ -117,6 +124,18 @@ jest.mock('expo-crypto', () => ({
   },
   getRandomBytes: jest.fn(() => new Uint8Array(16)),
   randomUUID: jest.fn(() => 'mock-uuid'),
+}));
+
+// Mock expo-clipboard
+jest.mock('expo-clipboard', () => ({
+  setStringAsync: jest.fn(() => Promise.resolve()),
+  getStringAsync: jest.fn(() => Promise.resolve('')),
+}));
+
+// Mock expo-sharing
+jest.mock('expo-sharing', () => ({
+  isAvailableAsync: jest.fn(() => Promise.resolve(false)),
+  shareAsync: jest.fn(() => Promise.resolve()),
 }));
 
 // Mock expo-splash-screen
