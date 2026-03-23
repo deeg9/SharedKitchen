@@ -15,6 +15,7 @@ import {
 
 import { supabase } from '../src/lib/supabase';
 import { useAuthStore } from '../src/stores/authStore';
+import { ColorSchemeProvider } from '../src/lib/color-scheme';
 
 // Prevent auto-hiding splash screen
 SplashScreen.preventAutoHideAsync();
@@ -82,5 +83,9 @@ export default function RootLayout() {
     return null;
   }
 
-  return <Slot />;
+  return (
+    <ColorSchemeProvider>
+      <Slot />
+    </ColorSchemeProvider>
+  );
 }

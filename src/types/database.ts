@@ -330,6 +330,44 @@ export interface Database {
           created_at?: string;
         };
       };
+      leftovers: {
+        Row: {
+          id: string;
+          household_id: string;
+          name: string;
+          date_made: string;
+          use_by_date: string;
+          portions: number;
+          status: 'fresh' | 'frozen';
+          notes: string | null;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          household_id: string;
+          name: string;
+          date_made?: string;
+          use_by_date: string;
+          portions?: number;
+          status?: 'fresh' | 'frozen';
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          household_id?: string;
+          name?: string;
+          date_made?: string;
+          use_by_date?: string;
+          portions?: number;
+          status?: 'fresh' | 'frozen';
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+        };
+      };
       budget_settings: {
         Row: {
           id: string;
@@ -386,6 +424,10 @@ export type Expense = Database['public']['Tables']['expenses']['Row'];
 export type ExpenseInsert = Database['public']['Tables']['expenses']['Insert'];
 export type ExpenseUpdate = Database['public']['Tables']['expenses']['Update'];
 export type BudgetSettings = Database['public']['Tables']['budget_settings']['Row'];
+
+export type Leftover = Database['public']['Tables']['leftovers']['Row'];
+export type LeftoverInsert = Database['public']['Tables']['leftovers']['Insert'];
+export type LeftoverUpdate = Database['public']['Tables']['leftovers']['Update'];
 
 /** Summary statistics for a grocery list */
 export interface GrocerySummary {
