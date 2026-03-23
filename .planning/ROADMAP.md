@@ -12,7 +12,7 @@ Mise delivers a collaborative dinner planning app for households in four phases:
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Auth, households, design system, tab navigation, and core app shell
+- [x] **Phase 1: Foundation** - Auth, households, design system, tab navigation, and core app shell (completed 2026-03-23)
 - [ ] **Phase 2: Core Features** - Recipes, meal planning, and grocery lists with real-time sync
 - [ ] **Phase 3: Supporting Features** - Budget tracking, leftovers, AI suggestions, and profile settings
 - [ ] **Phase 4: Onboarding and Freemium** - First-run onboarding flow and premium gating UI
@@ -89,7 +89,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 2/3 | In Progress|  |
+| 1. Foundation | 2/3 | Complete    | 2026-03-23 |
 | 2. Core Features | 0/3 | Not started | - |
 | 3. Supporting Features | 0/2 | Not started | - |
 | 4. Onboarding and Freemium | 0/2 | Not started | - |
