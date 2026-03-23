@@ -58,12 +58,12 @@
 
 ### Onboarding
 
-- [ ] **ONBR-01**: First-run onboarding: welcome screen with app description
-- [ ] **ONBR-02**: Create household step with name input
-- [ ] **ONBR-03**: Invite members step with share link/code and skip option
-- [ ] **ONBR-04**: Add first recipes step (import from URL or pick from starter suggestions)
-- [ ] **ONBR-05**: Plan your week step (assign meals for first 2-3 days)
-- [ ] **ONBR-06**: "All set" completion screen with confetti animation
+- [x] **ONBR-01**: First-run onboarding: welcome screen with app description
+- [x] **ONBR-02**: Create household step with name input
+- [x] **ONBR-03**: Invite members step with share link/code and skip option
+- [x] **ONBR-04**: Add first recipes step (import from URL or pick from starter suggestions)
+- [x] **ONBR-05**: Plan your week step (assign meals for first 2-3 days)
+- [x] **ONBR-06**: "All set" completion screen with confetti animation
 
 ### Profile & Settings
 
@@ -188,12 +188,12 @@
 | PROF-03 | Phase 3 | Complete |
 | PROF-04 | Phase 3 | Complete |
 | PROF-05 | Phase 3 | Complete |
-| ONBR-01 | Phase 4 | Pending |
-| ONBR-02 | Phase 4 | Pending |
-| ONBR-03 | Phase 4 | Pending |
-| ONBR-04 | Phase 4 | Pending |
-| ONBR-05 | Phase 4 | Pending |
-| ONBR-06 | Phase 4 | Pending |
+| ONBR-01 | Phase 4 | Complete |
+| ONBR-02 | Phase 4 | Complete |
+| ONBR-03 | Phase 4 | Complete |
+| ONBR-04 | Phase 4 | Complete |
+| ONBR-05 | Phase 4 | Complete |
+| ONBR-06 | Phase 4 | Complete |
 | PREM-01 | Phase 4 | Complete |
 | PREM-02 | Phase 4 | Complete |
 | PREM-03 | Phase 4 | Complete |

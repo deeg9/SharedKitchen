@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-03-23T20:52:39.399Z"
-last_activity: 2026-03-23 -- Completed 03-02-PLAN.md
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-03-23T20:53:39.873Z"
+last_activity: 2026-03-23 -- Completed 04-02-PLAN.md
 progress:
   total_phases: 4
   completed_phases: 4
@@ -54,6 +54,7 @@ Progress: [██████████] 100%
 | Phase 02 P02 | 6min | 2 tasks | 17 files |
 | Phase 03 P01 | 4min | 2 tasks | 9 files |
 | Phase 03 P02 | 6min | 3 tasks | 15 files |
+| Phase 04 P01 | 4min | 2 tasks | 11 files |
 | Phase 04 P02 | 5min | 2 tasks | 8 files |
 
 ## Accumulated Context
@@ -96,6 +97,10 @@ Recent decisions affecting current work:
 - [Phase 03-02]: Dietary preferences and notification settings stored in AsyncStorage (no DB table needed)
 - [Phase 04]: Simulated purchase via premiumStore.upgradeToPremium() with AsyncStorage persistence, no real payment
 - [Phase 04]: Feature gating via PREMIUM_FEATURES constant array with canAccess() helper
+- [Phase 04-01]: OnboardingStep type as 0-5 literal union for compile-time step validation
+- [Phase 04-01]: Confetti uses 24 Animated.timing pieces with random drift/rotation (no external lib)
+- [Phase 04-01]: Layout redirect checks both onboarding completion AND household count to avoid re-onboarding existing users
+- [Phase 04-01]: AddRecipesStep requires >= 1 recipe (not strict 3) for flexibility
 
 ### Pending Todos
 
@@ -107,6 +112,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-23T20:52:39.398Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-03-23T20:53:39.871Z
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None
