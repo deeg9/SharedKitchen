@@ -62,11 +62,11 @@ Plans:
   2. User can add leftover items with freshness badges and manage portions
   3. User sees AI suggestion cards based on cooking history on the plan screen
   4. User can view cooking stats, set dietary preferences, toggle dark mode, and configure notification settings
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: Budget dashboard and expense logging
-- [ ] 03-02: Leftover tracker, AI suggestions, and profile settings
+- [ ] 03-01-PLAN.md — Budget dashboard with monthly progress, category cards, weekly breakdown, and expense logging FAB
+- [ ] 03-02-PLAN.md — Leftover tracker with freshness badges, AI suggestion cards on plan screen, and profile settings (stats, dietary prefs, dark mode, notifications)
 
 ### Phase 4: Onboarding and Freemium
 **Goal**: New users experience a guided first-run flow, and the app presents freemium upgrade prompts for premium features
