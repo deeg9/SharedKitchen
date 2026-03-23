@@ -50,11 +50,11 @@
 - [x] **AUTH-01**: User can sign up with email and password
 - [x] **AUTH-02**: User can sign in with Google OAuth
 - [x] **AUTH-03**: User session persists across app restarts
-- [ ] **HOUS-01**: User can create a household with a custom name
-- [ ] **HOUS-02**: User can invite members via share code or copy link
-- [ ] **HOUS-03**: Invited user can join a household from an invite link
-- [ ] **HOUS-04**: User can view household members with avatars and roles (admin/member)
-- [ ] **HOUS-05**: User can belong to and switch between multiple households
+- [x] **HOUS-01**: User can create a household with a custom name
+- [x] **HOUS-02**: User can invite members via share code or copy link
+- [x] **HOUS-03**: Invited user can join a household from an invite link
+- [x] **HOUS-04**: User can view household members with avatars and roles (admin/member)
+- [x] **HOUS-05**: User can belong to and switch between multiple households
 
 ### Onboarding
 
@@ -137,11 +137,11 @@
 | AUTH-01 | Phase 1 | Complete |
 | AUTH-02 | Phase 1 | Complete |
 | AUTH-03 | Phase 1 | Complete |
-| HOUS-01 | Phase 1 | Pending |
-| HOUS-02 | Phase 1 | Pending |
-| HOUS-03 | Phase 1 | Pending |
-| HOUS-04 | Phase 1 | Pending |
-| HOUS-05 | Phase 1 | Pending |
+| HOUS-01 | Phase 1 | Complete |
+| HOUS-02 | Phase 1 | Complete |
+| HOUS-03 | Phase 1 | Complete |
+| HOUS-04 | Phase 1 | Complete |
+| HOUS-05 | Phase 1 | Complete |
 | DSGN-01 | Phase 1 | Pending |
 | DSGN-02 | Phase 1 | Pending |
 | DSGN-03 | Phase 1 | Pending |
