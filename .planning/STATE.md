@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-03-23T19:38:52.921Z"
+stopped_at: Completed 02-03-PLAN.md
+last_updated: "2026-03-23T19:39:00Z"
 last_activity: 2026-03-23 -- Completed 02-03-PLAN.md
 progress:
   total_phases: 4
@@ -80,6 +80,10 @@ Recent decisions affecting current work:
 - [Phase 02-02]: OpenAI gpt-4o-mini with JSON mode for structured recipe extraction from HTML
 - [Phase 02-02]: RecipeForm initialData prop with useEffect sync for AI-populated form fields
 - [Phase 02-02]: Surprise Me uses local recipe array shuffle rather than database random query
+- 02-03: Keyword-based inferSection for mapping ingredients to store sections (extensible word lists)
+- 02-03: Optimistic UI for toggleItem with full revert on Supabase error
+- 02-03: Realtime channel per grocery_list_id with removeChannel cleanup on unmount
+- 02-03: AddItemSheet stays open after adding for batch entry
 
 ### Pending Todos
 
@@ -91,6 +95,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-23T19:38:49.215Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-03-23T19:39:00Z
+Stopped at: Completed 02-03-PLAN.md
 Resume file: None

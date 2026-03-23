@@ -29,14 +29,14 @@
 
 ### Grocery
 
-- [ ] **GROC-01**: User can generate a grocery list from the current week's meal plan
-- [ ] **GROC-02**: Grocery items are grouped by store section (Proteins, Produce, Dairy & Eggs, Pantry)
-- [ ] **GROC-03**: Each grocery item shows name, quantity/unit, and estimated price
-- [ ] **GROC-04**: User can check off items with a circular checkbox (green check, line-through, avatar shown)
-- [ ] **GROC-05**: Checked items move to a collapsed "Completed" section at the bottom
-- [ ] **GROC-06**: Summary bar shows item count, estimated total, items checked, and progress bar
-- [ ] **GROC-07**: User can manually add items to the grocery list
-- [ ] **GROC-08**: Grocery list syncs in real-time across household members via Supabase Realtime
+- [x] **GROC-01**: User can generate a grocery list from the current week's meal plan
+- [x] **GROC-02**: Grocery items are grouped by store section (Proteins, Produce, Dairy & Eggs, Pantry)
+- [x] **GROC-03**: Each grocery item shows name, quantity/unit, and estimated price
+- [x] **GROC-04**: User can check off items with a circular checkbox (green check, line-through, avatar shown)
+- [x] **GROC-05**: Checked items move to a collapsed "Completed" section at the bottom
+- [x] **GROC-06**: Summary bar shows item count, estimated total, items checked, and progress bar
+- [x] **GROC-07**: User can manually add items to the grocery list
+- [x] **GROC-08**: Grocery list syncs in real-time across household members via Supabase Realtime
 
 ### Budget
 
@@ -167,14 +167,14 @@
 | PLAN-05 | Phase 2 | Complete |
 | PLAN-06 | Phase 2 | Complete |
 | PLAN-07 | Phase 2 | Complete |
-| GROC-01 | Phase 2 | Pending |
-| GROC-02 | Phase 2 | Pending |
-| GROC-03 | Phase 2 | Pending |
-| GROC-04 | Phase 2 | Pending |
-| GROC-05 | Phase 2 | Pending |
-| GROC-06 | Phase 2 | Pending |
-| GROC-07 | Phase 2 | Pending |
-| GROC-08 | Phase 2 | Pending |
+| GROC-01 | Phase 2 | Complete |
+| GROC-02 | Phase 2 | Complete |
+| GROC-03 | Phase 2 | Complete |
+| GROC-04 | Phase 2 | Complete |
+| GROC-05 | Phase 2 | Complete |
+| GROC-06 | Phase 2 | Complete |
+| GROC-07 | Phase 2 | Complete |
+| GROC-08 | Phase 2 | Complete |
 | BUDG-01 | Phase 3 | Pending |
 | BUDG-02 | Phase 3 | Pending |
 | BUDG-03 | Phase 3 | Pending |
