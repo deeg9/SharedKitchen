@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { colors } from '../../theme/colors';
 
 interface InviteCardProps {
   inviteCode: string;
@@ -45,16 +46,14 @@ export function InviteCard({ inviteCode, onCopy, onShare }: InviteCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#f0f4ff',
+    backgroundColor: colors.surfaceContainerHigh,
     borderRadius: 16,
     padding: 24,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#d0dcf0',
   },
   label: {
     fontSize: 14,
-    color: '#666',
+    color: colors.onSurfaceVariant,
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 1,
@@ -63,7 +62,7 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: '700',
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-    color: '#1a1a2e',
+    color: colors.onSurface,
     letterSpacing: 4,
     marginBottom: 24,
   },
@@ -72,7 +71,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   copyButton: {
-    backgroundColor: '#4a90d9',
+    backgroundColor: colors.primary,
     borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 24,
@@ -80,22 +79,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   copyButtonText: {
-    color: '#fff',
+    color: colors.onPrimary,
     fontSize: 16,
     fontWeight: '600',
   },
   shareButton: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surfaceContainerLowest,
     borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 24,
     flex: 1,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#4a90d9',
   },
   shareButtonText: {
-    color: '#4a90d9',
+    color: colors.primary,
     fontSize: 16,
     fontWeight: '600',
   },

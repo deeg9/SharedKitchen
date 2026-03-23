@@ -16,6 +16,7 @@ import * as Crypto from 'expo-crypto';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 import { supabase } from '../../src/lib/supabase';
+import { colors } from '../../src/theme/colors';
 
 // Configure Google Sign-In (safe to call even without client IDs)
 try {
@@ -135,7 +136,7 @@ export default function SignInScreen() {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={colors.onPrimary} />
             ) : (
               <Text style={styles.buttonText}>Sign In</Text>
             )}
@@ -172,7 +173,7 @@ export default function SignInScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   scrollContent: {
     flexGrow: 1,
@@ -186,21 +187,22 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: '700',
     marginBottom: 8,
+    color: colors.onSurface,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: colors.onSurfaceVariant,
   },
   form: {
     marginBottom: 24,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
+    backgroundColor: colors.surfaceContainerLow,
     borderRadius: 8,
     padding: 16,
     fontSize: 16,
     marginBottom: 12,
+    color: colors.onSurface,
   },
   button: {
     borderRadius: 8,
@@ -210,10 +212,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   primaryButton: {
-    backgroundColor: '#2563eb',
+    backgroundColor: colors.primary,
   },
   buttonText: {
-    color: '#fff',
+    color: colors.onPrimary,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -225,19 +227,17 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#ddd',
+    backgroundColor: colors.outlineVariant,
   },
   dividerText: {
     marginHorizontal: 16,
-    color: '#666',
+    color: colors.onSurfaceVariant,
   },
   googleButton: {
-    backgroundColor: '#f5f5f5',
-    borderWidth: 1,
-    borderColor: '#ddd',
+    backgroundColor: colors.surfaceContainerLow,
   },
   googleButtonText: {
-    color: '#333',
+    color: colors.onSurface,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -246,10 +246,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   footerText: {
-    color: '#666',
+    color: colors.onSurfaceVariant,
   },
   linkText: {
-    color: '#2563eb',
+    color: colors.primary,
     fontWeight: '600',
   },
 });

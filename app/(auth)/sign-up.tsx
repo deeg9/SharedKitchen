@@ -14,6 +14,7 @@ import {
 import { Link } from 'expo-router';
 
 import { supabase } from '../../src/lib/supabase';
+import { colors } from '../../src/theme/colors';
 
 export default function SignUpScreen() {
   const [email, setEmail] = useState('');
@@ -101,7 +102,7 @@ export default function SignUpScreen() {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={colors.onPrimary} />
             ) : (
               <Text style={styles.buttonText}>Create Account</Text>
             )}
@@ -124,7 +125,7 @@ export default function SignUpScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   scrollContent: {
     flexGrow: 1,
@@ -138,21 +139,22 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: '700',
     marginBottom: 8,
+    color: colors.onSurface,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: colors.onSurfaceVariant,
   },
   form: {
     marginBottom: 24,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
+    backgroundColor: colors.surfaceContainerLow,
     borderRadius: 8,
     padding: 16,
     fontSize: 16,
     marginBottom: 12,
+    color: colors.onSurface,
   },
   button: {
     borderRadius: 8,
@@ -162,10 +164,10 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   primaryButton: {
-    backgroundColor: '#2563eb',
+    backgroundColor: colors.primary,
   },
   buttonText: {
-    color: '#fff',
+    color: colors.onPrimary,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -174,10 +176,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   footerText: {
-    color: '#666',
+    color: colors.onSurfaceVariant,
   },
   linkText: {
-    color: '#2563eb',
+    color: colors.primary,
     fontWeight: '600',
   },
 });

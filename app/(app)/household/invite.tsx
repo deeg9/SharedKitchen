@@ -11,6 +11,7 @@ import * as Clipboard from 'expo-clipboard';
 import * as Sharing from 'expo-sharing';
 import { useHouseholdStore } from '../../../src/stores/householdStore';
 import { InviteCard } from '../../../src/components/household/InviteCard';
+import { colors } from '../../../src/theme/colors';
 
 export default function InviteScreen() {
   const router = useRouter();
@@ -81,7 +82,7 @@ export default function InviteScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     padding: 24,
   },
   content: {
@@ -91,36 +92,36 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#1a1a2e',
+    color: colors.onSurface,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: colors.onSurfaceVariant,
     marginBottom: 32,
     lineHeight: 22,
   },
   hint: {
     fontSize: 14,
-    color: '#999',
+    color: colors.outline,
     textAlign: 'center',
     marginTop: 24,
     lineHeight: 20,
   },
   errorText: {
     fontSize: 16,
-    color: '#e74c3c',
+    color: colors.error,
     textAlign: 'center',
   },
   doneButton: {
-    backgroundColor: '#4a90d9',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
     marginBottom: 16,
   },
   doneButtonText: {
-    color: '#fff',
+    color: colors.onPrimary,
     fontSize: 18,
     fontWeight: '600',
   },

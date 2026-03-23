@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { HouseholdMemberWithProfile } from '../../stores/householdStore';
+import { colors } from '../../theme/colors';
 
 interface MemberListProps {
   members: HouseholdMemberWithProfile[];
@@ -68,14 +69,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 16,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#eee',
+    backgroundColor: colors.surfaceContainerLow,
+    marginBottom: 2,
   },
   avatar: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#e8e0f0',
+    backgroundColor: colors.primaryFixed,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#5a3e8e',
+    color: colors.primary,
   },
   info: {
     flex: 1,
@@ -91,7 +92,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#1a1a2e',
+    color: colors.onSurface,
   },
   roleBadge: {
     paddingVertical: 4,
@@ -99,20 +100,20 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   adminBadge: {
-    backgroundColor: '#fff3e0',
+    backgroundColor: colors.secondaryFixed,
   },
   memberBadge: {
-    backgroundColor: '#f0f4ff',
+    backgroundColor: colors.surfaceContainerHigh,
   },
   roleText: {
     fontSize: 12,
     fontWeight: '600',
   },
   adminText: {
-    color: '#e67e22',
+    color: colors.secondary,
   },
   memberText: {
-    color: '#4a90d9',
+    color: colors.primary,
   },
   emptyContainer: {
     padding: 32,
@@ -120,6 +121,6 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#999',
+    color: colors.outline,
   },
 });

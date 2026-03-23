@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useHouseholdStore } from '../../../src/stores/householdStore';
+import { colors } from '../../../src/theme/colors';
 
 export default function CreateHouseholdScreen() {
   const router = useRouter();
@@ -75,7 +76,7 @@ export default function CreateHouseholdScreen() {
           disabled={!isValid || loading}
         >
           {loading ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={colors.onPrimary} />
           ) : (
             <Text style={styles.buttonText}>Create Household</Text>
           )}
@@ -88,7 +89,7 @@ export default function CreateHouseholdScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   content: {
     flex: 1,
@@ -98,40 +99,39 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#1a1a2e',
+    color: colors.onSurface,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: colors.onSurfaceVariant,
     marginBottom: 32,
     lineHeight: 22,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
+    backgroundColor: colors.surfaceContainerLow,
     borderRadius: 12,
     padding: 16,
     fontSize: 18,
-    backgroundColor: '#f9f9f9',
+    color: colors.onSurface,
   },
   inputError: {
-    borderColor: '#e74c3c',
+    backgroundColor: colors.errorContainer,
   },
   errorText: {
-    color: '#e74c3c',
+    color: colors.error,
     fontSize: 14,
     marginTop: 8,
   },
   charCount: {
     fontSize: 12,
-    color: '#999',
+    color: colors.outline,
     textAlign: 'right',
     marginTop: 4,
     marginBottom: 24,
   },
   button: {
-    backgroundColor: '#4a90d9',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   buttonText: {
-    color: '#fff',
+    color: colors.onPrimary,
     fontSize: 18,
     fontWeight: '600',
   },
