@@ -33,24 +33,50 @@ const CATEGORY_OPTIONS = [
 interface RecipeFormProps {
   onSubmit: (recipe: Omit<RecipeInsert, 'household_id' | 'created_by'>, imageUri?: string) => void;
   loading?: boolean;
+  initialData?: Omit<RecipeInsert, 'household_id' | 'created_by'>;
 }
 
-export function RecipeForm({ onSubmit, loading = false }: RecipeFormProps) {
-  const [name, setName] = useState('');
-  const [category, setCategory] = useState('');
+export function RecipeForm({ onSubmit, loading = false, initialData }: RecipeFormProps) {
+  const [name, setName] = useState(initialData?.name ?? '');
+  const [category, setCategory] = useState(initialData?.category ?? '');
   const [imageUri, setImageUri] = useState<string | null>(null);
-  const [prepTime, setPrepTime] = useState('');
-  const [cookTime, setCookTime] = useState('');
-  const [servings, setServings] = useState('4');
-  const [estimatedCost, setEstimatedCost] = useState('');
-  const [ingredients, setIngredients] = useState<Ingredient[]>([
-    { amount: 0, unit: '', name: '' },
-  ]);
-  const [instructions, setInstructions] = useState<InstructionStep[]>([
-    { step_number: 1, text: '' },
-  ]);
-  const [tags, setTags] = useState('');
+  const [prepTime, setPrepTime] = useState(
+    initialData?.prep_time_minutes != null ? String(initialData.prep_time_minutes) : ''
+  );
+  const [cookTime, setCookTime] = useState(
+    initialData?.cook_time_minutes != null ? String(initialData.cook_time_minutes) : ''
+  );
+  const [servings, setServings] = useState(
+    initialData?.servings != null ? String(initialData.servings) : '4'
+  );
+  const [estimatedCost, setEstimatedCost] = useState(
+    initialData?.estimated_cost != null ? String(initialData.estimated_cost) : ''
+  );
+  const [ingredients, setIngredients] = useState<Ingredient[]>(
+    initialData?.ingredients?.length ? initialData.ingredients : [{ amount: 0, unit: '', name: '' }]
+  );
+  const [instructions, setInstructions] = useState<InstructionStep[]>(
+    initialData?.instructions?.length ? initialData.instructions : [{ step_number: 1, text: '' }]
+  );
+  const [tags, setTags] = useState(
+    initialData?.tags?.length ? initialData.tags.join(', ') : ''
+  );
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Re-populate form when initialData changes (e.g., AI import)
+  React.useEffect(() => {
+    if (initialData) {
+      setName(initialData.name ?? '');
+      setCategory(initialData.category ?? '');
+      setPrepTime(initialData.prep_time_minutes != null ? String(initialData.prep_time_minutes) : '');
+      setCookTime(initialData.cook_time_minutes != null ? String(initialData.cook_time_minutes) : '');
+      setServings(initialData.servings != null ? String(initialData.servings) : '4');
+      setEstimatedCost(initialData.estimated_cost != null ? String(initialData.estimated_cost) : '');
+      setIngredients(initialData.ingredients?.length ? initialData.ingredients : [{ amount: 0, unit: '', name: '' }]);
+      setInstructions(initialData.instructions?.length ? initialData.instructions : [{ step_number: 1, text: '' }]);
+      setTags(initialData.tags?.length ? initialData.tags.join(', ') : '');
+    }
+  }, [initialData]);
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();

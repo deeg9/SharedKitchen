@@ -1,15 +1,25 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, TextInput, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { RecipeForm } from '../../../src/components/recipes/RecipeForm';
+import { Button } from '../../../src/components/ui/Button';
 import { useRecipeStore } from '../../../src/stores/recipeStore';
 import { useHouseholdStore } from '../../../src/stores/householdStore';
 import { supabase } from '../../../src/lib/supabase';
+import { parseRecipeUrl } from '../../../src/lib/ai';
 import { RecipeInsert } from '../../../src/types/database';
 import { colors } from '../../../src/theme/colors';
 import { typography } from '../../../src/theme/typography';
-import { spacing } from '../../../src/theme/spacing';
+import { spacing, borderRadius } from '../../../src/theme/spacing';
+
+const PROGRESS_MESSAGES = [
+  'Fetching recipe...',
+  'Parsing ingredients...',
+  'Extracting instructions...',
+  'Almost done...',
+];
 
 export default function AddRecipeScreen() {
   const router = useRouter();
@@ -17,6 +27,47 @@ export default function AddRecipeScreen() {
   const { createRecipe } = useRecipeStore();
   const { activeHouseholdId } = useHouseholdStore();
   const [loading, setLoading] = useState(false);
+  const [importUrl, setImportUrl] = useState('');
+  const [importing, setImporting] = useState(false);
+  const [progressMsg, setProgressMsg] = useState('');
+  const [importedData, setImportedData] = useState<Omit<RecipeInsert, 'household_id' | 'created_by'> | null>(null);
+  const progressInterval = useRef<NodeJS.Timeout | null>(null);
+
+  const startProgress = () => {
+    let idx = 0;
+    setProgressMsg(PROGRESS_MESSAGES[0]);
+    progressInterval.current = setInterval(() => {
+      idx = Math.min(idx + 1, PROGRESS_MESSAGES.length - 1);
+      setProgressMsg(PROGRESS_MESSAGES[idx]);
+    }, 2000);
+  };
+
+  const stopProgress = () => {
+    if (progressInterval.current) {
+      clearInterval(progressInterval.current);
+      progressInterval.current = null;
+    }
+    setProgressMsg('');
+  };
+
+  const handleImport = async () => {
+    if (!importUrl.trim()) {
+      Alert.alert('Error', 'Please enter a recipe URL.');
+      return;
+    }
+
+    setImporting(true);
+    startProgress();
+    try {
+      const data = await parseRecipeUrl(importUrl.trim());
+      setImportedData(data);
+    } catch (error: any) {
+      Alert.alert('Import Failed', error.message ?? 'Could not parse recipe from URL.');
+    } finally {
+      setImporting(false);
+      stopProgress();
+    }
+  };
 
   const handleSubmit = async (
     recipeData: Omit<RecipeInsert, 'household_id' | 'created_by'>,
@@ -88,7 +139,48 @@ export default function AddRecipeScreen() {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>New Recipe</Text>
       </View>
-      <RecipeForm onSubmit={handleSubmit} loading={loading} />
+
+      {/* Import from URL Section */}
+      <View style={styles.importSection}>
+        <View style={styles.importHeader}>
+          <MaterialCommunityIcons name="link-variant" size={20} color={colors.primary} />
+          <Text style={styles.importTitle}>Import from URL</Text>
+        </View>
+        <View style={styles.importRow}>
+          <TextInput
+            style={styles.urlInput}
+            placeholder="Paste recipe URL..."
+            placeholderTextColor={colors.outlineVariant}
+            value={importUrl}
+            onChangeText={setImportUrl}
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="url"
+            editable={!importing}
+          />
+          <Button
+            variant="secondary"
+            size="sm"
+            onPress={handleImport}
+            loading={importing}
+            disabled={importing}
+          >
+            Import
+          </Button>
+        </View>
+        {importing && progressMsg ? (
+          <View style={styles.progressRow}>
+            <ActivityIndicator size="small" color={colors.primary} />
+            <Text style={styles.progressText}>{progressMsg}</Text>
+          </View>
+        ) : null}
+      </View>
+
+      <RecipeForm
+        onSubmit={handleSubmit}
+        loading={loading}
+        initialData={importedData ?? undefined}
+      />
     </View>
   );
 }
@@ -107,5 +199,48 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...typography.headlineMd,
     color: colors.onSurface,
+  },
+  importSection: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.outlineVariant,
+    backgroundColor: colors.surfaceContainerLow,
+  },
+  importHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  importTitle: {
+    ...typography.labelLg,
+    color: colors.primary,
+  },
+  importRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    alignItems: 'center',
+  },
+  urlInput: {
+    flex: 1,
+    ...typography.bodyMd,
+    color: colors.onSurface,
+    backgroundColor: colors.surfaceContainerLowest,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.outlineVariant,
+  },
+  progressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginTop: spacing.sm,
+  },
+  progressText: {
+    ...typography.bodySm,
+    color: colors.onSurfaceVariant,
   },
 });
