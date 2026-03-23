@@ -176,6 +176,38 @@ export interface Database {
           created_at?: string;
         };
       };
+      meal_plans: {
+        Row: {
+          id: string;
+          household_id: string;
+          recipe_id: string | null;
+          plan_date: string;
+          assigned_cook: string | null;
+          notes: string | null;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          household_id: string;
+          recipe_id?: string | null;
+          plan_date: string;
+          assigned_cook?: string | null;
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          household_id?: string;
+          recipe_id?: string | null;
+          plan_date?: string;
+          assigned_cook?: string | null;
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+        };
+      };
       recipe_notes: {
         Row: {
           id: string;
@@ -199,6 +231,73 @@ export interface Database {
           created_at?: string;
         };
       };
+      grocery_lists: {
+        Row: {
+          id: string;
+          household_id: string;
+          week_start: string;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          household_id: string;
+          week_start: string;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          household_id?: string;
+          week_start?: string;
+          created_by?: string | null;
+          created_at?: string;
+        };
+      };
+      grocery_items: {
+        Row: {
+          id: string;
+          grocery_list_id: string;
+          name: string;
+          quantity: string | null;
+          estimated_price: number | null;
+          section: 'Proteins' | 'Produce' | 'Dairy & Eggs' | 'Pantry' | 'Other' | null;
+          is_checked: boolean;
+          checked_by: string | null;
+          checked_at: string | null;
+          is_manual: boolean;
+          source_recipe_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          grocery_list_id?: string;
+          name: string;
+          quantity?: string | null;
+          estimated_price?: number | null;
+          section?: 'Proteins' | 'Produce' | 'Dairy & Eggs' | 'Pantry' | 'Other' | null;
+          is_checked?: boolean;
+          checked_by?: string | null;
+          checked_at?: string | null;
+          is_manual?: boolean;
+          source_recipe_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          grocery_list_id?: string;
+          name?: string;
+          quantity?: string | null;
+          estimated_price?: number | null;
+          section?: 'Proteins' | 'Produce' | 'Dairy & Eggs' | 'Pantry' | 'Other' | null;
+          is_checked?: boolean;
+          checked_by?: string | null;
+          checked_at?: string | null;
+          is_manual?: boolean;
+          source_recipe_id?: string | null;
+          created_at?: string;
+        };
+      };
     };
     Views: {
       [_ in never]: never;
@@ -218,3 +317,23 @@ export type RecipeInsert = Database['public']['Tables']['recipes']['Insert'];
 export type RecipeUpdate = Database['public']['Tables']['recipes']['Update'];
 export type RecipeRating = Database['public']['Tables']['recipe_ratings']['Row'];
 export type RecipeNote = Database['public']['Tables']['recipe_notes']['Row'];
+
+export type MealPlan = Database['public']['Tables']['meal_plans']['Row'];
+export type MealPlanInsert = Database['public']['Tables']['meal_plans']['Insert'];
+export type MealPlanUpdate = Database['public']['Tables']['meal_plans']['Update'];
+
+export interface MealPlanWithRecipe extends MealPlan {
+  recipes: Recipe | null;
+}
+
+export type GroceryList = Database['public']['Tables']['grocery_lists']['Row'];
+export type GroceryItem = Database['public']['Tables']['grocery_items']['Row'];
+export type GroceryItemInsert = Database['public']['Tables']['grocery_items']['Insert'];
+
+/** Summary statistics for a grocery list */
+export interface GrocerySummary {
+  totalItems: number;
+  checkedItems: number;
+  estimatedTotal: number;
+  progressPercent: number;
+}

@@ -112,9 +112,15 @@ jest.mock('../src/lib/supabase', () => {
         upsert: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
         in: jest.fn().mockReturnThis(),
+        gte: jest.fn().mockReturnThis(),
+        lte: jest.fn().mockReturnThis(),
+        match: jest.fn().mockReturnThis(),
         order: jest.fn().mockReturnThis(),
         single: jest.fn(() => Promise.resolve({ data: null, error: null })),
       })),
+      functions: {
+        invoke: jest.fn(() => Promise.resolve({ data: null, error: null })),
+      },
       channel: jest.fn(() => ({
         on: jest.fn().mockReturnThis(),
         subscribe: jest.fn().mockReturnThis(),
