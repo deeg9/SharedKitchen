@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -6,10 +6,12 @@ import { WeekHeader } from '../../../src/components/plan/WeekHeader';
 import { DayCard } from '../../../src/components/plan/DayCard';
 import { PlanEditSheet } from '../../../src/components/plan/PlanEditSheet';
 import { SurpriseMe } from '../../../src/components/plan/SurpriseMe';
+import { SuggestionCard } from '../../../src/components/plan/SuggestionCard';
 import { usePlanStore } from '../../../src/stores/planStore';
 import { useHouseholdStore } from '../../../src/stores/householdStore';
 import { useRecipeStore } from '../../../src/stores/recipeStore';
 import { toDateString } from '../../../src/lib/dates';
+import { generateSuggestions } from '../../../src/lib/suggestions';
 import { Skeleton } from '../../../src/components/ui/Skeleton';
 import { colors } from '../../../src/theme/colors';
 import { typography } from '../../../src/theme/typography';
@@ -19,7 +21,7 @@ import { shadows } from '../../../src/theme/shadows';
 export default function PlanScreen() {
   const insets = useSafeAreaInsets();
   const { activeHouseholdId } = useHouseholdStore();
-  const { fetchRecipes } = useRecipeStore();
+  const { fetchRecipes, recipes, ratings } = useRecipeStore();
   const {
     weekOffset,
     mealPlan,
@@ -55,6 +57,17 @@ export default function PlanScreen() {
   const handleCloseEdit = useCallback(() => {
     setEditSheetOpen(false);
     setSelectedDate(null);
+  }, []);
+
+  // Generate AI suggestions from cooking history
+  const suggestions = useMemo(() => {
+    const mealPlanArray = Array.from(mealPlan.values());
+    return generateSuggestions(recipes, mealPlanArray, ratings);
+  }, [recipes, mealPlan, ratings]);
+
+  const handleAddSuggestionToPlan = useCallback((recipeId: string) => {
+    setSelectedDate(new Date());
+    setEditSheetOpen(true);
   }, []);
 
   const selectedDateStr = selectedDate ? toDateString(selectedDate) : '';
@@ -105,6 +118,26 @@ export default function PlanScreen() {
               />
             );
           })
+        )}
+
+        {/* AI Suggestion Cards */}
+        {suggestions.length > 0 && (
+          <View style={styles.suggestionsSection}>
+            <Text style={styles.suggestionsTitle}>Suggestions</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.suggestionsScroll}
+            >
+              {suggestions.map((s) => (
+                <SuggestionCard
+                  key={s.recipeId}
+                  suggestion={s}
+                  onAddToPlan={handleAddSuggestionToPlan}
+                />
+              ))}
+            </ScrollView>
+          </View>
         )}
       </ScrollView>
 
@@ -163,6 +196,19 @@ const styles = StyleSheet.create({
   skeletonContent: {
     flex: 1,
     gap: spacing.sm,
+  },
+  suggestionsSection: {
+    marginTop: spacing.lg,
+    marginBottom: spacing.md,
+  },
+  suggestionsTitle: {
+    ...typography.titleMd,
+    color: colors.onSurface,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  suggestionsScroll: {
+    paddingHorizontal: spacing.md,
   },
   fab: {
     position: 'absolute',

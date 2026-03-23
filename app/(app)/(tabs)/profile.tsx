@@ -1,17 +1,37 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, ScrollView, StyleSheet, Pressable, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuthStore } from '../../../src/stores/authStore';
 import { useHouseholdStore, HouseholdMemberWithProfile } from '../../../src/stores/householdStore';
+import { usePlanStore } from '../../../src/stores/planStore';
 import { Avatar } from '../../../src/components/ui/Avatar';
 import { Button } from '../../../src/components/ui/Button';
 import { Card } from '../../../src/components/ui/Card';
 import { Skeleton } from '../../../src/components/ui/Skeleton';
 import { BottomSheet } from '../../../src/components/ui/BottomSheet';
+import { useColorScheme } from '../../../src/lib/color-scheme';
 import { colors } from '../../../src/theme/colors';
 import { typography } from '../../../src/theme/typography';
 import { spacing, borderRadius } from '../../../src/theme/spacing';
 import { TAB_BAR_HEIGHT } from '../../../src/lib/constants';
+
+const DIETARY_OPTIONS = [
+  'Vegetarian',
+  'Gluten-Free',
+  'Dairy-Free',
+  'Keto',
+  'Nut-Free',
+  'Vegan',
+];
+
+interface NotificationSettings {
+  cookingReminders: boolean;
+  leftoverAlerts: boolean;
+  budgetWarnings: boolean;
+  householdActivity: boolean;
+}
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -26,12 +46,84 @@ export default function ProfileScreen() {
     initialize,
   } = useHouseholdStore();
 
+  const { mealPlan } = usePlanStore();
+  const { isDark, toggleColorScheme } = useColorScheme();
+
   const [showHouseholdPicker, setShowHouseholdPicker] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const [cookingCount, setCookingCount] = useState(0);
+  const [dietaryPrefs, setDietaryPrefs] = useState<string[]>([]);
+  const [defaultServings, setDefaultServings] = useState(4);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifSettings, setNotifSettings] = useState<NotificationSettings>({
+    cookingReminders: true,
+    leftoverAlerts: true,
+    budgetWarnings: true,
+    householdActivity: true,
+  });
 
   useEffect(() => {
     initialize();
+
+    // Load dietary preferences
+    AsyncStorage.getItem('dietary_preferences').then((val) => {
+      if (val) setDietaryPrefs(JSON.parse(val));
+    });
+
+    // Load default servings
+    AsyncStorage.getItem('default_servings').then((val) => {
+      if (val) setDefaultServings(parseInt(val, 10));
+    });
+
+    // Load notification settings
+    AsyncStorage.getItem('notification_settings').then((val) => {
+      if (val) setNotifSettings(JSON.parse(val));
+    });
   }, []);
+
+  // Compute cooking count from meal plan data
+  useEffect(() => {
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    let count = 0;
+    mealPlan.forEach((entry) => {
+      const date = new Date(entry.plan_date + 'T00:00:00');
+      if (date >= monthStart && date <= now) count++;
+    });
+    setCookingCount(count);
+  }, [mealPlan]);
+
+  const toggleDietaryPref = useCallback(
+    (pref: string) => {
+      setDietaryPrefs((prev) => {
+        const next = prev.includes(pref)
+          ? prev.filter((p) => p !== pref)
+          : [...prev, pref];
+        AsyncStorage.setItem('dietary_preferences', JSON.stringify(next));
+        return next;
+      });
+    },
+    []
+  );
+
+  const updateServings = useCallback((delta: number) => {
+    setDefaultServings((prev) => {
+      const next = Math.max(1, prev + delta);
+      AsyncStorage.setItem('default_servings', String(next));
+      return next;
+    });
+  }, []);
+
+  const updateNotifSetting = useCallback(
+    (key: keyof NotificationSettings, value: boolean) => {
+      setNotifSettings((prev) => {
+        const next = { ...prev, [key]: value };
+        AsyncStorage.setItem('notification_settings', JSON.stringify(next));
+        return next;
+      });
+    },
+    []
+  );
 
   const currentHousehold = activeHousehold();
   const displayName = user?.user_metadata?.full_name ?? user?.user_metadata?.display_name ?? 'User';
@@ -157,6 +249,99 @@ export default function ProfileScreen() {
           )}
         </View>
 
+        {/* Cooking Stats */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Cooking Stats</Text>
+          <Card variant="filled">
+            <View style={styles.statsRow}>
+              <MaterialCommunityIcons name="chef-hat" size={24} color={colors.primary} />
+              <Text style={styles.statsText}>
+                You've cooked {cookingCount} {cookingCount === 1 ? 'time' : 'times'} this month
+              </Text>
+            </View>
+          </Card>
+        </View>
+
+        {/* Dietary Preferences */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Dietary Restrictions</Text>
+          <View style={styles.chipRow}>
+            {DIETARY_OPTIONS.map((opt) => {
+              const selected = dietaryPrefs.includes(opt);
+              return (
+                <Pressable
+                  key={opt}
+                  style={[styles.dietChip, selected && styles.dietChipSelected]}
+                  onPress={() => toggleDietaryPref(opt)}
+                >
+                  <Text style={[styles.dietChipText, selected && styles.dietChipTextSelected]}>
+                    {opt}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+
+          <View style={styles.servingsRow}>
+            <Text style={styles.servingsLabel}>Default Servings</Text>
+            <View style={styles.servingsStepper}>
+              <Pressable
+                style={styles.servingsButton}
+                onPress={() => updateServings(-1)}
+              >
+                <MaterialCommunityIcons name="minus" size={18} color={colors.onSurfaceVariant} />
+              </Pressable>
+              <Text style={styles.servingsCount}>{defaultServings}</Text>
+              <Pressable
+                style={styles.servingsButton}
+                onPress={() => updateServings(1)}
+              >
+                <MaterialCommunityIcons name="plus" size={18} color={colors.onSurfaceVariant} />
+              </Pressable>
+            </View>
+          </View>
+        </View>
+
+        {/* App Settings */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>App Settings</Text>
+
+          <View style={styles.settingRow}>
+            <MaterialCommunityIcons name="weather-night" size={20} color={colors.onSurface} />
+            <Text style={styles.settingLabel}>Dark Mode</Text>
+            <Switch
+              value={isDark}
+              onValueChange={toggleColorScheme}
+              trackColor={{ false: colors.outlineVariant, true: colors.primary }}
+              thumbColor={colors.surfaceContainerLowest}
+            />
+          </View>
+
+          <Pressable
+            style={styles.settingRow}
+            onPress={() => setShowNotifications(true)}
+          >
+            <MaterialCommunityIcons name="bell-outline" size={20} color={colors.onSurface} />
+            <Text style={[styles.settingLabel, { flex: 1 }]}>Notification Settings</Text>
+            <MaterialCommunityIcons name="chevron-right" size={20} color={colors.onSurfaceVariant} />
+          </Pressable>
+
+          <Pressable
+            style={styles.settingRow}
+            onPress={() => router.push('/(app)/leftovers' as any)}
+          >
+            <MaterialCommunityIcons name="food-variant" size={20} color={colors.onSurface} />
+            <Text style={[styles.settingLabel, { flex: 1 }]}>Manage Leftovers</Text>
+            <MaterialCommunityIcons name="chevron-right" size={20} color={colors.onSurfaceVariant} />
+          </Pressable>
+
+          <Pressable style={styles.settingRow}>
+            <MaterialCommunityIcons name="download-outline" size={20} color={colors.onSurface} />
+            <Text style={[styles.settingLabel, { flex: 1 }]}>Data Export</Text>
+            <MaterialCommunityIcons name="chevron-right" size={20} color={colors.onSurfaceVariant} />
+          </Pressable>
+        </View>
+
         {/* Sign Out */}
         <View style={styles.signOutSection}>
           <Button
@@ -198,6 +383,57 @@ export default function ProfileScreen() {
               </Text>
             </Pressable>
           ))}
+        </View>
+      </BottomSheet>
+
+      {/* Notification Settings Bottom Sheet */}
+      <BottomSheet
+        isOpen={showNotifications}
+        onClose={() => setShowNotifications(false)}
+        snapPoints={['50%']}
+      >
+        <View style={styles.sheetContent}>
+          <Text style={styles.sheetTitle}>Notification Settings</Text>
+
+          <View style={styles.notifRow}>
+            <Text style={styles.notifLabel}>Cooking Reminders</Text>
+            <Switch
+              value={notifSettings.cookingReminders}
+              onValueChange={(v) => updateNotifSetting('cookingReminders', v)}
+              trackColor={{ false: colors.outlineVariant, true: colors.primary }}
+              thumbColor={colors.surfaceContainerLowest}
+            />
+          </View>
+
+          <View style={styles.notifRow}>
+            <Text style={styles.notifLabel}>Leftover Alerts</Text>
+            <Switch
+              value={notifSettings.leftoverAlerts}
+              onValueChange={(v) => updateNotifSetting('leftoverAlerts', v)}
+              trackColor={{ false: colors.outlineVariant, true: colors.primary }}
+              thumbColor={colors.surfaceContainerLowest}
+            />
+          </View>
+
+          <View style={styles.notifRow}>
+            <Text style={styles.notifLabel}>Budget Warnings</Text>
+            <Switch
+              value={notifSettings.budgetWarnings}
+              onValueChange={(v) => updateNotifSetting('budgetWarnings', v)}
+              trackColor={{ false: colors.outlineVariant, true: colors.primary }}
+              thumbColor={colors.surfaceContainerLowest}
+            />
+          </View>
+
+          <View style={styles.notifRow}>
+            <Text style={styles.notifLabel}>Household Activity</Text>
+            <Switch
+              value={notifSettings.householdActivity}
+              onValueChange={(v) => updateNotifSetting('householdActivity', v)}
+              trackColor={{ false: colors.outlineVariant, true: colors.primary }}
+              thumbColor={colors.surfaceContainerLowest}
+            />
+          </View>
         </View>
       </BottomSheet>
     </View>
@@ -320,5 +556,90 @@ const styles = StyleSheet.create({
   activeHouseholdOptionText: {
     color: colors.primary,
     fontWeight: '600',
+  },
+  statsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  statsText: {
+    ...typography.bodyLg,
+    color: colors.onSurface,
+    flex: 1,
+  },
+  chipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  dietChip: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.surfaceContainerHigh,
+  },
+  dietChipSelected: {
+    backgroundColor: colors.primary,
+  },
+  dietChipText: {
+    ...typography.labelMd,
+    color: colors.onSurfaceVariant,
+  },
+  dietChipTextSelected: {
+    color: colors.onPrimary,
+  },
+  servingsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.sm,
+  },
+  servingsLabel: {
+    ...typography.bodyMd,
+    color: colors.onSurface,
+  },
+  servingsStepper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  servingsButton: {
+    width: 32,
+    height: 32,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.surfaceContainerHigh,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  servingsCount: {
+    ...typography.labelLg,
+    color: colors.onSurface,
+    minWidth: 20,
+    textAlign: 'center',
+  },
+  settingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingVertical: spacing.sm + 4,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.outlineVariant,
+  },
+  settingLabel: {
+    ...typography.bodyLg,
+    color: colors.onSurface,
+  },
+  notifRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.sm + 4,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.outlineVariant,
+  },
+  notifLabel: {
+    ...typography.bodyLg,
+    color: colors.onSurface,
   },
 });
