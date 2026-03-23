@@ -134,13 +134,75 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (Populated during roadmap creation) | | |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| HOUS-01 | Phase 1 | Pending |
+| HOUS-02 | Phase 1 | Pending |
+| HOUS-03 | Phase 1 | Pending |
+| HOUS-04 | Phase 1 | Pending |
+| HOUS-05 | Phase 1 | Pending |
+| DSGN-01 | Phase 1 | Pending |
+| DSGN-02 | Phase 1 | Pending |
+| DSGN-03 | Phase 1 | Pending |
+| DSGN-04 | Phase 1 | Pending |
+| DSGN-05 | Phase 1 | Pending |
+| DSGN-06 | Phase 1 | Pending |
+| PROF-01 | Phase 1 | Pending |
+| PROF-06 | Phase 1 | Pending |
+| RECP-01 | Phase 2 | Pending |
+| RECP-02 | Phase 2 | Pending |
+| RECP-03 | Phase 2 | Pending |
+| RECP-04 | Phase 2 | Pending |
+| RECP-05 | Phase 2 | Pending |
+| RECP-06 | Phase 2 | Pending |
+| RECP-07 | Phase 2 | Pending |
+| RECP-08 | Phase 2 | Pending |
+| RECP-09 | Phase 2 | Pending |
+| AI-01 | Phase 2 | Pending |
+| PLAN-01 | Phase 2 | Pending |
+| PLAN-02 | Phase 2 | Pending |
+| PLAN-03 | Phase 2 | Pending |
+| PLAN-04 | Phase 2 | Pending |
+| PLAN-05 | Phase 2 | Pending |
+| PLAN-06 | Phase 2 | Pending |
+| PLAN-07 | Phase 2 | Pending |
+| GROC-01 | Phase 2 | Pending |
+| GROC-02 | Phase 2 | Pending |
+| GROC-03 | Phase 2 | Pending |
+| GROC-04 | Phase 2 | Pending |
+| GROC-05 | Phase 2 | Pending |
+| GROC-06 | Phase 2 | Pending |
+| GROC-07 | Phase 2 | Pending |
+| GROC-08 | Phase 2 | Pending |
+| BUDG-01 | Phase 3 | Pending |
+| BUDG-02 | Phase 3 | Pending |
+| BUDG-03 | Phase 3 | Pending |
+| BUDG-04 | Phase 3 | Pending |
+| LEFT-01 | Phase 3 | Pending |
+| LEFT-02 | Phase 3 | Pending |
+| LEFT-03 | Phase 3 | Pending |
+| LEFT-04 | Phase 3 | Pending |
+| AI-02 | Phase 3 | Pending |
+| PROF-02 | Phase 3 | Pending |
+| PROF-03 | Phase 3 | Pending |
+| PROF-04 | Phase 3 | Pending |
+| PROF-05 | Phase 3 | Pending |
+| ONBR-01 | Phase 4 | Pending |
+| ONBR-02 | Phase 4 | Pending |
+| ONBR-03 | Phase 4 | Pending |
+| ONBR-04 | Phase 4 | Pending |
+| ONBR-05 | Phase 4 | Pending |
+| ONBR-06 | Phase 4 | Pending |
+| PREM-01 | Phase 4 | Pending |
+| PREM-02 | Phase 4 | Pending |
+| PREM-03 | Phase 4 | Pending |
 
 **Coverage:**
-- v1 requirements: 48 total
-- Mapped to phases: 0
-- Unmapped: 48
+- v1 requirements: 63 total
+- Mapped to phases: 63
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-22*
-*Last updated: 2026-03-22 after initial definition*
+*Last updated: 2026-03-22 after roadmap creation*
