@@ -143,3 +143,43 @@ jest.mock('expo-splash-screen', () => ({
   preventAutoHideAsync: jest.fn(() => Promise.resolve()),
   hideAsync: jest.fn(() => Promise.resolve()),
 }));
+
+// Mock @expo/vector-icons
+jest.mock('@expo/vector-icons', () => {
+  const { Text } = require('react-native');
+  return {
+    MaterialCommunityIcons: ({ name, ...props }: any) => (
+      <Text testID={`icon-${name}`} {...props}>{name}</Text>
+    ),
+    MaterialIcons: ({ name, ...props }: any) => (
+      <Text testID={`icon-${name}`} {...props}>{name}</Text>
+    ),
+  };
+});
+
+// Mock expo-blur
+jest.mock('expo-blur', () => {
+  const { View } = require('react-native');
+  return {
+    BlurView: ({ children, ...props }: any) => (
+      <View testID="blur-view" {...props}>{children}</View>
+    ),
+  };
+});
+
+// Mock expo-image-picker
+jest.mock('expo-image-picker', () => ({
+  requestMediaLibraryPermissionsAsync: jest.fn(() =>
+    Promise.resolve({ granted: true })
+  ),
+  launchImageLibraryAsync: jest.fn(() =>
+    Promise.resolve({ canceled: true, assets: [] })
+  ),
+  MediaTypeOptions: { Images: 'Images' },
+}));
+
+// Mock react-native-safe-area-context
+jest.mock('react-native-safe-area-context', () => ({
+  useSafeAreaInsets: () => ({ top: 0, bottom: 34, left: 0, right: 0 }),
+  SafeAreaProvider: ({ children }: any) => children,
+}));

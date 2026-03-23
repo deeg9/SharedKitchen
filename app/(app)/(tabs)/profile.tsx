@@ -1,28 +1,324 @@
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useAuthStore } from '../../../src/stores/authStore';
+import { useHouseholdStore, HouseholdMemberWithProfile } from '../../../src/stores/householdStore';
+import { Avatar } from '../../../src/components/ui/Avatar';
+import { Button } from '../../../src/components/ui/Button';
+import { Card } from '../../../src/components/ui/Card';
+import { Skeleton } from '../../../src/components/ui/Skeleton';
+import { BottomSheet } from '../../../src/components/ui/BottomSheet';
+import { colors } from '../../../src/theme/colors';
+import { typography } from '../../../src/theme/typography';
+import { spacing, borderRadius } from '../../../src/theme/spacing';
+import { TAB_BAR_HEIGHT } from '../../../src/lib/constants';
 
 export default function ProfileScreen() {
+  const router = useRouter();
+  const { user, signOut, loading: authLoading } = useAuthStore();
+  const {
+    households,
+    activeHouseholdId,
+    members,
+    loading: householdLoading,
+    activeHousehold,
+    setActiveHousehold,
+    initialize,
+  } = useHouseholdStore();
+
+  const [showHouseholdPicker, setShowHouseholdPicker] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+
+  useEffect(() => {
+    initialize();
+  }, []);
+
+  const currentHousehold = activeHousehold();
+  const displayName = user?.user_metadata?.full_name ?? user?.user_metadata?.display_name ?? 'User';
+  const email = user?.email ?? '';
+  const avatarUrl = user?.user_metadata?.avatar_url ?? null;
+
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    try {
+      await signOut();
+    } catch {
+      setSigningOut(false);
+    }
+  };
+
+  const handleSwitchHousehold = async (id: string) => {
+    await setActiveHousehold(id);
+    setShowHouseholdPicker(false);
+  };
+
+  const isLoading = authLoading || householdLoading;
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Profile</Text>
-      <Text style={styles.subtitle}>Coming soon</Text>
+    <View style={styles.screen}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.content,
+          { paddingBottom: TAB_BAR_HEIGHT + 32 },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Profile Header */}
+        <View style={styles.header}>
+          {isLoading ? (
+            <>
+              <Skeleton.Circle size={64} />
+              <Skeleton.Text width={160} style={{ marginTop: spacing.md }} />
+              <Skeleton.Text width={200} style={{ marginTop: spacing.sm }} />
+            </>
+          ) : (
+            <>
+              <Avatar uri={avatarUrl} name={displayName} size="lg" />
+              <Text style={styles.displayName}>{displayName}</Text>
+              <Text style={styles.email}>{email}</Text>
+            </>
+          )}
+
+          <Button
+            variant="tertiary"
+            size="sm"
+            onPress={() => router.push('/(app)/edit-profile')}
+            style={{ marginTop: spacing.md }}
+          >
+            Edit Profile
+          </Button>
+        </View>
+
+        {/* Household Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Household</Text>
+
+          {isLoading ? (
+            <Skeleton.Card />
+          ) : currentHousehold ? (
+            <Card variant="elevated" style={styles.householdCard}>
+              <Pressable
+                onPress={() =>
+                  households.length > 1 && setShowHouseholdPicker(true)
+                }
+                style={styles.householdHeader}
+              >
+                <Text style={styles.householdName}>
+                  {currentHousehold.name}
+                </Text>
+                {households.length > 1 && (
+                  <Text style={styles.switchText}>Switch</Text>
+                )}
+              </Pressable>
+
+              {/* Inline Member List - TODO: Replace with MemberList component from Plan 02 when available */}
+              <View style={styles.membersSection}>
+                <Text style={styles.membersTitle}>Members</Text>
+                {members.map((member) => (
+                  <View key={member.id} style={styles.memberRow}>
+                    <Avatar
+                      uri={member.profiles?.avatar_url}
+                      name={member.profiles?.display_name ?? 'Member'}
+                      size="sm"
+                    />
+                    <View style={styles.memberInfo}>
+                      <Text style={styles.memberName}>
+                        {member.profiles?.display_name ?? 'Unknown'}
+                      </Text>
+                      <Text style={styles.memberRole}>{member.role}</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+
+              <Button
+                variant="tertiary"
+                size="sm"
+                onPress={() => router.push('/(app)/household/invite' as any)}
+                style={{ marginTop: spacing.sm }}
+              >
+                Invite Members
+              </Button>
+            </Card>
+          ) : (
+            <Card variant="filled" style={styles.noHouseholdCard}>
+              <Text style={styles.noHouseholdText}>
+                You are not part of any household yet.
+              </Text>
+              <Button
+                variant="primary"
+                size="md"
+                onPress={() => router.push('/(app)/household/create' as any)}
+                style={{ marginTop: spacing.md }}
+              >
+                Create a Household
+              </Button>
+            </Card>
+          )}
+        </View>
+
+        {/* Sign Out */}
+        <View style={styles.signOutSection}>
+          <Button
+            variant="ghost"
+            size="md"
+            loading={signingOut}
+            onPress={handleSignOut}
+            style={styles.signOutButton}
+          >
+            <Text style={styles.signOutText}>Sign Out</Text>
+          </Button>
+        </View>
+      </ScrollView>
+
+      {/* Household Picker Bottom Sheet */}
+      <BottomSheet
+        isOpen={showHouseholdPicker}
+        onClose={() => setShowHouseholdPicker(false)}
+        snapPoints={['40%']}
+      >
+        <View style={styles.sheetContent}>
+          <Text style={styles.sheetTitle}>Switch Household</Text>
+          {households.map((h) => (
+            <Pressable
+              key={h.id}
+              style={[
+                styles.householdOption,
+                h.id === activeHouseholdId && styles.activeHouseholdOption,
+              ]}
+              onPress={() => handleSwitchHousehold(h.id)}
+            >
+              <Text
+                style={[
+                  styles.householdOptionText,
+                  h.id === activeHouseholdId && styles.activeHouseholdOptionText,
+                ]}
+              >
+                {h.name}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      </BottomSheet>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: colors.surface,
+  },
+  content: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xxl + spacing.lg,
+  },
+  header: {
     alignItems: 'center',
-    backgroundColor: '#fff',
+    marginBottom: spacing.xl,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 8,
+  displayName: {
+    ...typography.headlineMd,
+    color: colors.onSurface,
+    marginTop: spacing.md,
   },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
+  email: {
+    ...typography.bodyMd,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xs,
+  },
+  section: {
+    marginBottom: spacing.lg,
+  },
+  sectionTitle: {
+    ...typography.titleMd,
+    color: colors.onSurface,
+    marginBottom: spacing.sm,
+  },
+  householdCard: {
+    // No extra styles needed beyond Card defaults
+  },
+  householdHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  householdName: {
+    ...typography.titleLg,
+    color: colors.onSurface,
+  },
+  switchText: {
+    ...typography.labelMd,
+    color: colors.primary,
+  },
+  membersSection: {
+    marginBottom: spacing.sm,
+  },
+  membersTitle: {
+    ...typography.labelLg,
+    color: colors.onSurfaceVariant,
+    marginBottom: spacing.sm,
+  },
+  memberRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.sm,
+  },
+  memberInfo: {
+    marginLeft: spacing.sm,
+  },
+  memberName: {
+    ...typography.bodyMd,
+    color: colors.onSurface,
+  },
+  memberRole: {
+    ...typography.labelSm,
+    color: colors.onSurfaceVariant,
+  },
+  noHouseholdCard: {
+    alignItems: 'center',
+    paddingVertical: spacing.xl,
+  },
+  noHouseholdText: {
+    ...typography.bodyMd,
+    color: colors.onSurfaceVariant,
+    textAlign: 'center',
+  },
+  signOutSection: {
+    marginTop: spacing.lg,
+    alignItems: 'center',
+  },
+  signOutButton: {
+    // Ghost button styling handled by Button component
+  },
+  signOutText: {
+    ...typography.labelLg,
+    color: colors.error,
+  },
+  sheetContent: {
+    padding: spacing.lg,
+  },
+  sheetTitle: {
+    ...typography.titleMd,
+    color: colors.onSurface,
+    marginBottom: spacing.md,
+  },
+  householdOption: {
+    paddingVertical: spacing.sm + 4,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.md,
+    marginBottom: spacing.xs,
+  },
+  activeHouseholdOption: {
+    backgroundColor: colors.primaryFixed,
+  },
+  householdOptionText: {
+    ...typography.bodyLg,
+    color: colors.onSurface,
+  },
+  activeHouseholdOptionText: {
+    color: colors.primary,
+    fontWeight: '600',
   },
 });
