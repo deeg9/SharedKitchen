@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Auth, households, design system, tab navigation, and core app shell (completed 2026-03-23)
 - [x] **Phase 2: Core Features** - Recipes, meal planning, and grocery lists with real-time sync (completed 2026-03-23)
-- [ ] **Phase 3: Supporting Features** - Budget tracking, leftovers, AI suggestions, and profile settings
+- [x] **Phase 3: Supporting Features** - Budget tracking, leftovers, AI suggestions, and profile settings (completed 2026-03-23)
 - [ ] **Phase 4: Onboarding and Freemium** - First-run onboarding flow and premium gating UI
 
 ## Phase Details
@@ -91,5 +91,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/3 | Complete    | 2026-03-23 |
 | 2. Core Features | 3/3 | Complete    | 2026-03-23 |
-| 3. Supporting Features | 0/2 | Not started | - |
+| 3. Supporting Features | 2/2 | Complete   | 2026-03-23 |
 | 4. Onboarding and Freemium | 0/2 | Not started | - |

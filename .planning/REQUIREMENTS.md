@@ -68,23 +68,23 @@
 ### Profile & Settings
 
 - [x] **PROF-01**: User can view and edit profile (avatar, name)
-- [ ] **PROF-02**: User can view cooking stats (times cooked this month, distribution chart)
-- [ ] **PROF-03**: User can set dietary preferences (vegetarian, gluten-free, dairy-free, etc.)
-- [ ] **PROF-04**: User can toggle dark mode
-- [ ] **PROF-05**: User can configure notifications (cooking reminders, leftover alerts, budget warnings, household activity)
+- [x] **PROF-02**: User can view cooking stats (times cooked this month, distribution chart)
+- [x] **PROF-03**: User can set dietary preferences (vegetarian, gluten-free, dairy-free, etc.)
+- [x] **PROF-04**: User can toggle dark mode
+- [x] **PROF-05**: User can configure notifications (cooking reminders, leftover alerts, budget warnings, household activity)
 - [x] **PROF-06**: User can sign out
 
 ### Leftovers
 
-- [ ] **LEFT-01**: User can add leftover items (name, date made, use-by date, portions, status, notes)
-- [ ] **LEFT-02**: Leftover items show freshness status badges (Fresh, Use Soon, Frozen, Expired)
-- [ ] **LEFT-03**: Summary bar shows item count and status breakdown
-- [ ] **LEFT-04**: User can adjust portions remaining with a stepper
+- [x] **LEFT-01**: User can add leftover items (name, date made, use-by date, portions, status, notes)
+- [x] **LEFT-02**: Leftover items show freshness status badges (Fresh, Use Soon, Frozen, Expired)
+- [x] **LEFT-03**: Summary bar shows item count and status breakdown
+- [x] **LEFT-04**: User can adjust portions remaining with a stepper
 
 ### AI Features
 
 - [x] **AI-01**: AI can parse a recipe URL and extract structured recipe data (name, ingredients, instructions, times, servings)
-- [ ] **AI-02**: AI generates suggestion cards based on user history ("You haven't made X in 3 weeks")
+- [x] **AI-02**: AI generates suggestion cards based on user history ("You haven't made X in 3 weeks")
 
 ### Freemium
 
@@ -179,15 +179,15 @@
 | BUDG-02 | Phase 3 | Complete |
 | BUDG-03 | Phase 3 | Complete |
 | BUDG-04 | Phase 3 | Complete |
-| LEFT-01 | Phase 3 | Pending |
-| LEFT-02 | Phase 3 | Pending |
-| LEFT-03 | Phase 3 | Pending |
-| LEFT-04 | Phase 3 | Pending |
-| AI-02 | Phase 3 | Pending |
-| PROF-02 | Phase 3 | Pending |
-| PROF-03 | Phase 3 | Pending |
-| PROF-04 | Phase 3 | Pending |
-| PROF-05 | Phase 3 | Pending |
+| LEFT-01 | Phase 3 | Complete |
+| LEFT-02 | Phase 3 | Complete |
+| LEFT-03 | Phase 3 | Complete |
+| LEFT-04 | Phase 3 | Complete |
+| AI-02 | Phase 3 | Complete |
+| PROF-02 | Phase 3 | Complete |
+| PROF-03 | Phase 3 | Complete |
+| PROF-04 | Phase 3 | Complete |
+| PROF-05 | Phase 3 | Complete |
 | ONBR-01 | Phase 4 | Pending |
 | ONBR-02 | Phase 4 | Pending |
 | ONBR-03 | Phase 4 | Pending |
