@@ -47,9 +47,9 @@
 
 ### Household & Auth
 
-- [ ] **AUTH-01**: User can sign up with email and password
-- [ ] **AUTH-02**: User can sign in with Google OAuth
-- [ ] **AUTH-03**: User session persists across app restarts
+- [x] **AUTH-01**: User can sign up with email and password
+- [x] **AUTH-02**: User can sign in with Google OAuth
+- [x] **AUTH-03**: User session persists across app restarts
 - [ ] **HOUS-01**: User can create a household with a custom name
 - [ ] **HOUS-02**: User can invite members via share code or copy link
 - [ ] **HOUS-03**: Invited user can join a household from an invite link
@@ -134,9 +134,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
+| AUTH-03 | Phase 1 | Complete |
 | HOUS-01 | Phase 1 | Pending |
 | HOUS-02 | Phase 1 | Pending |
 | HOUS-03 | Phase 1 | Pending |

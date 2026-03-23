@@ -32,7 +32,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Expo project setup, Supabase client, auth flows (email/password + Google OAuth), test infrastructure
+- [x] 01-01-PLAN.md — Expo project setup, Supabase client, auth flows (email/password + Google OAuth), test infrastructure
 - [ ] 01-02-PLAN.md — Household CRUD, invite/join system, member list, multi-household switching
 - [ ] 01-03-PLAN.md — Culinary Curator design system tokens, UI components, glassmorphic tab bar, profile screen
 
