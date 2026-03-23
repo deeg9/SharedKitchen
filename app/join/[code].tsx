@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuthStore } from '../../src/stores/authStore';
 import { useHouseholdStore } from '../../src/stores/householdStore';
+import { colors } from '../../src/theme/colors';
 
 const PENDING_JOIN_CODE_KEY = 'mise_pending_join_code';
 
@@ -47,7 +48,7 @@ export default function JoinByCodeScreen() {
     <View style={styles.container}>
       {status === 'loading' && (
         <>
-          <ActivityIndicator size="large" color="#4a90d9" />
+          <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.text}>Joining household...</Text>
         </>
       )}
@@ -69,25 +70,25 @@ export { PENDING_JOIN_CODE_KEY };
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
   },
   text: {
     fontSize: 16,
-    color: '#666',
+    color: colors.onSurfaceVariant,
     marginTop: 16,
   },
   errorText: {
     fontSize: 18,
-    color: '#e74c3c',
+    color: colors.error,
     fontWeight: '600',
     textAlign: 'center',
   },
   subtext: {
     fontSize: 14,
-    color: '#999',
+    color: colors.outline,
     marginTop: 8,
     textAlign: 'center',
   },
