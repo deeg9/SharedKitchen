@@ -7,13 +7,13 @@
 
 ### Meal Planning
 
-- [ ] **PLAN-01**: User can view a weekly dinner calendar showing 7 days with recipe name, cook assignment avatar, prep time, and cost badges
-- [ ] **PLAN-02**: User can navigate between weeks (previous/next arrows) and jump to current week via "Today" pill
-- [ ] **PLAN-03**: User can tap a day card to open a bottom sheet for editing (choose recipe, assign cook, add notes)
-- [ ] **PLAN-04**: User can clear a day's meal plan
-- [ ] **PLAN-05**: Empty day cards show dashed outline with "+" and "Add Dinner" text
-- [ ] **PLAN-06**: User can tap "Surprise Me" FAB to get a random dinner suggestion with shuffle and 3 alternative options
-- [ ] **PLAN-07**: User can add a randomly suggested recipe directly to their plan
+- [x] **PLAN-01**: User can view a weekly dinner calendar showing 7 days with recipe name, cook assignment avatar, prep time, and cost badges
+- [x] **PLAN-02**: User can navigate between weeks (previous/next arrows) and jump to current week via "Today" pill
+- [x] **PLAN-03**: User can tap a day card to open a bottom sheet for editing (choose recipe, assign cook, add notes)
+- [x] **PLAN-04**: User can clear a day's meal plan
+- [x] **PLAN-05**: Empty day cards show dashed outline with "+" and "Add Dinner" text
+- [x] **PLAN-06**: User can tap "Surprise Me" FAB to get a random dinner suggestion with shuffle and 3 alternative options
+- [x] **PLAN-07**: User can add a randomly suggested recipe directly to their plan
 
 ### Recipes
 
@@ -23,7 +23,7 @@
 - [x] **RECP-04**: User can rate recipes 1-5 stars
 - [x] **RECP-05**: User can add notes to recipes (e.g., "Use guanciale next time")
 - [x] **RECP-06**: User can create a recipe manually with name, photo, category, prep/cook time, servings, cost, ingredients, instructions, and tags
-- [ ] **RECP-07**: User can import a recipe from a URL using AI parsing (paste link, AI extracts recipe data)
+- [x] **RECP-07**: User can import a recipe from a URL using AI parsing (paste link, AI extracts recipe data)
 - [x] **RECP-08**: User can favorite/heart recipes
 - [x] **RECP-09**: User can add a recipe to their meal plan from the recipe detail page
 
@@ -83,7 +83,7 @@
 
 ### AI Features
 
-- [ ] **AI-01**: AI can parse a recipe URL and extract structured recipe data (name, ingredients, instructions, times, servings)
+- [x] **AI-01**: AI can parse a recipe URL and extract structured recipe data (name, ingredients, instructions, times, servings)
 - [ ] **AI-02**: AI generates suggestion cards based on user history ("You haven't made X in 3 weeks")
 
 ### Freemium
@@ -156,17 +156,17 @@
 | RECP-04 | Phase 2 | Complete |
 | RECP-05 | Phase 2 | Complete |
 | RECP-06 | Phase 2 | Complete |
-| RECP-07 | Phase 2 | Pending |
+| RECP-07 | Phase 2 | Complete |
 | RECP-08 | Phase 2 | Complete |
 | RECP-09 | Phase 2 | Complete |
-| AI-01 | Phase 2 | Pending |
-| PLAN-01 | Phase 2 | Pending |
-| PLAN-02 | Phase 2 | Pending |
-| PLAN-03 | Phase 2 | Pending |
-| PLAN-04 | Phase 2 | Pending |
-| PLAN-05 | Phase 2 | Pending |
-| PLAN-06 | Phase 2 | Pending |
-| PLAN-07 | Phase 2 | Pending |
+| AI-01 | Phase 2 | Complete |
+| PLAN-01 | Phase 2 | Complete |
+| PLAN-02 | Phase 2 | Complete |
+| PLAN-03 | Phase 2 | Complete |
+| PLAN-04 | Phase 2 | Complete |
+| PLAN-05 | Phase 2 | Complete |
+| PLAN-06 | Phase 2 | Complete |
+| PLAN-07 | Phase 2 | Complete |
 | GROC-01 | Phase 2 | Pending |
 | GROC-02 | Phase 2 | Pending |
 | GROC-03 | Phase 2 | Pending |
