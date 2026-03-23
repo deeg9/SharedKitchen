@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Completed 01-03-PLAN.md
-last_updated: "2026-03-23T16:55:37.295Z"
-last_activity: 2026-03-23 -- Completed 01-03-PLAN.md
+status: in-progress
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-03-23T19:27:00.000Z"
+last_activity: 2026-03-23 -- Completed 02-01-PLAN.md
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
-  percent: 100
+  total_plans: 6
+  completed_plans: 4
+  percent: 67
 ---
 
 # Project State
@@ -21,32 +21,33 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Phase 1: Foundation
+**Current focus:** Phase 2: Core Features
 
 ## Current Position
 
-Phase: 1 of 4 (Foundation)
-Plan: 3 of 3 in current phase
-Status: Phase Complete
-Last activity: 2026-03-23 -- Completed 01-03-PLAN.md
+Phase: 2 of 4 (Core Features)
+Plan: 1 of 3 in current phase
+Status: In Progress
+Last activity: 2026-03-23 -- Completed 02-01-PLAN.md
 
-Progress: [██████████] 100%
+Progress: [██████░░░░] 67%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
+- Total plans completed: 4
 - Average duration: 7min
-- Total execution time: 0.33 hours
+- Total execution time: 0.43 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Foundation | 3 | 20min | 7min |
+| 2. Core Features | 1 | 6min | 6min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (8min), 01-02 (5min), 01-03 (7min)
+- Last 5 plans: 01-01 (8min), 01-02 (5min), 01-03 (7min), 02-01 (6min)
 - Trend: stable
 
 *Updated after each plan completion*
@@ -70,6 +71,10 @@ Recent decisions affecting current work:
 - 01-03: moduleNameMapper for @expo/vector-icons (nested in expo node_modules)
 - 01-03: Inline member list fallback in profile (Plan 02 MemberList not yet available)
 - 01-03: Opacity-based shimmer for Skeleton (lightweight Reanimated approach)
+- 02-01: JSONB columns for ingredients/instructions arrays (flexible schema without join tables)
+- 02-01: scaleIngredients as exported pure function for testability
+- 02-01: FlashList for recipe grid performance with 2-column layout
+- 02-01: Meal plan insertion gracefully handles missing meal_plans table
 
 ### Pending Todos
 
@@ -81,6 +86,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-23T16:42:00.000Z
-Stopped at: Completed 01-03-PLAN.md
+Last session: 2026-03-23T19:20:32.000Z
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None

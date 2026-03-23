@@ -17,15 +17,15 @@
 
 ### Recipes
 
-- [ ] **RECP-01**: User can browse recipes in a searchable 2-column grid with category filter chips
-- [ ] **RECP-02**: User can view recipe detail with hero image, metadata pills, star rating, ingredients with checkboxes, step-by-step instructions, and notes
-- [ ] **RECP-03**: User can scale recipe portions (x1, x2, x3) and ingredient amounts update accordingly
-- [ ] **RECP-04**: User can rate recipes 1-5 stars
-- [ ] **RECP-05**: User can add notes to recipes (e.g., "Use guanciale next time")
-- [ ] **RECP-06**: User can create a recipe manually with name, photo, category, prep/cook time, servings, cost, ingredients, instructions, and tags
+- [x] **RECP-01**: User can browse recipes in a searchable 2-column grid with category filter chips
+- [x] **RECP-02**: User can view recipe detail with hero image, metadata pills, star rating, ingredients with checkboxes, step-by-step instructions, and notes
+- [x] **RECP-03**: User can scale recipe portions (x1, x2, x3) and ingredient amounts update accordingly
+- [x] **RECP-04**: User can rate recipes 1-5 stars
+- [x] **RECP-05**: User can add notes to recipes (e.g., "Use guanciale next time")
+- [x] **RECP-06**: User can create a recipe manually with name, photo, category, prep/cook time, servings, cost, ingredients, instructions, and tags
 - [ ] **RECP-07**: User can import a recipe from a URL using AI parsing (paste link, AI extracts recipe data)
-- [ ] **RECP-08**: User can favorite/heart recipes
-- [ ] **RECP-09**: User can add a recipe to their meal plan from the recipe detail page
+- [x] **RECP-08**: User can favorite/heart recipes
+- [x] **RECP-09**: User can add a recipe to their meal plan from the recipe detail page
 
 ### Grocery
 
@@ -150,15 +150,15 @@
 | DSGN-06 | Phase 1 | Complete |
 | PROF-01 | Phase 1 | Complete |
 | PROF-06 | Phase 1 | Complete |
-| RECP-01 | Phase 2 | Pending |
-| RECP-02 | Phase 2 | Pending |
-| RECP-03 | Phase 2 | Pending |
-| RECP-04 | Phase 2 | Pending |
-| RECP-05 | Phase 2 | Pending |
-| RECP-06 | Phase 2 | Pending |
+| RECP-01 | Phase 2 | Complete |
+| RECP-02 | Phase 2 | Complete |
+| RECP-03 | Phase 2 | Complete |
+| RECP-04 | Phase 2 | Complete |
+| RECP-05 | Phase 2 | Complete |
+| RECP-06 | Phase 2 | Complete |
 | RECP-07 | Phase 2 | Pending |
-| RECP-08 | Phase 2 | Pending |
-| RECP-09 | Phase 2 | Pending |
+| RECP-08 | Phase 2 | Complete |
+| RECP-09 | Phase 2 | Complete |
 | AI-01 | Phase 2 | Pending |
 | PLAN-01 | Phase 2 | Pending |
 | PLAN-02 | Phase 2 | Pending |
