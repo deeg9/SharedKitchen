@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-03-PLAN.md
-last_updated: "2026-03-23T19:46:01.060Z"
-last_activity: 2026-03-23 -- Completed 02-03-PLAN.md
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-03-23T20:21:52.372Z"
+last_activity: 2026-03-23 -- Completed 03-01-PLAN.md
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
-  percent: 83
+  total_plans: 8
+  completed_plans: 7
+  percent: 88
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Phase 2: Core Features
+**Current focus:** Phase 3: Supporting Features
 
 ## Current Position
 
-Phase: 2 of 4 (Core Features)
-Plan: 3 of 3 in current phase
+Phase: 3 of 4 (Supporting Features)
+Plan: 1 of 2 in current phase
 Status: In Progress
-Last activity: 2026-03-23 -- Completed 02-03-PLAN.md
+Last activity: 2026-03-23 -- Completed 03-01-PLAN.md
 
-Progress: [████████░░] 83%
+Progress: [█████████░] 88%
 
 ## Performance Metrics
 
@@ -52,6 +52,7 @@ Progress: [████████░░] 83%
 
 *Updated after each plan completion*
 | Phase 02 P02 | 6min | 2 tasks | 17 files |
+| Phase 03 P01 | 4min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,9 @@ Recent decisions affecting current work:
 - 02-03: Optimistic UI for toggleItem with full revert on Supabase error
 - 02-03: Realtime channel per grocery_list_id with removeChannel cleanup on unmount
 - 02-03: AddItemSheet stays open after adding for batch entry
+- [Phase 03-01]: Week bucketing uses fixed 7-day windows from month start for simpler month-scoped display
+- [Phase 03-01]: Budget target defaults to $600 with upsert on household_id unique constraint
+- [Phase 03-01]: Category chip selector pattern for 3 fixed categories (Groceries, Dining Out, Takeout)
 
 ### Pending Todos
 
@@ -95,6 +99,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-23T19:39:00Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-03-23T20:21:52.370Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None

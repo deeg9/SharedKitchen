@@ -40,10 +40,10 @@
 
 ### Budget
 
-- [ ] **BUDG-01**: User can view monthly spending progress bar showing amount spent vs budget target
-- [ ] **BUDG-02**: Three metric cards show spending by category (Groceries, Dining Out, Takeout) with amounts and percentages
-- [ ] **BUDG-03**: Weekly breakdown section with expandable cards showing date range, total, and category breakdown
-- [ ] **BUDG-04**: User can log an expense via FAB (amount, category, description, date)
+- [x] **BUDG-01**: User can view monthly spending progress bar showing amount spent vs budget target
+- [x] **BUDG-02**: Three metric cards show spending by category (Groceries, Dining Out, Takeout) with amounts and percentages
+- [x] **BUDG-03**: Weekly breakdown section with expandable cards showing date range, total, and category breakdown
+- [x] **BUDG-04**: User can log an expense via FAB (amount, category, description, date)
 
 ### Household & Auth
 
@@ -175,10 +175,10 @@
 | GROC-06 | Phase 2 | Complete |
 | GROC-07 | Phase 2 | Complete |
 | GROC-08 | Phase 2 | Complete |
-| BUDG-01 | Phase 3 | Pending |
-| BUDG-02 | Phase 3 | Pending |
-| BUDG-03 | Phase 3 | Pending |
-| BUDG-04 | Phase 3 | Pending |
+| BUDG-01 | Phase 3 | Complete |
+| BUDG-02 | Phase 3 | Complete |
+| BUDG-03 | Phase 3 | Complete |
+| BUDG-04 | Phase 3 | Complete |
 | LEFT-01 | Phase 3 | Pending |
 | LEFT-02 | Phase 3 | Pending |
 | LEFT-03 | Phase 3 | Pending |
