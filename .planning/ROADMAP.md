@@ -29,12 +29,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can view household members with avatars and roles, and switch between multiple households
   4. App displays 5-tab bottom navigation with the Culinary Curator design system applied (tonal layering, correct typography, color tokens, skeleton loading states)
   5. User can view/edit their profile and sign out
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: Expo project setup, Supabase integration, auth flows
-- [ ] 01-02: Household management and multi-household support
-- [ ] 01-03: Design system, tab navigation, profile screen
+- [ ] 01-01-PLAN.md — Expo project setup, Supabase client, auth flows (email/password + Google OAuth), test infrastructure
+- [ ] 01-02-PLAN.md — Household CRUD, invite/join system, member list, multi-household switching
+- [ ] 01-03-PLAN.md — Culinary Curator design system tokens, UI components, glassmorphic tab bar, profile screen
 
 ### Phase 2: Core Features
 **Goal**: Users can manage recipes, plan weekly dinners, and shop from an auto-generated grocery list that syncs in real-time across the household
