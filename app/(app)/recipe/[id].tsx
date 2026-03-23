@@ -19,7 +19,7 @@ import { Button } from '../../../src/components/ui/Button';
 import { Skeleton } from '../../../src/components/ui/Skeleton';
 import { useRecipeStore, scaleIngredients } from '../../../src/stores/recipeStore';
 import { useHouseholdStore } from '../../../src/stores/householdStore';
-import { supabase } from '../../../src/lib/supabase';
+import { usePlanStore } from '../../../src/stores/planStore';
 import { colors } from '../../../src/theme/colors';
 import { typography } from '../../../src/theme/typography';
 import { spacing, borderRadius } from '../../../src/theme/spacing';
@@ -96,21 +96,13 @@ export default function RecipeDetailScreen() {
     setNoteText('');
   };
 
+  const assignRecipe = usePlanStore((s) => s.assignRecipe);
+
   const handleAddToPlan = async (dayOffset: number) => {
     if (!recipe || !activeHouseholdId) return;
     const planDate = format(addDays(new Date(), dayOffset), 'yyyy-MM-dd');
-    try {
-      await supabase.from('meal_plans').insert({
-        household_id: activeHouseholdId,
-        recipe_id: recipe.id,
-        planned_date: planDate,
-        meal_type: 'dinner',
-      });
-      setShowPlanSheet(false);
-    } catch (err) {
-      // Silently handle - meal_plans table may not exist yet
-      setShowPlanSheet(false);
-    }
+    await assignRecipe(planDate, recipe.id);
+    setShowPlanSheet(false);
   };
 
   if (loading || !recipe) {

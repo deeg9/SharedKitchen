@@ -22,16 +22,16 @@ ALTER TABLE meal_plans ENABLE ROW LEVEL SECURITY;
 -- RLS Policies using existing is_household_member() function
 CREATE POLICY "Household members can view meal plans"
   ON meal_plans FOR SELECT
-  USING (is_household_member(household_id));
+  USING (is_household_member(household_id, auth.uid()));
 
 CREATE POLICY "Household members can create meal plans"
   ON meal_plans FOR INSERT
-  WITH CHECK (is_household_member(household_id));
+  WITH CHECK (is_household_member(household_id, auth.uid()));
 
 CREATE POLICY "Household members can update meal plans"
   ON meal_plans FOR UPDATE
-  USING (is_household_member(household_id));
+  USING (is_household_member(household_id, auth.uid()));
 
 CREATE POLICY "Household members can delete meal plans"
   ON meal_plans FOR DELETE
-  USING (is_household_member(household_id));
+  USING (is_household_member(household_id, auth.uid()));
