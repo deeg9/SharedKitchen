@@ -46,12 +46,12 @@ Plans:
   3. User can view the weekly dinner calendar, navigate between weeks, and edit day cards (assign recipe, cook, notes) or clear them
   4. User can use "Surprise Me" to get random dinner suggestions and add them to the plan
   5. User can generate a grocery list from the week's plan, check items off (with real-time sync visible to household members), and manually add items
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: Recipe library, detail view, and manual creation
-- [ ] 02-02: AI recipe import and meal planning calendar
-- [ ] 02-03: Grocery list with real-time sync
+- [ ] 02-01-PLAN.md — Recipe data layer (schema + RLS + types), recipe store, recipe library grid, detail screen, and manual creation form
+- [ ] 02-02-PLAN.md — AI recipe URL import (Edge Function + client), meal planning calendar with week nav, day editing, and Surprise Me
+- [ ] 02-03-PLAN.md — Grocery list with auto-generation, section grouping, check-off, manual add, summary bar, and Supabase Realtime sync
 
 ### Phase 3: Supporting Features
 **Goal**: Users can track spending, manage leftovers, receive AI suggestions, and configure their preferences
