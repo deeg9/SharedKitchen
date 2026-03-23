@@ -109,9 +109,23 @@ jest.mock('../src/lib/supabase', () => {
         insert: jest.fn().mockReturnThis(),
         update: jest.fn().mockReturnThis(),
         delete: jest.fn().mockReturnThis(),
+        upsert: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
+        in: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
         single: jest.fn(() => Promise.resolve({ data: null, error: null })),
       })),
+      channel: jest.fn(() => ({
+        on: jest.fn().mockReturnThis(),
+        subscribe: jest.fn().mockReturnThis(),
+        unsubscribe: jest.fn(),
+      })),
+      storage: {
+        from: jest.fn(() => ({
+          upload: jest.fn(() => Promise.resolve({ data: { path: 'mock-path' }, error: null })),
+          getPublicUrl: jest.fn(() => ({ data: { publicUrl: 'https://mock-url.com/image.jpg' } })),
+        })),
+      },
     },
   };
 });
@@ -176,6 +190,24 @@ jest.mock('expo-image-picker', () => ({
     Promise.resolve({ canceled: true, assets: [] })
   ),
   MediaTypeOptions: { Images: 'Images' },
+}));
+
+// Mock @shopify/flash-list
+jest.mock('@shopify/flash-list', () => {
+  const { FlatList } = require('react-native');
+  return {
+    FlashList: FlatList,
+    MasonryFlashList: FlatList,
+  };
+});
+
+// Mock expo-haptics
+jest.mock('expo-haptics', () => ({
+  impactAsync: jest.fn(() => Promise.resolve()),
+  notificationAsync: jest.fn(() => Promise.resolve()),
+  selectionAsync: jest.fn(() => Promise.resolve()),
+  ImpactFeedbackStyle: { Light: 'light', Medium: 'medium', Heavy: 'heavy' },
+  NotificationFeedbackType: { Success: 'success', Warning: 'warning', Error: 'error' },
 }));
 
 // Mock react-native-safe-area-context
