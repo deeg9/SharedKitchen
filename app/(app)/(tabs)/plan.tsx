@@ -10,6 +10,8 @@ import { SuggestionCard } from '../../../src/components/plan/SuggestionCard';
 import { usePlanStore } from '../../../src/stores/planStore';
 import { useHouseholdStore } from '../../../src/stores/householdStore';
 import { useRecipeStore } from '../../../src/stores/recipeStore';
+import { usePremiumStore } from '../../../src/stores/premiumStore';
+import { UpgradePrompt } from '../../../src/components/premium/UpgradePrompt';
 import { toDateString } from '../../../src/lib/dates';
 import { generateSuggestions } from '../../../src/lib/suggestions';
 import { Skeleton } from '../../../src/components/ui/Skeleton';
@@ -32,9 +34,12 @@ export default function PlanScreen() {
     fetchMealPlan,
   } = usePlanStore();
 
+  const premiumStore = usePremiumStore();
+
   const [editSheetOpen, setEditSheetOpen] = useState(false);
   const [surpriseVisible, setSurpriseVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
 
   const days = weekDays();
   const label = weekLabel();
@@ -123,7 +128,24 @@ export default function PlanScreen() {
         {/* AI Suggestion Cards */}
         {suggestions.length > 0 && (
           <View style={styles.suggestionsSection}>
-            <Text style={styles.suggestionsTitle}>Suggestions</Text>
+            <View style={styles.suggestionsTitleRow}>
+              <Text style={styles.suggestionsTitle}>Suggestions</Text>
+              {!premiumStore.canAccess('advanced_suggestions') && (
+                <View style={styles.proIndicator}>
+                  <Text style={styles.proIndicatorText}>PRO</Text>
+                </View>
+              )}
+              <Pressable
+                onPress={() => {
+                  if (!premiumStore.canAccess('advanced_suggestions')) {
+                    setShowUpgradePrompt(true);
+                  }
+                }}
+                style={styles.viewAllButton}
+              >
+                <Text style={styles.viewAllText}>View All</Text>
+              </Pressable>
+            </View>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -170,6 +192,13 @@ export default function PlanScreen() {
           dateString={todayStr}
         />
       )}
+
+      {/* Premium Upgrade Prompt */}
+      <UpgradePrompt
+        visible={showUpgradePrompt}
+        onDismiss={() => setShowUpgradePrompt(false)}
+        feature="advanced_suggestions"
+      />
     </View>
   );
 }
@@ -201,11 +230,35 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
     marginBottom: spacing.md,
   },
+  suggestionsTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+    gap: spacing.sm,
+  },
   suggestionsTitle: {
     ...typography.titleMd,
     color: colors.onSurface,
-    marginHorizontal: spacing.md,
-    marginBottom: spacing.sm,
+  },
+  proIndicator: {
+    backgroundColor: colors.secondary,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: borderRadius.full,
+  },
+  proIndicatorText: {
+    fontSize: 9,
+    fontWeight: '700' as const,
+    color: '#ffffff',
+    letterSpacing: 0.5,
+  },
+  viewAllButton: {
+    marginLeft: 'auto' as any,
+  },
+  viewAllText: {
+    ...typography.labelMd,
+    color: colors.primary,
   },
   suggestionsScroll: {
     paddingHorizontal: spacing.md,

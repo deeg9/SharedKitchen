@@ -6,6 +6,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuthStore } from '../../../src/stores/authStore';
 import { useHouseholdStore, HouseholdMemberWithProfile } from '../../../src/stores/householdStore';
 import { usePlanStore } from '../../../src/stores/planStore';
+import { usePremiumStore } from '../../../src/stores/premiumStore';
+import { PremiumBadge } from '../../../src/components/premium/PremiumBadge';
 import { Avatar } from '../../../src/components/ui/Avatar';
 import { Button } from '../../../src/components/ui/Button';
 import { Card } from '../../../src/components/ui/Card';
@@ -48,6 +50,7 @@ export default function ProfileScreen() {
 
   const { mealPlan } = usePlanStore();
   const { isDark, toggleColorScheme } = useColorScheme();
+  const premiumStore = usePremiumStore();
 
   const [showHouseholdPicker, setShowHouseholdPicker] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
@@ -64,6 +67,7 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     initialize();
+    premiumStore.initialize();
 
     // Load dietary preferences
     AsyncStorage.getItem('dietary_preferences').then((val) => {
@@ -166,7 +170,10 @@ export default function ProfileScreen() {
           ) : (
             <>
               <Avatar uri={avatarUrl} name={displayName} size="lg" />
-              <Text style={styles.displayName}>{displayName}</Text>
+              <View style={styles.nameRow}>
+                <Text style={styles.displayName}>{displayName}</Text>
+                <PremiumBadge size="large" />
+              </View>
               <Text style={styles.email}>{email}</Text>
             </>
           )}
@@ -260,6 +267,26 @@ export default function ProfileScreen() {
               </Text>
             </View>
           </Card>
+        </View>
+
+        {/* Subscription */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Subscription</Text>
+          <Pressable onPress={() => router.push('/(app)/subscription' as any)}>
+            <Card variant="filled" style={styles.subscriptionCard}>
+              <View style={styles.subscriptionRow}>
+                <MaterialCommunityIcons
+                  name={premiumStore.isPremium() ? 'crown' : 'star-outline'}
+                  size={22}
+                  color={premiumStore.isPremium() ? colors.secondary : colors.onSurfaceVariant}
+                />
+                <Text style={styles.subscriptionLabel}>
+                  {premiumStore.isPremium() ? 'Premium' : 'Free Plan'}
+                </Text>
+                <MaterialCommunityIcons name="chevron-right" size={20} color={colors.onSurfaceVariant} />
+              </View>
+            </Card>
+          </Pressable>
         </View>
 
         {/* Dietary Preferences */}
@@ -453,10 +480,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: spacing.xl,
   },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginTop: spacing.md,
+  },
   displayName: {
     ...typography.headlineMd,
     color: colors.onSurface,
-    marginTop: spacing.md,
   },
   email: {
     ...typography.bodyMd,
@@ -556,6 +588,19 @@ const styles = StyleSheet.create({
   activeHouseholdOptionText: {
     color: colors.primary,
     fontWeight: '600',
+  },
+  subscriptionCard: {
+    // Card defaults are sufficient
+  },
+  subscriptionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm + 4,
+  },
+  subscriptionLabel: {
+    ...typography.bodyLg,
+    color: colors.onSurface,
+    flex: 1,
   },
   statsRow: {
     flexDirection: 'row',

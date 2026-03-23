@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Pressable, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useBudgetStore } from '../../../src/stores/budgetStore';
@@ -14,10 +14,14 @@ import { typography } from '../../../src/theme/typography';
 import { spacing, borderRadius } from '../../../src/theme/spacing';
 import { shadows } from '../../../src/theme/shadows';
 import { TAB_BAR_HEIGHT } from '../../../src/lib/constants';
+import { usePremiumStore } from '../../../src/stores/premiumStore';
+import { UpgradePrompt } from '../../../src/components/premium/UpgradePrompt';
 
 export default function BudgetScreen() {
   const insets = useSafeAreaInsets();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+  const premiumStore = usePremiumStore();
 
   const { activeHouseholdId } = useHouseholdStore();
   const {
@@ -72,9 +76,24 @@ export default function BudgetScreen() {
           </View>
           <Text style={styles.appTitle}>Mise</Text>
         </View>
-        <Pressable>
-          <MaterialCommunityIcons name="bell-outline" size={24} color={colors.onSurface} />
-        </Pressable>
+        <View style={styles.headerRight}>
+          <Pressable
+            onPress={() => {
+              if (premiumStore.canAccess('analytics_dashboard')) {
+                Alert.alert('Coming Soon', 'Analytics dashboard coming soon in a future update.');
+              } else {
+                setShowUpgradePrompt(true);
+              }
+            }}
+            style={styles.trendsButton}
+          >
+            <MaterialCommunityIcons name="chart-line" size={20} color={colors.primary} />
+            <Text style={styles.trendsText}>Trends</Text>
+          </Pressable>
+          <Pressable>
+            <MaterialCommunityIcons name="bell-outline" size={24} color={colors.onSurface} />
+          </Pressable>
+        </View>
       </View>
 
       <ScrollView
@@ -124,6 +143,13 @@ export default function BudgetScreen() {
           householdId={activeHouseholdId}
         />
       )}
+
+      {/* Premium Upgrade Prompt */}
+      <UpgradePrompt
+        visible={showUpgradePrompt}
+        onDismiss={() => setShowUpgradePrompt(false)}
+        feature="analytics_dashboard"
+      />
     </View>
   );
 }
@@ -143,6 +169,24 @@ const styles = StyleSheet.create({
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  trendsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm + 4,
+    paddingVertical: spacing.xs + 2,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.primaryFixed,
+  },
+  trendsText: {
+    ...typography.labelMd,
+    color: colors.primary,
   },
   avatar: {
     marginRight: spacing.sm,
