@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-22)
 Phase: 4 of 4 (Onboarding and Freemium)
 Plan: 2 of 2 in current phase
 Status: Phase Complete
-Last activity: 2026-03-23 - Completed quick task 1: finish any and all of the supabase stuff
+Last activity: 2026-03-23 - Completed quick task 2: Create and run Playwright MCP end-to-end tests
 
 Progress: [██████████] 100%
 
@@ -116,6 +116,7 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 1 | finish any and all of the supabase stuff | 2026-03-23 | 62b2075 | [1-finish-any-and-all-of-the-supabase-stuff](./quick/1-finish-any-and-all-of-the-supabase-stuff/) |
+| 2 | Create and run Playwright MCP end-to-end tests | 2026-03-23 | pending | [2-create-and-run-playwright-mcp-end-to-end](./quick/2-create-and-run-playwright-mcp-end-to-end/) |
 
 ## Session Continuity
 

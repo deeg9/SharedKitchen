@@ -25,6 +25,7 @@ import { typography } from '../../../src/theme/typography';
 import { spacing, borderRadius } from '../../../src/theme/spacing';
 import { Ingredient, InstructionStep as InstructionStepType } from '../../../src/types/database';
 import { format, addDays } from 'date-fns';
+import { supabase } from '../../../src/lib/supabase';
 
 const SCALE_OPTIONS = [1, 2, 3] as const;
 

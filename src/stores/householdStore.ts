@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Crypto from 'expo-crypto';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/database';
 
@@ -125,30 +126,34 @@ export const useHouseholdStore = create<HouseholdState>((set, get) => ({
         return null;
       }
 
-      // Insert the household
-      const { data: household, error: createError } = await supabase
+      // Generate ID client-side so we know it before INSERT returns.
+      // This avoids the RLS issue where .select() after INSERT fails because
+      // the SELECT policy requires household membership (which doesn't exist yet).
+      const householdId = Crypto.randomUUID();
+
+      // Insert the household without .select() to avoid SELECT RLS conflict
+      const { error: createError } = await supabase
         .from('households')
-        .insert({ name, created_by: user.id })
-        .select()
-        .single();
+        .insert({ id: householdId, name, created_by: user.id });
 
       if (createError) throw createError;
-      if (!household) throw new Error('Failed to create household');
 
-      // Add creator as admin
+      // Add creator as admin — must happen before any SELECT on households
       const { error: memberError } = await supabase
         .from('household_members')
         .insert({
-          household_id: household.id,
+          household_id: householdId,
           user_id: user.id,
           role: 'admin',
         });
 
       if (memberError) throw memberError;
 
-      // Refresh list and set as active
+      // Now we can fetch — the SELECT RLS will pass since we're a member
       await get().fetchHouseholds();
-      await get().setActiveHousehold(household.id);
+      await get().setActiveHousehold(householdId);
+
+      const household = get().households.find((h) => h.id === householdId) ?? null;
 
       set({ loading: false });
       return household;
