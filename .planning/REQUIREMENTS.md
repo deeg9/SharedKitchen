@@ -88,9 +88,9 @@
 
 ### Freemium
 
-- [ ] **PREM-01**: Premium badge displays on profile for subscribed users
-- [ ] **PREM-02**: Upgrade prompts/gates appear for premium-only features
-- [ ] **PREM-03**: Subscription management UI (current plan display, upgrade button) — no real payment processing
+- [x] **PREM-01**: Premium badge displays on profile for subscribed users
+- [x] **PREM-02**: Upgrade prompts/gates appear for premium-only features
+- [x] **PREM-03**: Subscription management UI (current plan display, upgrade button) — no real payment processing
 
 ### Design System
 
@@ -194,9 +194,9 @@
 | ONBR-04 | Phase 4 | Pending |
 | ONBR-05 | Phase 4 | Pending |
 | ONBR-06 | Phase 4 | Pending |
-| PREM-01 | Phase 4 | Pending |
-| PREM-02 | Phase 4 | Pending |
-| PREM-03 | Phase 4 | Pending |
+| PREM-01 | Phase 4 | Complete |
+| PREM-02 | Phase 4 | Complete |
+| PREM-03 | Phase 4 | Complete |
 
 **Coverage:**
 - v1 requirements: 63 total
