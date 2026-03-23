@@ -116,7 +116,7 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 1 | finish any and all of the supabase stuff | 2026-03-23 | 62b2075 | [1-finish-any-and-all-of-the-supabase-stuff](./quick/1-finish-any-and-all-of-the-supabase-stuff/) |
-| 2 | Create and run Playwright MCP end-to-end tests | 2026-03-23 | pending | [2-create-and-run-playwright-mcp-end-to-end](./quick/2-create-and-run-playwright-mcp-end-to-end/) |
+| 2 | Create and run Playwright MCP end-to-end tests | 2026-03-23 | a7c2dd7 | [2-create-and-run-playwright-mcp-end-to-end](./quick/2-create-and-run-playwright-mcp-end-to-end/) |
 
 ## Session Continuity
 
