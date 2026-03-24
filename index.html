@@ -65,7 +65,8 @@
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
     html { scroll-behavior: smooth; }
-    body { font-family: 'Inter', sans-serif; }
+    body { font-family: 'Inter', sans-serif; opacity: 0; transition: opacity 0.2s ease-in; }
+    body.loaded { opacity: 1; }
     h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
     .hero-gradient {
       background: linear-gradient(135deg, #fbf9f5 0%, #d3e8d5 50%, #ffdcc3 100%);
@@ -276,6 +277,9 @@
       <p class="text-xs text-outline">&copy; 2026 SharedKitchen. All rights reserved.</p>
     </div>
   </footer>
+
+  <!-- Show page once styles are ready -->
+  <script>document.body.classList.add('loaded');</script>
 
   <!-- ═══ Vercel Analytics ═══ -->
   <script defer src="/_vercel/insights/script.js"></script>
