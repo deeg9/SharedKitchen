@@ -8,22 +8,9 @@ import { spacing, borderRadius } from '../../theme/spacing';
 import { shadows } from '../../theme/shadows';
 import { useGroceryStore } from '../../stores/groceryStore';
 import { GroceryItem as GroceryItemType } from '../../types/database';
+import { useGroceryCategoryStore } from '../../stores/groceryCategoryStore';
 
 const UNIT_OPTIONS = ['Unit', 'lb', 'oz', 'Gallon', 'cups', 'bunch', 'bag', 'pk'] as const;
-
-export const SECTION_OPTIONS: { label: string; dbValue: string }[] = [
-  { label: 'Produce', dbValue: 'Produce' },
-  { label: 'Dairy', dbValue: 'Dairy & Eggs' },
-  { label: 'Meat', dbValue: 'Proteins' },
-  { label: 'Pantry', dbValue: 'Pantry' },
-  { label: 'Frozen', dbValue: 'Other' },
-  { label: 'Household', dbValue: 'Other' },
-];
-
-function sectionDbToLabel(dbValue: string | null): string {
-  const match = SECTION_OPTIONS.find((s) => s.dbValue === dbValue);
-  return match?.label ?? 'Produce';
-}
 
 function parseQuantity(qty: string | null): { num: number; unitIdx: number } {
   if (!qty) return { num: 1, unitIdx: 0 };
@@ -50,8 +37,14 @@ export function AddItemSheet({ isOpen, onClose, listId, editItem }: AddItemSheet
   const [price, setPrice] = useState('');
   const addManualItem = useGroceryStore((s) => s.addManualItem);
   const updateItem = useGroceryStore((s) => s.updateItem);
+  const categories = useGroceryCategoryStore((s) => s.categories);
 
   const isEditMode = !!editItem;
+
+  function sectionDbToLabel(dbValue: string | null): string {
+    const match = categories.find((s) => s.dbValue === dbValue);
+    return match?.label ?? categories[0]?.label ?? 'Produce';
+  }
 
   // Pre-fill when editing
   useEffect(() => {
@@ -72,7 +65,7 @@ export function AddItemSheet({ isOpen, onClose, listId, editItem }: AddItemSheet
     }
   }, [editItem, isOpen]);
 
-  const selectedSection = SECTION_OPTIONS.find((s) => s.label === sectionLabel);
+  const selectedSection = categories.find((s) => s.label === sectionLabel);
 
   const handleSubmit = async () => {
     if (!name.trim()) return;
@@ -200,7 +193,7 @@ export function AddItemSheet({ isOpen, onClose, listId, editItem }: AddItemSheet
           <View style={styles.section}>
             <Text style={styles.fieldLabel}>Store Section</Text>
             <View style={styles.sectionChips}>
-              {SECTION_OPTIONS.map((s) => (
+              {categories.map((s) => (
                 <Pressable
                   key={s.label}
                   onPress={() => setSectionLabel(s.label)}

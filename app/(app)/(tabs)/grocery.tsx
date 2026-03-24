@@ -11,6 +11,8 @@ import { Button } from '../../../src/components/ui/Button';
 import { GrocerySection } from '../../../src/components/grocery/GrocerySection';
 import { GrocerySummary } from '../../../src/components/grocery/GrocerySummary';
 import { AddItemSheet } from '../../../src/components/grocery/AddItemSheet';
+import { EditCategoriesSheet } from '../../../src/components/grocery/EditCategoriesSheet';
+import { useGroceryCategoryStore } from '../../../src/stores/groceryCategoryStore';
 import { useGroceryStore } from '../../../src/stores/groceryStore';
 import { useHouseholdStore } from '../../../src/stores/householdStore';
 import { usePlanStore } from '../../../src/stores/planStore';
@@ -27,7 +29,9 @@ export default function GroceryScreen() {
   const insets = useSafeAreaInsets();
   const [addSheetOpen, setAddSheetOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<GroceryItemType | null>(null);
+  const [catSheetOpen, setCatSheetOpen] = useState(false);
   const [userId, setUserId] = useState<string>('');
+  const initCategories = useGroceryCategoryStore((s) => s.initialize);
 
   const activeHouseholdId = useHouseholdStore((s) => s.activeHouseholdId);
   const mealPlan = usePlanStore((s) => s.mealPlan);
@@ -46,11 +50,12 @@ export default function GroceryScreen() {
   // Realtime sync
   useGrocerySync(activeHouseholdId, activeListId);
 
-  // Get current user id
+  // Get current user id + init categories
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) setUserId(data.user.id);
     });
+    initCategories();
   }, []);
 
   // Fetch grocery list on mount
@@ -125,7 +130,12 @@ export default function GroceryScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <Text style={styles.screenTitle}>Grocery List</Text>
+      <View style={styles.titleRow}>
+        <Text style={styles.screenTitle}>Grocery List</Text>
+        <Pressable onPress={() => setCatSheetOpen(true)} style={styles.editCatBtn}>
+          <MaterialCommunityIcons name="tag-edit-outline" size={20} color={colors.onSurfaceVariant} />
+        </Pressable>
+      </View>
 
       <GrocerySummary summary={summaryData} />
 
@@ -197,6 +207,11 @@ export default function GroceryScreen() {
           editItem={editingItem}
         />
       )}
+
+      <EditCategoriesSheet
+        isOpen={catSheetOpen}
+        onClose={() => setCatSheetOpen(false)}
+      />
     </View>
   );
 }
@@ -206,11 +221,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.surface,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm + 4,
+  },
+  editCatBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: borderRadius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   screenTitle: {
     ...typography.headlineMd,
     color: colors.onSurface,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm + 4,
   },
   scrollView: {
     flex: 1,
