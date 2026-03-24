@@ -7,23 +7,11 @@ import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
 import { Recipe } from '../../types/database';
+import { getDefaultRecipeImage } from '../../lib/images';
 
 interface RecipeCardProps {
   recipe: Recipe;
   isFavorite?: boolean;
-}
-
-const FOOD_EMOJIS = ['🍳', '🥗', '🍝', '🌮', '🍕', '🍲', '🥘', '🍜'];
-
-function getPlaceholderEmoji(name: string): string {
-  const idx = name.length % FOOD_EMOJIS.length;
-  return FOOD_EMOJIS[idx];
-}
-
-function getPlaceholderColor(name: string): string {
-  const hues = ['#e8d5c0', '#c0d5c2', '#d5c0c0', '#c0c8d5', '#d5d0c0', '#c0d5d0'];
-  const idx = name.length % hues.length;
-  return hues[idx];
 }
 
 export function RecipeCard({ recipe, isFavorite = false }: RecipeCardProps) {
@@ -36,20 +24,12 @@ export function RecipeCard({ recipe, isFavorite = false }: RecipeCardProps) {
   return (
     <Pressable onPress={handlePress} style={styles.pressable}>
       <Card variant="elevated" style={styles.card}>
-        {/* Image or placeholder */}
+        {/* Image */}
         <View style={styles.imageContainer}>
-          {recipe.image_url ? (
-            <Image source={{ uri: recipe.image_url }} style={styles.image} />
-          ) : (
-            <View
-              style={[
-                styles.placeholder,
-                { backgroundColor: getPlaceholderColor(recipe.name) },
-              ]}
-            >
-              <Text style={styles.emoji}>{getPlaceholderEmoji(recipe.name)}</Text>
-            </View>
-          )}
+          <Image
+            source={{ uri: recipe.image_url || getDefaultRecipeImage(recipe.id, recipe.category) }}
+            style={styles.image}
+          />
           {isFavorite && (
             <View style={styles.heartOverlay}>
               <MaterialCommunityIcons name="heart" size={18} color={colors.error} />
@@ -106,17 +86,6 @@ const styles = StyleSheet.create({
     height: '100%',
     borderTopLeftRadius: borderRadius.lg,
     borderTopRightRadius: borderRadius.lg,
-  },
-  placeholder: {
-    width: '100%',
-    height: '100%',
-    borderTopLeftRadius: borderRadius.lg,
-    borderTopRightRadius: borderRadius.lg,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  emoji: {
-    fontSize: 36,
   },
   heartOverlay: {
     position: 'absolute',

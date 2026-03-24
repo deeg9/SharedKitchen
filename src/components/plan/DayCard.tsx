@@ -8,6 +8,7 @@ import { spacing, borderRadius } from '../../theme/spacing';
 import { formatDayLabel } from '../../lib/dates';
 import { MealPlanWithRecipe } from '../../stores/planStore';
 import { MealType, MEAL_TYPES, MEAL_TYPE_CONFIG } from '../../types/database';
+import { getDefaultRecipeImage } from '../../lib/images';
 
 // --- MealSlot: renders a single breakfast/lunch/dinner slot ---
 
@@ -40,17 +41,10 @@ function MealSlot({ mealType, plan, onPress }: MealSlotProps) {
     <Pressable onPress={onPress}>
       <Card variant="elevated" style={slotStyles.filled}>
         <View style={slotStyles.filledRow}>
-          {recipe.image_url ? (
-            <Image source={{ uri: recipe.image_url }} style={slotStyles.thumbnail} />
-          ) : (
-            <View style={[slotStyles.thumbnail, slotStyles.placeholderImage]}>
-              <MaterialCommunityIcons
-                name={config.icon as any}
-                size={16}
-                color={colors.outlineVariant}
-              />
-            </View>
-          )}
+          <Image
+            source={{ uri: recipe.image_url || getDefaultRecipeImage(plan.recipe_id ?? plan.id, recipe.category) }}
+            style={slotStyles.thumbnail}
+          />
 
           <View style={slotStyles.info}>
             <Text style={slotStyles.mealLabel}>{config.label}</Text>
