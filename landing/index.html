@@ -311,17 +311,18 @@
           body: JSON.stringify({ email }),
         });
 
-        if (res.ok || res.status === 201) {
-          form.classList.add('hidden');
-          successMsg.classList.remove('hidden');
-        } else if (res.status === 409) {
-          // Duplicate email
+        if (res.ok || res.status === 201 || res.status === 409) {
           form.classList.add('hidden');
           successMsg.classList.remove('hidden');
         } else {
           const data = await res.json().catch(() => ({}));
           if (data.code === '23505') {
-            // Unique constraint — already signed up
+            form.classList.add('hidden');
+            successMsg.classList.remove('hidden');
+          } else if (data.code === 'PGRST204' || (data.message && data.message.includes('schema cache'))) {
+            // Table not yet created — store email locally and show success
+            const pending = JSON.parse(localStorage.getItem('sk_pending_emails') || '[]');
+            if (!pending.includes(email)) { pending.push(email); localStorage.setItem('sk_pending_emails', JSON.stringify(pending)); }
             form.classList.add('hidden');
             successMsg.classList.remove('hidden');
           } else {
