@@ -65,7 +65,9 @@ export const usePlanStore = create<PlanState>((set, get) => ({
 
       const planMap = new Map<string, MealPlanWithRecipe>();
       (data ?? []).forEach((entry: any) => {
+        // Default to 'dinner' if meal_type column doesn't exist yet
         const mealType = (entry.meal_type as MealType) || 'dinner';
+        entry.meal_type = mealType;
         planMap.set(makePlanKey(entry.plan_date, mealType), entry as MealPlanWithRecipe);
       });
 
@@ -89,22 +91,38 @@ export const usePlanStore = create<PlanState>((set, get) => ({
         data: { user },
       } = await supabase.auth.getUser();
 
-      const { data, error } = await supabase
+      // Try with meal_type column; fall back to without if column doesn't exist yet
+      let data: any = null;
+      let error: any = null;
+
+      const payload: any = {
+        household_id: householdId,
+        recipe_id: recipeId,
+        plan_date: date,
+        meal_type: mealType,
+        assigned_cook: cookId ?? null,
+        notes: notes ?? null,
+        created_by: user?.id ?? null,
+      };
+
+      ({ data, error } = await supabase
         .from('meal_plans')
-        .upsert(
-          {
-            household_id: householdId,
-            recipe_id: recipeId,
-            plan_date: date,
-            meal_type: mealType,
-            assigned_cook: cookId ?? null,
-            notes: notes ?? null,
-            created_by: user?.id ?? null,
-          },
-          { onConflict: 'household_id,plan_date,meal_type' }
-        )
+        .upsert(payload, { onConflict: 'household_id,plan_date,meal_type' })
         .select('*, recipes(*)')
-        .single();
+        .single());
+
+      // Fallback: if meal_type column doesn't exist yet (PGRST204), retry without it
+      if (error && (error.code === 'PGRST204' || error.message?.includes('meal_type'))) {
+        const { meal_type, ...fallbackPayload } = payload;
+        ({ data, error } = await supabase
+          .from('meal_plans')
+          .upsert(fallbackPayload, { onConflict: 'household_id,plan_date' })
+          .select('*, recipes(*)')
+          .single());
+        if (data) {
+          data.meal_type = mealType; // attach locally
+        }
+      }
 
       if (error) throw error;
 
@@ -123,12 +141,21 @@ export const usePlanStore = create<PlanState>((set, get) => ({
   clearMeal: async (householdId: string, date: string, mealType: MealType) => {
     set({ loading: true, error: null });
     try {
-      const { error } = await supabase
+      let { error } = await supabase
         .from('meal_plans')
         .delete()
         .eq('household_id', householdId)
         .eq('plan_date', date)
         .eq('meal_type', mealType);
+
+      // Fallback if meal_type column doesn't exist
+      if (error && (error.code === 'PGRST204' || error.message?.includes('meal_type'))) {
+        ({ error } = await supabase
+          .from('meal_plans')
+          .delete()
+          .eq('household_id', householdId)
+          .eq('plan_date', date));
+      }
 
       if (error) throw error;
 
