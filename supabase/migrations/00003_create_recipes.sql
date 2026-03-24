@@ -57,19 +57,19 @@ ALTER TABLE recipe_notes ENABLE ROW LEVEL SECURITY;
 -- RLS policies for recipes (using existing is_household_member function)
 CREATE POLICY "Users can view recipes in their household"
   ON recipes FOR SELECT
-  USING (is_household_member(household_id));
+  USING (is_household_member(household_id, auth.uid()));
 
 CREATE POLICY "Users can insert recipes in their household"
   ON recipes FOR INSERT
-  WITH CHECK (is_household_member(household_id));
+  WITH CHECK (is_household_member(household_id, auth.uid()));
 
 CREATE POLICY "Users can update recipes in their household"
   ON recipes FOR UPDATE
-  USING (is_household_member(household_id));
+  USING (is_household_member(household_id, auth.uid()));
 
 CREATE POLICY "Users can delete recipes in their household"
   ON recipes FOR DELETE
-  USING (is_household_member(household_id));
+  USING (is_household_member(household_id, auth.uid()));
 
 -- RLS policies for recipe_ratings (join through recipes to check household)
 CREATE POLICY "Users can view ratings for household recipes"
@@ -77,7 +77,7 @@ CREATE POLICY "Users can view ratings for household recipes"
   USING (EXISTS (
     SELECT 1 FROM recipes r
     WHERE r.id = recipe_ratings.recipe_id
-    AND is_household_member(r.household_id)
+    AND is_household_member(r.household_id, auth.uid())
   ));
 
 CREATE POLICY "Users can insert ratings for household recipes"
@@ -87,7 +87,7 @@ CREATE POLICY "Users can insert ratings for household recipes"
     AND EXISTS (
       SELECT 1 FROM recipes r
       WHERE r.id = recipe_ratings.recipe_id
-      AND is_household_member(r.household_id)
+      AND is_household_member(r.household_id, auth.uid())
     )
   );
 
@@ -105,7 +105,7 @@ CREATE POLICY "Users can view notes for household recipes"
   USING (EXISTS (
     SELECT 1 FROM recipes r
     WHERE r.id = recipe_notes.recipe_id
-    AND is_household_member(r.household_id)
+    AND is_household_member(r.household_id, auth.uid())
   ));
 
 CREATE POLICY "Users can insert notes for household recipes"
@@ -115,7 +115,7 @@ CREATE POLICY "Users can insert notes for household recipes"
     AND EXISTS (
       SELECT 1 FROM recipes r
       WHERE r.id = recipe_notes.recipe_id
-      AND is_household_member(r.household_id)
+      AND is_household_member(r.household_id, auth.uid())
     )
   );
 

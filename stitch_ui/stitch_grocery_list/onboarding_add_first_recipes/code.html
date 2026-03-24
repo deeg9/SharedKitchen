@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mise - Add Your First Recipes</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-fixed": "#dde6d2",
+                        "surface-container": "#efeeea",
+                        "secondary-fixed": "#ffdcc3",
+                        "primary": "#334537",
+                        "on-secondary-container": "#663500",
+                        "surface-variant": "#e4e2de",
+                        "on-secondary-fixed": "#2f1500",
+                        "error": "#ba1a1a",
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#1b1c1a",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#c3c8c1",
+                        "on-surface": "#1b1c1a",
+                        "on-surface-variant": "#434843",
+                        "tertiary-fixed-dim": "#c0c9b7",
+                        "surface-bright": "#fbf9f5",
+                        "surface-container-high": "#eae8e4",
+                        "surface-dim": "#dbdad6",
+                        "on-primary-fixed-variant": "#394b3d",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#0e1f13",
+                        "tertiary": "#3b4436",
+                        "secondary-fixed-dim": "#ffb77d",
+                        "on-primary-container": "#c0d5c2",
+                        "inverse-on-surface": "#f2f0ed",
+                        "surface-container-highest": "#e4e2de",
+                        "background": "#fbf9f5",
+                        "secondary": "#904d00",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#b7ccb9",
+                        "outline": "#737872",
+                        "on-tertiary-container": "#c9d2bf",
+                        "on-tertiary": "#ffffff",
+                        "inverse-surface": "#30312e",
+                        "tertiary-container": "#535b4c",
+                        "secondary-container": "#fe932c",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed-variant": "#6e3900",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#d3e8d5",
+                        "surface-container-low": "#f5f3ef",
+                        "surface": "#fbf9f5",
+                        "primary-fixed-dim": "#b7ccb9",
+                        "on-tertiary-fixed-variant": "#41493b",
+                        "primary-container": "#4a5d4e",
+                        "surface-tint": "#506354",
+                        "on-tertiary-fixed": "#161e12"
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .recipe-grid-asymmetric > div:nth-child(even) {
+            margin-top: 2rem;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body min-h-screen">
+<!-- Top Navigation Anchor (Suppressed based on Transactional Flow Rule, using Simplified Header instead) -->
+<header class="sticky top-0 z-50 bg-[#fbf9f5]/80 backdrop-blur-md px-6 py-6">
+<div class="max-w-screen-xl mx-auto flex justify-between items-center">
+<div class="text-xl font-headline font-bold text-primary tracking-tighter">Mise</div>
+<div class="flex items-center gap-4">
+<div class="h-1.5 w-32 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full w-3/4 bg-primary rounded-full"></div>
+</div>
+<span class="text-label text-xs font-semibold text-primary/60 uppercase tracking-widest">Step 4 of 5</span>
+</div>
+</div>
+</header>
+<main class="max-w-screen-xl mx-auto px-6 pt-12 pb-32">
+<!-- Hero Section: Asymmetric Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-12 items-end mb-20">
+<div class="md:col-span-7">
+<h1 class="font-headline text-5xl md:text-7xl font-bold text-primary tracking-tight leading-[1.1] mb-6">
+                    Add 3 recipes <br/>to get started
+                </h1>
+<p class="text-on-surface-variant text-lg max-w-md leading-relaxed">
+                    Build your digital cookbook. Start with our curated favorites or import your own secret weapons.
+                </p>
+</div>
+<div class="md:col-span-5 flex justify-end">
+<button class="group relative px-8 py-5 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3 active:scale-95">
+<span class="material-symbols-outlined" data-icon="link">link</span>
+<span class="font-headline font-bold">Import from URL</span>
+</button>
+</div>
+</div>
+<!-- Recipe Suggestions Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 recipe-grid-asymmetric">
+<!-- Recipe Card 1 -->
+<div class="group relative bg-surface-container-lowest rounded-lg p-4 transition-all duration-500 hover:translate-y-[-8px]">
+<div class="relative aspect-[4/5] rounded-md overflow-hidden mb-6 bg-surface-container">
+<img alt="Green salad with eggs" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Vibrant green salad with soft boiled eggs and avocado" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2zpjEGMapb3GdVdRibcSHjLeCLzeMvjTVZknUgszec1L1tQhBVgvyMaaLuX7dNArpPWf1Kwi5PMJyKwuHLwoRNy_RTGR0LY_4un1_0LmhzFwuSZO5t3C-oVi68u2EfyHncSPkIINNhtJ9NEBz1z2GF_k1fm1WF87tWPJqpVTzT4ABSva9tB3x9G4xBZ0PT22m8Wgd9czOeQagkoYhUNWuDpZVugYNJ5L2itLud82j0Q5Xq1b8f9jvi6-cKT5yeUtaeW9-FZRQa38n"/>
+<button class="absolute top-4 right-4 w-12 h-12 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-primary shadow-lg hover:bg-primary hover:text-white transition-all duration-300 active:scale-90">
+<span class="material-symbols-outlined text-2xl" data-icon="add">add</span>
+</button>
+</div>
+<div class="px-2">
+<div class="flex items-center gap-3 mb-2">
+<span class="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary">Quick Prep</span>
+<div class="h-[1px] flex-grow bg-outline-variant/20"></div>
+</div>
+<h3 class="font-headline text-2xl font-bold text-primary mb-2">Spring Harvest Salad</h3>
+<p class="text-sm text-on-surface-variant font-medium">15 mins • Vegetarian</p>
+</div>
+</div>
+<!-- Recipe Card 2 -->
+<div class="group relative bg-surface-container-low rounded-lg p-4 transition-all duration-500 hover:translate-y-[-8px]">
+<div class="relative aspect-[4/5] rounded-md overflow-hidden mb-6 bg-surface-container">
+<img alt="Pesto Pasta" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Rustic pesto pasta with toasted pine nuts and parmesan" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2hLxpsKRHjJp-wQuAiHgVscMH9kXPKSdq4WIGXcLce1ncB7XtIHfEB-MwvByq8o3CPwnxe8DzriR97zESag5SqiBEdlzDpYAUbVoDOcLhOmJ3XHPh4Vd6s1dVJoN_qchebCBRl_40oWJI7PryknhleTYXI5vqx2evqnXWgo2V9tLSK2CoNtganCC5Kk_-OAlrFcQlCncrMJbRQaTIiBei9hSx2O4TrKtWgGNqfM42I-fFt8VwvezNd7KcPYftpwXEgcYZbGy9_5CK"/>
+<button class="absolute top-4 right-4 w-12 h-12 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-primary shadow-lg hover:bg-primary hover:text-white transition-all duration-300 active:scale-90">
+<span class="material-symbols-outlined text-2xl" data-icon="add">add</span>
+</button>
+</div>
+<div class="px-2">
+<div class="flex items-center gap-3 mb-2">
+<span class="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary">Pantry Staple</span>
+<div class="h-[1px] flex-grow bg-outline-variant/20"></div>
+</div>
+<h3 class="font-headline text-2xl font-bold text-primary mb-2">Heritage Basil Pesto</h3>
+<p class="text-sm text-on-surface-variant font-medium">20 mins • Italian</p>
+</div>
+</div>
+<!-- Recipe Card 3 -->
+<div class="group relative bg-surface-container-lowest rounded-lg p-4 transition-all duration-500 hover:translate-y-[-8px]">
+<div class="relative aspect-[4/5] rounded-md overflow-hidden mb-6 bg-surface-container">
+<img alt="Roasted Veggie Bowl" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Warm grain bowl with roasted sweet potatoes and kale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1hzSyuvoSqVrn3OZgxhWRddcRo-Lwr7iY40losVE4C8CJUS6-0Q0I2cOTZqszAyGZ3GcjJy_1-5iJU0ncYudZofCThSaVpwoff0OPV7yTKycTkCyuVw-W15C3x9FcbDrQBqPGVhJr3S0DKGiljUxCgmdT8FJCvFdww6t-1qqxVfxAxilfLzrNuIqo_75w9I0ex8-R7dgR1_CME9aGaxaqf-UXE8MfDvDKrSpNZSWeiu8LvKLEFvPhL3vZ8Hf43QzWhvxAFHGm8Q4b"/>
+<button class="absolute top-4 right-4 w-12 h-12 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-primary shadow-lg hover:bg-primary hover:text-white transition-all duration-300 active:scale-90">
+<span class="material-symbols-outlined text-2xl" data-icon="add">add</span>
+</button>
+</div>
+<div class="px-2">
+<div class="flex items-center gap-3 mb-2">
+<span class="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary">Nutritious</span>
+<div class="h-[1px] flex-grow bg-outline-variant/20"></div>
+</div>
+<h3 class="font-headline text-2xl font-bold text-primary mb-2">Miso Sweet Potato Bowl</h3>
+<p class="text-sm text-on-surface-variant font-medium">35 mins • Vegan</p>
+</div>
+</div>
+<!-- Recipe Card 4 -->
+<div class="group relative bg-surface-container-low rounded-lg p-4 transition-all duration-500 hover:translate-y-[-8px]">
+<div class="relative aspect-[4/5] rounded-md overflow-hidden mb-6 bg-surface-container">
+<img alt="Gourmet steak" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Perfectly seared steak with rosemary and butter" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDZQ9RBtcTEziq9pFmc7JxeRAh3xcWFWgwBsqscd8F7rLpiqTBaKH8-Ht3r3DDZ0_2ncyo_fcZHPFpxQ-jbSd4reMHczHvesx_silp69TrBw-7Zs8KQxuDCsAqMAhc_PuF16Aq6vxaJQWOfFosGWUF-hWMPSjw1gvJ1UgUne4SYbWotcbvQAk2vAhG5yhI04-zD3qpgweWRKYo5axFmcSUydB4eZFKwsplw5y0BMdV7On23tAaC3AuzSF7fmisYLWrPkQ2bjgmQKJM"/>
+<button class="absolute top-4 right-4 w-12 h-12 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-primary shadow-lg hover:bg-primary hover:text-white transition-all duration-300 active:scale-90">
+<span class="material-symbols-outlined text-2xl" data-icon="add">add</span>
+</button>
+</div>
+<div class="px-2">
+<div class="flex items-center gap-3 mb-2">
+<span class="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary">Weekend Chef</span>
+<div class="h-[1px] flex-grow bg-outline-variant/20"></div>
+</div>
+<h3 class="font-headline text-2xl font-bold text-primary mb-2">Reverse-Seared Ribeye</h3>
+<p class="text-sm text-on-surface-variant font-medium">45 mins • High Protein</p>
+</div>
+</div>
+<!-- Recipe Card 5 -->
+<div class="group relative bg-surface-container-lowest rounded-lg p-4 transition-all duration-500 hover:translate-y-[-8px]">
+<div class="relative aspect-[4/5] rounded-md overflow-hidden mb-6 bg-surface-container">
+<img alt="Berry dessert" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Fluffy pancakes with fresh summer berries" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD62yyk1Hd4mLxSfUOGSN-TGbXhwFoh_wkXBnAxPQHpdlU0zLNtmjo0VuySFWMYtcIWU4IX1GpAT-MDA3Sl5a9fEv0XnI8l08CVEsGSXkzGUebmiOntR8pPm3xno4J309smblsNt7zsRjTO578zA16d0cvXxqu4TBus2zkTQxbyNs9ogdT7U8qZPf3i9DKRo1qarUPKOXqso959pl1mXjWZVc6aCE4UA6EHyrHItqeIyjsVMDXpVbjE8VIdyDk0zU1Uf30ZY7xUCFZM"/>
+<button class="absolute top-4 right-4 w-12 h-12 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-primary shadow-lg hover:bg-primary hover:text-white transition-all duration-300 active:scale-90">
+<span class="material-symbols-outlined text-2xl" data-icon="add">add</span>
+</button>
+</div>
+<div class="px-2">
+<div class="flex items-center gap-3 mb-2">
+<span class="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary">Brunch</span>
+<div class="h-[1px] flex-grow bg-outline-variant/20"></div>
+</div>
+<h3 class="font-headline text-2xl font-bold text-primary mb-2">Cloud-Light Hotcakes</h3>
+<p class="text-sm text-on-surface-variant font-medium">25 mins • Breakfast</p>
+</div>
+</div>
+<!-- Recipe Card 6 (Empty/Add Custom State) -->
+<div class="group relative bg-surface-container-highest/30 border-2 border-dashed border-outline-variant/30 rounded-lg p-4 flex flex-col items-center justify-center min-h-[400px] transition-all hover:bg-surface-container-highest/50">
+<div class="w-16 h-16 rounded-full bg-surface-container-lowest flex items-center justify-center mb-4 shadow-sm">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="search">search</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-primary mb-1">None of these?</h3>
+<p class="text-on-surface-variant text-sm text-center mb-6 max-w-[200px]">Search for a specific dish or ingredient</p>
+<button class="px-6 py-2.5 bg-surface-container-lowest text-primary font-bold rounded-full text-sm shadow-sm hover:shadow-md transition-all active:scale-95">
+                    Browse More
+                </button>
+</div>
+</div>
+</main>
+<!-- Floating Footer Navigation (Transactional) -->
+<div class="fixed bottom-0 left-0 w-full p-6 flex justify-center z-50">
+<div class="w-full max-w-xl bg-primary/95 backdrop-blur-xl rounded-full py-4 px-8 flex justify-between items-center shadow-2xl">
+<div class="flex items-center gap-4">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-primary bg-secondary-fixed flex items-center justify-center overflow-hidden">
+<span class="text-[10px] font-bold text-on-secondary-fixed">SC</span>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-primary bg-tertiary-fixed flex items-center justify-center">
+<span class="text-[10px] font-bold text-on-tertiary-fixed">BP</span>
+</div>
+</div>
+<p class="text-on-primary text-sm font-medium">0 / 3 recipes selected</p>
+</div>
+<button class="opacity-50 pointer-events-none px-6 py-2.5 bg-white/10 text-white font-bold rounded-full text-sm transition-all">
+                Continue
+            </button>
+</div>
+</div>
+</body></html>

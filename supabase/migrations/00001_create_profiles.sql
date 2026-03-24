@@ -14,18 +14,6 @@ CREATE POLICY "Users can read own profile"
   ON profiles FOR SELECT
   USING (auth.uid() = id);
 
--- Policy: Users can read profiles of co-household members
-CREATE POLICY "Users can read co-member profiles"
-  ON profiles FOR SELECT
-  USING (
-    id IN (
-      SELECT hm2.user_id
-      FROM household_members hm1
-      JOIN household_members hm2 ON hm1.household_id = hm2.household_id
-      WHERE hm1.user_id = auth.uid()
-    )
-  );
-
 -- Policy: Users can update their own profile
 CREATE POLICY "Users can update own profile"
   ON profiles FOR UPDATE

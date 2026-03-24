@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mise - Random Dinner Generator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#6e3900",
+                        "on-secondary-fixed": "#2f1500",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#394b3d",
+                        "on-tertiary-fixed-variant": "#41493b",
+                        "surface-variant": "#e4e2de",
+                        "secondary-container": "#fe932c",
+                        "surface-container-low": "#f5f3ef",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#c0d5c2",
+                        "tertiary-container": "#535b4c",
+                        "surface-bright": "#fbf9f5",
+                        "on-primary-fixed": "#0e1f13",
+                        "on-surface-variant": "#434843",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed-dim": "#c0c9b7",
+                        "inverse-on-surface": "#f2f0ed",
+                        "surface": "#fbf9f5",
+                        "secondary-fixed": "#ffdcc3",
+                        "primary-fixed": "#d3e8d5",
+                        "on-tertiary-fixed": "#161e12",
+                        "primary-fixed-dim": "#b7ccb9",
+                        "surface-tint": "#506354",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#dde6d2",
+                        "background": "#fbf9f5",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#1b1c1a",
+                        "surface-container-highest": "#e4e2de",
+                        "on-secondary-container": "#663500",
+                        "secondary-fixed-dim": "#ffb77d",
+                        "secondary": "#904d00",
+                        "surface-dim": "#dbdad6",
+                        "primary": "#334537",
+                        "outline": "#737872",
+                        "tertiary": "#3b4436",
+                        "on-tertiary": "#ffffff",
+                        "inverse-surface": "#30312e",
+                        "surface-container": "#efeeea",
+                        "on-background": "#1b1c1a",
+                        "on-tertiary-container": "#c9d2bf",
+                        "inverse-primary": "#b7ccb9",
+                        "primary-container": "#4a5d4e",
+                        "surface-container-high": "#eae8e4",
+                        "outline-variant": "#c3c8c1"
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body min-h-screen flex items-center justify-center p-4">
+<!-- Modal Backdrop -->
+<div class="fixed inset-0 bg-on-surface/20 backdrop-blur-sm z-0"></div>
+<!-- Random Dinner Generator Modal -->
+<main class="relative z-10 w-full max-w-lg bg-surface-bright rounded-xl shadow-[0_24px_48px_rgba(27,28,26,0.08)] overflow-hidden flex flex-col">
+<!-- Drag Handle Area -->
+<div class="w-full flex justify-center py-4">
+<div class="w-12 h-1.5 bg-surface-container-highest rounded-full"></div>
+</div>
+<!-- Header -->
+<header class="px-8 pb-6 text-center">
+<h1 class="font-headline text-3xl font-extrabold tracking-tight text-primary">Dinner Tonight?</h1>
+<p class="font-body text-on-surface-variant/70 mt-1">We've curated a few ideas for your kitchen.</p>
+</header>
+<!-- Content Area -->
+<div class="px-6 pb-8 space-y-8 overflow-y-auto max-h-[707px] hide-scrollbar">
+<!-- Main Pick (Gochujang Chicken) -->
+<section class="relative group">
+<div class="bg-surface-container-lowest rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
+<div class="relative h-64 w-full">
+<img class="w-full h-full object-cover" data-alt="Gochujang glazed chicken with scallions and sesame seeds" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAW_q_SKetuAe0OSFkKsfP3vkehhdKFFjd_GZbvd7uv5J5OaNMu_kf1k26Wu6JHNWcWUiaR7AlLEsVMM7ub1w-vfBzx-pfSo_Ly9BfCaD6YqJpn4iCn1D6N2AJUNDom_RF9RIcR5omWmvg0FDCHLie3HSj-t9cCP8Eue85GArTTJDG6MTmKVE1PBjz-9CZZU9R1YtXlRw_GnhgPpthlDMllCyl4BDqoaFWyFpDnIbBu9zuw5TnyZxW0_wfyc2ePlp9xYGPOJ8XiEVi8"/>
+<div class="absolute top-4 left-4 bg-primary text-white font-label text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full backdrop-blur-md bg-opacity-80">
+                            Chef's Choice
+                        </div>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h2 class="font-headline text-2xl font-bold text-primary">Gochujang Chicken</h2>
+<div class="flex gap-3 mt-2">
+<span class="inline-flex items-center gap-1 font-label text-xs font-semibold text-secondary">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+                                        Spicy
+                                    </span>
+<span class="inline-flex items-center gap-1 font-label text-xs font-medium text-on-surface-variant/60">
+<span class="material-symbols-outlined text-sm">schedule</span>
+                                        30 min
+                                    </span>
+<span class="inline-flex items-center gap-1 font-label text-xs font-medium text-on-surface-variant/60">
+<span class="material-symbols-outlined text-sm">payments</span>
+                                        $12
+                                    </span>
+</div>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-white px-5 py-2.5 rounded-full font-label text-sm font-semibold shadow-lg shadow-primary/20 transition-transform active:scale-95">
+                                Add to Plan
+                            </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Secondary Options -->
+<section>
+<h3 class="font-headline text-lg font-bold text-primary mb-4 px-2">3 More Options</h3>
+<div class="flex overflow-x-auto gap-4 hide-scrollbar -mx-2 px-2 pb-4">
+<!-- Option 1 -->
+<div class="min-w-[240px] bg-surface-container-low rounded-lg p-4 flex flex-col justify-between transition-colors hover:bg-surface-container-high group">
+<div class="relative h-32 w-full mb-4 rounded-md overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Creamy spinach and feta pasta in a ceramic bowl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDG6NcmppT1IXMZxTH3L1bIGnuWEKrkKDEPqf7AzrLdBWuFZ-pdxN0EIZwVDHL2M_wFA19VJpFdRuIQtAQRsDPYiSrccdh4U3qCa_C_5w-XIOB5mvOzymcs_cp3H9LqjQuiqCTjDBa08QqNPMzVT9mcSLRyC7csws1u1CXmVMT9MWYGkYFGcXAmHaiJ9D3wpUTNhrUSlkazVrcnlX1RH0hv_NoEP6DZTU6aOv7p0ZzxeJMFdY-RRNW_Zd4JvW-jwYhpXAbvGJYoOHNE"/>
+</div>
+<div>
+<h4 class="font-headline font-bold text-primary leading-tight">Spinach &amp; Feta Pasta</h4>
+<div class="flex gap-2 mt-1 mb-4">
+<span class="text-[10px] font-bold uppercase tracking-wider text-primary/60">Vegetarian</span>
+<span class="text-[10px] font-medium text-on-surface-variant/40">20 min</span>
+</div>
+</div>
+<button class="w-full border border-primary/10 bg-surface-container-lowest text-primary py-2 rounded-full font-label text-xs font-bold transition-all group-hover:bg-primary group-hover:text-white">
+                            Add to Plan
+                        </button>
+</div>
+<!-- Option 2 -->
+<div class="min-w-[240px] bg-surface-container-low rounded-lg p-4 flex flex-col justify-between transition-colors hover:bg-surface-container-high group">
+<div class="relative h-32 w-full mb-4 rounded-md overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Gourmet fish tacos with lime and cabbage slaw" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZSeI7qFzGhw9CRM_dkAnVwunO23-Tw-GfjLCr7Cw3SWypM1uuQOS05JTStZhP-YTZ6Zr6AAjkhGglSr1yoryTLd4xBz5dIlGrzVQCMiiYtw_422MueiDFyW-dj9FHCfFgui1XH_8hyhbL2Trv3Y3xYmN7hJN4cTfNF55FcowbCMS2SjSdFVmw9X94Qq777ktXbE3EiAxhS8Ha_iah4b-Yz8oXv_QEfwl0lfpGiLIQzIkm_RGhV326wJC4X1ejtoZWJV1pVWVD_26i"/>
+</div>
+<div>
+<h4 class="font-headline font-bold text-primary leading-tight">Baja Fish Tacos</h4>
+<div class="flex gap-2 mt-1 mb-4">
+<span class="text-[10px] font-bold uppercase tracking-wider text-primary/60">Seafood</span>
+<span class="text-[10px] font-medium text-on-surface-variant/40">25 min</span>
+</div>
+</div>
+<button class="w-full border border-primary/10 bg-surface-container-lowest text-primary py-2 rounded-full font-label text-xs font-bold transition-all group-hover:bg-primary group-hover:text-white">
+                            Add to Plan
+                        </button>
+</div>
+<!-- Option 3 -->
+<div class="min-w-[240px] bg-surface-container-low rounded-lg p-4 flex flex-col justify-between transition-colors hover:bg-surface-container-high group">
+<div class="relative h-32 w-full mb-4 rounded-md overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Creamy mushroom risotto topped with fresh herbs" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHsfFU1FI-dyeWtsvNIDyaLSD8QD7q7vE_vsLdf4NdhWWxQZ6YrERSBZw2fPxzYWmXA2CcDGIjbWaaIGFpd1F3HjgncI5RCG0Q-K-N8VO4m_wK891ei9WzN9G5xUtHUZodixfOo4bqvl8THm7x8tgRWdv9NOJoTzsvgF_6GlcWhmhEIFou_eUc_u02gE6DDMxaaQHUxk3IJFms5kq3vzdyxBx3UaGiaSlVasbOXGRqQFYfSoNsilk-nbtpnXTz7-UN0wGUn6XXJywB"/>
+</div>
+<div>
+<h4 class="font-headline font-bold text-primary leading-tight">Mushroom Risotto</h4>
+<div class="flex gap-2 mt-1 mb-4">
+<span class="text-[10px] font-bold uppercase tracking-wider text-primary/60">Vegetarian</span>
+<span class="text-[10px] font-medium text-on-surface-variant/40">45 min</span>
+</div>
+</div>
+<button class="w-full border border-primary/10 bg-surface-container-lowest text-primary py-2 rounded-full font-label text-xs font-bold transition-all group-hover:bg-primary group-hover:text-white">
+                            Add to Plan
+                        </button>
+</div>
+</div>
+</section>
+<!-- Shuffle Controls -->
+<div class="pt-4 flex flex-col items-center gap-4">
+<button class="flex items-center gap-3 bg-secondary text-white px-10 py-4 rounded-full font-headline font-bold text-lg shadow-xl shadow-secondary/30 transition-all hover:scale-105 active:scale-95">
+<span class="material-symbols-outlined text-2xl" data-weight="fill" style="font-variation-settings: 'FILL' 1;">casino</span>
+                    Shuffle
+                </button>
+<p class="font-label text-xs text-on-surface-variant/50">Don't like these? Roll again.</p>
+</div>
+</div>
+<!-- Sticky Bottom Spacer -->
+<div class="h-6 bg-surface-bright"></div>
+</main>
+<!-- Navigation Shell Placeholder (Not visible but following hierarchy logic) -->
+<nav class="hidden md:flex fixed top-0 left-0 w-full z-50 justify-between items-center px-6 py-4 bg-[#fbf9f5]/80 backdrop-blur-lg">
+<div class="text-xl font-bold text-[#334537] italic font-headline">The Culinary Curator</div>
+<div class="flex gap-6">
+<span class="material-symbols-outlined text-[#334537]">menu</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">person</span>
+</div>
+</div>
+</nav>
+</body></html>

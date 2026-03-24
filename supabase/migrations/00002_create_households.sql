@@ -84,3 +84,16 @@ CREATE POLICY "Users can join households"
 CREATE POLICY "Admins can remove members"
   ON household_members FOR DELETE
   USING (is_household_admin(household_id, auth.uid()));
+
+-- Policy: Users can read profiles of co-household members
+-- (Placed here because it depends on household_members table)
+CREATE POLICY "Users can read co-member profiles"
+  ON profiles FOR SELECT
+  USING (
+    id IN (
+      SELECT hm2.user_id
+      FROM household_members hm1
+      JOIN household_members hm2 ON hm1.household_id = hm2.household_id
+      WHERE hm1.user_id = auth.uid()
+    )
+  );

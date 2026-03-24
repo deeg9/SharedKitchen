@@ -56,8 +56,22 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 ## Context
 
 - Architecture spec lives at `/Users/deeg/Desktop/mise-stitch-prompt.md` — comprehensive UI/screen definitions for all 5 tabs, detail pages, onboarding, and design notes
+- **Stitch UI screens** already generated at `stitch_ui/stitch_grocery_list/` — 16 screens as static HTML/Tailwind mockups with screenshots. These are the front-end reference designs to translate into React Native components:
+  - `plan_home` — Weekly dinner calendar (Tab 1)
+  - `recipes_library` — Recipe grid with search/filters (Tab 2)
+  - `refined_recipe_detail_street_tacos_al_pastor` — Recipe detail page
+  - `add_recipe_form` — Add/edit recipe form
+  - `grocery_list` — Grocery checklist grouped by section (Tab 3)
+  - `budget_dashboard` — Monthly spending dashboard (Tab 4)
+  - `profile_household_updated` — Profile & household management (Tab 5)
+  - `random_dinner_generator` — Surprise Me modal
+  - `household_invite_join_landing_page` — Invite/join household
+  - `onboarding_welcome`, `onboarding_create_household`, `onboarding_invite_members`, `onboarding_add_first_recipes`, `onboarding_all_set` — Onboarding flow
+  - `mise_waitlist_landing_page` — Marketing landing page
+  - `mise_en_place/DESIGN.md` — Full design system documentation ("The Culinary Curator")
 - Landing page already built at `index.html` (Tailwind CSS, static marketing page with waitlist)
 - Design language: warm cream/off-white backgrounds, deep olive/sage green primary (#334537), burnt orange accent (#904d00), Material Design 3 color tokens, Plus Jakarta Sans headers, Inter body text, rounded outlined Material Symbols icons
+- Design philosophy: "Tactile Sophistication" — no-line rule (use tonal layering not borders), ambient shadows, ghost borders, breathing room, intentional asymmetry
 - 8px spacing grid, rounded corners, subtle shadows, skeleton loading states, optimistic UI updates
 - Real-time collaboration is central — Supabase Realtime for grocery sync, household activity
 

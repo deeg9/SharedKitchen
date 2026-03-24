@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mise - Recipes Library</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary": "#3b4436",
+              "on-secondary-fixed": "#2f1500",
+              "error": "#ba1a1a",
+              "on-secondary-container": "#663500",
+              "inverse-primary": "#b7ccb9",
+              "on-tertiary-fixed": "#161e12",
+              "on-primary-fixed-variant": "#394b3d",
+              "surface-container-high": "#eae8e4",
+              "on-primary": "#ffffff",
+              "on-tertiary": "#ffffff",
+              "surface-tint": "#506354",
+              "outline-variant": "#c3c8c1",
+              "inverse-surface": "#30312e",
+              "surface-dim": "#dbdad6",
+              "on-primary-container": "#c0d5c2",
+              "secondary": "#904d00",
+              "secondary-fixed": "#ffdcc3",
+              "surface-container-low": "#f5f3ef",
+              "tertiary-container": "#535b4c",
+              "surface": "#fbf9f5",
+              "inverse-on-surface": "#f2f0ed",
+              "tertiary-fixed": "#dde6d2",
+              "background": "#fbf9f5",
+              "on-secondary-fixed-variant": "#6e3900",
+              "secondary-container": "#fe932c",
+              "on-error-container": "#93000a",
+              "secondary-fixed-dim": "#ffb77d",
+              "on-background": "#1b1c1a",
+              "on-tertiary-container": "#c9d2bf",
+              "surface-variant": "#e4e2de",
+              "on-tertiary-fixed-variant": "#41493b",
+              "on-secondary": "#ffffff",
+              "primary-container": "#4a5d4e",
+              "surface-bright": "#fbf9f5",
+              "on-error": "#ffffff",
+              "primary-fixed": "#d3e8d5",
+              "primary-fixed-dim": "#b7ccb9",
+              "outline": "#737872",
+              "surface-container-lowest": "#ffffff",
+              "error-container": "#ffdad6",
+              "on-surface-variant": "#434843",
+              "on-surface": "#1b1c1a",
+              "tertiary-fixed-dim": "#c0c9b7",
+              "primary": "#334537",
+              "surface-container-highest": "#e4e2de",
+              "on-primary-fixed": "#0e1f13",
+              "surface-container": "#efeeea"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #fbf9f5;
+        color: #1b1c1a;
+      }
+      h1, h2, h3 {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface min-h-screen pb-32">
+<!-- Top Navigation Bar -->
+<nav class="sticky top-0 z-40 bg-[#fbf9f5] dark:bg-stone-900 flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden">
+<img alt="User profile avatar" class="w-full h-full object-cover" data-alt="Close up portrait of a smiling woman" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuCFZHAZ0SKePCgNcbVhjzdfiFwiR1Tg5modxR77KsBkaivYG1tQLlJB1jXZ5t4-yUTL1yvJU3ZNQmzRym-dxV0VBMvNQ_2FXk0bF7-9ajc3BQZtmPeQ2G4v1_CcsTTgexcHoig15JgEb2F4ZMLZ-0TD53zrExEMhpkH2DDb51WH7V-G-MhSMMovKNNHxth7KhjMlisHsU77c0Z6nACo5PXHnAULcJgkfEwamdndSFSYUYlB2rMXTP5mQN38Eo8utMN9pof77xqEqq"/>
+</div>
+<span class="text-[#334537] dark:text-[#fbf9f5] font-['Plus_Jakarta_Sans'] font-extrabold text-2xl">Mise</span>
+</div>
+<button class="text-[#334537] dark:text-[#4a5d4e] w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f5f3ef] transition-colors">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+</button>
+</nav>
+<main class="max-w-7xl mx-auto px-6 pt-4">
+<!-- Header Section -->
+<header class="mb-8">
+<h1 class="text-4xl font-extrabold text-primary tracking-tight mb-6">Recipes</h1>
+<!-- Search Bar -->
+<div class="relative group mb-6">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" data-icon="search">search</span>
+<input class="w-full pl-12 pr-4 py-4 bg-surface-container-lowest rounded-2xl border-none ring-1 ring-outline-variant/15 focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-primary/30 font-body" placeholder="Search recipes..." type="text"/>
+</div>
+<!-- Horizontal Filter Chips -->
+<div class="flex gap-3 overflow-x-auto pb-2 no-scrollbar -mx-6 px-6">
+<button class="px-6 py-2 rounded-full bg-primary text-on-primary font-medium text-sm whitespace-nowrap">All</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-highest text-primary font-medium text-sm whitespace-nowrap hover:bg-surface-container-high transition-colors">Chicken</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-highest text-primary font-medium text-sm whitespace-nowrap hover:bg-surface-container-high transition-colors">Seafood</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-highest text-primary font-medium text-sm whitespace-nowrap hover:bg-surface-container-high transition-colors">Mexican</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-highest text-primary font-medium text-sm whitespace-nowrap hover:bg-surface-container-high transition-colors">Vegetarian</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-highest text-primary font-medium text-sm whitespace-nowrap hover:bg-surface-container-high transition-colors">Italian</button>
+</div>
+</header>
+<!-- Recipe Grid (2 Columns) -->
+<section class="grid grid-cols-2 gap-4 md:gap-8">
+<!-- Recipe Card 1 -->
+<div class="flex flex-col group cursor-pointer">
+<div class="aspect-[4/5] rounded-lg overflow-hidden mb-4 relative shadow-sm transition-transform duration-300 group-hover:scale-[1.02]">
+<img alt="Tacos" class="w-full h-full object-cover" data-alt="Plate of authentic mexican street tacos with lime" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLpEtZNWYrbgStQWDGZHw_bBCFCXW61RAef8A5gDs9_wcDLudhQbBVciikW6lBcvGXwsXSmtB1vopic-ywilyC2kDXalY2qXVsUBvpysbnugjMxV_ckzN0YllUm33A37cEX3PU39l7A2QmV0vswkFgMMh_5XTilTqQqatgOtCu-QjbcDaVQT_VhJyOH_1cz1xZK92Y7Dudm8gmEiu7Z4lG_7Gw17OkcCRzexsaE96r9q8KvnEuB_jcFnYyrOMo_Oa2lKvfxOSsM2oG"/>
+<div class="absolute top-3 right-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-xs font-bold text-on-surface">4.8</span>
+</div>
+</div>
+<div class="px-1">
+<span class="text-[10px] font-bold uppercase tracking-widest text-secondary mb-1 block">Mexican</span>
+<h3 class="text-lg font-bold text-primary leading-tight mb-2">Street Tacos Al Pastor</h3>
+<div class="flex flex-wrap gap-y-1 gap-x-4 items-center opacity-60">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span>
+<span class="text-xs font-medium">35 min total</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="payments">payments</span>
+<span class="text-xs font-medium">$16</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Recipe Card 2 -->
+<div class="flex flex-col group cursor-pointer pt-6 md:pt-12"> <!-- Intentional Asymmetry -->
+<div class="aspect-[4/5] rounded-lg overflow-hidden mb-4 relative shadow-sm transition-transform duration-300 group-hover:scale-[1.02]">
+<img alt="Salmon Bowl" class="w-full h-full object-cover" data-alt="Healthy roasted salmon bowl with grains and vegetables" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKQVE3XhBv8GDwOaBCgI8nA_Us_zoGi7010Kor9qkdcxtWkcZ_cr76VNEuNQ7OMt__PxphhsuD1bh0duapxP3VueIL5ouOqz3MKD3Sz7hxO9_tVeewOPy5JGxzQHJg7Wybb5Jf4gfnJEATumI08tkgaIgZXRuTx_vXJrqR0aTKzecrGF5oe3eTMt3Ex1pJ3PU21s6hp_aX97k07oh56EUYafylrFhFsxndsJ-k4wnqcuXYU3Ova-tbxLPdqJidwLRzwv71q7FdZBWp"/>
+<div class="absolute top-3 right-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-xs font-bold text-on-surface">4.9</span>
+</div>
+</div>
+<div class="px-1">
+<span class="text-[10px] font-bold uppercase tracking-widest text-secondary mb-1 block">Seafood</span>
+<h3 class="text-lg font-bold text-primary leading-tight mb-2">Honey Glazed Salmon</h3>
+<div class="flex flex-wrap gap-y-1 gap-x-4 items-center opacity-60">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span>
+<span class="text-xs font-medium">25 min total</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="payments">payments</span>
+<span class="text-xs font-medium">$22</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Recipe Card 3 -->
+<div class="flex flex-col group cursor-pointer">
+<div class="aspect-[4/5] rounded-lg overflow-hidden mb-4 relative shadow-sm transition-transform duration-300 group-hover:scale-[1.02]">
+<img alt="Salad" class="w-full h-full object-cover" data-alt="Fresh mediterranean salad with feta and olives" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLuD4Pv2TcPRckFMQcaQDH1u8HYTJ8IqN75zpIfuHAFe36JXG_QkjwTQ6AP1Je-t-CUnnW9i2H9U3VhGpUVl9IhDqyH8TvaLMa5sx23C1HbBgELr-LlVIGgp4R5u_7-g33fBG6YDWLzheXdq7LQx7CFPfmfYvvRzXEDU0vnMqXAp6DQzD5gCfAO5PZ8blWtLc76DA78Q3zpueDNvWepltFH1a0scklT3PXva96TWtbdqDOquNZSUgk-INqdgmtluoj0pyPhqSYN8Wz"/>
+<div class="absolute top-3 right-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-xs font-bold text-on-surface">4.5</span>
+</div>
+</div>
+<div class="px-1">
+<span class="text-[10px] font-bold uppercase tracking-widest text-secondary mb-1 block">Vegetarian</span>
+<h3 class="text-lg font-bold text-primary leading-tight mb-2">Zesty Greek Salad</h3>
+<div class="flex flex-wrap gap-y-1 gap-x-4 items-center opacity-60">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span>
+<span class="text-xs font-medium">15 min total</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="payments">payments</span>
+<span class="text-xs font-medium">$12</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Recipe Card 4 -->
+<div class="flex flex-col group cursor-pointer pt-6 md:pt-12">
+<div class="aspect-[4/5] rounded-lg overflow-hidden mb-4 relative shadow-sm transition-transform duration-300 group-hover:scale-[1.02]">
+<img alt="Chicken" class="w-full h-full object-cover" data-alt="Golden crispy roasted chicken thighs with rosemary" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2DVeq-VXIrwBf50QHJBituFwRIKN2pB-ihdCmCwdACVC7vQODLPED8O4NRMUuIK5Kjzcz0La9Ta9bw5ivVk8LdQRbw6vgcEvtHSAWS2SWhYQhIozKFzNRfSo0BznM3pEtp7Iyjub42g2qoeiegZYTRFuhDvpC7zNRT4OIJD6z01z_rsEnPCW8sD3RKsxQgZd1RBt0Sl_iEwAS7yiHcrhLOFa_S3AF6F-txbwaKxB3jSoQhxhv5Xl-xQtFU3st0lCPxjoTaVIo480p"/>
+<div class="absolute top-3 right-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-xs font-bold text-on-surface">4.7</span>
+</div>
+</div>
+<div class="px-1">
+<span class="text-[10px] font-bold uppercase tracking-widest text-secondary mb-1 block">Chicken</span>
+<h3 class="text-lg font-bold text-primary leading-tight mb-2">Rosemary Roast Thighs</h3>
+<div class="flex flex-wrap gap-y-1 gap-x-4 items-center opacity-60">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span>
+<span class="text-xs font-medium">45 min total</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="payments">payments</span>
+<span class="text-xs font-medium">$18</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-28 right-6 w-14 h-14 rounded-full bg-gradient-to-br from-secondary to-[#fe932c] text-white flex items-center justify-center shadow-lg active:scale-95 transition-transform z-50">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-[#fbf9f5]/80 dark:bg-stone-900/80 backdrop-blur-md border-t border-[#e4e2de]/15 shadow-[0_-4px_24px_rgba(27,28,26,0.04)] z-50 rounded-t-[2.5rem]">
+<div class="flex flex-col items-center justify-center text-[#4a5d4e] dark:text-[#e4e2de] opacity-70 hover:opacity-100 transition-all cursor-pointer">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Plan</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-gradient-to-br from-[#334537] to-[#4a5d4e] text-white rounded-full w-14 h-14 -mt-2 shadow-lg active:scale-95 duration-200 ease-in-out cursor-pointer">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-['Inter'] text-[9px] font-medium tracking-wide uppercase">Recipes</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#4a5d4e] dark:text-[#e4e2de] opacity-70 hover:opacity-100 transition-all cursor-pointer">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Grocery</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#4a5d4e] dark:text-[#e4e2de] opacity-70 hover:opacity-100 transition-all cursor-pointer">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Budget</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#4a5d4e] dark:text-[#e4e2de] opacity-70 hover:opacity-100 transition-all cursor-pointer">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Profile</span>
+</div>
+</nav>
+</body></html>

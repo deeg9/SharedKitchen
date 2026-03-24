@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mise — Plan dinners together, not alone.</title>
+  <meta name="description" content="The collaborative cookbook for modern households. Plan meals, sync grocery lists, split budgets, and curate recipes — all in one shared kitchen space." />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Mise — Plan dinners together, not alone." />
+  <meta property="og:description" content="The collaborative cookbook for modern households. Plan meals, sync grocery lists, and split budgets together." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=1200&h=630&fit=crop" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Mise — Plan dinners together, not alone." />
+  <meta name="twitter:description" content="The collaborative cookbook for modern households." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CDN (fine for single-page static sites) -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#334537",
+            "primary-container": "#4a5d4e",
+            "primary-fixed": "#d3e8d5",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#c0d5c2",
+            "secondary": "#904d00",
+            "secondary-container": "#fe932c",
+            "secondary-fixed": "#ffdcc3",
+            "on-secondary": "#ffffff",
+            "surface": "#fbf9f5",
+            "surface-container": "#efeeea",
+            "surface-container-low": "#f5f3ef",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-high": "#eae8e4",
+            "surface-container-highest": "#e4e2de",
+            "on-surface": "#1b1c1a",
+            "on-surface-variant": "#434843",
+            "outline": "#737872",
+            "outline-variant": "#c3c8c1",
+            "error": "#ba1a1a",
+          },
+          fontFamily: {
+            headline: ["Plus Jakarta Sans", "sans-serif"],
+            body: ["Inter", "sans-serif"],
+          },
+          borderRadius: { DEFAULT: "1rem", lg: "2rem", xl: "3rem", full: "9999px" },
+        },
+      },
+    };
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; }
+    h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .hero-gradient {
+      background: linear-gradient(135deg, #fbf9f5 0%, #d3e8d5 50%, #ffdcc3 100%);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface">
+
+  <!-- ═══ Nav ═══ -->
+  <header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/10">
+    <div class="flex justify-between items-center px-6 py-4 max-w-screen-xl mx-auto">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary text-2xl">restaurant_menu</span>
+        <span class="text-2xl font-extrabold text-primary tracking-tighter font-headline">Mise</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-8">
+        <a class="text-on-surface-variant hover:text-primary transition-colors font-headline font-medium" href="#features">Features</a>
+        <a class="text-on-surface-variant hover:text-primary transition-colors font-headline font-medium" href="#how">How it Works</a>
+        <a class="text-on-surface-variant hover:text-primary transition-colors font-headline font-medium" href="#signup">Get Access</a>
+      </nav>
+      <a href="#signup" class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-headline font-bold hover:opacity-90 active:scale-95 transition-all text-sm">
+        Get Early Access
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <!-- ═══ Hero ═══ -->
+    <section class="hero-gradient pt-32 pb-20 px-6 overflow-hidden">
+      <div class="max-w-screen-xl mx-auto md:flex md:items-center md:gap-16">
+        <div class="md:w-1/2 space-y-8">
+          <div class="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full border border-primary/10">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            <span class="text-xs font-bold text-primary uppercase tracking-widest">Early Access Available</span>
+          </div>
+          <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-primary leading-[1.05]">
+            Plan dinners <span class="text-secondary">together</span>, not alone.
+          </h1>
+          <p class="text-on-surface-variant text-lg md:text-xl max-w-lg leading-relaxed">
+            The collaborative cookbook for modern households. Sync grocery lists, split budgets, and curate recipes — all in one shared kitchen space.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 pt-2">
+            <a href="#signup" class="bg-primary text-on-primary px-8 py-4 rounded-full font-headline font-bold text-center shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-95 text-lg">
+              Get Early Access — It's Free
+            </a>
+          </div>
+          <div class="flex items-center gap-4 pt-2">
+            <div class="flex -space-x-2">
+              <div class="w-8 h-8 rounded-full bg-primary-fixed border-2 border-white flex items-center justify-center text-xs font-bold text-primary">A</div>
+              <div class="w-8 h-8 rounded-full bg-secondary-fixed border-2 border-white flex items-center justify-center text-xs font-bold text-secondary">M</div>
+              <div class="w-8 h-8 rounded-full bg-primary-container border-2 border-white flex items-center justify-center text-xs font-bold text-on-primary-container">D</div>
+            </div>
+            <p class="text-sm text-on-surface-variant"><strong id="signup-count">2,400+</strong> households already signed up</p>
+          </div>
+        </div>
+        <div class="mt-12 md:mt-0 md:w-1/2 relative">
+          <div class="aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl relative z-10 border border-white/20">
+            <img alt="Couple cooking together in a bright kitchen" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=750&fit=crop" loading="lazy" />
+          </div>
+          <div class="absolute -bottom-8 -left-8 w-40 h-40 bg-secondary-fixed rounded-full -z-0 opacity-40 blur-xl"></div>
+          <div class="absolute -top-8 -right-8 w-56 h-56 bg-primary-fixed rounded-full -z-0 opacity-30 blur-xl"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ Features ═══ -->
+    <section class="px-6 py-24 max-w-screen-xl mx-auto" id="features">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-extrabold text-primary mb-4">Built for real kitchens</h2>
+        <p class="text-on-surface-variant text-lg max-w-xl mx-auto">Everything your household needs to plan, shop, cook, and eat together — beautifully.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Feature 1 -->
+        <div class="bg-surface-container-low p-8 rounded-[2rem] group hover:bg-surface-container transition-colors">
+          <div class="w-14 h-14 rounded-2xl bg-primary-fixed flex items-center justify-center mb-6">
+            <span class="material-symbols-outlined text-primary text-2xl">calendar_month</span>
+          </div>
+          <h3 class="text-2xl font-bold text-primary mb-3">Meal Planning</h3>
+          <p class="text-on-surface-variant leading-relaxed">Schedule breakfast, lunch, and dinner on a shared calendar. Assign cooks and see who's making what.</p>
+        </div>
+        <!-- Feature 2 -->
+        <div class="bg-primary-container text-on-primary-container p-8 rounded-[2rem]">
+          <div class="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center mb-6">
+            <span class="material-symbols-outlined text-white text-2xl">shopping_cart</span>
+          </div>
+          <h3 class="text-2xl font-bold text-white mb-3">Smart Grocery Lists</h3>
+          <p class="text-on-primary-container/80 leading-relaxed">Auto-generated from your meal plan. Grouped by aisle, shared in real-time. Never double-buy the milk.</p>
+        </div>
+        <!-- Feature 3 -->
+        <div class="bg-surface-container-lowest p-8 rounded-[2rem] border border-outline-variant/10 shadow-sm">
+          <div class="w-14 h-14 rounded-2xl bg-secondary-fixed flex items-center justify-center mb-6">
+            <span class="material-symbols-outlined text-secondary text-2xl">payments</span>
+          </div>
+          <h3 class="text-2xl font-bold text-primary mb-3">Budget Tracking</h3>
+          <p class="text-on-surface-variant leading-relaxed">Track grocery spend across the household. Set monthly targets and see category breakdowns at a glance.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ How it Works ═══ -->
+    <section class="bg-surface-container-low py-24 px-6" id="how">
+      <div class="max-w-screen-xl mx-auto">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl font-extrabold text-primary mb-4">Three steps to dinner bliss</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div class="text-center space-y-4">
+            <div class="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center mx-auto font-headline font-black text-2xl shadow-lg shadow-primary/20">1</div>
+            <h3 class="text-xl font-bold text-primary">Create your Kitchen</h3>
+            <p class="text-on-surface-variant">Name your household and invite your roommates, partner, or family to join.</p>
+          </div>
+          <div class="text-center space-y-4">
+            <div class="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center mx-auto font-headline font-black text-2xl shadow-lg shadow-primary/20">2</div>
+            <h3 class="text-xl font-bold text-primary">Plan your meals</h3>
+            <p class="text-on-surface-variant">Add recipes, assign cooks, and fill your weekly meal plan with breakfast, lunch, and dinner.</p>
+          </div>
+          <div class="text-center space-y-4">
+            <div class="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center mx-auto font-headline font-black text-2xl shadow-lg shadow-primary/20">3</div>
+            <h3 class="text-xl font-bold text-primary">Shop & cook together</h3>
+            <p class="text-on-surface-variant">Generate your grocery list with one tap. Check items off in real-time from any device.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ Social Proof ═══ -->
+    <section class="py-24 px-6">
+      <div class="max-w-screen-xl mx-auto text-center">
+        <div class="flex flex-wrap justify-center gap-12 items-center opacity-60">
+          <div class="space-y-1">
+            <span class="text-4xl font-extrabold text-primary font-headline">2,400+</span>
+            <p class="text-sm text-on-surface-variant uppercase tracking-widest font-bold">Households</p>
+          </div>
+          <div class="w-px h-12 bg-outline-variant/30 hidden md:block"></div>
+          <div class="space-y-1">
+            <span class="text-4xl font-extrabold text-primary font-headline">10k+</span>
+            <p class="text-sm text-on-surface-variant uppercase tracking-widest font-bold">Meals Planned</p>
+          </div>
+          <div class="w-px h-12 bg-outline-variant/30 hidden md:block"></div>
+          <div class="space-y-1">
+            <span class="text-4xl font-extrabold text-primary font-headline">4.9</span>
+            <p class="text-sm text-on-surface-variant uppercase tracking-widest font-bold">User Rating</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ Signup CTA ═══ -->
+    <section class="px-6 py-24 bg-surface-container-low" id="signup">
+      <div class="max-w-2xl mx-auto text-center space-y-8 bg-surface-container-lowest p-8 md:p-16 rounded-[2rem] shadow-xl border border-outline-variant/10">
+        <div class="inline-flex items-center gap-2 bg-green-50 px-4 py-2 rounded-full border border-green-200">
+          <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          <span class="text-xs font-bold text-green-700 uppercase tracking-widest">Now Open</span>
+        </div>
+        <h2 class="text-4xl font-extrabold text-primary">Get early access</h2>
+        <p class="text-on-surface-variant text-lg">Join thousands of modern households already planning meals together with Mise.</p>
+
+        <form id="waitlist-form" class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+          <input
+            id="email-input"
+            type="email"
+            required
+            placeholder="Enter your email"
+            class="flex-grow px-6 py-4 rounded-full border-2 border-surface-container-highest focus:border-primary focus:ring-0 bg-surface transition-all"
+          />
+          <button
+            type="submit"
+            id="submit-btn"
+            class="bg-primary text-on-primary px-8 py-4 rounded-full font-headline font-bold hover:opacity-90 active:scale-95 transition-all whitespace-nowrap"
+          >
+            Get Access
+          </button>
+        </form>
+
+        <div id="success-message" class="hidden">
+          <div class="bg-green-50 text-green-800 px-6 py-4 rounded-2xl border border-green-200 inline-flex items-center gap-3">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+            <span class="font-medium">You're in! Check your email for next steps.</span>
+          </div>
+        </div>
+
+        <div id="error-message" class="hidden">
+          <div class="bg-red-50 text-red-800 px-6 py-4 rounded-2xl border border-red-200 inline-flex items-center gap-3">
+            <span class="material-symbols-outlined">error</span>
+            <span class="font-medium" id="error-text">Something went wrong. Please try again.</span>
+          </div>
+        </div>
+
+        <p class="text-xs text-outline uppercase tracking-widest">Early Access Available — Free Forever for Early Users</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ═══ Footer ═══ -->
+  <footer class="bg-surface-container-highest py-16 px-6">
+    <div class="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
+      <div class="space-y-4">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-2xl">restaurant_menu</span>
+          <span class="text-2xl font-extrabold text-primary tracking-tighter font-headline">Mise</span>
+        </div>
+        <p class="text-on-surface-variant text-sm leading-relaxed">The collaborative cookbook for modern households. Made for dinner lovers, by dinner lovers.</p>
+      </div>
+      <div>
+        <h4 class="font-headline font-bold text-primary mb-6">Product</h4>
+        <ul class="space-y-3 text-sm text-on-surface-variant">
+          <li><a class="hover:text-primary transition-colors" href="#features">Features</a></li>
+          <li><a class="hover:text-primary transition-colors" href="#how">How it Works</a></li>
+          <li><a class="hover:text-primary transition-colors" href="#signup">Get Access</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-headline font-bold text-primary mb-6">Company</h4>
+        <ul class="space-y-3 text-sm text-on-surface-variant">
+          <li><a class="hover:text-primary transition-colors" href="#">About</a></li>
+          <li><a class="hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
+          <li><a class="hover:text-primary transition-colors" href="#">Terms of Service</a></li>
+        </ul>
+      </div>
+      <div class="space-y-4">
+        <h4 class="font-headline font-bold text-primary">Stay connected</h4>
+        <a href="#signup" class="inline-block text-primary font-bold underline decoration-secondary decoration-2 underline-offset-4 font-headline">Get Early Access</a>
+      </div>
+    </div>
+    <div class="max-w-screen-xl mx-auto mt-16 pt-8 border-t border-outline-variant/30 text-center">
+      <p class="text-xs text-outline">&copy; 2026 Mise. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- ═══ Supabase Waitlist Script ═══ -->
+  <script>
+    const SUPABASE_URL = 'https://jzwxutnqdpnjssvouohe.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6d3h1dG5xZHBuanNzdm91b2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDMzNzMsImV4cCI6MjA4OTg3OTM3M30.TW4eqSoMVDAoM5h5Ix1CX2Fbp-GMvkB0RmWuuLvTHbk';
+
+    const form = document.getElementById('waitlist-form');
+    const emailInput = document.getElementById('email-input');
+    const submitBtn = document.getElementById('submit-btn');
+    const successMsg = document.getElementById('success-message');
+    const errorMsg = document.getElementById('error-message');
+    const errorText = document.getElementById('error-text');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = emailInput.value.trim();
+      if (!email) return;
+
+      submitBtn.textContent = 'Joining...';
+      submitBtn.disabled = true;
+      successMsg.classList.add('hidden');
+      errorMsg.classList.add('hidden');
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal',
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        if (res.ok || res.status === 201) {
+          form.classList.add('hidden');
+          successMsg.classList.remove('hidden');
+        } else if (res.status === 409) {
+          // Duplicate email
+          form.classList.add('hidden');
+          successMsg.classList.remove('hidden');
+        } else {
+          const data = await res.json().catch(() => ({}));
+          if (data.code === '23505') {
+            // Unique constraint — already signed up
+            form.classList.add('hidden');
+            successMsg.classList.remove('hidden');
+          } else {
+            throw new Error(data.message || 'Failed to join waitlist');
+          }
+        }
+      } catch (err) {
+        errorText.textContent = err.message || 'Something went wrong. Please try again.';
+        errorMsg.classList.remove('hidden');
+      } finally {
+        submitBtn.textContent = 'Get Access';
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+
+</body>
+</html>

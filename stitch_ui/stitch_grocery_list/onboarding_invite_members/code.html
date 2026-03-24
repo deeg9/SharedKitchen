@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-fixed": "#dde6d2",
+              "surface-container": "#efeeea",
+              "secondary-fixed": "#ffdcc3",
+              "primary": "#334537",
+              "on-secondary-container": "#663500",
+              "surface-variant": "#e4e2de",
+              "on-secondary-fixed": "#2f1500",
+              "error": "#ba1a1a",
+              "surface-container-lowest": "#ffffff",
+              "on-background": "#1b1c1a",
+              "on-error": "#ffffff",
+              "outline-variant": "#c3c8c1",
+              "on-surface": "#1b1c1a",
+              "on-surface-variant": "#434843",
+              "tertiary-fixed-dim": "#c0c9b7",
+              "surface-bright": "#fbf9f5",
+              "surface-container-high": "#eae8e4",
+              "surface-dim": "#dbdad6",
+              "on-primary-fixed-variant": "#394b3d",
+              "on-primary": "#ffffff",
+              "on-primary-fixed": "#0e1f13",
+              "tertiary": "#3b4436",
+              "secondary-fixed-dim": "#ffb77d",
+              "on-primary-container": "#c0d5c2",
+              "inverse-on-surface": "#f2f0ed",
+              "surface-container-highest": "#e4e2de",
+              "background": "#fbf9f5",
+              "secondary": "#904d00",
+              "error-container": "#ffdad6",
+              "inverse-primary": "#b7ccb9",
+              "outline": "#737872",
+              "on-tertiary-container": "#c9d2bf",
+              "on-tertiary": "#ffffff",
+              "inverse-surface": "#30312e",
+              "tertiary-container": "#535b4c",
+              "secondary-container": "#fe932c",
+              "on-secondary": "#ffffff",
+              "on-secondary-fixed-variant": "#6e3900",
+              "on-error-container": "#93000a",
+              "primary-fixed": "#d3e8d5",
+              "surface-container-low": "#f5f3ef",
+              "surface": "#fbf9f5",
+              "primary-fixed-dim": "#b7ccb9",
+              "on-tertiary-fixed-variant": "#41493b",
+              "primary-container": "#4a5d4e",
+              "surface-tint": "#506354",
+              "on-tertiary-fixed": "#161e12"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .bg-mesh {
+        background-color: #fbf9f5;
+        background-image: radial-gradient(at 0% 0%, #f5f3ef 0px, transparent 50%),
+                          radial-gradient(at 100% 0%, #e4e2de 0px, transparent 50%);
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface antialiased min-h-screen flex flex-col">
+<!-- Stepper Indicator -->
+<nav class="w-full max-w-screen-xl mx-auto px-6 py-8 flex justify-between items-center">
+<div class="flex items-center gap-2">
+<div class="h-1 w-8 rounded-full bg-primary-container opacity-20"></div>
+<div class="h-1 w-8 rounded-full bg-primary-container opacity-20"></div>
+<div class="h-1.5 w-12 rounded-full bg-primary shadow-sm"></div>
+</div>
+<span class="font-label text-sm font-semibold tracking-widest text-primary/40 uppercase">Step 03</span>
+</nav>
+<main class="flex-grow flex flex-col items-center justify-center px-6 max-w-xl mx-auto w-full">
+<!-- Header Section -->
+<header class="text-center mb-12">
+<h1 class="font-headline text-4xl md:text-5xl font-extrabold text-primary tracking-tighter mb-4">
+                Invite your people
+            </h1>
+<p class="text-on-surface-variant text-lg max-w-xs mx-auto leading-relaxed">
+                Cooking is better when shared. Bring your favorite foodies into your kitchen.
+            </p>
+</header>
+<!-- Main Card Section -->
+<div class="w-full bg-surface-container-low rounded-lg p-8 md:p-12 mb-8 relative overflow-hidden group">
+<!-- Decorative Elements -->
+<div class="absolute -top-12 -right-12 w-32 h-32 bg-secondary/5 rounded-full blur-3xl"></div>
+<div class="absolute -bottom-12 -left-12 w-32 h-32 bg-primary/5 rounded-full blur-3xl"></div>
+<div class="relative z-10 flex flex-col items-center">
+<div class="font-label text-xs font-bold uppercase tracking-[0.2em] text-on-surface-variant/60 mb-6">
+                    Your Kitchen Code
+                </div>
+<!-- Invite Code Display -->
+<div class="flex items-center justify-center gap-4 bg-surface-container-lowest rounded-full px-8 py-5 shadow-sm mb-10 w-full border border-outline-variant/10">
+<span class="font-headline text-3xl md:text-4xl font-black text-primary tracking-widest">MISE-1234</span>
+<button class="p-2 text-primary hover:bg-surface-container-high rounded-full transition-colors active:scale-90">
+<span class="material-symbols-outlined" data-icon="content_copy">content_copy</span>
+</button>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col gap-4 w-full">
+<!-- Share via Text (Primary) -->
+<button class="w-full py-5 px-8 rounded-full bg-gradient-to-br from-primary to-primary-container text-on-primary font-headline font-bold text-lg shadow-xl shadow-primary/10 flex items-center justify-center gap-3 transition-all hover:translate-y-[-2px] active:scale-[0.98]">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+                        Share via Text
+                    </button>
+<!-- Copy Link (Secondary) -->
+<button class="w-full py-5 px-8 rounded-full bg-secondary-fixed text-on-secondary-fixed font-headline font-bold text-lg flex items-center justify-center gap-3 transition-all hover:bg-secondary-fixed-dim active:scale-[0.98]">
+<span class="material-symbols-outlined" data-icon="link">link</span>
+                        Copy Link
+                    </button>
+</div>
+</div>
+</div>
+<!-- Secondary Content / Preview -->
+<div class="grid grid-cols-3 gap-4 w-full mb-12">
+<div class="bg-surface-container-high h-16 rounded-full flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" data-alt="User profile portrait of a smiling person" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUK_kbvyI17Bp3B0MLA0jJKtTJxQ0fINNrmG4CB5jWb-7tnMKTRgwj4d47PFXxo5stqBuW8xE_DsUfEFyPt80OBeeC4WsjIh-A-XTur-hWFQ5LCFBY5J3Di2AMbE06BD3i3h22R4lbnkdR3BnRKMopOhNFYd16nts9ITPflI4SpPvHKLXfZaa3SsgYiptFXHDS_0g61M6AVeQbGMkLLP4o5nrq2FpeJyb6Yi6Co_iKDFY04urcGk-bWNS27URWkBdmoDDRrbpG8KUD"/>
+</div>
+<div class="bg-surface-container-high h-16 rounded-full flex items-center justify-center overflow-hidden border-2 border-surface">
+<img class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" data-alt="User profile portrait of a happy chef" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFJcCqxq6cc_0-WRCut51jmaGOtpomgYWmiBtxqalj11iXHLwR9sPjdtR36egJOyHPViY60dS_aK8OuVnt_JI4_MPj0eYTOs_BFvz8_nUxX2hdUmvX6gmlPPCuNK4Y0fxAf6OWoc1Tl-HlWwyCFrzAw9ioL9XGtoTkrBzk5cSiwtxzfpTHPAAWDhxjd3mrIAS9wDzrCClmQNMMRKN5BYYmFtx_KooxvaibkfJsPoD933_SiWz_AdBIFiL2zWF-nCjGO3eY5rzMjnH4"/>
+</div>
+<div class="bg-tertiary-fixed h-16 rounded-full flex items-center justify-center text-on-tertiary-fixed font-headline font-bold">
+                +4
+            </div>
+</div>
+<!-- Footer Actions -->
+<footer class="text-center pb-12">
+<a class="font-headline font-bold text-primary/60 hover:text-primary transition-colors text-sm tracking-wide py-2 inline-block" href="#">
+                Skip for now
+            </a>
+</footer>
+</main>
+<!-- Visual Polish: Decorative Kitchen Elements -->
+<div class="fixed bottom-10 right-10 opacity-5 pointer-events-none hidden md:block">
+<span class="material-symbols-outlined text-[12rem]" data-icon="restaurant_menu">restaurant_menu</span>
+</div>
+<div class="fixed top-20 left-10 opacity-5 pointer-events-none hidden md:block">
+<span class="material-symbols-outlined text-[8rem]" data-icon="skillet">skillet</span>
+</div>
+</body></html>

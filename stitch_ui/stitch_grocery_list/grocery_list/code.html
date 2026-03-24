@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary": "#3b4436",
+              "on-secondary-fixed": "#2f1500",
+              "error": "#ba1a1a",
+              "on-secondary-container": "#663500",
+              "inverse-primary": "#b7ccb9",
+              "on-tertiary-fixed": "#161e12",
+              "on-primary-fixed-variant": "#394b3d",
+              "surface-container-high": "#eae8e4",
+              "on-primary": "#ffffff",
+              "on-tertiary": "#ffffff",
+              "surface-tint": "#506354",
+              "outline-variant": "#c3c8c1",
+              "inverse-surface": "#30312e",
+              "surface-dim": "#dbdad6",
+              "on-primary-container": "#c0d5c2",
+              "secondary": "#904d00",
+              "secondary-fixed": "#ffdcc3",
+              "surface-container-low": "#f5f3ef",
+              "tertiary-container": "#535b4c",
+              "surface": "#fbf9f5",
+              "inverse-on-surface": "#f2f0ed",
+              "tertiary-fixed": "#dde6d2",
+              "background": "#fbf9f5",
+              "on-secondary-fixed-variant": "#6e3900",
+              "secondary-container": "#fe932c",
+              "on-error-container": "#93000a",
+              "secondary-fixed-dim": "#ffb77d",
+              "on-background": "#1b1c1a",
+              "on-tertiary-container": "#c9d2bf",
+              "surface-variant": "#e4e2de",
+              "on-tertiary-fixed-variant": "#41493b",
+              "on-secondary": "#ffffff",
+              "primary-container": "#4a5d4e",
+              "surface-bright": "#fbf9f5",
+              "on-error": "#ffffff",
+              "primary-fixed": "#d3e8d5",
+              "primary-fixed-dim": "#b7ccb9",
+              "outline": "#737872",
+              "surface-container-lowest": "#ffffff",
+              "error-container": "#ffdad6",
+              "on-surface-variant": "#434843",
+              "on-surface": "#1b1c1a",
+              "tertiary-fixed-dim": "#c0c9b7",
+              "primary": "#334537",
+              "surface-container-highest": "#e4e2de",
+              "on-primary-fixed": "#0e1f13",
+              "surface-container": "#efeeea"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-32">
+<!-- Top App Bar -->
+<header class="bg-[#fbf9f5] dark:bg-stone-900 sticky top-0 z-40">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User profile avatar small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7w-tHNPn0ajy4-HRVy5rF7LLiIRFCaiHswWezkKHW4H-9cdZLhJAae3E0GYdMxalwQPyMqnppm3O4pkONTGVzqkQFi-iF590FH4uqpT_CgLp8aj7irUjeNR0DZAFpr3GPvEpEcn87n4fsSLz5nSqlGdIY2clHlkYWQ5fXTzVlgMkCIm-atX7S2Mfymp9cMTcX5adRmc8azEw_qNGCfiT03t5zcu7BJd7N6MTXe-VlAiTdMZIFK5z8n_mnEKfnmeX37sCEgEwsEbGK"/>
+</div>
+<h1 class="text-[#334537] dark:text-[#fbf9f5] font-['Plus_Jakarta_Sans'] font-extrabold text-2xl">Mise</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-[#f5f3ef] dark:hover:bg-stone-800 transition-colors text-[#334537]">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+</button>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-6 pt-4">
+<!-- Summary Dashboard Bar -->
+<section class="bg-surface-container-lowest p-6 rounded-lg mb-8 shadow-[0_-4px_24px_rgba(27,28,26,0.04)]">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+<div>
+<h2 class="text-xl font-bold text-primary mb-1">Weekly Grocery List</h2>
+<p class="text-on-surface-variant font-label text-sm">18 items · ~$85 estimated · 4 checked</p>
+</div>
+<div class="flex -space-x-2">
+<img class="w-8 h-8 rounded-full border-2 border-surface shadow-sm" data-alt="User 1 avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA22l2lo9wmgiNFEz3uvQrKlVXWQuoZjbDIOSqI2oRXUToq44ykMMtJQE0OaUAmT8Y_UrzJPZLuInLmTLQtALyuahM1OR4RCYBayn7miOQkH4eoXYpwDlKTn9D-LHt870KvQ57pJmsflK7wFcxSGt8UArud3wtbFu__nAg4Zc2PZ_xrKVCX-K5IccYnqm-EGFb9Z1ru0VsfJwldGDLn3YITipiXyLZJ3UTY82CHUG4qyf262A9diJuFz3o5eiu5XnLJsSFI56DV1Ya5"/>
+<img class="w-8 h-8 rounded-full border-2 border-surface shadow-sm" data-alt="User 2 avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDWEvZ0ovuazgRofGX9I73-RstwXSClaZRlkyWeUGEbqMOfDgEXUTxVLN5TF8Ovd1d4Jkp3k45Ehj_232NOwpsWbm_GRyPqyaZhwaVASCdz5eQZEEA-MisrR-J1051LKtk0W_zlB0WnQ_LnU1XpVzcpm5fFZgmREPl8PP-zxiWC8p-8ZQ2WGgHylPaW1AqAB1vpUAzb_ZZvNHZAKd81qFnx6FiUvB5s8DkPl3XBjzYc0jiwNVxDv3w7sdq2Sc3h3NV_D-XMyJTwrNk"/>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-surface-container-high flex items-center justify-center text-[10px] font-bold">+1</div>
+</div>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary to-primary-container w-[22%] rounded-full"></div>
+</div>
+</section>
+<!-- Grocery List Sections -->
+<div class="space-y-10">
+<!-- Proteins Section -->
+<section>
+<div class="flex items-center gap-3 mb-4 opacity-90">
+<span class="material-symbols-outlined text-primary" data-icon="restaurant">restaurant</span>
+<h3 class="text-lg font-bold tracking-tight text-primary">Proteins</h3>
+</div>
+<div class="space-y-1">
+<!-- Item 1 -->
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-lg hover:shadow-sm transition-all group">
+<div class="flex items-center gap-4">
+<button class="w-7 h-7 rounded-full border-2 border-outline-variant flex items-center justify-center hover:border-primary transition-colors">
+</button>
+<div>
+<p class="font-medium text-on-surface">Organic Chicken Breast</p>
+<p class="text-xs text-on-surface-variant">2 packs · ~$14.50</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-xs font-medium text-outline">Pantry</span>
+<span class="material-symbols-outlined text-outline text-lg" data-icon="more_vert">more_vert</span>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-lg hover:shadow-sm transition-all group">
+<div class="flex items-center gap-4">
+<button class="w-7 h-7 rounded-full border-2 border-outline-variant flex items-center justify-center hover:border-primary transition-colors">
+</button>
+<div>
+<p class="font-medium text-on-surface">Wild Caught Salmon</p>
+<p class="text-xs text-on-surface-variant">1.5 lbs · ~$22.00</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline text-lg" data-icon="more_vert">more_vert</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Produce Section -->
+<section>
+<div class="flex items-center gap-3 mb-4 opacity-90">
+<span class="material-symbols-outlined text-primary" data-icon="eco">eco</span>
+<h3 class="text-lg font-bold tracking-tight text-primary">Produce</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-lg">
+<div class="flex items-center gap-4">
+<button class="w-7 h-7 rounded-full border-2 border-outline-variant flex items-center justify-center"></button>
+<div>
+<p class="font-medium text-on-surface">Honeycrisp Apples</p>
+<p class="text-xs text-on-surface-variant">4 qty · ~$6.00</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-lg" data-icon="drag_indicator">drag_indicator</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-lg">
+<div class="flex items-center gap-4">
+<button class="w-7 h-7 rounded-full border-2 border-outline-variant flex items-center justify-center"></button>
+<div>
+<p class="font-medium text-on-surface">Baby Spinach</p>
+<p class="text-xs text-on-surface-variant">1 large tub · ~$5.50</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-lg" data-icon="drag_indicator">drag_indicator</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-lg">
+<div class="flex items-center gap-4">
+<button class="w-7 h-7 rounded-full border-2 border-outline-variant flex items-center justify-center"></button>
+<div>
+<p class="font-medium text-on-surface">Avocados</p>
+<p class="text-xs text-on-surface-variant">3 qty · ~$4.50</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-lg" data-icon="drag_indicator">drag_indicator</span>
+</div>
+</div>
+</section>
+<!-- Dairy Section (with checked items) -->
+<section>
+<div class="flex items-center gap-3 mb-4 opacity-90">
+<span class="material-symbols-outlined text-primary" data-icon="egg">egg</span>
+<h3 class="text-lg font-bold tracking-tight text-primary">Dairy</h3>
+</div>
+<div class="space-y-1">
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-lg">
+<div class="flex items-center gap-4">
+<button class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center" style="font-variation-settings: 'FILL' 1;">
+<span class="material-symbols-outlined text-sm" data-icon="check">check</span>
+</button>
+<div>
+<p class="font-medium text-on-surface-variant line-through opacity-60">Greek Yogurt (Plain)</p>
+<p class="text-xs text-outline line-through opacity-60">1 tub · ~$6.00</p>
+</div>
+</div>
+<img class="w-6 h-6 rounded-full grayscale opacity-50" data-alt="Checked by Sarah avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnI-10jHjWh7bBY65Yc7QC3LCUUTYzdFC7PZnIH6OoClZJFOFPbjvOQtXg9R4ArV1Crqz2bF7DTS2JwpJAk7Pp64Kvpb0T-yS6sc311A14sgYRM3gA-bX1vpIG6HUuVaiYPLeDGNs7D6SKTRqiY_xTvsV61qGybu3rM23x7vKLUlCgatURi7gX-s-gt2awDUww4ImVzWMf-E0ytnDy7otCFg_3vUq7J7HY3gthkUvyFw2Hoapc1_YVVr2Kd5pOTMdGLB9ZOPo7NxTR"/>
+</div>
+</div>
+</section>
+<!-- Completed Section (Collapsed) -->
+<section class="mt-12">
+<button class="flex items-center justify-between w-full p-4 bg-surface-container-high rounded-lg text-primary font-bold">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="expand_more">expand_more</span>
+<span>Completed (3)</span>
+</div>
+<span class="text-xs font-normal">Show all</span>
+</button>
+</section>
+</div>
+</main>
+<!-- Floating Add Button -->
+<div class="fixed bottom-28 right-6 md:right-12 z-50">
+<button class="w-16 h-16 rounded-full bg-gradient-to-br from-[#334537] to-[#4a5d4e] text-white shadow-xl flex items-center justify-center hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-3xl" data-icon="add">add</span>
+</button>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 rounded-t-[2.5rem] bg-[#fbf9f5]/80 dark:bg-stone-900/80 backdrop-blur-md border-t border-[#e4e2de]/15 shadow-[0_-4px_24px_rgba(27,28,26,0.04)]">
+<div class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3">
+<a class="flex flex-col items-center justify-center text-[#4a5d4e] dark:text-[#e4e2de] opacity-70 hover:opacity-100 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Plan</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#4a5d4e] dark:text-[#e4e2de] opacity-70 hover:opacity-100 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Recipes</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-gradient-to-br from-[#334537] to-[#4a5d4e] text-white rounded-full w-14 h-14 -mt-8 shadow-lg Active: scale-95 duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+<span class="sr-only">Grocery</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#4a5d4e] dark:text-[#e4e2de] opacity-70 hover:opacity-100 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Budget</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#4a5d4e] dark:text-[#e4e2de] opacity-70 hover:opacity-100 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Profile</span>
+</a>
+</div>
+</nav>
+</body></html>
