@@ -17,6 +17,7 @@ import { usePlanStore } from '../../../src/stores/planStore';
 import { useGrocerySync } from '../../../src/hooks/useGrocerySync';
 import { getWeekDays, toDateString } from '../../../src/lib/dates';
 import { supabase } from '../../../src/lib/supabase';
+import { TAB_BAR_HEIGHT } from '../../../src/lib/constants';
 
 const SECTION_ORDER = ['Proteins', 'Produce', 'Dairy & Eggs', 'Pantry', 'Other'];
 
@@ -167,7 +168,7 @@ export default function GroceryScreen() {
       {/* FAB for manual add */}
       {activeListId && (
         <Pressable
-          style={[styles.fab, { bottom: insets.bottom + spacing.md }]}
+          style={[styles.fab, { bottom: TAB_BAR_HEIGHT + spacing.md }]}
           onPress={() => setAddSheetOpen(true)}
           testID="add-item-fab"
         >
