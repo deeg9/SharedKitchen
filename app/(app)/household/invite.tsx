@@ -39,7 +39,7 @@ export default function InviteScreen() {
         // For a better UX, use Share from react-native directly
         const { Share } = require('react-native');
         await Share.share({
-          message: `Join my household on Mise! Use code: ${activeHousehold.invite_code}\n\nOr open this link: ${inviteLink}`,
+          message: `Join my household on SharedKitchen! Use code: ${activeHousehold.invite_code}\n\nOr open this link: ${inviteLink}`,
         });
       } else {
         Alert.alert('Sharing not available', 'Sharing is not available on this device.');

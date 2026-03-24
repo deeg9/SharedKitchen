@@ -107,7 +107,7 @@ export default function SignInScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
-          <Text style={styles.title}>Welcome to Mise</Text>
+          <Text style={styles.title}>Welcome to SharedKitchen</Text>
           <Text style={styles.subtitle}>Sign in to continue</Text>
         </View>
 

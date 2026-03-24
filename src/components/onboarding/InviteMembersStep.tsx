@@ -19,7 +19,7 @@ export function InviteMembersStep() {
   const handleShare = async () => {
     try {
       await Share.share({
-        message: `Join my kitchen on Mise! Use code: ${inviteCode}`,
+        message: `Join my kitchen on SharedKitchen! Use code: ${inviteCode}`,
       });
     } catch {
       // User cancelled share

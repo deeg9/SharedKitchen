@@ -26,7 +26,7 @@ Deno.serve(async (req: Request) => {
     let html: string;
     try {
       const response = await fetch(url, {
-        headers: { 'User-Agent': 'Mise Recipe Parser/1.0' },
+        headers: { 'User-Agent': 'SharedKitchen Recipe Parser/1.0' },
       });
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);

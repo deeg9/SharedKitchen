@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "Mise",
-    "slug": "mise",
+    "name": "SharedKitchen",
+    "slug": "sharedkitchen",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "scheme": "mise",
+    "scheme": "sharedkitchen",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",

@@ -74,7 +74,7 @@ export default function BudgetScreen() {
           <View style={styles.avatar}>
             <MaterialCommunityIcons name="account-circle" size={36} color={colors.primary} />
           </View>
-          <Text style={styles.appTitle}>Mise</Text>
+          <Text style={styles.appTitle}>SharedKitchen</Text>
         </View>
         <View style={styles.headerRight}>
           <Pressable

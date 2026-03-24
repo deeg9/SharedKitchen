@@ -66,7 +66,7 @@ export default function SignUpScreen() {
       >
         <View style={styles.header}>
           <Text style={styles.title}>Create Account</Text>
-          <Text style={styles.subtitle}>Sign up to get started with Mise</Text>
+          <Text style={styles.subtitle}>Sign up to get started with SharedKitchen</Text>
         </View>
 
         <View style={styles.form}>

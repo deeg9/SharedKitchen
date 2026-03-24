@@ -26,7 +26,7 @@ export function WelcomeStep() {
 
       <View style={styles.content}>
         <Text style={styles.headline}>
-          Welcome to <Text style={styles.italic}>Mise</Text>
+          Welcome to <Text style={styles.italic}>SharedKitchen</Text>
         </Text>
         <Text style={styles.subtitle}>
           Plan dinners together, not alone.
