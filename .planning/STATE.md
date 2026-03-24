@@ -117,7 +117,7 @@ None yet.
 |---|-------------|------|--------|-----------|
 | 1 | finish any and all of the supabase stuff | 2026-03-23 | 62b2075 | [1-finish-any-and-all-of-the-supabase-stuff](./quick/1-finish-any-and-all-of-the-supabase-stuff/) |
 | 2 | Create and run Playwright MCP end-to-end tests | 2026-03-23 | a7c2dd7 | [2-create-and-run-playwright-mcp-end-to-end](./quick/2-create-and-run-playwright-mcp-end-to-end/) |
-| 3 | Investigate RLS 403s and text node warnings | 2026-03-24 | pending | [3-fix-rls-403s-on-grocery-items-and-expens](./quick/3-fix-rls-403s-on-grocery-items-and-expens/) |
+| 3 | Investigate RLS 403s and text node warnings | 2026-03-24 | 1f3ebc6 | [3-fix-rls-403s-on-grocery-items-and-expens](./quick/3-fix-rls-403s-on-grocery-items-and-expens/) |
 
 ## Session Continuity
 
