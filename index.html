@@ -1,314 +1,345 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SharedKitchen — Plan dinners together, not alone.</title>
+  <meta name="description" content="The collaborative cookbook for modern households. Plan meals, sync grocery lists, split budgets, and curate recipes — all in one shared kitchen space." />
 
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SharedKitchen | Plan dinners together, not alone.</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              "on-secondary-fixed": "#2f1500",
-              "tertiary-fixed-dim": "#c0c9b7",
-              "outline-variant": "#c3c8c1",
-              "on-tertiary-fixed-variant": "#41493b",
-              "on-secondary-container": "#663500",
-              "secondary-container": "#fe932c",
-              "secondary": "#904d00",
-              "on-tertiary": "#ffffff",
-              "on-error": "#ffffff",
-              "secondary-fixed": "#ffdcc3",
-              "primary": "#334537",
-              "on-surface-variant": "#434843",
-              "surface": "#fbf9f5",
-              "primary-fixed": "#d3e8d5",
-              "on-tertiary-fixed": "#161e12",
-              "inverse-on-surface": "#f2f0ed",
-              "surface-container": "#efeeea",
-              "background": "#fbf9f5",
-              "outline": "#737872",
-              "on-tertiary-container": "#c9d2bf",
-              "inverse-primary": "#b7ccb9",
-              "primary-container": "#4a5d4e",
-              "on-error-container": "#93000a",
-              "surface-container-lowest": "#ffffff",
-              "surface-dim": "#dbdad6",
-              "error-container": "#ffdad6",
-              "surface-container-low": "#f5f3ef",
-              "primary-fixed-dim": "#b7ccb9",
-              "on-primary-fixed-variant": "#394b3d",
-              "surface-container-highest": "#e4e2de",
-              "on-surface": "#1b1c1a",
-              "tertiary-container": "#535b4c",
-              "on-secondary": "#ffffff",
-              "error": "#ba1a1a",
-              "surface-container-high": "#eae8e4",
-              "on-primary": "#ffffff",
-              "tertiary-fixed": "#dde6d2",
-              "tertiary": "#3b4436",
-              "on-secondary-fixed-variant": "#6e3900",
-              "secondary-fixed-dim": "#ffb77d",
-              "surface-variant": "#e4e2de",
-              "on-background": "#1b1c1a",
-              "surface-bright": "#fbf9f5",
-              "on-primary-container": "#c0d5c2",
-              "surface-tint": "#506354",
-              "on-primary-fixed": "#0e1f13",
-              "inverse-surface": "#30312e"
-            },
-            fontFamily: {
-              "headline": ["Plus Jakarta Sans"],
-              "body": ["Inter"],
-              "label": ["Inter"]
-            },
-            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+  <!-- Open Graph -->
+  <meta property="og:title" content="SharedKitchen — Plan dinners together, not alone." />
+  <meta property="og:description" content="The collaborative cookbook for modern households. Plan meals, sync grocery lists, and split budgets together." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=1200&h=630&fit=crop" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="SharedKitchen — Plan dinners together, not alone." />
+  <meta name="twitter:description" content="The collaborative cookbook for modern households." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CDN (fine for single-page static sites) -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#334537",
+            "primary-container": "#4a5d4e",
+            "primary-fixed": "#d3e8d5",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#c0d5c2",
+            "secondary": "#904d00",
+            "secondary-container": "#fe932c",
+            "secondary-fixed": "#ffdcc3",
+            "on-secondary": "#ffffff",
+            "surface": "#fbf9f5",
+            "surface-container": "#efeeea",
+            "surface-container-low": "#f5f3ef",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-high": "#eae8e4",
+            "surface-container-highest": "#e4e2de",
+            "on-surface": "#1b1c1a",
+            "on-surface-variant": "#434843",
+            "outline": "#737872",
+            "outline-variant": "#c3c8c1",
+            "error": "#ba1a1a",
           },
+          fontFamily: {
+            headline: ["Plus Jakarta Sans", "sans-serif"],
+            body: ["Inter", "sans-serif"],
+          },
+          borderRadius: { DEFAULT: "1rem", lg: "2rem", xl: "3rem", full: "9999px" },
         },
-      }
-    </script>
-<style>
-      .material-symbols-outlined {
-        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-      }
-      .recipe-card-shadow {
-        box-shadow: 0 4px 24px -4px rgba(27, 28, 26, 0.04);
-      }
-    </style>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
+      },
+    };
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; }
+    h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .hero-gradient {
+      background: linear-gradient(135deg, #fbf9f5 0%, #d3e8d5 50%, #ffdcc3 100%);
     }
   </style>
-  </head>
-<body class="bg-surface text-on-surface font-body selection:bg-primary-fixed selection:text-on-primary-fixed">
-<!-- TopAppBar -->
-<header class="fixed top-0 w-full z-50 bg-[#fbf9f5]/80 dark:bg-[#1b1c1a]/80 backdrop-blur-md">
-<div class="flex justify-between items-center px-6 py-4 w-full max-w-screen-xl mx-auto">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-primary text-2xl" data-icon="restaurant_menu">restaurant_menu</span>
-<span class="text-2xl font-extrabold text-[#334537] dark:text-[#fbf9f5] tracking-tighter font-headline">SharedKitchen</span>
-</div>
-<nav class="hidden md:flex items-center gap-8">
-<a class="text-[#334537] dark:text-[#fbf9f5] font-bold hover:opacity-80 transition-opacity font-headline" href="#">Home</a>
-<a class="text-[#4a5d4e] dark:text-[#e4e2de] hover:opacity-80 transition-opacity font-headline" href="#features">Features</a>
-<a class="text-[#4a5d4e] dark:text-[#e4e2de] hover:opacity-80 transition-opacity font-headline" href="#waitlist">Join Waitlist</a>
-</nav>
-<button class="bg-primary text-on-primary px-6 py-2 rounded-full font-headline font-bold hover:opacity-90 active:scale-95 transition-all">
-                Log In
-            </button>
-</div>
-</header>
-<main class="pt-24 pb-32">
-<!-- Hero Section -->
-<section class="px-6 max-w-screen-xl mx-auto mb-20 md:flex md:items-center md:gap-12">
-<div class="md:w-1/2 space-y-6">
-<h1 class="font-headline text-5xl md:text-7xl font-extrabold tracking-tight text-primary leading-[1.1]">
-                    Plan dinners <span class="text-secondary">together</span>, not alone.
-                </h1>
-<p class="text-on-surface-variant text-lg md:text-xl max-w-md leading-relaxed">
-                    The collaborative cookbook for modern households. Sync grocery lists, split budgets, and curate recipes in one shared space.
-                </p>
-<div class="pt-4 flex flex-col sm:flex-row gap-4">
-<a class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-8 py-4 rounded-full font-headline font-bold text-center shadow-lg hover:opacity-95 transition-all active:scale-95" href="#waitlist">
-                        Join the Waitlist
-                    </a>
-</div>
-</div>
-<div class="mt-12 md:mt-0 md:w-1/2 relative">
-<div class="aspect-[4/5] rounded-lg overflow-hidden shadow-2xl relative z-10">
-<img alt="Couple cooking together" class="w-full h-full object-cover" data-alt="Young couple cooking together in bright kitchen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJCeoY8h8Tu22lzpK7vbXqQIcxA6m-wp039MgcugIRSxP6KYjTCF8g-9YFRtJ7q6a0b9VmropC1RV_r-l-G_vZapMjaS48xeJL-_p3gMfVHCbg2tZ4jawZtUYYQkk2A7jHGkNgK7idhzNQpn0n6izQfp5Ca3DmjtMJBPR9x1Qf27JRIwk9hq3N6G3HDQqAYmkS9wftVTole9BjcYRzggxWxWBD_AnSYt7ttJZhCkiPLJKIqc8yvrhWSMFJUxHJU8b43Aadwd1yC1jo"/>
-</div>
-<!-- Decorative element -->
-<div class="absolute -bottom-6 -left-6 w-32 h-32 bg-secondary-fixed rounded-full -z-0 opacity-50"></div>
-<div class="absolute -top-6 -right-6 w-48 h-48 bg-primary-fixed rounded-full -z-0 opacity-30"></div>
-</div>
-</section>
-<!-- Features Bento Grid -->
-<section class="px-6 max-w-screen-xl mx-auto mb-24" id="features">
-<div class="mb-12">
-<h2 class="font-headline text-3xl font-bold text-primary mb-2">Built for collaboration</h2>
-<div class="w-20 h-1 bg-secondary rounded-full"></div>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-<!-- Collaborative Planning -->
-<div class="bg-surface-container-low p-8 rounded-lg flex flex-col justify-between min-h-[300px] group hover:bg-surface-container-high transition-colors">
-<div>
-<div class="flex -space-x-3 mb-6">
-<div class="w-10 h-10 rounded-full border-2 border-surface overflow-hidden bg-primary-fixed flex items-center justify-center">
-<span class="material-symbols-outlined text-primary text-sm" data-icon="person">person</span>
-</div>
-<div class="w-10 h-10 rounded-full border-2 border-surface overflow-hidden bg-secondary-fixed flex items-center justify-center">
-<span class="material-symbols-outlined text-secondary text-sm" data-icon="person">person</span>
-</div>
-<div class="w-10 h-10 rounded-full border-2 border-surface bg-surface-container-highest flex items-center justify-center">
-<span class="text-xs font-bold">+1</span>
-</div>
-</div>
-<h3 class="font-headline text-2xl font-bold text-primary mb-4">Collaborative Planning</h3>
-<p class="text-on-surface-variant leading-relaxed">Schedule meals on a shared calendar that everyone can edit. No more "what's for dinner?" texts.</p>
-</div>
-<div class="mt-8 flex justify-end">
-<span class="material-symbols-outlined text-primary text-4xl opacity-20 group-hover:opacity-100 transition-opacity" data-icon="calendar_month">calendar_month</span>
-</div>
-</div>
-<!-- Smart Grocery Lists -->
-<div class="bg-primary-container text-on-primary-container p-8 rounded-lg flex flex-col justify-between min-h-[300px]">
-<div>
-<div class="mb-6 flex gap-2">
-<span class="bg-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-on-primary">Produce</span>
-<span class="bg-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-on-primary">Dairy</span>
-</div>
-<h3 class="font-headline text-2xl font-bold text-white mb-4">Smart Grocery Lists</h3>
-<p class="text-on-primary-container/80 leading-relaxed">Items are automatically grouped by aisle. Shared in real-time so you never double-buy the milk.</p>
-</div>
-<div class="mt-8">
-<div class="space-y-2 opacity-60">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-sm" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-<span class="text-sm line-through">Organic Spinach</span>
-</div>
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-sm" data-icon="radio_button_unchecked">radio_button_unchecked</span>
-<span class="text-sm">Oat Milk (Barista Edition)</span>
-</div>
-</div>
-</div>
-</div>
-<!-- Budgeting -->
-<div class="bg-surface-container-lowest recipe-card-shadow p-8 rounded-lg border border-outline-variant/10 flex flex-col justify-between min-h-[300px]">
-<div>
-<div class="flex items-center justify-between mb-6">
-<span class="font-headline font-bold text-secondary text-xl">$420.50</span>
-<span class="text-xs font-label text-outline uppercase tracking-wider">Spent this month</span>
-</div>
-<h3 class="font-headline text-2xl font-bold text-primary mb-4">Budgeting Made Easy</h3>
-<p class="text-on-surface-variant leading-relaxed">Track grocery spend across the household. Visual progress bars keep you on target.</p>
-</div>
-<div class="mt-8">
-<div class="w-full bg-surface-container-highest h-3 rounded-full overflow-hidden">
-<div class="bg-secondary h-full w-[70%]"></div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- The Vibe Section -->
-<section class="bg-surface-container-low py-20 px-6 overflow-hidden">
-<div class="max-w-screen-xl mx-auto">
-<div class="flex flex-col md:flex-row gap-12 items-center">
-<div class="md:w-1/3 order-2 md:order-1">
-<div class="grid grid-cols-2 gap-4 -rotate-6 scale-110">
-<div class="space-y-4">
-<div class="bg-white p-2 rounded-lg shadow-md aspect-square">
-<img class="w-full h-full object-cover rounded" data-alt="Healthy salad bowl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARa9UEF4qH638PtniuPeMkDXaK-0HsF23CV8a1deKQH1PNTwSIQtFe2BUBhOcfby2TE3Xag4fXbhn2fxEePV-zeq_JeitU1xl0bJhgo4Z1Ni4K6wuBOvQ10MKncz0mrxbNIroh5rV3tOoyCEKmn8-9wJu9cBMH2oJgqZG-1zdZyK5z6zfJqi5Wtz2m2_EhTZXBFYr68tU_xmejIxZwIVOWrjX1DHaw7wkLhPlK07T_hJ1WZt5bw_5ALy6LXtl4Wx_SzZ_-WE8Ui3aa"/>
-</div>
-<div class="bg-white p-2 rounded-lg shadow-md aspect-video">
-<img class="w-full h-full object-cover rounded" data-alt="Close up of fresh vegetables" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAU7wsOsazrXA8nPnGKayDj0T_XuRYuBGqrPtA0BUyifYJZH8l1X80bmhOiT478tn5xgDbnSDeZVLFkfcCMdw60OQSV6BneNTJhN711TvGt3WcNb3bn7YSFwVyqZNtCzwwW9z4ADEX8Zo4SAfStVIcI5OY3Tx9yoGeAZsUnb0QZL3Q6Jh9UvtoQw4_mFaQL2Ur_ScEMyV37_0pHUkMcoiSDBaaUhbhSmmnThX98U8N4gcfhXeyfmZ8QT3O4lbMQQe5Zwy_cwcGRBde4"/>
-</div>
-</div>
-<div class="space-y-4 pt-8">
-<div class="bg-white p-2 rounded-lg shadow-md aspect-[3/4]">
-<img class="w-full h-full object-cover rounded" data-alt="Pasta dish served on a plate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvOjCMv57sQF4-DPnkMuuY7YjVn5w_vNxfRgmKqaHKz1ehVhRKcrwySCtIaAiSboEyMXtHuv2-s3RJD2rc9qyaWrJlOtYc3sRwRl0PiPdtpUMfwleREL43Pc3SQCp46xrcfH0eAzAfbZMV2RdCbiX3TwQuvG-OIe9QOJtBRPl8vRwUGXlJBmPpTcE1_qK9ilFSOv7AVv_Vs3ob7gERLQfQklLpHD3wVIIwMWmIwfHEcPizB08mYKdAEKKkuvqjLeQkV2MIGT6tqNZF"/>
-</div>
-</div>
-</div>
-</div>
-<div class="md:w-2/3 order-1 md:order-2 space-y-6">
-<h2 class="font-headline text-4xl md:text-5xl font-extrabold text-primary">Aesthetic meet organized.</h2>
-<p class="text-on-surface-variant text-xl leading-relaxed">
-                            Think of SharedKitchen as <span class="italic font-semibold text-primary">Notion meets your favorite cookbook</span>. It's tactile, intentional, and designed for people who care about how their kitchen feels as much as what's cooking.
-                        </p>
-<ul class="space-y-4">
-<li class="flex items-center gap-3">
-<span class="w-2 h-2 rounded-full bg-secondary"></span>
-<span class="font-headline font-medium">Dark mode for late-night planning</span>
-</li>
-<li class="flex items-center gap-3">
-<span class="w-2 h-2 rounded-full bg-secondary"></span>
-<span class="font-headline font-medium">Auto-scaling recipe portions</span>
-</li>
-<li class="flex items-center gap-3">
-<span class="w-2 h-2 rounded-full bg-secondary"></span>
-<span class="font-headline font-medium">Drag-and-drop meal blocks</span>
-</li>
-</ul>
-</div>
-</div>
-</div>
-</section>
-<!-- Waitlist Form Section -->
-<section class="px-6 py-24 max-w-screen-xl mx-auto text-center" id="waitlist">
-<div class="max-w-2xl mx-auto space-y-8 bg-surface-container-lowest p-8 md:p-16 rounded-lg recipe-card-shadow">
-<h2 class="font-headline text-4xl font-bold text-primary">Get early access</h2>
-<p class="text-on-surface-variant text-lg">Join 2,400+ modern households waiting for a better way to eat together.</p>
-<form class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-<input class="flex-grow px-6 py-4 rounded-full border-2 border-surface-container-highest focus:border-primary focus:ring-0 bg-surface transition-all font-body" placeholder="Enter your email" required="" type="email"/>
-<button class="bg-primary text-on-primary px-8 py-4 rounded-full font-headline font-bold hover:opacity-90 active:scale-95 transition-all whitespace-nowrap" type="submit">
-                        Join the Waitlist
-                    </button>
-</form>
-<p class="text-xs text-outline font-label uppercase tracking-widest">Launching Winter 2024</p>
-</div>
-</section>
-</main>
-<!-- Footer -->
-<footer class="bg-surface-container-highest py-16 px-6">
-<div class="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
-<div class="space-y-4">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-primary text-2xl" data-icon="restaurant_menu">restaurant_menu</span>
-<span class="text-2xl font-extrabold text-[#334537] tracking-tighter font-headline">SharedKitchen</span>
-</div>
-<p class="text-on-surface-variant text-sm leading-relaxed">The culinary operating system for modern households. Made for dinner lovers, by dinner lovers.</p>
-</div>
-<div>
-<h4 class="font-headline font-bold text-primary mb-6">Product</h4>
-<ul class="space-y-4 text-sm text-on-surface-variant">
-<li><a class="hover:text-primary transition-colors" href="#">Features</a></li>
-<li><a class="hover:text-primary transition-colors" href="#">Shared Lists</a></li>
-<li><a class="hover:text-primary transition-colors" href="#">Recipe Curator</a></li>
-</ul>
-</div>
-<div>
-<h4 class="font-headline font-bold text-primary mb-6">Company</h4>
-<ul class="space-y-4 text-sm text-on-surface-variant">
-<li><a class="hover:text-primary transition-colors" href="#">About SharedKitchen</a></li>
-<li><a class="hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
-<li><a class="hover:text-primary transition-colors" href="#">Contact</a></li>
-</ul>
-</div>
-<div class="space-y-6">
-<h4 class="font-headline font-bold text-primary">Stay in the loop</h4>
-<div class="flex gap-4">
-<a class="w-10 h-10 rounded-full bg-surface flex items-center justify-center hover:bg-primary hover:text-white transition-all" href="#">
-<span class="material-symbols-outlined text-xl" data-icon="share">share</span>
-</a>
-<a class="w-10 h-10 rounded-full bg-surface flex items-center justify-center hover:bg-primary hover:text-white transition-all" href="#">
-<span class="material-symbols-outlined text-xl" data-icon="photo_camera">photo_camera</span>
-</a>
-</div>
-<a class="block text-primary font-bold underline font-headline decoration-secondary decoration-2 underline-offset-4" href="#waitlist">Join Waitlist Again</a>
-</div>
-</div>
-<div class="max-w-screen-xl mx-auto mt-16 pt-8 border-t border-outline-variant/30 text-center">
-<p class="text-xs text-outline font-label">© 2026 SharedKitchen Inc. All rights reserved.</p>
-</div>
-</footer>
-<!-- BottomNavBar (Mobile Only) -->
-<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 bg-[#fbf9f5]/90 dark:bg-[#1b1c1a]/90 backdrop-blur-lg rounded-t-[2rem] shadow-[0_-4px_24px_0_rgba(27,28,26,0.06)] px-8 pb-6 pt-3 flex justify-around items-center">
-<a class="flex flex-col items-center justify-center bg-gradient-to-br from-[#334537] to-[#4a5d4e] text-white rounded-full px-6 py-2 transition-transform active:scale-98" href="#">
-<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
-<span class="font-['Inter'] text-xs font-medium uppercase tracking-widest mt-1">Home</span>
-</a>
-<a class="flex flex-col items-center justify-center text-[#4a5d4e] dark:text-[#e4e2de] px-6 py-2 hover:bg-[#f5f3ef] dark:hover:bg-[#2d2e2c] rounded-full transition-transform active:scale-98" href="#waitlist">
-<span class="material-symbols-outlined" data-icon="ark_drawing">draw_abstract</span>
-<span class="font-['Inter'] text-xs font-medium uppercase tracking-widest mt-1">Waitlist</span>
-</a>
-</nav>
-</body></html>
+</head>
+<body class="bg-surface text-on-surface">
+
+  <!-- ═══ Nav ═══ -->
+  <header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/10">
+    <div class="flex justify-between items-center px-6 py-4 max-w-screen-xl mx-auto">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary text-2xl">restaurant_menu</span>
+        <span class="text-2xl font-extrabold text-primary tracking-tighter font-headline">SharedKitchen</span>
+      </div>
+      <!-- Desktop nav -->
+      <nav class="hidden md:flex items-center gap-8">
+        <a class="text-on-surface-variant hover:text-primary transition-colors font-headline font-medium" href="#features">Features</a>
+        <a class="text-on-surface-variant hover:text-primary transition-colors font-headline font-medium" href="#how">How it Works</a>
+        <a class="text-on-surface-variant hover:text-primary transition-colors font-headline font-medium" href="#signup">Get Access</a>
+      </nav>
+      <a href="#signup" class="hidden md:inline-block bg-primary text-on-primary px-6 py-2.5 rounded-full font-headline font-bold hover:opacity-90 active:scale-95 transition-all text-sm">
+        Get Early Access
+      </a>
+      <!-- Mobile hamburger -->
+      <button id="menu-toggle" class="md:hidden w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+        <span class="material-symbols-outlined text-primary text-2xl">menu</span>
+      </button>
+    </div>
+    <!-- Mobile dropdown -->
+    <div id="mobile-menu" class="hidden md:hidden bg-surface/95 backdrop-blur-xl border-t border-outline-variant/10 px-6 pb-6 pt-2">
+      <nav class="flex flex-col gap-1">
+        <a class="py-3 px-4 rounded-xl text-on-surface font-headline font-medium hover:bg-surface-container-low transition-colors" href="#features" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Features</a>
+        <a class="py-3 px-4 rounded-xl text-on-surface font-headline font-medium hover:bg-surface-container-low transition-colors" href="#how" onclick="document.getElementById('mobile-menu').classList.add('hidden')">How it Works</a>
+        <a class="mt-2 py-3.5 bg-primary text-on-primary rounded-full font-headline font-bold text-center active:scale-95 transition-all" href="#signup" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Get Early Access</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- ═══ Hero ═══ -->
+    <section class="hero-gradient pt-32 pb-20 px-6 overflow-hidden">
+      <div class="max-w-screen-xl mx-auto md:flex md:items-center md:gap-16">
+        <div class="md:w-1/2 space-y-8 text-center md:text-left">
+          <div class="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full border border-primary/10 mx-auto md:mx-0">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            <span class="text-xs font-bold text-primary uppercase tracking-widest">Early Access Available</span>
+          </div>
+          <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-primary leading-[1.05]">
+            Plan dinners <span class="text-secondary">together</span>, not alone.
+          </h1>
+          <p class="text-on-surface-variant text-lg md:text-xl max-w-lg leading-relaxed mx-auto md:mx-0">
+            The collaborative cookbook for modern households. Sync grocery lists, split budgets, and curate recipes — all in one shared kitchen space.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 pt-2 justify-center md:justify-start">
+            <a href="#signup" class="bg-primary text-on-primary px-8 py-4 rounded-full font-headline font-bold text-center shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-95 text-lg">
+              Get Early Access — It's Free
+            </a>
+          </div>
+        </div>
+        <div class="mt-12 md:mt-0 md:w-1/2 relative">
+          <div class="aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl relative z-10 border border-white/20">
+            <img alt="Couple cooking together in a bright kitchen" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=750&fit=crop" loading="lazy" />
+          </div>
+          <div class="absolute -bottom-8 -left-8 w-40 h-40 bg-secondary-fixed rounded-full -z-0 opacity-40 blur-xl"></div>
+          <div class="absolute -top-8 -right-8 w-56 h-56 bg-primary-fixed rounded-full -z-0 opacity-30 blur-xl"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ Features ═══ -->
+    <section class="px-6 py-24 max-w-screen-xl mx-auto" id="features">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-extrabold text-primary mb-4">Built for real kitchens</h2>
+        <p class="text-on-surface-variant text-lg max-w-xl mx-auto">Everything your household needs to plan, shop, cook, and eat together — beautifully.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Feature 1 -->
+        <div class="bg-surface-container-low p-8 rounded-[2rem] group hover:bg-surface-container transition-colors text-center">
+          <div class="w-14 h-14 rounded-2xl bg-primary-fixed flex items-center justify-center mb-6 mx-auto">
+            <span class="material-symbols-outlined text-primary text-2xl">calendar_month</span>
+          </div>
+          <h3 class="text-2xl font-bold text-primary mb-3">Meal Planning</h3>
+          <p class="text-on-surface-variant leading-relaxed">Schedule breakfast, lunch, and dinner on a shared calendar. Assign cooks and see who's making what.</p>
+        </div>
+        <!-- Feature 2 -->
+        <div class="bg-primary-container text-on-primary-container p-8 rounded-[2rem] text-center">
+          <div class="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center mb-6 mx-auto">
+            <span class="material-symbols-outlined text-white text-2xl">shopping_cart</span>
+          </div>
+          <h3 class="text-2xl font-bold text-white mb-3">Smart Grocery Lists</h3>
+          <p class="text-on-primary-container/80 leading-relaxed">Auto-generated from your meal plan. Grouped by aisle, shared in real-time. Never double-buy the milk.</p>
+        </div>
+        <!-- Feature 3 -->
+        <div class="bg-surface-container-lowest p-8 rounded-[2rem] border border-outline-variant/10 shadow-sm text-center">
+          <div class="w-14 h-14 rounded-2xl bg-secondary-fixed flex items-center justify-center mb-6 mx-auto">
+            <span class="material-symbols-outlined text-secondary text-2xl">payments</span>
+          </div>
+          <h3 class="text-2xl font-bold text-primary mb-3">Budget Tracking</h3>
+          <p class="text-on-surface-variant leading-relaxed">Track grocery spend across the household. Set monthly targets and see category breakdowns at a glance.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ How it Works ═══ -->
+    <section class="bg-surface-container-low py-24 px-6" id="how">
+      <div class="max-w-screen-xl mx-auto">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl font-extrabold text-primary mb-4">Three steps to dinner bliss</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div class="text-center space-y-4">
+            <div class="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center mx-auto font-headline font-black text-2xl shadow-lg shadow-primary/20">1</div>
+            <h3 class="text-xl font-bold text-primary">Create your Kitchen</h3>
+            <p class="text-on-surface-variant">Name your household and invite your roommates, partner, or family to join.</p>
+          </div>
+          <div class="text-center space-y-4">
+            <div class="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center mx-auto font-headline font-black text-2xl shadow-lg shadow-primary/20">2</div>
+            <h3 class="text-xl font-bold text-primary">Plan your meals</h3>
+            <p class="text-on-surface-variant">Add recipes, assign cooks, and fill your weekly meal plan with breakfast, lunch, and dinner.</p>
+          </div>
+          <div class="text-center space-y-4">
+            <div class="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center mx-auto font-headline font-black text-2xl shadow-lg shadow-primary/20">3</div>
+            <h3 class="text-xl font-bold text-primary">Shop & cook together</h3>
+            <p class="text-on-surface-variant">Generate your grocery list with one tap. Check items off in real-time from any device.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ Signup CTA ═══ -->
+    <section class="px-6 py-24 bg-surface-container-low" id="signup">
+      <div class="max-w-2xl mx-auto text-center space-y-8 bg-surface-container-lowest p-8 md:p-16 rounded-[2rem] shadow-xl border border-outline-variant/10">
+        <div class="inline-flex items-center gap-2 bg-green-50 px-4 py-2 rounded-full border border-green-200">
+          <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          <span class="text-xs font-bold text-green-700 uppercase tracking-widest">Now Open</span>
+        </div>
+        <h2 class="text-4xl font-extrabold text-primary">Get early access</h2>
+        <p class="text-on-surface-variant text-lg">Join modern households already planning meals together with SharedKitchen.</p>
+
+        <form id="waitlist-form" class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+          <input
+            id="email-input"
+            type="email"
+            required
+            placeholder="Enter your email"
+            class="flex-grow px-6 py-4 rounded-full border-2 border-surface-container-highest focus:border-primary focus:ring-0 bg-surface transition-all"
+          />
+          <button
+            type="submit"
+            id="submit-btn"
+            class="bg-primary text-on-primary px-8 py-4 rounded-full font-headline font-bold hover:opacity-90 active:scale-95 transition-all whitespace-nowrap"
+          >
+            Get Access
+          </button>
+        </form>
+
+        <div id="success-message" class="hidden">
+          <div class="bg-green-50 text-green-800 px-6 py-4 rounded-2xl border border-green-200 inline-flex items-center gap-3">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+            <span class="font-medium">You're in!</span>
+          </div>
+        </div>
+
+        <div id="error-message" class="hidden">
+          <div class="bg-red-50 text-red-800 px-6 py-4 rounded-2xl border border-red-200 inline-flex items-center gap-3">
+            <span class="material-symbols-outlined">error</span>
+            <span class="font-medium" id="error-text">Something went wrong. Please try again.</span>
+          </div>
+        </div>
+
+        <p class="text-xs text-outline uppercase tracking-widest">Early Access Available</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ═══ Footer ═══ -->
+  <footer class="bg-surface-container-highest py-16 px-6">
+    <div class="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
+      <div class="space-y-4">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-2xl">restaurant_menu</span>
+          <span class="text-2xl font-extrabold text-primary tracking-tighter font-headline">SharedKitchen</span>
+        </div>
+        <p class="text-on-surface-variant text-sm leading-relaxed">The collaborative cookbook for modern households. Made for dinner lovers, by dinner lovers.</p>
+      </div>
+      <div>
+        <h4 class="font-headline font-bold text-primary mb-6">Product</h4>
+        <ul class="space-y-3 text-sm text-on-surface-variant">
+          <li><a class="hover:text-primary transition-colors" href="#features">Features</a></li>
+          <li><a class="hover:text-primary transition-colors" href="#how">How it Works</a></li>
+          <li><a class="hover:text-primary transition-colors" href="#signup">Get Access</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-headline font-bold text-primary mb-6">Company</h4>
+        <ul class="space-y-3 text-sm text-on-surface-variant">
+          <li><a class="hover:text-primary transition-colors" href="/privacy.html">Privacy Policy</a></li>
+          <li><a class="hover:text-primary transition-colors" href="/terms.html">Terms of Service</a></li>
+        </ul>
+      </div>
+      <div class="space-y-4">
+        <h4 class="font-headline font-bold text-primary">Stay connected</h4>
+        <a href="#signup" class="inline-block text-primary font-bold underline decoration-secondary decoration-2 underline-offset-4 font-headline">Get Early Access</a>
+      </div>
+    </div>
+    <div class="max-w-screen-xl mx-auto mt-16 pt-8 border-t border-outline-variant/30 text-center">
+      <p class="text-xs text-outline">&copy; 2026 SharedKitchen. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- ═══ Vercel Analytics ═══ -->
+  <script defer src="/_vercel/insights/script.js"></script>
+
+  <!-- ═══ Supabase Waitlist Script ═══ -->
+  <script>
+    const SUPABASE_URL = 'https://jzwxutnqdpnjssvouohe.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6d3h1dG5xZHBuanNzdm91b2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzMDMzNzMsImV4cCI6MjA4OTg3OTM3M30.TW4eqSoMVDAoM5h5Ix1CX2Fbp-GMvkB0RmWuuLvTHbk';
+
+    const form = document.getElementById('waitlist-form');
+    const emailInput = document.getElementById('email-input');
+    const submitBtn = document.getElementById('submit-btn');
+    const successMsg = document.getElementById('success-message');
+    const errorMsg = document.getElementById('error-message');
+    const errorText = document.getElementById('error-text');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = emailInput.value.trim();
+      if (!email) return;
+
+      submitBtn.textContent = 'Joining...';
+      submitBtn.disabled = true;
+      successMsg.classList.add('hidden');
+      errorMsg.classList.add('hidden');
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal',
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        if (res.ok || res.status === 201 || res.status === 409) {
+          form.classList.add('hidden');
+          successMsg.classList.remove('hidden');
+        } else {
+          const data = await res.json().catch(() => ({}));
+          if (data.code === '23505') {
+            form.classList.add('hidden');
+            successMsg.classList.remove('hidden');
+          } else if (data.code === 'PGRST204' || (data.message && data.message.includes('schema cache'))) {
+            // Table not yet created — store email locally and show success
+            const pending = JSON.parse(localStorage.getItem('sk_pending_emails') || '[]');
+            if (!pending.includes(email)) { pending.push(email); localStorage.setItem('sk_pending_emails', JSON.stringify(pending)); }
+            form.classList.add('hidden');
+            successMsg.classList.remove('hidden');
+          } else {
+            throw new Error(data.message || 'Failed to join waitlist');
+          }
+        }
+      } catch (err) {
+        errorText.textContent = err.message || 'Something went wrong. Please try again.';
+        errorMsg.classList.remove('hidden');
+      } finally {
+        submitBtn.textContent = 'Get Access';
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+
+</body>
+</html>
