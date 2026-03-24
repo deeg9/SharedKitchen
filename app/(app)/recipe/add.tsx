@@ -137,7 +137,7 @@ export default function AddRecipeScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
+        <Pressable onPress={() => router.canGoBack() ? router.back() : router.replace('/(app)/(tabs)/recipes')} style={styles.backButton}>
           <MaterialCommunityIcons name="arrow-left" size={24} color={colors.primary} />
         </Pressable>
         <Text style={styles.headerTitle}>Add Recipe</Text>
