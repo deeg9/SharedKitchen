@@ -86,7 +86,7 @@
         <a class="text-on-surface-variant hover:text-primary transition-colors font-headline font-medium" href="#how">How it Works</a>
         <a class="text-on-surface-variant hover:text-primary transition-colors font-headline font-medium" href="#signup">Get Access</a>
       </nav>
-      <a href="#signup" class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-headline font-bold hover:opacity-90 active:scale-95 transition-all text-sm">
+      <a href="#signup" class="hidden md:inline-block bg-primary text-on-primary px-6 py-2.5 rounded-full font-headline font-bold hover:opacity-90 active:scale-95 transition-all text-sm">
         Get Early Access
       </a>
     </div>
@@ -96,29 +96,21 @@
     <!-- ═══ Hero ═══ -->
     <section class="hero-gradient pt-32 pb-20 px-6 overflow-hidden">
       <div class="max-w-screen-xl mx-auto md:flex md:items-center md:gap-16">
-        <div class="md:w-1/2 space-y-8">
-          <div class="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full border border-primary/10">
+        <div class="md:w-1/2 space-y-8 text-center md:text-left">
+          <div class="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full border border-primary/10 mx-auto md:mx-0">
             <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
             <span class="text-xs font-bold text-primary uppercase tracking-widest">Early Access Available</span>
           </div>
           <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-primary leading-[1.05]">
             Plan dinners <span class="text-secondary">together</span>, not alone.
           </h1>
-          <p class="text-on-surface-variant text-lg md:text-xl max-w-lg leading-relaxed">
+          <p class="text-on-surface-variant text-lg md:text-xl max-w-lg leading-relaxed mx-auto md:mx-0">
             The collaborative cookbook for modern households. Sync grocery lists, split budgets, and curate recipes — all in one shared kitchen space.
           </p>
-          <div class="flex flex-col sm:flex-row gap-4 pt-2">
+          <div class="flex flex-col sm:flex-row gap-4 pt-2 justify-center md:justify-start">
             <a href="#signup" class="bg-primary text-on-primary px-8 py-4 rounded-full font-headline font-bold text-center shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-95 text-lg">
               Get Early Access — It's Free
             </a>
-          </div>
-          <div class="flex items-center gap-4 pt-2">
-            <div class="flex -space-x-2">
-              <div class="w-8 h-8 rounded-full bg-primary-fixed border-2 border-white flex items-center justify-center text-xs font-bold text-primary">A</div>
-              <div class="w-8 h-8 rounded-full bg-secondary-fixed border-2 border-white flex items-center justify-center text-xs font-bold text-secondary">M</div>
-              <div class="w-8 h-8 rounded-full bg-primary-container border-2 border-white flex items-center justify-center text-xs font-bold text-on-primary-container">D</div>
-            </div>
-            <p class="text-sm text-on-surface-variant"><strong id="signup-count">2,400+</strong> households already signed up</p>
           </div>
         </div>
         <div class="mt-12 md:mt-0 md:w-1/2 relative">
@@ -139,24 +131,24 @@
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <!-- Feature 1 -->
-        <div class="bg-surface-container-low p-8 rounded-[2rem] group hover:bg-surface-container transition-colors">
-          <div class="w-14 h-14 rounded-2xl bg-primary-fixed flex items-center justify-center mb-6">
+        <div class="bg-surface-container-low p-8 rounded-[2rem] group hover:bg-surface-container transition-colors text-center">
+          <div class="w-14 h-14 rounded-2xl bg-primary-fixed flex items-center justify-center mb-6 mx-auto">
             <span class="material-symbols-outlined text-primary text-2xl">calendar_month</span>
           </div>
           <h3 class="text-2xl font-bold text-primary mb-3">Meal Planning</h3>
           <p class="text-on-surface-variant leading-relaxed">Schedule breakfast, lunch, and dinner on a shared calendar. Assign cooks and see who's making what.</p>
         </div>
         <!-- Feature 2 -->
-        <div class="bg-primary-container text-on-primary-container p-8 rounded-[2rem]">
-          <div class="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center mb-6">
+        <div class="bg-primary-container text-on-primary-container p-8 rounded-[2rem] text-center">
+          <div class="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center mb-6 mx-auto">
             <span class="material-symbols-outlined text-white text-2xl">shopping_cart</span>
           </div>
           <h3 class="text-2xl font-bold text-white mb-3">Smart Grocery Lists</h3>
           <p class="text-on-primary-container/80 leading-relaxed">Auto-generated from your meal plan. Grouped by aisle, shared in real-time. Never double-buy the milk.</p>
         </div>
         <!-- Feature 3 -->
-        <div class="bg-surface-container-lowest p-8 rounded-[2rem] border border-outline-variant/10 shadow-sm">
-          <div class="w-14 h-14 rounded-2xl bg-secondary-fixed flex items-center justify-center mb-6">
+        <div class="bg-surface-container-lowest p-8 rounded-[2rem] border border-outline-variant/10 shadow-sm text-center">
+          <div class="w-14 h-14 rounded-2xl bg-secondary-fixed flex items-center justify-center mb-6 mx-auto">
             <span class="material-symbols-outlined text-secondary text-2xl">payments</span>
           </div>
           <h3 class="text-2xl font-bold text-primary mb-3">Budget Tracking</h3>
