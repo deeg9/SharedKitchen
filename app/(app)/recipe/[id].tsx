@@ -140,10 +140,10 @@ export default function RecipeDetailScreen() {
             <MaterialCommunityIcons name="arrow-left" size={22} color={colors.primary} />
           </Pressable>
           <Pressable
-            onPress={() => {}}
+            onPress={() => router.push(`/recipe/edit/${id}`)}
             style={[s.headerBtn, { right: spacing.md, top: insets.top + spacing.xs }]}
           >
-            <MaterialCommunityIcons name="dots-vertical" size={22} color={colors.primary} />
+            <MaterialCommunityIcons name="pencil-outline" size={22} color={colors.primary} />
           </Pressable>
           {/* Tags on image */}
           <View style={s.heroTags}>
