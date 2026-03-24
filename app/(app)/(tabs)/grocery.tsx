@@ -131,6 +131,7 @@ export default function GroceryScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.titleRow}>
+        <View style={styles.editCatBtn} />
         <Text style={styles.screenTitle}>Grocery List</Text>
         <Pressable onPress={() => setCatSheetOpen(true)} style={styles.editCatBtn}>
           <MaterialCommunityIcons name="tag-edit-outline" size={20} color={colors.onSurfaceVariant} />
@@ -238,6 +239,7 @@ const styles = StyleSheet.create({
   screenTitle: {
     ...typography.headlineMd,
     color: colors.onSurface,
+    textAlign: 'center',
   },
   scrollView: {
     flex: 1,
