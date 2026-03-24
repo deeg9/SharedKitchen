@@ -9,6 +9,7 @@ import { useHouseholdStore } from '../../../src/stores/householdStore';
 import { colors } from '../../../src/theme/colors';
 import { spacing, borderRadius } from '../../../src/theme/spacing';
 import { shadows } from '../../../src/theme/shadows';
+import { TAB_BAR_HEIGHT } from '../../../src/lib/constants';
 
 export default function RecipesScreen() {
   const router = useRouter();
@@ -37,7 +38,7 @@ export default function RecipesScreen() {
       {/* FAB */}
       <Pressable
         onPress={() => router.push('/recipe/add')}
-        style={[styles.fab, { bottom: insets.bottom + spacing.lg }]}
+        style={[styles.fab, { bottom: TAB_BAR_HEIGHT + spacing.md }]}
       >
         <MaterialCommunityIcons name="plus" size={28} color={colors.onPrimary} />
       </Pressable>
