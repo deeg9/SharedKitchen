@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
-import { getWeekDays, getWeekLabel, toDateString } from '../lib/dates';
-import { Recipe, Database } from '../types/database';
+import { getWeekDays, getWeekLabel, toDateString, makePlanKey } from '../lib/dates';
+import { Recipe, Database, MealType } from '../types/database';
 
 export type MealPlan = Database['public']['Tables']['meal_plans']['Row'];
 
@@ -25,11 +25,12 @@ interface PlanState {
   assignRecipe: (
     householdId: string,
     date: string,
+    mealType: MealType,
     recipeId: string,
     cookId?: string,
     notes?: string
   ) => Promise<void>;
-  clearDay: (householdId: string, date: string) => Promise<void>;
+  clearMeal: (householdId: string, date: string, mealType: MealType) => Promise<void>;
   getRandomSuggestion: (householdId: string) => Promise<Recipe | null>;
 }
 
@@ -64,7 +65,8 @@ export const usePlanStore = create<PlanState>((set, get) => ({
 
       const planMap = new Map<string, MealPlanWithRecipe>();
       (data ?? []).forEach((entry: any) => {
-        planMap.set(entry.plan_date, entry as MealPlanWithRecipe);
+        const mealType = (entry.meal_type as MealType) || 'dinner';
+        planMap.set(makePlanKey(entry.plan_date, mealType), entry as MealPlanWithRecipe);
       });
 
       set({ mealPlan: planMap, loading: false });
@@ -76,6 +78,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
   assignRecipe: async (
     householdId: string,
     date: string,
+    mealType: MealType,
     recipeId: string,
     cookId?: string,
     notes?: string
@@ -93,11 +96,12 @@ export const usePlanStore = create<PlanState>((set, get) => ({
             household_id: householdId,
             recipe_id: recipeId,
             plan_date: date,
+            meal_type: mealType,
             assigned_cook: cookId ?? null,
             notes: notes ?? null,
             created_by: user?.id ?? null,
           },
-          { onConflict: 'household_id,plan_date' }
+          { onConflict: 'household_id,plan_date,meal_type' }
         )
         .select('*, recipes(*)')
         .single();
@@ -107,7 +111,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
       set((state) => {
         const newPlan = new Map(state.mealPlan);
         if (data) {
-          newPlan.set(date, data as MealPlanWithRecipe);
+          newPlan.set(makePlanKey(date, mealType), data as MealPlanWithRecipe);
         }
         return { mealPlan: newPlan, loading: false };
       });
@@ -116,24 +120,25 @@ export const usePlanStore = create<PlanState>((set, get) => ({
     }
   },
 
-  clearDay: async (householdId: string, date: string) => {
+  clearMeal: async (householdId: string, date: string, mealType: MealType) => {
     set({ loading: true, error: null });
     try {
       const { error } = await supabase
         .from('meal_plans')
         .delete()
         .eq('household_id', householdId)
-        .match({ plan_date: date });
+        .eq('plan_date', date)
+        .eq('meal_type', mealType);
 
       if (error) throw error;
 
       set((state) => {
         const newPlan = new Map(state.mealPlan);
-        newPlan.delete(date);
+        newPlan.delete(makePlanKey(date, mealType));
         return { mealPlan: newPlan, loading: false };
       });
     } catch (error: any) {
-      set({ loading: false, error: error.message ?? 'Failed to clear day' });
+      set({ loading: false, error: error.message ?? 'Failed to clear meal' });
     }
   },
 

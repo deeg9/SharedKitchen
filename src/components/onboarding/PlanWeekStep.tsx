@@ -67,6 +67,7 @@ export function PlanWeekStep() {
         await assignRecipe(
           effectiveHouseholdId,
           assignments[i].dateStr,
+          'dinner',
           addedRecipes[i].id
         );
       } catch {

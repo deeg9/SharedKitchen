@@ -13,7 +13,7 @@ import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { usePlanStore } from '../../stores/planStore';
 import { useRecipeStore } from '../../stores/recipeStore';
-import { Recipe } from '../../types/database';
+import { Recipe, MealType } from '../../types/database';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
@@ -23,6 +23,7 @@ interface SurpriseMeProps {
   onClose: () => void;
   householdId: string;
   dateString: string;
+  mealType?: MealType;
 }
 
 export function SurpriseMe({
@@ -30,6 +31,7 @@ export function SurpriseMe({
   onClose,
   householdId,
   dateString,
+  mealType = 'dinner',
 }: SurpriseMeProps) {
   const { getRandomSuggestion, assignRecipe } = usePlanStore();
   const { recipes } = useRecipeStore();
@@ -62,7 +64,7 @@ export function SurpriseMe({
   const handleAddToPlan = async (recipe: Recipe) => {
     setAdding(true);
     try {
-      await assignRecipe(householdId, dateString, recipe.id);
+      await assignRecipe(householdId, dateString, mealType, recipe.id);
       onClose();
     } finally {
       setAdding(false);

@@ -106,26 +106,31 @@ describe('planStore', () => {
       };
       mockFrom.mockReturnValue(mockChain);
 
-      await usePlanStore.getState().assignRecipe('h-1', '2026-03-23', 'r-1', 'u-1', 'test notes');
+      await usePlanStore.getState().assignRecipe('h-1', '2026-03-23', 'dinner', 'r-1', 'u-1', 'test notes');
 
       expect(mockFrom).toHaveBeenCalledWith('meal_plans');
       expect(mockChain.upsert).toHaveBeenCalled();
     });
   });
 
-  describe('clearDay', () => {
-    it('calls delete on meal_plans', async () => {
+  describe('clearMeal', () => {
+    it('calls delete on meal_plans with meal_type', async () => {
       const mockChain = {
         delete: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
-        match: jest.fn(() => Promise.resolve({ data: null, error: null })),
       };
+      // Chain .eq() calls: first returns this, second returns this, third resolves
+      mockChain.eq
+        .mockReturnValueOnce(mockChain)
+        .mockReturnValueOnce(mockChain)
+        .mockResolvedValueOnce({ data: null, error: null });
       mockFrom.mockReturnValue(mockChain);
 
-      await usePlanStore.getState().clearDay('h-1', '2026-03-23');
+      await usePlanStore.getState().clearMeal('h-1', '2026-03-23', 'dinner');
 
       expect(mockFrom).toHaveBeenCalledWith('meal_plans');
       expect(mockChain.delete).toHaveBeenCalled();
+      expect(mockChain.eq).toHaveBeenCalledWith('meal_type', 'dinner');
     });
   });
 

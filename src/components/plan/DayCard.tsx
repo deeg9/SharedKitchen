@@ -5,92 +5,70 @@ import { Card } from '../ui/Card';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
-import { formatDayLabel, toDateString } from '../../lib/dates';
+import { formatDayLabel } from '../../lib/dates';
 import { MealPlanWithRecipe } from '../../stores/planStore';
+import { MealType, MEAL_TYPES, MEAL_TYPE_CONFIG } from '../../types/database';
 
-interface DayCardProps {
-  date: Date;
-  mealPlan?: MealPlanWithRecipe;
-  isToday: boolean;
+// --- MealSlot: renders a single breakfast/lunch/dinner slot ---
+
+interface MealSlotProps {
+  mealType: MealType;
+  plan?: MealPlanWithRecipe;
   onPress: () => void;
 }
 
-export function DayCard({ date, mealPlan, isToday, onPress }: DayCardProps) {
-  const label = formatDayLabel(date);
-  const hasRecipe = mealPlan?.recipes != null;
+function MealSlot({ mealType, plan, onPress }: MealSlotProps) {
+  const config = MEAL_TYPE_CONFIG[mealType];
+  const hasRecipe = plan?.recipes != null;
 
   if (!hasRecipe) {
     return (
-      <Pressable onPress={onPress} style={styles.pressable}>
-        <View style={[styles.emptyCard, isToday && styles.todayBorder]}>
-          <View style={styles.dayHeader}>
-            <Text style={[styles.weekday, isToday && styles.todayText]}>
-              {label.weekday}
-            </Text>
-            <Text style={styles.dayNumber}>{label.day}</Text>
+      <Pressable onPress={onPress}>
+        <View style={slotStyles.empty}>
+          <View style={slotStyles.emptyIcon}>
+            <MaterialCommunityIcons name="plus" size={16} color={colors.outlineVariant} />
           </View>
-          <View style={styles.emptyContent}>
-            <MaterialCommunityIcons
-              name="plus"
-              size={24}
-              color={colors.outlineVariant}
-            />
-            <Text style={styles.addText}>Add Dinner</Text>
-          </View>
+          <Text style={slotStyles.emptyText}>Add {config.label}</Text>
         </View>
       </Pressable>
     );
   }
 
-  const recipe = mealPlan.recipes!;
+  const recipe = plan.recipes!;
 
   return (
-    <Pressable onPress={onPress} style={styles.pressable}>
-      <Card variant="elevated" style={[styles.filledCard, isToday && styles.todayBorder]}>
-        <View style={styles.dayHeader}>
-          <Text style={[styles.weekday, isToday && styles.todayText]}>
-            {label.weekday}
-          </Text>
-          <Text style={styles.dayNumber}>{label.day}</Text>
-        </View>
-
-        <View style={styles.recipeRow}>
+    <Pressable onPress={onPress}>
+      <Card variant="elevated" style={slotStyles.filled}>
+        <View style={slotStyles.filledRow}>
           {recipe.image_url ? (
-            <Image source={{ uri: recipe.image_url }} style={styles.thumbnail} />
+            <Image source={{ uri: recipe.image_url }} style={slotStyles.thumbnail} />
           ) : (
-            <View style={[styles.thumbnail, styles.placeholderImage]}>
+            <View style={[slotStyles.thumbnail, slotStyles.placeholderImage]}>
               <MaterialCommunityIcons
-                name="food-variant"
-                size={20}
+                name={config.icon as any}
+                size={16}
                 color={colors.outlineVariant}
               />
             </View>
           )}
 
-          <View style={styles.recipeInfo}>
-            <Text style={styles.recipeName} numberOfLines={1}>
+          <View style={slotStyles.info}>
+            <Text style={slotStyles.mealLabel}>{config.label}</Text>
+            <Text style={slotStyles.recipeName} numberOfLines={1}>
               {recipe.name}
             </Text>
-
-            <View style={styles.metaRow}>
+            <View style={slotStyles.metaRow}>
               {recipe.prep_time_minutes != null && (
-                <View style={styles.pill}>
-                  <MaterialCommunityIcons
-                    name="clock-outline"
-                    size={12}
-                    color={colors.onSurfaceVariant}
-                  />
-                  <Text style={styles.pillText}>
+                <View style={slotStyles.pill}>
+                  <MaterialCommunityIcons name="clock-outline" size={10} color={colors.onSurfaceVariant} />
+                  <Text style={slotStyles.pillText}>
                     {recipe.prep_time_minutes + (recipe.cook_time_minutes ?? 0)}m
                   </Text>
                 </View>
               )}
-
               {recipe.estimated_cost != null && (
-                <View style={styles.pill}>
-                  <Text style={styles.pillText}>
-                    ${recipe.estimated_cost.toFixed(0)}
-                  </Text>
+                <View style={slotStyles.pill}>
+                  <Text style={slotStyles.pillText}>${recipe.estimated_cost.toFixed(0)}</Text>
                 </View>
               )}
             </View>
@@ -101,64 +79,43 @@ export function DayCard({ date, mealPlan, isToday, onPress }: DayCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  pressable: {
-    marginHorizontal: spacing.md,
-    marginVertical: spacing.xs,
-  },
-  emptyCard: {
-    borderWidth: 2,
+const slotStyles = StyleSheet.create({
+  empty: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    borderWidth: 1.5,
     borderStyle: 'dashed',
     borderColor: colors.outlineVariant,
-    borderRadius: borderRadius.lg,
-    padding: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    minHeight: 72,
+    borderRadius: borderRadius.md,
   },
-  filledCard: {
-    padding: spacing.sm,
-  },
-  todayBorder: {
-    borderColor: colors.primary,
-    borderWidth: 2,
-  },
-  dayHeader: {
-    alignItems: 'center',
-    marginRight: spacing.md,
-    width: 40,
-  },
-  weekday: {
-    ...typography.labelSm,
-    color: colors.onSurfaceVariant,
-  },
-  dayNumber: {
-    ...typography.titleMd,
-    color: colors.onSurface,
-  },
-  todayText: {
-    color: colors.primary,
-  },
-  emptyContent: {
-    flex: 1,
-    flexDirection: 'row',
+  emptyIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    backgroundColor: colors.surfaceContainerLow,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.sm,
   },
-  addText: {
-    ...typography.bodyMd,
+  emptyText: {
+    ...typography.labelSm,
     color: colors.outlineVariant,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
-  recipeRow: {
+  filled: {
+    padding: spacing.sm,
+  },
+  filledRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
   },
   thumbnail: {
-    width: 48,
-    height: 48,
-    borderRadius: borderRadius.sm,
+    width: 40,
+    height: 40,
+    borderRadius: 8,
     marginRight: spacing.sm,
   },
   placeholderImage: {
@@ -166,30 +123,124 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  recipeInfo: {
+  info: {
     flex: 1,
   },
+  mealLabel: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: colors.secondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 1,
+  },
   recipeName: {
-    ...typography.titleMd,
+    ...typography.titleSm,
     color: colors.onSurface,
     marginBottom: 2,
   },
   metaRow: {
     flexDirection: 'row',
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   pill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
     backgroundColor: colors.surfaceContainer,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
+    paddingHorizontal: spacing.xs + 2,
+    paddingVertical: 1,
     borderRadius: borderRadius.full,
   },
   pillText: {
-    ...typography.labelSm,
+    fontSize: 10,
+    fontWeight: '600',
     color: colors.onSurfaceVariant,
-    textTransform: 'none',
   },
 });
+
+// --- DaySection: renders date header + 3 MealSlots ---
+
+interface DaySectionProps {
+  date: Date;
+  meals: Partial<Record<MealType, MealPlanWithRecipe | undefined>>;
+  isToday: boolean;
+  onMealPress: (mealType: MealType) => void;
+}
+
+export function DaySection({ date, meals, isToday, onMealPress }: DaySectionProps) {
+  const label = formatDayLabel(date);
+
+  return (
+    <View style={sectionStyles.container}>
+      <View style={sectionStyles.row}>
+        {/* Date header */}
+        <View style={sectionStyles.dateCol}>
+          <Text style={sectionStyles.dateLabel}>{label.month} {label.day}</Text>
+          <Text style={[sectionStyles.weekday, isToday && sectionStyles.todayText]}>
+            {label.weekday}
+          </Text>
+        </View>
+
+        {/* Separator */}
+        <View style={sectionStyles.separator} />
+
+        {/* Meal slots */}
+        <View style={sectionStyles.slotsCol}>
+          {MEAL_TYPES.map((mt) => (
+            <MealSlot
+              key={mt}
+              mealType={mt}
+              plan={meals[mt]}
+              onPress={() => onMealPress(mt)}
+            />
+          ))}
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const sectionStyles = StyleSheet.create({
+  container: {
+    marginHorizontal: spacing.md,
+    marginVertical: spacing.sm,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  dateCol: {
+    width: 52,
+    paddingTop: spacing.sm,
+  },
+  dateLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: colors.outline,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  weekday: {
+    ...typography.labelMd,
+    fontWeight: '700',
+    color: colors.outline,
+  },
+  todayText: {
+    color: colors.primary,
+  },
+  separator: {
+    width: 1,
+    alignSelf: 'stretch',
+    backgroundColor: colors.outlineVariant,
+    opacity: 0.3,
+    marginHorizontal: spacing.sm,
+  },
+  slotsCol: {
+    flex: 1,
+    gap: spacing.xs + 2,
+  },
+});
+
+// Keep backward-compatible export name
+export { DaySection as DayCard };

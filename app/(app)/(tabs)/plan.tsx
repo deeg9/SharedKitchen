@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { WeekHeader } from '../../../src/components/plan/WeekHeader';
-import { DayCard } from '../../../src/components/plan/DayCard';
+import { DaySection } from '../../../src/components/plan/DayCard';
 import { PlanEditSheet } from '../../../src/components/plan/PlanEditSheet';
 import { SurpriseMe } from '../../../src/components/plan/SurpriseMe';
 import { SuggestionCard } from '../../../src/components/plan/SuggestionCard';
@@ -12,8 +12,9 @@ import { useHouseholdStore } from '../../../src/stores/householdStore';
 import { useRecipeStore } from '../../../src/stores/recipeStore';
 import { usePremiumStore } from '../../../src/stores/premiumStore';
 import { UpgradePrompt } from '../../../src/components/premium/UpgradePrompt';
-import { toDateString } from '../../../src/lib/dates';
+import { toDateString, makePlanKey } from '../../../src/lib/dates';
 import { generateSuggestions } from '../../../src/lib/suggestions';
+import { MealType, MEAL_TYPES } from '../../../src/types/database';
 import { Skeleton } from '../../../src/components/ui/Skeleton';
 import { colors } from '../../../src/theme/colors';
 import { typography } from '../../../src/theme/typography';
@@ -39,6 +40,7 @@ export default function PlanScreen() {
   const [editSheetOpen, setEditSheetOpen] = useState(false);
   const [surpriseVisible, setSurpriseVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedMealType, setSelectedMealType] = useState<MealType>('dinner');
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
 
   const days = weekDays();
@@ -54,8 +56,9 @@ export default function PlanScreen() {
     }
   }, [activeHouseholdId, weekOffset]);
 
-  const handleDayPress = useCallback((date: Date) => {
+  const handleMealPress = useCallback((date: Date, mealType: MealType) => {
     setSelectedDate(date);
+    setSelectedMealType(mealType);
     setEditSheetOpen(true);
   }, []);
 
@@ -72,12 +75,13 @@ export default function PlanScreen() {
 
   const handleAddSuggestionToPlan = useCallback((recipeId: string) => {
     setSelectedDate(new Date());
+    setSelectedMealType('dinner');
     setEditSheetOpen(true);
   }, []);
 
   const selectedDateStr = selectedDate ? toDateString(selectedDate) : '';
   const selectedPlan = selectedDateStr
-    ? mealPlan.get(selectedDateStr)
+    ? mealPlan.get(makePlanKey(selectedDateStr, selectedMealType))
     : undefined;
 
   return (
@@ -91,7 +95,7 @@ export default function PlanScreen() {
         onToday={() => setWeekOffset(0)}
       />
 
-      {/* Day Cards */}
+      {/* Day Sections */}
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
@@ -105,21 +109,28 @@ export default function PlanScreen() {
               <View style={styles.skeletonContent}>
                 <Skeleton width="60%" height={16} borderRadius={4} />
                 <Skeleton width="40%" height={12} borderRadius={4} />
+                <Skeleton width="40%" height={12} borderRadius={4} />
               </View>
             </View>
           ))
         ) : (
           days.map((date) => {
             const dateStr = toDateString(date);
-            const plan = mealPlan.get(dateStr);
             const isToday = dateStr === todayStr;
+
+            // Build meals record for this day
+            const meals: Partial<Record<MealType, any>> = {};
+            for (const mt of MEAL_TYPES) {
+              meals[mt] = mealPlan.get(makePlanKey(dateStr, mt));
+            }
+
             return (
-              <DayCard
+              <DaySection
                 key={dateStr}
                 date={date}
-                mealPlan={plan}
+                meals={meals}
                 isToday={isToday}
-                onPress={() => handleDayPress(date)}
+                onMealPress={(mt) => handleMealPress(date, mt)}
               />
             );
           })
@@ -179,6 +190,7 @@ export default function PlanScreen() {
           onClose={handleCloseEdit}
           date={selectedDate}
           dateString={selectedDateStr}
+          mealType={selectedMealType}
           existingPlan={selectedPlan}
         />
       )}
@@ -190,6 +202,7 @@ export default function PlanScreen() {
           onClose={() => setSurpriseVisible(false)}
           householdId={activeHouseholdId}
           dateString={todayStr}
+          mealType="dinner"
         />
       )}
 

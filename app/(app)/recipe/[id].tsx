@@ -102,7 +102,7 @@ export default function RecipeDetailScreen() {
   const handleAddToPlan = async (dayOffset: number) => {
     if (!recipe || !activeHouseholdId) return;
     const planDate = format(addDays(new Date(), dayOffset), 'yyyy-MM-dd');
-    await assignRecipe(planDate, recipe.id);
+    await assignRecipe(activeHouseholdId, planDate, 'dinner', recipe.id);
     setShowPlanSheet(false);
   };
 

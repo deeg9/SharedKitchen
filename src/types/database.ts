@@ -11,6 +11,17 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
+/** Meal type for meal plan entries */
+export type MealType = 'breakfast' | 'lunch' | 'dinner';
+
+export const MEAL_TYPES: MealType[] = ['breakfast', 'lunch', 'dinner'];
+
+export const MEAL_TYPE_CONFIG: Record<MealType, { label: string; icon: string }> = {
+  breakfast: { label: 'Breakfast', icon: 'food-croissant' },
+  lunch: { label: 'Lunch', icon: 'food-apple' },
+  dinner: { label: 'Dinner', icon: 'food-variant' },
+};
+
 /** Ingredient within a recipe's JSONB ingredients array */
 export interface Ingredient {
   amount: number;
@@ -182,6 +193,7 @@ export interface Database {
           household_id: string;
           recipe_id: string | null;
           plan_date: string;
+          meal_type: MealType;
           assigned_cook: string | null;
           notes: string | null;
           created_by: string | null;
@@ -192,6 +204,7 @@ export interface Database {
           household_id: string;
           recipe_id?: string | null;
           plan_date: string;
+          meal_type?: MealType;
           assigned_cook?: string | null;
           notes?: string | null;
           created_by?: string | null;
@@ -202,6 +215,7 @@ export interface Database {
           household_id?: string;
           recipe_id?: string | null;
           plan_date?: string;
+          meal_type?: MealType;
           assigned_cook?: string | null;
           notes?: string | null;
           created_by?: string | null;

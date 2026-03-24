@@ -5,6 +5,7 @@ import {
   endOfWeek,
   format,
 } from 'date-fns';
+import { MealType } from '../types/database';
 
 /**
  * Returns 7 Date objects (Mon-Sun) for the week at the given offset.
@@ -39,6 +40,13 @@ export function formatDayLabel(date: Date): {
     day: format(date, 'd'),
     weekday: format(date, 'EEE').toUpperCase(),
   };
+}
+
+/**
+ * Creates a composite key for the meal plan Map: "yyyy-MM-dd-mealType".
+ */
+export function makePlanKey(date: string, mealType: MealType): string {
+  return `${date}-${mealType}`;
 }
 
 /**
