@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-22)
 Phase: 4 of 4 (Onboarding and Freemium)
 Plan: 2 of 2 in current phase
 Status: Phase Complete
-Last activity: 2026-03-24 - Completed quick task 4: Redesign add recipe form
+Last activity: 2026-03-24 - Completed quick task 5: Grocery edit items + collapsible sections
 
 Progress: [██████████] 100%
 
@@ -119,6 +119,7 @@ None yet.
 | 2 | Create and run Playwright MCP end-to-end tests | 2026-03-23 | a7c2dd7 | [2-create-and-run-playwright-mcp-end-to-end](./quick/2-create-and-run-playwright-mcp-end-to-end/) |
 | 3 | Investigate RLS 403s and text node warnings | 2026-03-24 | 1f3ebc6 | [3-fix-rls-403s-on-grocery-items-and-expens](./quick/3-fix-rls-403s-on-grocery-items-and-expens/) |
 | 4 | Redesign add recipe form to match HTML mockup | 2026-03-24 | f71f1f6 | [4-redesign-add-recipe-form-to-match-html-m](./quick/4-redesign-add-recipe-form-to-match-html-m/) |
+| 5 | Grocery: edit items, collapsible sections | 2026-03-24 | pending | [5-grocery-list-edit-items-collapsible-sect](./quick/5-grocery-list-edit-items-collapsible-sect/) |
 
 ## Session Continuity
 

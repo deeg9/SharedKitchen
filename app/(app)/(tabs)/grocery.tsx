@@ -21,9 +21,12 @@ import { TAB_BAR_HEIGHT } from '../../../src/lib/constants';
 
 const SECTION_ORDER = ['Proteins', 'Produce', 'Dairy & Eggs', 'Pantry', 'Other'];
 
+import { GroceryItem as GroceryItemType } from '../../../src/types/database';
+
 export default function GroceryScreen() {
   const insets = useSafeAreaInsets();
   const [addSheetOpen, setAddSheetOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<GroceryItemType | null>(null);
   const [userId, setUserId] = useState<string>('');
 
   const activeHouseholdId = useHouseholdStore((s) => s.activeHouseholdId);
@@ -131,7 +134,7 @@ export default function GroceryScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Unchecked sections in defined order */}
+        {/* Unchecked sections in defined order — all collapsible */}
         {SECTION_ORDER.map((sectionName) => {
           const sectionItems = sections[sectionName];
           if (!sectionItems || sectionItems.length === 0) return null;
@@ -141,6 +144,10 @@ export default function GroceryScreen() {
               title={sectionName}
               items={sectionItems}
               userId={userId}
+              onEditItem={(item) => {
+                setEditingItem(item);
+                setAddSheetOpen(true);
+              }}
             />
           );
         })}
@@ -151,8 +158,11 @@ export default function GroceryScreen() {
             title="Completed"
             items={completed}
             userId={userId}
-            collapsible
             defaultCollapsed
+            onEditItem={(item) => {
+              setEditingItem(item);
+              setAddSheetOpen(true);
+            }}
           />
         )}
 
@@ -169,7 +179,7 @@ export default function GroceryScreen() {
       {activeListId && (
         <Pressable
           style={[styles.fab, { bottom: TAB_BAR_HEIGHT + spacing.md }]}
-          onPress={() => setAddSheetOpen(true)}
+          onPress={() => { setEditingItem(null); setAddSheetOpen(true); }}
           testID="add-item-fab"
         >
           <MaterialCommunityIcons name="plus" size={28} color={colors.onPrimary} />
@@ -179,8 +189,12 @@ export default function GroceryScreen() {
       {activeListId && (
         <AddItemSheet
           isOpen={addSheetOpen}
-          onClose={() => setAddSheetOpen(false)}
+          onClose={() => {
+            setAddSheetOpen(false);
+            setEditingItem(null);
+          }}
           listId={activeListId}
+          editItem={editingItem}
         />
       )}
     </View>

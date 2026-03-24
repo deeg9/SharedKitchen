@@ -13,14 +13,16 @@ interface GrocerySectionProps {
   userId: string;
   collapsible?: boolean;
   defaultCollapsed?: boolean;
+  onEditItem?: (item: GroceryItemType) => void;
 }
 
 export function GrocerySection({
   title,
   items,
   userId,
-  collapsible = false,
+  collapsible = true,
   defaultCollapsed = false,
+  onEditItem,
 }: GrocerySectionProps) {
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
 
@@ -30,8 +32,7 @@ export function GrocerySection({
     <View style={styles.container} testID={`grocery-section-${title}`}>
       <Pressable
         style={styles.header}
-        onPress={collapsible ? () => setCollapsed(!collapsed) : undefined}
-        disabled={!collapsible}
+        onPress={() => setCollapsed(!collapsed)}
       >
         <View style={styles.headerLeft}>
           <Text style={styles.title}>{title}</Text>
@@ -39,18 +40,21 @@ export function GrocerySection({
             <Text style={styles.badgeText}>{items.length}</Text>
           </View>
         </View>
-        {collapsible && (
-          <MaterialCommunityIcons
-            name={collapsed ? 'chevron-down' : 'chevron-up'}
-            size={20}
-            color={colors.onSurfaceVariant}
-          />
-        )}
+        <MaterialCommunityIcons
+          name={collapsed ? 'chevron-down' : 'chevron-up'}
+          size={20}
+          color={colors.onSurfaceVariant}
+        />
       </Pressable>
 
       {!collapsed &&
         items.map((item) => (
-          <GroceryItem key={item.id} item={item} userId={userId} />
+          <GroceryItem
+            key={item.id}
+            item={item}
+            userId={userId}
+            onEdit={onEditItem}
+          />
         ))}
     </View>
   );

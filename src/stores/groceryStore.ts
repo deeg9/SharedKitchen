@@ -43,6 +43,10 @@ interface GroceryState {
     estimatedPrice?: number
   ) => Promise<void>;
   removeItem: (itemId: string) => Promise<void>;
+  updateItem: (
+    itemId: string,
+    updates: { name?: string; quantity?: string; section?: string; estimated_price?: number | null }
+  ) => Promise<void>;
 
   // Realtime helpers (called by useGrocerySync)
   _addItem: (item: GroceryItem) => void;
@@ -256,6 +260,31 @@ export const useGroceryStore = create<GroceryState>((set, get) => ({
       // Revert
       set((state) => ({
         items: [...state.items, original],
+        error: error.message,
+      }));
+    }
+  },
+
+  updateItem: async (itemId, updates) => {
+    const { items } = get();
+    const original = items.find((i) => i.id === itemId);
+
+    // Optimistic update
+    set({
+      items: items.map((i) =>
+        i.id === itemId ? { ...i, ...updates } as GroceryItem : i
+      ),
+    });
+
+    const { error } = await supabase
+      .from('grocery_items')
+      .update(updates)
+      .eq('id', itemId);
+
+    if (error && original) {
+      // Revert
+      set((state) => ({
+        items: state.items.map((i) => (i.id === itemId ? original : i)),
         error: error.message,
       }));
     }

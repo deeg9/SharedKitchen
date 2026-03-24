@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, ScrollView, StyleSheet, Pressable } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheet } from '../ui/BottomSheet';
@@ -7,10 +7,11 @@ import { typography, fontFamily } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
 import { shadows } from '../../theme/shadows';
 import { useGroceryStore } from '../../stores/groceryStore';
+import { GroceryItem as GroceryItemType } from '../../types/database';
 
 const UNIT_OPTIONS = ['Unit', 'lb', 'oz', 'Gallon', 'cups', 'bunch', 'bag', 'pk'] as const;
 
-const SECTION_OPTIONS: { label: string; dbValue: string }[] = [
+export const SECTION_OPTIONS: { label: string; dbValue: string }[] = [
   { label: 'Produce', dbValue: 'Produce' },
   { label: 'Dairy', dbValue: 'Dairy & Eggs' },
   { label: 'Meat', dbValue: 'Proteins' },
@@ -19,13 +20,28 @@ const SECTION_OPTIONS: { label: string; dbValue: string }[] = [
   { label: 'Household', dbValue: 'Other' },
 ];
 
+function sectionDbToLabel(dbValue: string | null): string {
+  const match = SECTION_OPTIONS.find((s) => s.dbValue === dbValue);
+  return match?.label ?? 'Produce';
+}
+
+function parseQuantity(qty: string | null): { num: number; unitIdx: number } {
+  if (!qty) return { num: 1, unitIdx: 0 };
+  const parts = qty.trim().split(/\s+/);
+  const num = parseInt(parts[0], 10) || 1;
+  const unitStr = parts.slice(1).join(' ');
+  const idx = UNIT_OPTIONS.findIndex((u) => u.toLowerCase() === unitStr.toLowerCase());
+  return { num, unitIdx: idx >= 0 ? idx : 0 };
+}
+
 interface AddItemSheetProps {
   isOpen: boolean;
   onClose: () => void;
   listId: string;
+  editItem?: GroceryItemType | null;
 }
 
-export function AddItemSheet({ isOpen, onClose, listId }: AddItemSheetProps) {
+export function AddItemSheet({ isOpen, onClose, listId, editItem }: AddItemSheetProps) {
   const [name, setName] = useState('');
   const [qty, setQty] = useState(1);
   const [unitIdx, setUnitIdx] = useState(0);
@@ -33,28 +49,60 @@ export function AddItemSheet({ isOpen, onClose, listId }: AddItemSheetProps) {
   const [notes, setNotes] = useState('');
   const [price, setPrice] = useState('');
   const addManualItem = useGroceryStore((s) => s.addManualItem);
+  const updateItem = useGroceryStore((s) => s.updateItem);
+
+  const isEditMode = !!editItem;
+
+  // Pre-fill when editing
+  useEffect(() => {
+    if (editItem) {
+      setName(editItem.name);
+      const parsed = parseQuantity(editItem.quantity);
+      setQty(parsed.num);
+      setUnitIdx(parsed.unitIdx);
+      setSectionLabel(sectionDbToLabel(editItem.section));
+      setPrice(editItem.estimated_price != null ? String(editItem.estimated_price) : '');
+      setNotes('');
+    } else {
+      setName('');
+      setQty(1);
+      setUnitIdx(0);
+      setNotes('');
+      setPrice('');
+    }
+  }, [editItem, isOpen]);
 
   const selectedSection = SECTION_OPTIONS.find((s) => s.label === sectionLabel);
 
-  const handleAdd = async () => {
+  const handleSubmit = async () => {
     if (!name.trim()) return;
     const unit = UNIT_OPTIONS[unitIdx];
     const quantityStr = unit === 'Unit' ? String(qty) : `${qty} ${unit}`;
     const parsedPrice = price ? parseFloat(price) : undefined;
+    const validPrice = parsedPrice != null && !isNaN(parsedPrice) ? parsedPrice : undefined;
 
-    await addManualItem(
-      listId,
-      name.trim(),
-      quantityStr,
-      selectedSection?.dbValue ?? 'Other',
-      !isNaN(parsedPrice as number) ? parsedPrice : undefined
-    );
-
-    // Clear form for next item
-    setName('');
-    setQty(1);
-    setNotes('');
-    setPrice('');
+    if (isEditMode && editItem) {
+      await updateItem(editItem.id, {
+        name: name.trim(),
+        quantity: quantityStr,
+        section: selectedSection?.dbValue ?? 'Other',
+        estimated_price: validPrice ?? null,
+      });
+      onClose();
+    } else {
+      await addManualItem(
+        listId,
+        name.trim(),
+        quantityStr,
+        selectedSection?.dbValue ?? 'Other',
+        validPrice
+      );
+      // Clear form for next item
+      setName('');
+      setQty(1);
+      setNotes('');
+      setPrice('');
+    }
   };
 
   return (
@@ -65,7 +113,7 @@ export function AddItemSheet({ isOpen, onClose, listId }: AddItemSheetProps) {
           <Pressable onPress={onClose} style={styles.closeBtn}>
             <MaterialCommunityIcons name="close" size={24} color={colors.primary} />
           </Pressable>
-          <Text style={styles.headerTitle}>Add to List</Text>
+          <Text style={styles.headerTitle}>{isEditMode ? 'Edit Item' : 'Add to List'}</Text>
           <View style={styles.closeBtn} />
         </View>
 
@@ -193,13 +241,13 @@ export function AddItemSheet({ isOpen, onClose, listId }: AddItemSheetProps) {
         {/* Add Button — fixed at bottom */}
         <View style={styles.footer}>
           <Pressable
-            onPress={handleAdd}
+            onPress={handleSubmit}
             disabled={!name.trim()}
             style={[styles.addBtn, !name.trim() && styles.addBtnDisabled]}
             testID="add-item-button"
           >
-            <MaterialCommunityIcons name="cart-plus" size={22} color={colors.onPrimary} />
-            <Text style={styles.addBtnText}>Add to List</Text>
+            <MaterialCommunityIcons name={isEditMode ? 'check' : 'cart-plus'} size={22} color={colors.onPrimary} />
+            <Text style={styles.addBtnText}>{isEditMode ? 'Save Changes' : 'Add to List'}</Text>
           </Pressable>
         </View>
       </View>

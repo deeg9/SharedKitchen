@@ -12,9 +12,10 @@ import { useHouseholdStore } from '../../stores/householdStore';
 interface GroceryItemProps {
   item: GroceryItemType;
   userId: string;
+  onEdit?: (item: GroceryItemType) => void;
 }
 
-export function GroceryItem({ item, userId }: GroceryItemProps) {
+export function GroceryItem({ item, userId, onEdit }: GroceryItemProps) {
   const toggleItem = useGroceryStore((s) => s.toggleItem);
   const removeItem = useGroceryStore((s) => s.removeItem);
   const members = useHouseholdStore((s) => s.members);
@@ -88,6 +89,15 @@ export function GroceryItem({ item, userId }: GroceryItemProps) {
             </Text>
           </View>
         ) : null}
+        {onEdit && (
+          <Pressable
+            onPress={() => onEdit(item)}
+            style={styles.editBtn}
+            hitSlop={8}
+          >
+            <MaterialCommunityIcons name="pencil-outline" size={16} color={colors.onSurfaceVariant} />
+          </Pressable>
+        )}
         <Pressable
           onPress={handleDelete}
           style={styles.deleteBtn}
@@ -168,12 +178,18 @@ const styles = StyleSheet.create({
     color: colors.onPrimaryContainer,
     fontSize: 10,
   },
+  editBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: borderRadius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   deleteBtn: {
     width: 28,
     height: 28,
     borderRadius: borderRadius.full,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: spacing.xs,
   },
 });
