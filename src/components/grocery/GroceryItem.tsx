@@ -16,6 +16,7 @@ interface GroceryItemProps {
 
 export function GroceryItem({ item, userId }: GroceryItemProps) {
   const toggleItem = useGroceryStore((s) => s.toggleItem);
+  const removeItem = useGroceryStore((s) => s.removeItem);
   const members = useHouseholdStore((s) => s.members);
 
   const checkerProfile = item.checked_by
@@ -25,6 +26,11 @@ export function GroceryItem({ item, userId }: GroceryItemProps) {
   const handleToggle = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     toggleItem(item.id, !item.is_checked, userId);
+  };
+
+  const handleDelete = async () => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    removeItem(item.id);
   };
 
   return (
@@ -82,6 +88,13 @@ export function GroceryItem({ item, userId }: GroceryItemProps) {
             </Text>
           </View>
         ) : null}
+        <Pressable
+          onPress={handleDelete}
+          style={styles.deleteBtn}
+          hitSlop={8}
+        >
+          <MaterialCommunityIcons name="close" size={16} color={colors.outlineVariant} />
+        </Pressable>
       </View>
     </Pressable>
   );
@@ -154,5 +167,13 @@ const styles = StyleSheet.create({
     ...typography.labelSm,
     color: colors.onPrimaryContainer,
     fontSize: 10,
+  },
+  deleteBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: borderRadius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: spacing.xs,
   },
 });
