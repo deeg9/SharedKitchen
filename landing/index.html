@@ -81,6 +81,7 @@
         <span class="material-symbols-outlined text-primary text-2xl">restaurant_menu</span>
         <span class="text-2xl font-extrabold text-primary tracking-tighter font-headline">SharedKitchen</span>
       </div>
+      <!-- Desktop nav -->
       <nav class="hidden md:flex items-center gap-8">
         <a class="text-on-surface-variant hover:text-primary transition-colors font-headline font-medium" href="#features">Features</a>
         <a class="text-on-surface-variant hover:text-primary transition-colors font-headline font-medium" href="#how">How it Works</a>
@@ -89,6 +90,18 @@
       <a href="#signup" class="hidden md:inline-block bg-primary text-on-primary px-6 py-2.5 rounded-full font-headline font-bold hover:opacity-90 active:scale-95 transition-all text-sm">
         Get Early Access
       </a>
+      <!-- Mobile hamburger -->
+      <button id="menu-toggle" class="md:hidden w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+        <span class="material-symbols-outlined text-primary text-2xl">menu</span>
+      </button>
+    </div>
+    <!-- Mobile dropdown -->
+    <div id="mobile-menu" class="hidden md:hidden bg-surface/95 backdrop-blur-xl border-t border-outline-variant/10 px-6 pb-6 pt-2">
+      <nav class="flex flex-col gap-1">
+        <a class="py-3 px-4 rounded-xl text-on-surface font-headline font-medium hover:bg-surface-container-low transition-colors" href="#features" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Features</a>
+        <a class="py-3 px-4 rounded-xl text-on-surface font-headline font-medium hover:bg-surface-container-low transition-colors" href="#how" onclick="document.getElementById('mobile-menu').classList.add('hidden')">How it Works</a>
+        <a class="mt-2 py-3.5 bg-primary text-on-primary rounded-full font-headline font-bold text-center active:scale-95 transition-all" href="#signup" onclick="document.getElementById('mobile-menu').classList.add('hidden')">Get Early Access</a>
+      </nav>
     </div>
   </header>
 
