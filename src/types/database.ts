@@ -34,6 +34,18 @@ export interface Ingredient {
 export interface InstructionStep {
   step_number: number;
   text: string;
+  timers?: Array<{ duration_seconds: number; label: string }>;
+}
+
+/** Nutrition information extracted from recipe source */
+export interface NutritionInfo {
+  calories?: string;
+  protein?: string;
+  fat?: string;
+  carbohydrates?: string;
+  fiber?: string;
+  sodium?: string;
+  sugar?: string;
 }
 
 export interface Database {
@@ -120,6 +132,8 @@ export interface Database {
           instructions: InstructionStep[];
           tags: string[];
           source_url: string | null;
+          nutrition_info: NutritionInfo | null;
+          source_image_url: string | null;
           created_by: string | null;
           created_at: string;
           updated_at: string;
@@ -138,6 +152,8 @@ export interface Database {
           instructions?: InstructionStep[];
           tags?: string[];
           source_url?: string | null;
+          nutrition_info?: NutritionInfo | null;
+          source_image_url?: string | null;
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -156,6 +172,8 @@ export interface Database {
           instructions?: InstructionStep[];
           tags?: string[];
           source_url?: string | null;
+          nutrition_info?: NutritionInfo | null;
+          source_image_url?: string | null;
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;
