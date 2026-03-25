@@ -2,7 +2,12 @@
 
 ## Overview
 
-Mise delivers a collaborative dinner planning app for households in four phases: first we establish the foundation (auth, households, design system, navigation), then build the three core feature pillars (recipes, meal planning, grocery lists with real-time sync), then add supporting features (budget tracking, leftovers, AI suggestions, profile settings), and finally polish with onboarding and freemium gating.
+Mise delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP: auth, households, recipes, meal planning, grocery sync, budget, leftovers, AI suggestions, onboarding, and freemium gating. v2.0 (Phases 5-9) levels up with real Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and comprehensive E2E testing.
+
+## Milestones
+
+- :white_check_mark: **v1.0 MVP** - Phases 1-4 (shipped 2026-03-23)
+- :construction: **v2.0 AI, Payments & Polish** - Phases 5-9 (in progress)
 
 ## Phases
 
@@ -12,84 +17,101 @@ Mise delivers a collaborative dinner planning app for households in four phases:
 
 Decimal phases appear between their surrounding integers in numeric order.
 
+<details>
+<summary>v1.0 MVP (Phases 1-4) - SHIPPED 2026-03-23</summary>
+
 - [x] **Phase 1: Foundation** - Auth, households, design system, tab navigation, and core app shell (completed 2026-03-23)
 - [x] **Phase 2: Core Features** - Recipes, meal planning, and grocery lists with real-time sync (completed 2026-03-23)
 - [x] **Phase 3: Supporting Features** - Budget tracking, leftovers, AI suggestions, and profile settings (completed 2026-03-23)
 - [x] **Phase 4: Onboarding and Freemium** - First-run onboarding flow and premium gating UI (completed 2026-03-23)
 
+</details>
+
+### v2.0 AI, Payments & Polish
+
+- [ ] **Phase 5: AI Fix & Payment Foundation** - Fix broken recipe import, build Stripe subscription checkout, server-authoritative premium gating
+- [ ] **Phase 6: Push Notifications** - Token registration, cooking reminders, leftover alerts, budget warnings
+- [ ] **Phase 7: Real-Time Presence** - Live avatar stacks and activity toasts for household collaboration visibility
+- [ ] **Phase 8: Enhanced AI & Cooking Mode** - Smarter recipe extraction, AI meal generator, fullscreen step-by-step cooking
+- [ ] **Phase 9: E2E Testing** - Maestro flows covering all user journeys and negative paths
+
 ## Phase Details
 
-### Phase 1: Foundation
-**Goal**: Users can sign up, create a household, invite members, and navigate a polished app shell with consistent design
-**Depends on**: Nothing (first phase)
-**Requirements**: AUTH-01, AUTH-02, AUTH-03, HOUS-01, HOUS-02, HOUS-03, HOUS-04, HOUS-05, DSGN-01, DSGN-02, DSGN-03, DSGN-04, DSGN-05, DSGN-06, PROF-01, PROF-06
+### Phase 5: AI Fix & Payment Foundation
+**Goal**: Recipe import works again (gpt-5-mini) and users can purchase and manage real premium subscriptions via Stripe with server-enforced gating
+**Depends on**: Phase 4
+**Requirements**: AI-03, AI-07, PAY-01, PAY-02, PAY-03, PAY-04, PAY-05
 **Success Criteria** (what must be TRUE):
-  1. User can create an account with email/password or Google OAuth, and their session persists across app restarts
-  2. User can create a household, invite others via share code/link, and invited users can join successfully
-  3. User can view household members with avatars and roles, and switch between multiple households
-  4. App displays 5-tab bottom navigation with the Culinary Curator design system applied (tonal layering, correct typography, color tokens, skeleton loading states)
-  5. User can view/edit their profile and sign out
-**Plans**: 3 plans
+  1. User can import a recipe from a URL and receive correctly parsed recipe data (gpt-5-mini replacing deprecated gpt-4o-mini)
+  2. User can tap "Upgrade" and complete a $9.99/mo premium subscription checkout via Stripe
+  3. User can access the Stripe billing portal to manage or cancel their subscription
+  4. Premium features are enforced server-side via RLS policies -- bypassing the client UI does not grant access
+  5. AI features enforce per-user rate limits and cache duplicate requests to control costs
+**Plans**: TBD
+**UI hint**: yes
 
-Plans:
-- [x] 01-01-PLAN.md — Expo project setup, Supabase client, auth flows (email/password + Google OAuth), test infrastructure
-- [ ] 01-02-PLAN.md — Household CRUD, invite/join system, member list, multi-household switching
-- [ ] 01-03-PLAN.md — Culinary Curator design system tokens, UI components, glassmorphic tab bar, profile screen
-
-### Phase 2: Core Features
-**Goal**: Users can manage recipes, plan weekly dinners, and shop from an auto-generated grocery list that syncs in real-time across the household
-**Depends on**: Phase 1
-**Requirements**: RECP-01, RECP-02, RECP-03, RECP-04, RECP-05, RECP-06, RECP-07, RECP-08, RECP-09, AI-01, PLAN-01, PLAN-02, PLAN-03, PLAN-04, PLAN-05, PLAN-06, PLAN-07, GROC-01, GROC-02, GROC-03, GROC-04, GROC-05, GROC-06, GROC-07, GROC-08
+### Phase 6: Push Notifications
+**Goal**: Users receive timely push notifications for cooking reminders, expiring leftovers, and budget warnings
+**Depends on**: Phase 5
+**Requirements**: NOTIF-01, NOTIF-02, NOTIF-03, NOTIF-04, NOTIF-05
 **Success Criteria** (what must be TRUE):
-  1. User can browse, search, and filter recipes in a 2-column grid, and view full recipe details with scaling, ratings, notes, and favoriting
-  2. User can create recipes manually and import recipes from a URL via AI parsing
-  3. User can view the weekly dinner calendar, navigate between weeks, and edit day cards (assign recipe, cook, notes) or clear them
-  4. User can use "Surprise Me" to get random dinner suggestions and add them to the plan
-  5. User can generate a grocery list from the week's plan, check items off (with real-time sync visible to household members), and manually add items
-**Plans**: 3 plans
+  1. App registers push tokens on device and stores them in the database with device info
+  2. User sees a contextual explanation of why notifications are valuable before the OS permission prompt appears
+  3. User receives a local notification reminding them to start cooking before meal prep time
+  4. User receives a push alert when a leftover item is approaching its use-by date
+  5. User receives a push alert when household spending crosses 80% or 100% of the monthly budget
+**Plans**: TBD
 
-Plans:
-- [ ] 02-01-PLAN.md — Recipe data layer (schema + RLS + types), recipe store, recipe library grid, detail screen, and manual creation form
-- [ ] 02-02-PLAN.md — AI recipe URL import (Edge Function + client), meal planning calendar with week nav, day editing, and Surprise Me
-- [ ] 02-03-PLAN.md — Grocery list with auto-generation, section grouping, check-off, manual add, summary bar, and Supabase Realtime sync
-
-### Phase 3: Supporting Features
-**Goal**: Users can track spending, manage leftovers, receive AI suggestions, and configure their preferences
-**Depends on**: Phase 2
-**Requirements**: BUDG-01, BUDG-02, BUDG-03, BUDG-04, LEFT-01, LEFT-02, LEFT-03, LEFT-04, AI-02, PROF-02, PROF-03, PROF-04, PROF-05
+### Phase 7: Real-Time Presence
+**Goal**: Users can see who else in their household is viewing the same screen and get live activity updates
+**Depends on**: Phase 5
+**Requirements**: RT-01, RT-02, RT-03, RT-04
 **Success Criteria** (what must be TRUE):
-  1. User can view monthly budget progress, category spending breakdown, weekly spending cards, and log expenses
-  2. User can add leftover items with freshness badges and manage portions
-  3. User sees AI suggestion cards based on cooking history on the plan screen
-  4. User can view cooking stats, set dietary preferences, toggle dark mode, and configure notification settings
-**Plans**: 2 plans
+  1. User sees avatar stacks on the grocery list screen showing which household members are currently viewing it
+  2. User sees avatar stacks on recipe detail screens showing who else is viewing the same recipe
+  3. User sees toast notifications when a household member checks off a grocery item or modifies the meal plan
+  4. Presence state syncs smoothly without phantom avatar flickering (debounced Supabase Presence)
+**Plans**: TBD
+**UI hint**: yes
 
-Plans:
-- [ ] 03-01-PLAN.md — Budget dashboard with monthly progress, category cards, weekly breakdown, and expense logging FAB
-- [ ] 03-02-PLAN.md — Leftover tracker with freshness badges, AI suggestion cards on plan screen, and profile settings (stats, dietary prefs, dark mode, notifications)
-
-### Phase 4: Onboarding and Freemium
-**Goal**: New users experience a guided first-run flow, and the app presents freemium upgrade prompts for premium features
-**Depends on**: Phase 3
-**Requirements**: ONBR-01, ONBR-02, ONBR-03, ONBR-04, ONBR-05, ONBR-06, PREM-01, PREM-02, PREM-03
+### Phase 8: Enhanced AI & Cooking Mode
+**Goal**: AI recipe extraction is smarter and cheaper, the meal generator gives context-aware suggestions, and users can cook step-by-step with timers
+**Depends on**: Phase 5, Phase 7
+**Requirements**: AI-04, AI-05, AI-06, COOK-01, COOK-02, COOK-03, COOK-04, COOK-05
 **Success Criteria** (what must be TRUE):
-  1. First-time user completes a multi-step onboarding flow: welcome, create household, invite members, add recipes, plan first meals, and sees confetti on completion
-  2. Premium badge displays on subscribed user profiles and upgrade prompts appear at gated features
-  3. User can view subscription management UI showing current plan and upgrade button (no real payment)
-**Plans**: 2 plans
+  1. Recipe import tries JSON-LD/schema.org structured data first and only falls back to LLM when structured data is missing
+  2. Recipe import extracts images and nutrition info from source URLs when available
+  3. User can generate meal suggestions that account for dietary preferences, cooking history, current leftovers, and remaining budget
+  4. User can enter fullscreen cooking mode from a recipe and navigate step-by-step with progress indication
+  5. Steps with time references display tappable countdown timers (start/pause/reset) auto-generated from AI-parsed durations
+**Plans**: TBD
+**UI hint**: yes
 
-Plans:
-- [ ] 04-01-PLAN.md — 6-step first-run onboarding flow (welcome, create household, invite members, add recipes, plan week, confetti completion)
-- [ ] 04-02-PLAN.md — Freemium gating with premium badge, upgrade prompts at gated features, and subscription management UI
+### Phase 9: E2E Testing
+**Goal**: All major user journeys and failure paths have Maestro E2E test coverage ensuring v2.0 is production-ready
+**Depends on**: Phase 8
+**Requirements**: TEST-01, TEST-02, TEST-03, TEST-04, TEST-05, TEST-06
+**Success Criteria** (what must be TRUE):
+  1. Maestro flows successfully run through auth (signup, login, logout) and onboarding
+  2. Maestro flows cover recipe creation, AI import, and recipe detail viewing
+  3. Maestro flows cover meal planning operations (add, edit, clear, Surprise Me) and grocery list workflows (generate, check off, manual add)
+  4. Maestro flows cover premium subscription checkout and verify gated feature access
+  5. Maestro flows cover negative paths: failed payment, denied notification permissions, AI timeout, and expired subscription
+**Plans**: TBD
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4
+Phases execute in numeric order: 5 -> 6 -> 7 -> 8 -> 9
 
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Foundation | 2/3 | Complete    | 2026-03-23 |
-| 2. Core Features | 3/3 | Complete    | 2026-03-23 |
-| 3. Supporting Features | 2/2 | Complete    | 2026-03-23 |
-| 4. Onboarding and Freemium | 2/2 | Complete    | 2026-03-23 |
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 1. Foundation | v1.0 | 2/3 | Complete | 2026-03-23 |
+| 2. Core Features | v1.0 | 3/3 | Complete | 2026-03-23 |
+| 3. Supporting Features | v1.0 | 2/2 | Complete | 2026-03-23 |
+| 4. Onboarding and Freemium | v1.0 | 2/2 | Complete | 2026-03-23 |
+| 5. AI Fix & Payment Foundation | v2.0 | 0/0 | Not started | - |
+| 6. Push Notifications | v2.0 | 0/0 | Not started | - |
+| 7. Real-Time Presence | v2.0 | 0/0 | Not started | - |
+| 8. Enhanced AI & Cooking Mode | v2.0 | 0/0 | Not started | - |
+| 9. E2E Testing | v2.0 | 0/0 | Not started | - |

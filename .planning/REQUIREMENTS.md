@@ -182,17 +182,44 @@
 
 ## Traceability
 
-Updated during roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (v2 requirements mapped below) | | |
+| PAY-01 | Phase 5 | Pending |
+| PAY-02 | Phase 5 | Pending |
+| PAY-03 | Phase 5 | Pending |
+| PAY-04 | Phase 5 | Pending |
+| PAY-05 | Phase 5 | Pending |
+| AI-03 | Phase 5 | Pending |
+| AI-07 | Phase 5 | Pending |
+| NOTIF-01 | Phase 6 | Pending |
+| NOTIF-02 | Phase 6 | Pending |
+| NOTIF-03 | Phase 6 | Pending |
+| NOTIF-04 | Phase 6 | Pending |
+| NOTIF-05 | Phase 6 | Pending |
+| RT-01 | Phase 7 | Pending |
+| RT-02 | Phase 7 | Pending |
+| RT-03 | Phase 7 | Pending |
+| RT-04 | Phase 7 | Pending |
+| AI-04 | Phase 8 | Pending |
+| AI-05 | Phase 8 | Pending |
+| AI-06 | Phase 8 | Pending |
+| COOK-01 | Phase 8 | Pending |
+| COOK-02 | Phase 8 | Pending |
+| COOK-03 | Phase 8 | Pending |
+| COOK-04 | Phase 8 | Pending |
+| COOK-05 | Phase 8 | Pending |
+| TEST-01 | Phase 9 | Pending |
+| TEST-02 | Phase 9 | Pending |
+| TEST-03 | Phase 9 | Pending |
+| TEST-04 | Phase 9 | Pending |
+| TEST-05 | Phase 9 | Pending |
+| TEST-06 | Phase 9 | Pending |
 
 **Coverage:**
-- v2 requirements: 28 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 28
+- v2 requirements: 30 total
+- Mapped to phases: 30/30
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-22*
-*Last updated: 2026-03-25 after v2.0 milestone requirements definition*
+*Last updated: 2026-03-25 after v2.0 roadmap creation*
