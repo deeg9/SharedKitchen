@@ -118,7 +118,12 @@ Plans:
   3. Maestro flows cover meal planning operations (add, edit, clear, Surprise Me) and grocery list workflows (generate, check off, manual add)
   4. Maestro flows cover premium subscription checkout and verify gated feature access
   5. Maestro flows cover negative paths: failed payment, denied notification permissions, AI timeout, and expired subscription
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 09-01-PLAN.md — Add testID props to all interactive elements and create auth/onboarding Maestro flows
+- [ ] 09-02-PLAN.md — Recipe management and meal planning Maestro flows
+- [ ] 09-03-PLAN.md — Grocery, premium checkout, and negative path Maestro flows
 
 ## Progress
 
@@ -135,4 +140,4 @@ Phases execute in numeric order: 5 -> 6 -> 7 -> 8 -> 9
 | 6. Push Notifications | v2.0 | 0/2 | Planned | - |
 | 7. Real-Time Presence | v2.0 | 2/2 | Complete   | 2026-03-25 |
 | 8. Enhanced AI & Cooking Mode | v2.0 | 0/3 | Planned | - |
-| 9. E2E Testing | v2.0 | 0/0 | Not started | - |
+| 9. E2E Testing | v2.0 | 0/3 | Planned | - |
