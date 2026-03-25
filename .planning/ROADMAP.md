@@ -99,7 +99,13 @@ Plans:
   3. User can generate meal suggestions that account for dietary preferences, cooking history, current leftovers, and remaining budget
   4. User can enter fullscreen cooking mode from a recipe and navigate step-by-step with progress indication
   5. Steps with time references display tappable countdown timers (start/pause/reset) auto-generated from AI-parsed durations
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — JSON-LD extraction, nutrition/image/timer fields, enhanced parse-recipe-url Edge Function
+- [ ] 08-02-PLAN.md — AI meal generator Edge Function and MealGeneratorSheet UI
+- [ ] 08-03-PLAN.md — Fullscreen cooking mode with step navigation, timers, and unit conversion
+
 **UI hint**: yes
 
 ### Phase 9: E2E Testing
@@ -128,5 +134,5 @@ Phases execute in numeric order: 5 -> 6 -> 7 -> 8 -> 9
 | 5. AI Fix & Payment Foundation | v2.0 | 0/3 | Planned    |  |
 | 6. Push Notifications | v2.0 | 0/2 | Planned | - |
 | 7. Real-Time Presence | v2.0 | 2/2 | Complete   | 2026-03-25 |
-| 8. Enhanced AI & Cooking Mode | v2.0 | 0/0 | Not started | - |
+| 8. Enhanced AI & Cooking Mode | v2.0 | 0/3 | Planned | - |
 | 9. E2E Testing | v2.0 | 0/0 | Not started | - |
