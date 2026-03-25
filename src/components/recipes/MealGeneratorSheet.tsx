@@ -7,6 +7,7 @@ import { BottomSheet } from '../ui/BottomSheet';
 import { Skeleton } from '../ui/Skeleton';
 import { MealSuggestionCard } from './MealSuggestionCard';
 import { generateMealSuggestions, MealSuggestion } from '../../lib/ai';
+import { supabase } from '../../lib/supabase';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
@@ -47,10 +48,19 @@ export function MealGeneratorSheet({
       const prefsJson = await AsyncStorage.getItem('dietary_preferences');
       const dietaryPreferences: string[] = prefsJson ? JSON.parse(prefsJson) : [];
 
-      setContextInfo((prev) => ({
-        ...prev,
+      // Populate context pills with real data
+      const [leftoverRes, budgetRes] = await Promise.all([
+        supabase.from('leftovers').select('id', { count: 'exact', head: true }).eq('household_id', householdId),
+        supabase.from('budget_settings').select('monthly_target').eq('household_id', householdId).maybeSingle(),
+      ]);
+      const leftoverCount = leftoverRes.count ?? 0;
+      const budgetTarget = budgetRes.data?.monthly_target ?? null;
+
+      setContextInfo({
         dietaryCount: dietaryPreferences.length,
-      }));
+        leftoverCount,
+        remainingBudget: budgetTarget,
+      });
 
       const results = await generateMealSuggestions(householdId, dietaryPreferences);
       setSuggestions(results);
