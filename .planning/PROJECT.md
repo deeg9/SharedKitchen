@@ -8,50 +8,71 @@ Mise is a collaborative dinner planning mobile app for couples, roommates, and f
 
 Households can collaboratively plan, shop for, and cook dinners together in real-time — eliminating the daily "what's for dinner?" friction.
 
+## Current Milestone: v2.0 AI, Payments & Polish
+
+**Goal:** Level up Mise with advanced AI features, real Stripe payments for premium, push notifications, real-time collaboration visibility, and comprehensive end-to-end testing across all features.
+
+**Target features:**
+- Enhanced AI recipe extraction from web URLs
+- AI-powered random meal generator based on preferences, history, dietary needs
+- Push notification system (cooking reminders, leftover alerts, budget warnings, household activity)
+- Real-time visibility when household members check off recipes or grocery items
+- Stripe integration for real payment processing (subscriptions, checkout, billing)
+- Premium tier system with actual gated features and paid unlock
+- Comprehensive end-to-end testing across all existing and new features
+
 ## Requirements
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ Weekly dinner calendar with day cards — v1.0 Phase 2
+- ✓ Shared recipe library with search, filters, 2-column grid — v1.0 Phase 2
+- ✓ AI-powered recipe import from URL — v1.0 Phase 2
+- ✓ Manual recipe creation — v1.0 Phase 2
+- ✓ Recipe detail with scaling, ratings, notes — v1.0 Phase 2
+- ✓ Grocery list auto-generated, grouped by section — v1.0 Phase 2
+- ✓ Real-time grocery list sync via Supabase Realtime — v1.0 Phase 2
+- ✓ Manual grocery item additions — v1.0 Phase 2
+- ✓ Monthly budget dashboard with category breakdown — v1.0 Phase 3
+- ✓ Weekly spending breakdown — v1.0 Phase 3
+- ✓ Quick expense logging — v1.0 Phase 3
+- ✓ Household creation and management — v1.0 Phase 1
+- ✓ Multi-household support — v1.0 Phase 1
+- ✓ Household invite system — v1.0 Phase 1
+- ✓ Email/password and Google OAuth auth — v1.0 Phase 1
+- ✓ User profile with avatar, name, cooking stats — v1.0 Phase 1/3
+- ✓ "Surprise Me" random dinner generator — v1.0 Phase 2
+- ✓ Edit meal plan day via bottom sheet — v1.0 Phase 2
+- ✓ Leftover tracker with freshness badges — v1.0 Phase 3
+- ✓ AI suggestion cards — v1.0 Phase 3
+- ✓ Onboarding flow — v1.0 Phase 4
+- ✓ Dietary preferences/restrictions — v1.0 Phase 3
+- ✓ Dark mode — v1.0 Phase 3
+- ✓ Notification settings UI — v1.0 Phase 3
+- ✓ Freemium gating UI (shell only) — v1.0 Phase 4
+- ✓ 5-tab bottom navigation — v1.0 Phase 1
+- ✓ Culinary Curator design system — v1.0 Phase 1
 
 ### Active
 
-- [ ] Weekly dinner calendar with day cards showing recipe, cook assignment, prep time, cost
-- [ ] Shared recipe library with search, category filters, and 2-column grid
-- [ ] AI-powered recipe import from URL (scrape/parse recipe data)
-- [ ] Manual recipe creation with ingredients, instructions, tags, photos
-- [ ] Recipe detail view with ingredient checkboxes, scaling, step-by-step instructions, notes, ratings
-- [ ] Grocery list auto-generated from weekly plan, grouped by store section
-- [ ] Real-time grocery list sync (see partner checking items off live via Supabase Realtime)
-- [ ] Manual grocery item additions
-- [ ] Monthly budget dashboard with spending progress bar, category breakdown (groceries/dining out/takeout)
-- [ ] Weekly spending breakdown with expandable cards
-- [ ] Quick expense logging (amount, category, description, date)
-- [ ] Household creation and management (name, members, roles)
-- [ ] Multi-household support (users can switch between households)
-- [ ] Household invite system (share code/link to join)
-- [ ] User authentication via email/password and Google OAuth
-- [ ] User profile with avatar, name, cooking stats
-- [ ] "Surprise Me" random dinner generator with shuffle and multiple options
-- [ ] Edit meal plan day via bottom sheet (pick recipe, assign cook, add notes)
-- [ ] Leftover tracker with freshness status badges and use-by dates
-- [ ] AI suggestion cards ("You haven't made X in 3 weeks — it's a 5-star favorite!")
-- [ ] Onboarding flow (welcome, create household, invite, add recipes, plan first week)
-- [ ] Dietary preferences/restrictions toggles
-- [ ] Dark mode support
-- [ ] Notification settings (cooking reminders, leftover alerts, budget warnings, household activity)
-- [ ] Premium dashboard with analytics (cooking distribution, spending trends, category breakdown, top rated meals)
-- [ ] Freemium gating UI (premium badge, upgrade prompts — no real payments wired)
-- [ ] 5-tab bottom navigation (Plan, Recipes, Grocery, Budget, Profile)
+- [ ] Enhanced AI recipe extraction from web (improved scraping, broader site support)
+- [ ] AI-powered random meal generator (preferences, history, dietary-aware suggestions)
+- [ ] Push notification system (cooking reminders, leftover alerts, budget warnings, household activity)
+- [ ] Real-time visibility for recipe/grocery check-offs (live avatars, activity indicators)
+- [ ] Stripe subscription integration (checkout, billing portal, webhook handling)
+- [ ] Premium tier with real payment gating (replace freemium shell with actual subscriptions)
+- [ ] Premium analytics dashboard (cooking distribution, spending trends, top rated meals)
+- [ ] Comprehensive E2E testing (all existing + new features)
 
 ### Out of Scope
 
-- In-app purchases / payment processing — freemium shell only, no real transactions in v1
-- Android build — iOS only for v1 launch
+- Android build — iOS only for v2.0; cross-platform foundation ready via Expo
 - Web version — mobile-first, no web client
 - Social features beyond household (no public profiles, no recipe sharing outside household)
 - Meal prep / batch cooking workflows — keep it simple per-day planning
-- Integration with external grocery delivery services (Instacart, etc.)
+- Grocery delivery integration (Instacart, etc.)
+- Real-time chat — household coordination via meal plan, not messaging
+- Video content in recipes — text + photos only
 
 ## Context
 
@@ -95,5 +116,22 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 | Real-time grocery sync from v1 | Core to the collaborative value prop — pull-to-refresh would undermine the "together" feeling | — Pending |
 | AI features in v1 | URL import reduces friction for recipe entry; suggestions drive engagement and re-engagement | — Pending |
 
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd:transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd:complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
 ---
-*Last updated: 2026-03-22 after initialization*
+*Last updated: 2026-03-24 after milestone v2.0 started*

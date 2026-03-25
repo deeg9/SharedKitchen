@@ -1,61 +1,34 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: completed
-stopped_at: Completed quick-1-PLAN.md
-last_updated: "2026-03-23T22:41:47.929Z"
-last_activity: 2026-03-23 -- Completed 04-02-PLAN.md
+milestone: v2.0
+milestone_name: AI, Payments & Polish
+status: planning
+stopped_at: null
+last_updated: "2026-03-24"
+last_activity: 2026-03-24 -- Milestone v2.0 started
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 10
-  completed_plans: 10
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-22)
+See: .planning/PROJECT.md (updated 2026-03-24)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Phase 4: Onboarding and Freemium
+**Current focus:** Defining requirements for v2.0
 
 ## Current Position
 
-Phase: 4 of 4 (Onboarding and Freemium)
-Plan: 2 of 2 in current phase
-Status: Phase Complete
-Last activity: 2026-03-24 - Completed quick task 5: Grocery edit items + collapsible sections
-
-Progress: [██████████] 100%
-
-## Performance Metrics
-
-**Velocity:**
-- Total plans completed: 6
-- Average duration: 6min
-- Total execution time: 0.60 hours
-
-**By Phase:**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 1. Foundation | 3 | 20min | 7min |
-| 2. Core Features | 3 | 18min | 6min |
-
-**Recent Trend:**
-- Last 5 plans: 01-02 (5min), 01-03 (7min), 02-01 (6min), 02-02 (6min), 02-03 (6min)
-- Trend: stable
-
-*Updated after each plan completion*
-| Phase 02 P02 | 6min | 2 tasks | 17 files |
-| Phase 03 P01 | 4min | 2 tasks | 9 files |
-| Phase 03 P02 | 6min | 3 tasks | 15 files |
-| Phase 04 P01 | 4min | 2 tasks | 11 files |
-| Phase 04 P02 | 5min | 2 tasks | 8 files |
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-24 — Milestone v2.0 started
 
 ## Accumulated Context
 
