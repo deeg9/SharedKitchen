@@ -114,9 +114,9 @@
 ### AI Features
 
 - [x] **AI-03**: Recipe import uses gpt-5-mini with structured outputs replacing deprecated gpt-4o-mini
-- [ ] **AI-04**: Recipe extraction tries JSON-LD/schema.org structured data first, falls back to LLM only when missing
-- [ ] **AI-05**: AI extracts recipe images and nutrition info from source URLs when available
-- [ ] **AI-06**: AI-powered meal generator suggests new recipes based on dietary prefs, cooking history, current leftovers, and remaining budget
+- [x] **AI-04**: Recipe extraction tries JSON-LD/schema.org structured data first, falls back to LLM only when missing
+- [x] **AI-05**: AI extracts recipe images and nutrition info from source URLs when available
+- [x] **AI-06**: AI-powered meal generator suggests new recipes based on dietary prefs, cooking history, current leftovers, and remaining budget
 - [x] **AI-07**: AI features include per-user rate limiting and response caching to control costs
 
 ### Push Notifications
@@ -140,7 +140,7 @@
 - [ ] **COOK-02**: Cooking mode has step pagination (prev/next arrows), "Step X of Y" indicator, and progress bar
 - [ ] **COOK-03**: Steps with time references show embedded tappable countdown timers (start/pause/reset)
 - [ ] **COOK-04**: User can toggle between metric and imperial units for ingredients and instruction text
-- [ ] **COOK-05**: AI extraction parses time durations from instruction text to auto-generate timer data for cooking mode
+- [x] **COOK-05**: AI extraction parses time durations from instruction text to auto-generate timer data for cooking mode
 
 ### E2E Testing
 
@@ -200,14 +200,14 @@
 | RT-02 | Phase 7 | Complete |
 | RT-03 | Phase 7 | Complete |
 | RT-04 | Phase 7 | Complete |
-| AI-04 | Phase 8 | Pending |
-| AI-05 | Phase 8 | Pending |
-| AI-06 | Phase 8 | Pending |
+| AI-04 | Phase 8 | Complete |
+| AI-05 | Phase 8 | Complete |
+| AI-06 | Phase 8 | Complete |
 | COOK-01 | Phase 8 | Pending |
 | COOK-02 | Phase 8 | Pending |
 | COOK-03 | Phase 8 | Pending |
 | COOK-04 | Phase 8 | Pending |
-| COOK-05 | Phase 8 | Pending |
+| COOK-05 | Phase 8 | Complete |
 | TEST-01 | Phase 9 | Pending |
 | TEST-02 | Phase 9 | Pending |
 | TEST-03 | Phase 9 | Pending |

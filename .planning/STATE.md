@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: AI, Payments & Polish
-status: Ready to plan
-stopped_at: Completed 07-02-PLAN.md
-last_updated: "2026-03-25T22:34:27.176Z"
+status: Ready to execute
+stopped_at: Completed 08-01-PLAN.md
+last_updated: "2026-03-25T23:07:41.808Z"
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 10
+  completed_plans: 9
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-24)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Phase 07 — Real-Time Presence
+**Current focus:** Phase 08 — Enhanced AI & Cooking Mode
 
 ## Current Position
 
-Phase: 8
-Plan: Not started
+Phase: 08 (Enhanced AI & Cooking Mode) — EXECUTING
+Plan: 3 of 3
 
 ## Performance Metrics
 
@@ -47,6 +47,8 @@ Plan: Not started
 | Phase 06 P02 | 2min | 2 tasks | 4 files |
 | Phase 07 P01 | 4min | 2 tasks | 8 files |
 | Phase 07 P02 | 2min | 2 tasks | 2 files |
+| Phase 08 P02 | 4min | 2 tasks | 6 files |
+| Phase 08 P01 | 4min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -75,6 +77,10 @@ Recent decisions affecting current work:
 - [Phase 07]: Separate useEffect hooks for grocery and meal plan subscriptions in useActivityToast for independent lifecycle
 - [Phase 07]: Replaced manual supabase.auth.getUser() with useAuthStore in grocery and recipe screens for reactive auth state
 - [Phase 07]: AppState-based channelKey nulling for presence lifecycle (background/foreground) instead of explicit untrack calls
+- [Phase 08]: buildMealPrompt and parseMealSuggestions exported as pure testable functions from ai.ts
+- [Phase 08]: Rate limit 5/day free, 20/day premium for meal generation (separate from recipe parsing)
+- [Phase 08]: Inline JSON-LD functions in Deno Edge Function; src/lib/jsonld.ts is canonical test target
+- [Phase 08]: JSON-LD-first extraction requires name + ingredients + instructions to skip OpenAI
 
 ### Pending Todos
 
@@ -98,6 +104,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T22:31:47.745Z
-Stopped at: Completed 07-02-PLAN.md
+Last session: 2026-03-25T23:07:41.806Z
+Stopped at: Completed 08-01-PLAN.md
 Resume file: None
