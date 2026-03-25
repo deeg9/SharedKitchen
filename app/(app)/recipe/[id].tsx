@@ -7,6 +7,8 @@ import {
   Pressable,
   TextInput,
   StyleSheet,
+  AppState,
+  AppStateStatus,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -24,7 +26,9 @@ import { shadows } from '../../../src/theme/shadows';
 import { getDefaultRecipeImage } from '../../../src/lib/images';
 import { Ingredient, InstructionStep as InstructionStepType } from '../../../src/types/database';
 import { format, addDays } from 'date-fns';
-import { supabase } from '../../../src/lib/supabase';
+import { usePresence, PresenceMember } from '../../../src/hooks/usePresence';
+import { PresenceAvatarStack } from '../../../src/components/presence/PresenceAvatarStack';
+import { useAuthStore } from '../../../src/stores/authStore';
 
 const SCALE_OPTIONS = [1, 2, 3] as const;
 
@@ -43,19 +47,41 @@ export default function RecipeDetailScreen() {
     addNote,
   } = useRecipeStore();
   const { activeHouseholdId } = useHouseholdStore();
+  const householdMembers = useHouseholdStore((s) => s.members);
+  const user = useAuthStore((s) => s.user);
+  const userId = user?.id ?? null;
 
   const [scale, setScale] = useState<1 | 2 | 3>(1);
   const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
   const [noteText, setNoteText] = useState('');
   const [showPlanSheet, setShowPlanSheet] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) fetchRecipeDetail(id);
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) setUserId(data.user.id);
-    });
   }, [id]);
+
+  // AppState tracking for presence accuracy (RT-04)
+  const [appActive, setAppActive] = useState(true);
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state: AppStateStatus) => {
+      setAppActive(state === 'active');
+    });
+    return () => sub.remove();
+  }, []);
+
+  // Build currentUser for presence
+  const memberProfile = householdMembers.find((m) => m.user_id === user?.id)?.profiles;
+  const currentPresenceUser: PresenceMember | null = user ? {
+    user_id: user.id,
+    display_name: memberProfile?.display_name ?? 'Me',
+    avatar_url: memberProfile?.avatar_url ?? null,
+  } : null;
+
+  // Presence hook -- channelKey is null when app is backgrounded
+  const presenceMembers = usePresence(
+    appActive && id ? `recipe:${id}` : null,
+    currentPresenceUser
+  );
 
   const userRating = useMemo(() => {
     if (!userId) return null;
@@ -145,6 +171,11 @@ export default function RecipeDetailScreen() {
           >
             <MaterialCommunityIcons name="pencil-outline" size={22} color={colors.primary} />
           </Pressable>
+          {presenceMembers.length > 0 && (
+            <View style={{ position: 'absolute', right: 60, top: insets.top + spacing.xs + 6, zIndex: 10 }}>
+              <PresenceAvatarStack members={presenceMembers} />
+            </View>
+          )}
           {/* Tags on image */}
           <View style={s.heroTags}>
             {recipe.category && (
