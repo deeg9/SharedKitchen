@@ -21,8 +21,8 @@ created: 2026-03-25
 | Preset | not applicable |
 | Component library | Custom RN components (`src/components/ui/`) following MD3 "Culinary Curator" system |
 | Icon library | `@expo/vector-icons` (MaterialCommunityIcons) |
-| Font headlines | Plus Jakarta Sans (700 Bold, 800 ExtraBold) |
-| Font body/labels | Inter (400 Regular, 500 Medium, 600 SemiBold) |
+| Font headlines | Plus Jakarta Sans (700 Bold) |
+| Font body/labels | Inter (500 Medium) |
 
 **Source:** DSGN-01 through DSGN-06 in REQUIREMENTS.md; existing `src/theme/` files.
 
@@ -49,20 +49,23 @@ Exceptions: none -- Phase 5 uses the existing scale without additions.
 
 ## Typography
 
-Phase 5 uses the existing typography scale from `src/theme/typography.ts`. Only the roles relevant to this phase are listed:
+Phase 5 uses 4 font sizes and 2 font weights. All headline roles use Plus Jakarta Sans 700 (Bold). All body/label roles use Inter 500 (Medium).
 
 | Role | Token | Size | Weight | Line Height | Usage in Phase 5 |
 |------|-------|------|--------|-------------|-------------------|
-| Display price | `headlineBold` custom | 32px | 700 | 40px | "$9.99" price tag (existing in SubscriptionSheet) |
-| Sheet title | `headlineMd` | 24px | 700 (Jakarta Bold) | 32px | "Unlock Premium" title |
-| Section title | `titleLg` | 20px | 600 (Inter SemiBold) | 28px | "Premium Plan", "Compare Plans" |
-| Body | `bodyMd` | 14px | 400 (Inter Regular) | 20px | Feature descriptions, member-since, error messages |
-| Body large | `bodyLg` | 16px | 400 (Inter Regular) | 24px | Price period "/month", feature list text |
-| Label | `labelLg` | 14px | 600 (Inter SemiBold) | 20px | "Maybe Later" dismiss link, button labels |
-| Small label | `labelMd` | 12px | 500 (Inter Medium) | 16px | Rate limit counter, status badges |
-| Micro | `bodySm` | 12px | 400 (Inter Regular) | 16px | Subscription status metadata, billing portal link |
+| Sheet title / Display price | `headlineMd` | 24px | 700 (Jakarta Bold) | 32px | "Unlock Premium" title, "$9.99" price tag |
+| Body large / Section title | `bodyLg` | 16px | 500 (Inter Medium) | 24px | "Premium Plan", "Compare Plans", price period "/month", feature list text |
+| Body / Label | `bodyMd` / `labelLg` | 14px | 500 (Inter Medium) | 20px | Feature descriptions, member-since, error messages, "Maybe Later" dismiss link, button labels |
+| Small label / Micro | `labelMd` / `bodySm` | 12px | 500 (Inter Medium) | 16px | Rate limit counter, status badges, subscription status metadata, billing portal link |
 
-**Source:** `src/theme/typography.ts` (existing, unchanged).
+Weight mapping (2 weights only):
+
+| Weight | Font | Value | Used For |
+|--------|------|-------|----------|
+| Bold | Plus Jakarta Sans | 700 | All headings, price display, sheet titles |
+| Medium | Inter | 500 | All body text, labels, buttons, badges, metadata |
+
+**Source:** `src/theme/typography.ts` (existing scale collapsed for Phase 5 contract).
 
 ---
 
@@ -105,7 +108,7 @@ Accent reserved for:
 | Checkout success | No custom UI -- Stripe PaymentSheet handles success state. After dismissal, poll subscription then show updated Premium Plan card. |
 | Checkout failure heading | "Payment could not be completed" |
 | Checkout failure body | "Your card was not charged. Please check your payment details and try again." |
-| Checkout failure action | "Try Again" button (re-opens PaymentSheet) + "Maybe Later" dismiss |
+| Checkout failure action | "Retry Payment" button (re-opens PaymentSheet) + "Maybe Later" dismiss |
 
 ### Subscription Management (PAY-04)
 
@@ -169,7 +172,7 @@ Phase 5 adds no new screens or components. All UI changes are modifications to e
 
 1. **Checkout loading state** -- SubscriptionSheet and UpgradePrompt "Upgrade to Premium" button shows `ActivityIndicator` (white, size 18) replacing button text, with "Preparing secure checkout..." below the button in `bodySm` / `onSurfaceVariant`. Button is disabled during loading.
 
-2. **Checkout failure state** -- Rendered inline in SubscriptionSheet below the Upgrade button area. Uses `errorContainer` (#ffdad6) background, `borderRadius.md` (12px), `spacing.md` (16px) padding. Contains error icon (`MaterialCommunityIcons` "alert-circle", size 20, `error` color), heading in `labelLg`, body in `bodyMd`, and "Try Again" button (variant "secondary", size "md").
+2. **Checkout failure state** -- Rendered inline in SubscriptionSheet below the Upgrade button area. Uses `errorContainer` (#ffdad6) background, `borderRadius.md` (12px), `spacing.md` (16px) padding. Contains error icon (`MaterialCommunityIcons` "alert-circle", size 20, `error` color), heading in `bodyMd` at 14px Inter 500, body in `bodySm` at 12px Inter 500, and "Retry Payment" button (variant "secondary", size "md").
 
 3. **Past-due warning banner** -- Shown at top of SubscriptionSheet when status is `past_due`. Full-width banner with `errorContainer` (#ffdad6) background, `spacing.md` padding, `borderRadius.md` corners. Warning icon + copy from Status States table. "Update Payment" button opens billing portal.
 
