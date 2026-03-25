@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Pressable, AppState, AppStateStatus } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors } from '../../../src/theme/colors';
@@ -18,8 +18,12 @@ import { useHouseholdStore } from '../../../src/stores/householdStore';
 import { usePlanStore } from '../../../src/stores/planStore';
 import { useGrocerySync } from '../../../src/hooks/useGrocerySync';
 import { getWeekDays, toDateString } from '../../../src/lib/dates';
-import { supabase } from '../../../src/lib/supabase';
 import { TAB_BAR_HEIGHT } from '../../../src/lib/constants';
+import { usePresence, PresenceMember } from '../../../src/hooks/usePresence';
+import { useActivityToast } from '../../../src/hooks/useActivityToast';
+import { PresenceAvatarStack } from '../../../src/components/presence/PresenceAvatarStack';
+import { ActivityToast } from '../../../src/components/presence/ActivityToast';
+import { useAuthStore } from '../../../src/stores/authStore';
 
 const SECTION_ORDER = ['Proteins', 'Produce', 'Dairy & Eggs', 'Pantry', 'Other'];
 
@@ -30,11 +34,30 @@ export default function GroceryScreen() {
   const [addSheetOpen, setAddSheetOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<GroceryItemType | null>(null);
   const [catSheetOpen, setCatSheetOpen] = useState(false);
-  const [userId, setUserId] = useState<string>('');
   const initCategories = useGroceryCategoryStore((s) => s.initialize);
 
+  const user = useAuthStore((s) => s.user);
+  const userId = user?.id ?? '';
   const activeHouseholdId = useHouseholdStore((s) => s.activeHouseholdId);
+  const members = useHouseholdStore((s) => s.members);
   const mealPlan = usePlanStore((s) => s.mealPlan);
+
+  // AppState tracking for presence accuracy (RT-04)
+  const [appActive, setAppActive] = useState(true);
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state: AppStateStatus) => {
+      setAppActive(state === 'active');
+    });
+    return () => sub.remove();
+  }, []);
+
+  // Build currentUser for presence
+  const profile = members.find((m) => m.user_id === user?.id)?.profiles;
+  const currentPresenceUser: PresenceMember | null = user ? {
+    user_id: user.id,
+    display_name: profile?.display_name ?? user.user_metadata?.display_name ?? 'Me',
+    avatar_url: profile?.avatar_url ?? user.user_metadata?.avatar_url ?? null,
+  } : null;
 
   const {
     items,
@@ -51,11 +74,28 @@ export default function GroceryScreen() {
   // Realtime sync
   useGrocerySync(activeHouseholdId, activeListId);
 
-  // Get current user id + init categories
+  // Presence hook -- channelKey is null when app is backgrounded (RT-04)
+  const presenceMembers = usePresence(
+    appActive && activeListId ? `grocery:${activeListId}` : null,
+    currentPresenceUser
+  );
+
+  // Activity toast hook
+  const memberLookup = useCallback((uid: string) => {
+    const m = members.find((mem) => mem.user_id === uid);
+    if (!m?.profiles) return null;
+    return { display_name: m.profiles.display_name ?? 'Someone', avatar_url: m.profiles.avatar_url };
+  }, [members]);
+
+  const { currentToast, dismissToast } = useActivityToast({
+    groceryListId: appActive ? activeListId : null,
+    householdId: appActive ? activeHouseholdId : null,
+    currentUserId: user?.id ?? null,
+    memberLookup,
+  });
+
+  // Init categories
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) setUserId(data.user.id);
-    });
     initCategories();
   }, []);
 
@@ -138,7 +178,7 @@ export default function GroceryScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.titleRow}>
-        <View style={styles.editCatBtn} />
+        <PresenceAvatarStack members={presenceMembers} />
         <Text style={styles.screenTitle}>Grocery List</Text>
         <Pressable onPress={() => setCatSheetOpen(true)} style={styles.editCatBtn}>
           <MaterialCommunityIcons name="tag-edit-outline" size={20} color={colors.onSurfaceVariant} />
@@ -220,6 +260,15 @@ export default function GroceryScreen() {
         isOpen={catSheetOpen}
         onClose={() => setCatSheetOpen(false)}
       />
+
+      {currentToast && (
+        <ActivityToast
+          avatar_url={currentToast.avatar_url}
+          display_name={currentToast.display_name}
+          message={currentToast.message}
+          onDismiss={dismissToast}
+        />
+      )}
     </View>
   );
 }
