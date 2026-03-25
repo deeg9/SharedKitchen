@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { getWeekDays, getWeekLabel, toDateString, makePlanKey } from '../lib/dates';
 import { Recipe, Database, MealType } from '../types/database';
+import { scheduleCookingReminder, cancelNotification } from '../lib/notifications';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type MealPlan = Database['public']['Tables']['meal_plans']['Row'];
 
@@ -133,6 +135,21 @@ export const usePlanStore = create<PlanState>((set, get) => ({
         }
         return { mealPlan: newPlan, loading: false };
       });
+
+      // Schedule cooking reminder notification
+      if (data?.id && data?.recipes) {
+        try {
+          const notifId = await scheduleCookingReminder(
+            data.id,
+            data.recipes.name,
+            date,
+            data.recipes.prep_time_minutes ?? 30
+          );
+          if (notifId) {
+            await AsyncStorage.setItem(`notif_meal_${data.id}`, notifId);
+          }
+        } catch {}
+      }
     } catch (error: any) {
       set({ loading: false, error: error.message ?? 'Failed to assign recipe' });
     }
@@ -141,6 +158,17 @@ export const usePlanStore = create<PlanState>((set, get) => ({
   clearMeal: async (householdId: string, date: string, mealType: MealType) => {
     set({ loading: true, error: null });
     try {
+      // Cancel cooking reminder if one was scheduled
+      const planKey = makePlanKey(date, mealType);
+      const existingEntry = get().mealPlan.get(planKey);
+      if (existingEntry?.id) {
+        const notifId = await AsyncStorage.getItem(`notif_meal_${existingEntry.id}`);
+        if (notifId) {
+          try { await cancelNotification(notifId); } catch {}
+          await AsyncStorage.removeItem(`notif_meal_${existingEntry.id}`);
+        }
+      }
+
       let { error } = await supabase
         .from('meal_plans')
         .delete()

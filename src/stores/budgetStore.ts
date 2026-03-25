@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { Expense } from '../types/database';
+import { checkBudgetThreshold } from '../lib/notifications';
 
 export type ExpenseCategory = 'Groceries' | 'Dining Out' | 'Takeout';
 
@@ -220,6 +221,12 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
       set((state) => ({
         expenses: [...state.expenses, expense as Expense],
       }));
+
+      // Check budget thresholds and fire alerts
+      const { monthlyTotal, budgetTarget } = get();
+      try {
+        await checkBudgetThreshold(monthlyTotal(), budgetTarget, 'Your Household');
+      } catch {}
     } catch (error: any) {
       set({ error: error.message ?? 'Failed to add expense' });
     }

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { Leftover } from '../types/database';
+import { scheduleLeftoverAlerts, cancelLeftoverAlerts } from '../lib/notifications';
 
 export type FreshnessStatus = 'Fresh' | 'Use Soon' | 'Expired' | 'Frozen';
 
@@ -130,6 +131,13 @@ export const useLeftoverStore = create<LeftoverState>((set, get) => ({
       set((state) => ({
         leftovers: [...state.leftovers, leftover as Leftover],
       }));
+
+      // Schedule expiry alert notifications
+      if (leftover?.id) {
+        try {
+          await scheduleLeftoverAlerts(leftover.id, data.name, data.use_by_date);
+        } catch {}
+      }
     } catch (error: any) {
       set({ error: error.message ?? 'Failed to add leftover' });
     }
@@ -166,6 +174,9 @@ export const useLeftoverStore = create<LeftoverState>((set, get) => ({
   deleteLeftover: async (id) => {
     const { leftovers } = get();
     const original = leftovers.find((l) => l.id === id);
+
+    // Cancel any scheduled expiry alerts
+    try { await cancelLeftoverAlerts(id); } catch {}
 
     // Optimistic remove
     set({ leftovers: leftovers.filter((l) => l.id !== id) });
