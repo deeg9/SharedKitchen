@@ -123,9 +123,9 @@
 
 - [x] **NOTIF-01**: App registers Expo push tokens and stores them in `push_tokens` table with device info
 - [x] **NOTIF-02**: User sees contextual permission explanation before notification access prompt
-- [ ] **NOTIF-03**: User receives local scheduled cooking reminders before meal prep time
-- [ ] **NOTIF-04**: User receives push alert when a leftover is approaching its use-by date (1 day before, day of)
-- [ ] **NOTIF-05**: User receives push alert when household spending exceeds 80% or 100% of monthly budget target
+- [x] **NOTIF-03**: User receives local scheduled cooking reminders before meal prep time
+- [x] **NOTIF-04**: User receives push alert when a leftover is approaching its use-by date (1 day before, day of)
+- [x] **NOTIF-05**: User receives push alert when household spending exceeds 80% or 100% of monthly budget target
 
 ### Real-Time Collaboration
 
@@ -193,9 +193,9 @@
 | AI-07 | Phase 5 | Complete |
 | NOTIF-01 | Phase 6 | Complete |
 | NOTIF-02 | Phase 6 | Complete |
-| NOTIF-03 | Phase 6 | Pending |
-| NOTIF-04 | Phase 6 | Pending |
-| NOTIF-05 | Phase 6 | Pending |
+| NOTIF-03 | Phase 6 | Complete |
+| NOTIF-04 | Phase 6 | Complete |
+| NOTIF-05 | Phase 6 | Complete |
 | RT-01 | Phase 7 | Pending |
 | RT-02 | Phase 7 | Pending |
 | RT-03 | Phase 7 | Pending |

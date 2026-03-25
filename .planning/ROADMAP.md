@@ -70,7 +70,7 @@ Plans:
 
 Plans:
 - [x] 06-01-PLAN.md — Notification service, push token registration, permission pre-prompt, DB migration
-- [ ] 06-02-PLAN.md — Wire scheduling into stores (cooking reminders, leftover alerts, budget warnings) and profile toggles
+- [x] 06-02-PLAN.md — Wire scheduling into stores (cooking reminders, leftover alerts, budget warnings) and profile toggles
 
 ### Phase 7: Real-Time Presence
 **Goal**: Users can see who else in their household is viewing the same screen and get live activity updates
