@@ -51,29 +51,28 @@ Source: src/theme/spacing.ts (existing scale used as-is, no new tokens needed).
 
 ## Typography
 
-### Standard Roles (existing, from src/theme/typography.ts)
+### Standard Roles (4 sizes, 2 weights)
 
 | Role | Size | Weight | Line Height | Font |
 |------|------|--------|-------------|------|
-| Body (bodyLg) | 16px | 400 | 24px (1.5) | Inter |
-| Body (bodyMd) | 14px | 400 | 20px (1.43) | Inter |
-| Label (labelLg) | 14px | 600 | 20px (1.43) | Inter |
-| Label (labelMd) | 12px | 500 | 16px (1.33) | Inter |
-| Title (titleLg) | 20px | 600 | 28px (1.4) | Inter |
-| Headline (headlineLg) | 28px | 700 | 36px (1.29) | Plus Jakarta Sans |
-| Display (displayLg) | 36px | 800 | 44px (1.22) | Plus Jakarta Sans |
+| Body / Labels | 14px | 400 | 20px (1.43) | Inter |
+| Body (default) | 16px | 400 | 24px (1.5) | Inter |
+| Titles / Instructions | 24px | 700 | 32px (1.33) | Plus Jakarta Sans |
+| Timer Display | 36px | 700 | 44px (1.22) | Plus Jakarta Sans |
+
+Weights used: 400 (Regular) for all body text and labels; 700 (Bold) for headings, titles, emphasis, and display elements.
 
 ### Phase 8 Specific Usage
 
-| Context | Style Token | Notes |
-|---------|-------------|-------|
-| Cooking mode instruction text | headlineMd (24px/700/32lh) | Large text for reading at arm's length; white on dark |
-| Cooking mode step indicator | labelLg (14px/600) | "Step 3 of 8" text |
-| Cooking mode timer display | displayLg (36px/800) | Countdown digits "04:32" in monospace-style rendering |
-| Cooking mode timer label | labelMd (12px/500) | Timer context label "Simmer" above the countdown |
-| Meal suggestion card title | titleLg (20px/600) | Suggestion recipe name |
-| Meal suggestion card detail | bodyMd (14px/400) | Description, cost, time estimates |
-| Unit toggle label | labelMd (12px/500) | "METRIC" / "IMPERIAL" segmented control |
+| Context | Size / Weight | Notes |
+|---------|---------------|-------|
+| Cooking mode instruction text | 24px / 700 | Large text for reading at arm's length; white on dark |
+| Cooking mode step indicator | 14px / 400 | "Step 3 of 8" text |
+| Cooking mode timer display | 36px / 700 | Countdown digits "04:32" in tabular-nums rendering |
+| Cooking mode timer label | 14px / 400 | Timer context label "Simmer" above the countdown |
+| Meal suggestion card title | 24px / 700 | Suggestion recipe name |
+| Meal suggestion card detail | 14px / 400 | Description, cost, time estimates |
+| Unit toggle label | 14px / 400 | "METRIC" / "IMPERIAL" segmented control |
 
 Note on timer digits: Use `fontVariant: ['tabular-nums']` on Inter for fixed-width digit rendering in countdown displays. Do not introduce a monospace font.
 
@@ -90,7 +89,7 @@ Note on timer digits: Use `fontVariant: ['tabular-nums']` on Inter for fixed-wid
 | Accent (10%) | #fe932c (secondaryContainer) | "Start Cooking" CTA, active timer ring, meal generator CTA |
 | Destructive | #ba1a1a (error) | Timer expired flash, stop/cancel actions |
 
-Accent reserved for: "Start Cooking" button on recipe detail, active running timer ring/pulse, "Generate Suggestions" CTA on meal generator, timer completion alert badge.
+Accent reserved for: "Start Cooking" button on recipe detail, active running timer ring/pulse, "Get Suggestions" CTA on meal generator, timer completion alert badge.
 
 ### Cooking Mode (dark immersive surface)
 
@@ -120,7 +119,7 @@ Source: src/theme/colors.ts inverse tokens + secondary tokens.
 | Component | File | Props | Visual Contract |
 |-----------|------|-------|-----------------|
 | CookingMode | src/components/cooking/CookingMode.tsx | recipe, onClose | Fullscreen dark container; status bar hidden; horizontal FlatList paging |
-| StepCard | src/components/cooking/StepCard.tsx | step, stepIndex, totalSteps, unitSystem | Full-width dark card; centered instruction text (headlineMd); step badge top-left |
+| StepCard | src/components/cooking/StepCard.tsx | step, stepIndex, totalSteps, unitSystem | Full-width dark card; centered instruction text (24px/700); step badge top-left |
 | CookingTimer | src/components/cooking/CookingTimer.tsx | durationSeconds, label, onComplete | Circular progress ring (64px diameter); digits center; start/pause/reset controls below |
 | CookingProgress | src/components/cooking/CookingProgress.tsx | currentStep, totalSteps | Horizontal bar (4px tall) at top of screen; filled segments for completed steps |
 | IngredientSidebar | src/components/cooking/IngredientSidebar.tsx | ingredients, scale, unitSystem, visible | Slide-in panel from left; semi-transparent dark overlay; ingredient list with checkboxes |
@@ -133,7 +132,7 @@ Source: src/theme/colors.ts inverse tokens + secondary tokens.
 | Component | Change |
 |-----------|--------|
 | Recipe detail bottom bar | Add "Start Cooking" button (accent color, pot-steam icon) alongside existing "Add to Plan" |
-| Recipe detail screen | Add unit toggle in ingredient section header (next to scale selector) |
+| Recipe detail screen | Add unit toggle in ingredient section header (next to scale selector row) |
 
 ---
 
@@ -151,14 +150,14 @@ Source: src/theme/colors.ts inverse tokens + secondary tokens.
 
 1. Horizontal swipe (FlatList pagingEnabled) or tap prev/next arrows at bottom
 2. Progress bar at top updates: each step is an equal-width segment; completed = inversePrimary, current = inversePrimary at 60%, remaining = onSurfaceVariant
-3. "Step X of Y" label centered below progress bar (labelLg, inverseOnSurface)
+3. "Step X of Y" label centered below progress bar (14px/400, inverseOnSurface)
 4. Haptic feedback (Haptics.selectionAsync) on step change
-5. On last step: next arrow disabled; "Done" label replaces next arrow; tapping Done exits cooking mode
+5. On last step: next arrow disabled; "Done Cooking" label replaces next arrow; tapping Done Cooking exits cooking mode
 
 ### Countdown Timers (COOK-03)
 
 1. Timer appears inline within StepCard, below the instruction text
-2. Timer shows: circular ring (64px), countdown digits centered (displayLg, tabular-nums), label above ring (labelMd)
+2. Timer shows: circular ring (64px), countdown digits centered (36px/700, tabular-nums), label above ring (14px/400)
 3. Initial state: ring empty (onSurfaceVariant), digits show full duration, play button (triangle icon) below
 4. Tap play: ring animates clockwise fill (secondaryContainer), digits count down, button becomes pause icon
 5. Tap pause: ring freezes, digits freeze, button becomes play icon, ring color dims to secondaryFixedDim
@@ -182,9 +181,9 @@ Source: src/theme/colors.ts inverse tokens + secondary tokens.
 3. Loading state: 3 skeleton cards with shimmer animation (existing Skeleton component)
 4. Context summary at top: 3 small pills showing "6 dietary prefs", "3 leftovers to use", "$42 remaining budget" (surfaceContainerLow background)
 5. Results: 3 MealSuggestionCards stacked vertically
-6. Each card: recipe name (titleLg), 2-line description (bodyMd), row of badges (estimated cost, prep time, "Uses leftovers" if applicable)
+6. Each card: recipe name (24px/700), 2-line description (14px/400), row of badges (estimated cost, prep time, "Uses leftovers" if applicable)
 7. Card CTA: "Add to Plan" ghost button (outline style, primary color)
-8. Bottom of sheet: "Generate More" text button to request fresh suggestions
+8. Bottom of sheet: "Try New Suggestions" text button to request fresh suggestions
 9. Error state: shown inline in sheet body
 
 ---
@@ -196,7 +195,7 @@ Source: src/theme/colors.ts inverse tokens + secondary tokens.
 | Primary CTA (cooking) | "Start Cooking" |
 | Primary CTA (meal gen) | "Get Suggestions" |
 | Cooking mode step indicator | "Step {X} of {Y}" |
-| Cooking mode done button | "Finish" |
+| Cooking mode done button | "Done Cooking" |
 | Cooking mode exit confirm | "Exit Cooking Mode?" / "Your timer will keep running in the background." / [Keep Cooking] [Exit] |
 | Timer start label | "Start Timer" (accessible label; visual is play icon only) |
 | Timer complete alert | "Timer done!" (local notification title) / "{label} is ready" (notification body) |
@@ -207,7 +206,7 @@ Source: src/theme/colors.ts inverse tokens + secondary tokens.
 | Meal generator error | "Couldn't generate suggestions right now. Check your connection and try again." / [Try Again] |
 | Meal suggestion uses-leftovers badge | "Uses leftovers" |
 | Meal suggestion add CTA | "Add to Plan" |
-| Meal generator refresh | "Generate More" |
+| Meal generator refresh | "Try New Suggestions" |
 
 ---
 
@@ -232,7 +231,7 @@ Source: src/theme/colors.ts inverse tokens + secondary tokens.
 |-------|--------|
 | Sheet closed | Not visible |
 | Loading | 3 skeleton cards with shimmer; context pills at top with real data |
-| Results | 3 suggestion cards; "Generate More" at bottom |
+| Results | 3 suggestion cards; "Try New Suggestions" at bottom |
 | Error | Inline error message with "Try Again" button |
 | Empty (no data) | "What should we cook?" heading + body text + CTA |
 
