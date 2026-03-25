@@ -81,7 +81,12 @@ Plans:
   2. User sees avatar stacks on recipe detail screens showing who else is viewing the same recipe
   3. User sees toast notifications when a household member checks off a grocery item or modifies the meal plan
   4. Presence state syncs smoothly without phantom avatar flickering (debounced Supabase Presence)
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — Build usePresence hook, useActivityToast hook, PresenceAvatarStack, and ActivityToast components with tests
+- [ ] 07-02-PLAN.md — Wire presence and activity toasts into grocery and recipe detail screens
+
 **UI hint**: yes
 
 ### Phase 8: Enhanced AI & Cooking Mode
@@ -122,6 +127,6 @@ Phases execute in numeric order: 5 -> 6 -> 7 -> 8 -> 9
 | 4. Onboarding and Freemium | v1.0 | 2/2 | Complete | 2026-03-23 |
 | 5. AI Fix & Payment Foundation | v2.0 | 0/3 | Planned    |  |
 | 6. Push Notifications | v2.0 | 0/2 | Planned | - |
-| 7. Real-Time Presence | v2.0 | 0/0 | Not started | - |
+| 7. Real-Time Presence | v2.0 | 0/2 | Planned | - |
 | 8. Enhanced AI & Cooking Mode | v2.0 | 0/0 | Not started | - |
 | 9. E2E Testing | v2.0 | 0/0 | Not started | - |
