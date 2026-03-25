@@ -6,7 +6,9 @@ import { colors } from '../../theme/colors';
 import { typography, fontFamily } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
 import { shadows } from '../../theme/shadows';
+import { TAB_BAR_HEIGHT } from '../../lib/constants';
 import { useGroceryStore } from '../../stores/groceryStore';
+import { useHouseholdStore, HouseholdMemberWithProfile } from '../../stores/householdStore';
 import { GroceryItem as GroceryItemType, FrequentItem } from '../../types/database';
 import { useGroceryCategoryStore } from '../../stores/groceryCategoryStore';
 import { QuickAddChips } from './QuickAddChips';
@@ -34,6 +36,9 @@ export function AddItemSheet({ isOpen, onClose, listId, editItem }: AddItemSheet
   const [qty, setQty] = useState(1);
   const [unitIdx, setUnitIdx] = useState(0);
   const [sectionLabel, setSectionLabel] = useState('Produce');
+  const [categoryOpen, setCategoryOpen] = useState(false);
+  const [assigneeOpen, setAssigneeOpen] = useState(false);
+  const [assignedTo, setAssignedTo] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
   const [price, setPrice] = useState('');
   const addManualItem = useGroceryStore((s) => s.addManualItem);
@@ -41,6 +46,7 @@ export function AddItemSheet({ isOpen, onClose, listId, editItem }: AddItemSheet
   const currentItems = useGroceryStore((s) => s.items);
   const frequentItems = useGroceryStore((s) => s.frequentItems);
   const categories = useGroceryCategoryStore((s) => s.categories);
+  const members = useHouseholdStore((s) => s.members);
 
   const isEditMode = !!editItem;
 
@@ -59,13 +65,17 @@ export function AddItemSheet({ isOpen, onClose, listId, editItem }: AddItemSheet
       setSectionLabel(sectionDbToLabel(editItem.section));
       setPrice(editItem.estimated_price != null ? String(editItem.estimated_price) : '');
       setNotes('');
+      setAssignedTo(null);
     } else {
       setName('');
       setQty(1);
       setUnitIdx(0);
       setNotes('');
       setPrice('');
+      setAssignedTo(null);
     }
+    setCategoryOpen(false);
+    setAssigneeOpen(false);
   }, [editItem, isOpen]);
 
   const selectedSection = categories.find((s) => s.label === sectionLabel);
@@ -114,7 +124,14 @@ export function AddItemSheet({ isOpen, onClose, listId, editItem }: AddItemSheet
       setQty(1);
       setNotes('');
       setPrice('');
+      setAssignedTo(null);
     }
+  };
+
+  const getAssigneeName = () => {
+    if (!assignedTo) return null;
+    const member = members.find((m) => m.user_id === assignedTo);
+    return member?.profiles?.display_name ?? 'Member';
   };
 
   return (
@@ -213,32 +230,123 @@ export function AddItemSheet({ isOpen, onClose, listId, editItem }: AddItemSheet
             </View>
           </View>
 
-          {/* Category */}
-          <View style={styles.section}>
+          {/* Category — dropdown */}
+          <View style={[styles.section, { zIndex: 20 }]}>
             <Text style={styles.fieldLabel}>Category</Text>
-            <View style={styles.sectionChips}>
-              {categories.map((s) => (
-                <Pressable
-                  key={s.label}
-                  onPress={() => setSectionLabel(s.label)}
-                  style={[
-                    styles.sectionChip,
-                    sectionLabel === s.label && styles.sectionChipActive,
-                  ]}
-                  testID={`section-chip-${s.label}`}
-                >
-                  <Text
-                    style={[
-                      styles.sectionChipText,
-                      sectionLabel === s.label && styles.sectionChipTextActive,
-                    ]}
+            <Pressable
+              style={[styles.dropdownTrigger, categoryOpen && styles.dropdownTriggerOpen]}
+              onPress={() => { setCategoryOpen(!categoryOpen); setAssigneeOpen(false); }}
+            >
+              <Text style={styles.dropdownTriggerText}>{sectionLabel}</Text>
+              <MaterialCommunityIcons
+                name={categoryOpen ? 'chevron-up' : 'chevron-down'}
+                size={18}
+                color={colors.onSurfaceVariant}
+              />
+            </Pressable>
+            {categoryOpen && (
+              <View style={styles.dropdownList}>
+                {categories.map((s) => (
+                  <Pressable
+                    key={s.label}
+                    style={[styles.dropdownItem, sectionLabel === s.label && styles.dropdownItemActive]}
+                    onPress={() => {
+                      setSectionLabel(s.label);
+                      setCategoryOpen(false);
+                    }}
+                    testID={`section-chip-${s.label}`}
                   >
-                    {s.label}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
+                    <Text
+                      style={[
+                        styles.dropdownItemText,
+                        sectionLabel === s.label && styles.dropdownItemTextActive,
+                      ]}
+                    >
+                      {s.label}
+                    </Text>
+                    {sectionLabel === s.label && (
+                      <MaterialCommunityIcons name="check" size={16} color={colors.primary} />
+                    )}
+                  </Pressable>
+                ))}
+              </View>
+            )}
           </View>
+
+          {/* Assigned To — dropdown */}
+          {members.length > 0 && (
+            <View style={[styles.section, { zIndex: 10 }]}>
+              <Text style={styles.fieldLabel}>Assigned To</Text>
+              <Pressable
+                style={[styles.dropdownTrigger, assigneeOpen && styles.dropdownTriggerOpen]}
+                onPress={() => { setAssigneeOpen(!assigneeOpen); setCategoryOpen(false); }}
+              >
+                <Text style={[
+                  styles.dropdownTriggerText,
+                  !assignedTo && styles.dropdownPlaceholder,
+                ]}>
+                  {getAssigneeName() ?? 'Anyone'}
+                </Text>
+                <MaterialCommunityIcons
+                  name={assigneeOpen ? 'chevron-up' : 'chevron-down'}
+                  size={18}
+                  color={colors.onSurfaceVariant}
+                />
+              </Pressable>
+              {assigneeOpen && (
+                <View style={styles.dropdownList}>
+                  <Pressable
+                    style={[styles.dropdownItem, !assignedTo && styles.dropdownItemActive]}
+                    onPress={() => {
+                      setAssignedTo(null);
+                      setAssigneeOpen(false);
+                    }}
+                  >
+                    <Text style={[
+                      styles.dropdownItemText,
+                      !assignedTo && styles.dropdownItemTextActive,
+                    ]}>
+                      Anyone
+                    </Text>
+                    {!assignedTo && (
+                      <MaterialCommunityIcons name="check" size={16} color={colors.primary} />
+                    )}
+                  </Pressable>
+                  {members.map((m) => {
+                    const memberName = m.profiles?.display_name ?? 'Member';
+                    const isActive = assignedTo === m.user_id;
+                    return (
+                      <Pressable
+                        key={m.user_id}
+                        style={[styles.dropdownItem, isActive && styles.dropdownItemActive]}
+                        onPress={() => {
+                          setAssignedTo(isActive ? null : m.user_id);
+                          setAssigneeOpen(false);
+                        }}
+                      >
+                        <View style={styles.memberRow}>
+                          <MaterialCommunityIcons
+                            name="account-circle-outline"
+                            size={20}
+                            color={isActive ? colors.primary : colors.onSurfaceVariant}
+                          />
+                          <Text style={[
+                            styles.dropdownItemText,
+                            isActive && styles.dropdownItemTextActive,
+                          ]}>
+                            {memberName}
+                          </Text>
+                        </View>
+                        {isActive && (
+                          <MaterialCommunityIcons name="check" size={16} color={colors.primary} />
+                        )}
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              )}
+            </View>
+          )}
 
           {/* Notes */}
           <View style={styles.section}>
@@ -253,20 +361,20 @@ export function AddItemSheet({ isOpen, onClose, listId, editItem }: AddItemSheet
               numberOfLines={3}
             />
           </View>
-        </ScrollView>
 
-        {/* Add Button — fixed at bottom */}
-        <View style={styles.footer}>
-          <Pressable
-            onPress={handleSubmit}
-            disabled={!name.trim()}
-            style={[styles.addBtn, !name.trim() && styles.addBtnDisabled]}
-            testID="add-item-button"
-          >
-            <MaterialCommunityIcons name={isEditMode ? 'check' : 'cart-plus'} size={22} color={colors.onPrimary} />
-            <Text style={styles.addBtnText}>{isEditMode ? 'Save Changes' : 'Add to List'}</Text>
-          </Pressable>
-        </View>
+          {/* Add Button */}
+          <View style={styles.footer}>
+            <Pressable
+              onPress={handleSubmit}
+              disabled={!name.trim()}
+              style={[styles.addBtn, !name.trim() && styles.addBtnDisabled]}
+              testID="add-item-button"
+            >
+              <MaterialCommunityIcons name={isEditMode ? 'check' : 'cart-plus'} size={22} color={colors.onPrimary} />
+              <Text style={styles.addBtnText}>{isEditMode ? 'Save Changes' : 'Add to List'}</Text>
+            </Pressable>
+          </View>
+        </ScrollView>
       </View>
     </BottomSheet>
   );
@@ -303,7 +411,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: spacing.md,
-    paddingBottom: spacing.xxl,
+    paddingBottom: TAB_BAR_HEIGHT + spacing.xl,
   },
   // Shared
   section: {
@@ -411,29 +519,62 @@ const styles = StyleSheet.create({
     color: colors.onSurface,
     padding: 0,
   },
-  // Section chips
-  sectionChips: {
+  // Dropdown trigger
+  dropdownTrigger: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-  },
-  sectionChip: {
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: borderRadius.md,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.surfaceContainerHighest,
+    paddingVertical: spacing.sm + 2,
+    borderWidth: 1,
+    borderColor: colors.outlineVariant,
   },
-  sectionChipActive: {
-    backgroundColor: colors.primary,
-    ...shadows.editorial,
+  dropdownTriggerOpen: {
+    borderColor: colors.primary,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
   },
-  sectionChipText: {
-    ...typography.labelMd,
-    color: colors.onSurfaceVariant,
+  dropdownTriggerText: {
+    ...typography.bodyMd,
+    color: colors.onSurface,
     fontWeight: '500',
   },
-  sectionChipTextActive: {
-    color: colors.onPrimary,
+  dropdownPlaceholder: {
+    color: colors.onSurfaceVariant,
+  },
+  dropdownList: {
+    backgroundColor: colors.surfaceContainerLowest,
+    borderWidth: 1,
+    borderTopWidth: 0,
+    borderColor: colors.primary,
+    borderBottomLeftRadius: borderRadius.md,
+    borderBottomRightRadius: borderRadius.md,
+    ...shadows.float,
+  },
+  dropdownItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm + 2,
+  },
+  dropdownItemActive: {
+    backgroundColor: colors.primaryFixed,
+  },
+  dropdownItemText: {
+    ...typography.bodyMd,
+    color: colors.onSurface,
+  },
+  dropdownItemTextActive: {
+    color: colors.primary,
+    fontWeight: '600',
+  },
+  memberRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
   // Notes
   notesInput: {
@@ -449,7 +590,6 @@ const styles = StyleSheet.create({
   footer: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
-    paddingBottom: spacing.lg,
   },
   addBtn: {
     flexDirection: 'row',

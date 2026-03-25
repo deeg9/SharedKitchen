@@ -2,16 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: AI, Payments & Polish
-status: executing
-stopped_at: "Completed 05-01-PLAN.md"
-last_updated: "2026-03-25"
-last_activity: 2026-03-25 -- Completed 05-01-PLAN.md (fix recipe import)
+status: Ready to execute
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-03-25T16:58:13.280Z"
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
-  percent: 33
+  completed_plans: 0
 ---
 
 # Project State
@@ -21,20 +19,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-24)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Phase 5 - AI Fix & Payment Foundation
+**Current focus:** Phase 05 — AI Fix & Payment Foundation
 
 ## Current Position
 
-Phase: 5 of 9 (AI Fix & Payment Foundation)
-Plan: 1 of 3 in current phase
-Status: Executing
-Last activity: 2026-03-25 -- Completed 05-01 (fix recipe import with gpt-5-mini)
-
-Progress: [███░░░░░░░] 33%
+Phase: 05 (AI Fix & Payment Foundation) — EXECUTING
+Plan: 3 of 3
 
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 10 (v1.0)
 - Average duration: —
 - Total execution time: —
@@ -47,6 +42,7 @@ Progress: [███░░░░░░░] 33%
 | 2. Core Features | 3 | — | — |
 | 3. Supporting | 2 | — | — |
 | 4. Onboarding | 2 | — | — |
+| Phase 05 P02 | 2min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -62,6 +58,12 @@ Recent decisions affecting current work:
 - [Phase 03-02]: Notification settings stored in AsyncStorage -- Phase 6 will wire these to actual push notification delivery
 - [Roadmap v2.0]: AI-03 (gpt-5-mini fix) is first priority -- live production regression
 - [Roadmap v2.0]: COOK features depend on AI-04/AI-05 for timer parsing from instructions
+- [Phase 05]: SubtleCryptoProvider for Deno-compatible Stripe signature verification
+- [Phase 05]: No client-side write methods on subscriptionStore -- server-authoritative only via service_role
+- [Phase 05]: maybeSingle() for graceful free-tier handling (no subscription row)
+- [Phase 05]: OPENAI_MODEL env var for runtime model configurability (defaults to gpt-5-mini)
+- [Phase 05]: Graceful try/catch on subscriptions table query -- no build dependency on Plan 02
+- [Phase 05]: Cache hits log tokens_used: 0 for accurate rate limit counting
 
 ### Pending Todos
 
@@ -85,6 +87,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25
-Stopped at: Roadmap created for v2.0 milestone (Phases 5-9)
+Last session: 2026-03-25T16:58:13.278Z
+Stopped at: Completed 05-01-PLAN.md
 Resume file: None

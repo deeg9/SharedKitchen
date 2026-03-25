@@ -16,12 +16,15 @@ interface RecipeState {
   error: string | null;
   searchQuery: string;
   activeCategory: string | null;
+  costRange: [number, number] | null;
+  maxPrepTime: number | null;
   selectedRecipe: Recipe | null;
   ratings: RecipeRating[];
   notes: RecipeNote[];
 
   // Computed
   filteredRecipes: () => Recipe[];
+  hasActiveFilters: () => boolean;
 
   // Actions
   fetchRecipes: (householdId: string) => Promise<void>;
@@ -31,6 +34,9 @@ interface RecipeState {
   fetchRecipeDetail: (id: string) => Promise<void>;
   setSearchQuery: (query: string) => void;
   setActiveCategory: (category: string | null) => void;
+  setCostRange: (range: [number, number] | null) => void;
+  setMaxPrepTime: (time: number | null) => void;
+  resetFilters: () => void;
   toggleFavorite: (recipeId: string, userId: string, isFavorite: boolean) => Promise<void>;
   rateRecipe: (recipeId: string, userId: string, rating: number) => Promise<void>;
   addNote: (recipeId: string, userId: string, content: string) => Promise<void>;
@@ -53,12 +59,14 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
   error: null,
   searchQuery: '',
   activeCategory: null,
+  costRange: null,
+  maxPrepTime: null,
   selectedRecipe: null,
   ratings: [],
   notes: [],
 
   filteredRecipes: () => {
-    const { recipes, searchQuery, activeCategory } = get();
+    const { recipes, searchQuery, activeCategory, costRange, maxPrepTime } = get();
     let filtered = recipes;
 
     if (searchQuery) {
@@ -70,7 +78,27 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
       filtered = filtered.filter((r) => r.category === activeCategory);
     }
 
+    if (costRange) {
+      const [min, max] = costRange;
+      filtered = filtered.filter((r) => {
+        const cost = r.estimated_cost ?? 0;
+        return cost >= min && cost <= max;
+      });
+    }
+
+    if (maxPrepTime) {
+      filtered = filtered.filter((r) => {
+        const time = r.prep_time_minutes ?? 0;
+        return time > 0 && time <= maxPrepTime;
+      });
+    }
+
     return filtered;
+  },
+
+  hasActiveFilters: () => {
+    const { activeCategory, costRange, maxPrepTime, searchQuery } = get();
+    return !!(activeCategory || costRange || maxPrepTime || searchQuery);
   },
 
   fetchRecipes: async (householdId: string) => {
@@ -202,6 +230,18 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
 
   setActiveCategory: (category: string | null) => {
     set({ activeCategory: category });
+  },
+
+  setCostRange: (range: [number, number] | null) => {
+    set({ costRange: range });
+  },
+
+  setMaxPrepTime: (time: number | null) => {
+    set({ maxPrepTime: time });
+  },
+
+  resetFilters: () => {
+    set({ activeCategory: null, costRange: null, maxPrepTime: null, searchQuery: '' });
   },
 
   toggleFavorite: async (recipeId: string, userId: string, isFavorite: boolean) => {

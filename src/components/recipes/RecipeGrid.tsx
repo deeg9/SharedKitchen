@@ -1,27 +1,15 @@
 import React from 'react';
-import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Input } from '../ui/Input';
 import { Skeleton } from '../ui/Skeleton';
 import { RecipeCard } from './RecipeCard';
+import { FilterBar } from './FilterBar';
 import { useRecipeStore } from '../../stores/recipeStore';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
-import { spacing, borderRadius } from '../../theme/spacing';
-import { Recipe, RecipeRating } from '../../types/database';
-
-const CATEGORIES = [
-  'All',
-  'Mexican',
-  'Seafood',
-  'Chicken',
-  'Vegetarian',
-  'Pasta',
-  'Asian',
-  'Salads',
-  'Soups',
-  'Desserts',
-];
+import { spacing } from '../../theme/spacing';
+import { Recipe } from '../../types/database';
 
 interface RecipeGridProps {
   favorites?: Map<string, boolean>;
@@ -31,22 +19,14 @@ export function RecipeGrid({ favorites }: RecipeGridProps) {
   const {
     loading,
     searchQuery,
-    activeCategory,
     setSearchQuery,
-    setActiveCategory,
     filteredRecipes,
+    hasActiveFilters,
   } = useRecipeStore();
 
   const recipes = filteredRecipes();
   const favMap = favorites ?? new Map();
-
-  const handleCategoryPress = (category: string) => {
-    if (category === 'All') {
-      setActiveCategory(null);
-    } else {
-      setActiveCategory(activeCategory === category ? null : category);
-    }
-  };
+  const filtersActive = hasActiveFilters();
 
   const renderRecipeCard = ({ item }: { item: Recipe }) => (
     <RecipeCard recipe={item} isFavorite={favMap.get(item.id) ?? false} />
@@ -77,29 +57,8 @@ export function RecipeGrid({ favorites }: RecipeGridProps) {
         onChangeText={setSearchQuery}
       />
 
-      {/* Category chips */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.chipScroll}
-        contentContainerStyle={styles.chipContainer}
-      >
-        {CATEGORIES.map((cat) => {
-          const isActive =
-            cat === 'All' ? activeCategory === null : activeCategory === cat;
-          return (
-            <Pressable
-              key={cat}
-              onPress={() => handleCategoryPress(cat)}
-              style={[styles.chip, isActive && styles.chipActive]}
-            >
-              <Text style={[styles.chipText, isActive && styles.chipTextActive]}>
-                {cat}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
+      {/* Filter dropdowns */}
+      <FilterBar />
 
       {/* Recipe grid */}
       {recipes.length === 0 ? (
@@ -107,7 +66,7 @@ export function RecipeGrid({ favorites }: RecipeGridProps) {
           <Text style={styles.emptyEmoji}>🍽</Text>
           <Text style={styles.emptyTitle}>No recipes found</Text>
           <Text style={styles.emptySubtitle}>
-            {searchQuery || activeCategory
+            {filtersActive
               ? 'Try adjusting your search or filters'
               : 'Add your first recipe to get started'}
           </Text>
@@ -130,33 +89,6 @@ export function RecipeGrid({ favorites }: RecipeGridProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  chipScroll: {
-    maxHeight: 44,
-    marginBottom: spacing.md,
-  },
-  chipContainer: {
-    gap: spacing.sm,
-    paddingRight: spacing.md,
-  },
-  chip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.surfaceContainer,
-    borderWidth: 1,
-    borderColor: colors.outlineVariant,
-  },
-  chipActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  chipText: {
-    ...typography.labelMd,
-    color: colors.onSurfaceVariant,
-  },
-  chipTextActive: {
-    color: colors.onPrimary,
   },
   listContent: {
     paddingBottom: spacing.xxl,

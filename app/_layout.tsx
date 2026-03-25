@@ -18,6 +18,8 @@ import { useAuthStore } from '../src/stores/authStore';
 import { useOnboardingStore } from '../src/stores/onboardingStore';
 import { useHouseholdStore } from '../src/stores/householdStore';
 import { ColorSchemeProvider } from '../src/lib/color-scheme';
+import { StripeProvider } from '@stripe/stripe-react-native';
+import { useSubscriptionStore } from '../src/stores/subscriptionStore';
 
 // Prevent auto-hiding splash screen
 SplashScreen.preventAutoHideAsync();
@@ -60,6 +62,12 @@ export default function RootLayout() {
       subscription.unsubscribe();
     };
   }, []);
+
+  // Initialize subscription state when user is authenticated
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    useSubscriptionStore.getState().initialize(session.user.id);
+  }, [session?.user?.id]);
 
   // Check onboarding status and fetch households when session is available
   useEffect(() => {
@@ -110,8 +118,10 @@ export default function RootLayout() {
   }
 
   return (
-    <ColorSchemeProvider>
-      <Slot />
-    </ColorSchemeProvider>
+    <StripeProvider publishableKey={process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''}>
+      <ColorSchemeProvider>
+        <Slot />
+      </ColorSchemeProvider>
+    </StripeProvider>
   );
 }

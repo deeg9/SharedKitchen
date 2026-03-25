@@ -106,18 +106,18 @@
 ### Payments & Premium
 
 - [ ] **PAY-01**: User can purchase a premium subscription ($9.99/mo) via Stripe checkout
-- [ ] **PAY-02**: Subscription state is server-authoritative (Supabase `subscriptions` table updated by Stripe webhooks, not AsyncStorage)
-- [ ] **PAY-03**: Stripe webhook Edge Function handles subscription lifecycle events (created, updated, canceled, payment failed) with idempotent processing
+- [x] **PAY-02**: Subscription state is server-authoritative (Supabase `subscriptions` table updated by Stripe webhooks, not AsyncStorage)
+- [x] **PAY-03**: Stripe webhook Edge Function handles subscription lifecycle events (created, updated, canceled, payment failed) with idempotent processing
 - [ ] **PAY-04**: User can manage subscription via Stripe-hosted billing portal (cancel, update payment method)
-- [ ] **PAY-05**: Premium features are enforced server-side via RLS policies, not just client-side checks
+- [x] **PAY-05**: Premium features are enforced server-side via RLS policies, not just client-side checks
 
 ### AI Features
 
-- [ ] **AI-03**: Recipe import uses gpt-5-mini with structured outputs replacing deprecated gpt-4o-mini
+- [x] **AI-03**: Recipe import uses gpt-5-mini with structured outputs replacing deprecated gpt-4o-mini
 - [ ] **AI-04**: Recipe extraction tries JSON-LD/schema.org structured data first, falls back to LLM only when missing
 - [ ] **AI-05**: AI extracts recipe images and nutrition info from source URLs when available
 - [ ] **AI-06**: AI-powered meal generator suggests new recipes based on dietary prefs, cooking history, current leftovers, and remaining budget
-- [ ] **AI-07**: AI features include per-user rate limiting and response caching to control costs
+- [x] **AI-07**: AI features include per-user rate limiting and response caching to control costs
 
 ### Push Notifications
 
@@ -185,12 +185,12 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | PAY-01 | Phase 5 | Pending |
-| PAY-02 | Phase 5 | Pending |
-| PAY-03 | Phase 5 | Pending |
+| PAY-02 | Phase 5 | Complete |
+| PAY-03 | Phase 5 | Complete |
 | PAY-04 | Phase 5 | Pending |
-| PAY-05 | Phase 5 | Pending |
-| AI-03 | Phase 5 | Pending |
-| AI-07 | Phase 5 | Pending |
+| PAY-05 | Phase 5 | Complete |
+| AI-03 | Phase 5 | Complete |
+| AI-07 | Phase 5 | Complete |
 | NOTIF-01 | Phase 6 | Pending |
 | NOTIF-02 | Phase 6 | Pending |
 | NOTIF-03 | Phase 6 | Pending |

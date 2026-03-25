@@ -47,7 +47,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can access the Stripe billing portal to manage or cancel their subscription
   4. Premium features are enforced server-side via RLS policies -- bypassing the client UI does not grant access
   5. AI features enforce per-user rate limits and cache duplicate requests to control costs
-**Plans:** 3 plans
+**Plans:** 0/3 plans executed
 
 Plans:
 - [ ] 05-01-PLAN.md — Fix recipe import (gpt-5-mini + structured outputs) and add AI rate limiting/caching
@@ -116,7 +116,7 @@ Phases execute in numeric order: 5 -> 6 -> 7 -> 8 -> 9
 | 2. Core Features | v1.0 | 3/3 | Complete | 2026-03-23 |
 | 3. Supporting Features | v1.0 | 2/2 | Complete | 2026-03-23 |
 | 4. Onboarding and Freemium | v1.0 | 2/2 | Complete | 2026-03-23 |
-| 5. AI Fix & Payment Foundation | v2.0 | 1/3 | In Progress | - |
+| 5. AI Fix & Payment Foundation | v2.0 | 0/3 | Planned    |  |
 | 6. Push Notifications | v2.0 | 0/0 | Not started | - |
 | 7. Real-Time Presence | v2.0 | 0/0 | Not started | - |
 | 8. Enhanced AI & Cooking Mode | v2.0 | 0/0 | Not started | - |
