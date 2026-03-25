@@ -4,17 +4,22 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Pressable,
   StyleSheet,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useHouseholdStore } from '../../../src/stores/householdStore';
 import { colors } from '../../../src/theme/colors';
+import { borderRadius } from '../../../src/theme/spacing';
 
 export default function JoinHouseholdScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { joinHousehold, loading } = useHouseholdStore();
   const [code, setCode] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +33,7 @@ export default function JoinHouseholdScreen() {
     const household = await joinHousehold(code.trim());
 
     if (household) {
-      router.replace('/(app)/(tabs)/plan');
+      router.back();
     } else {
       const storeError = useHouseholdStore.getState().error;
       setError(storeError ?? 'Failed to join household');
@@ -37,9 +42,12 @@ export default function JoinHouseholdScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { paddingTop: insets.top }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+      <Pressable style={styles.backButton} onPress={() => router.back()}>
+        <MaterialCommunityIcons name="arrow-left" size={24} color={colors.onSurface} />
+      </Pressable>
       <View style={styles.content}>
         <Text style={styles.title}>Join a Household</Text>
         <Text style={styles.subtitle}>
@@ -83,6 +91,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.surface,
+    padding: 24,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: borderRadius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
   },
   content: {
     flex: 1,

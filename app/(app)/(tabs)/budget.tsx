@@ -133,7 +133,7 @@ export default function BudgetScreen() {
         style={styles.fab}
         onPress={() => setSheetOpen(true)}
       >
-        <Text style={styles.fabIcon}>$</Text>
+        <MaterialCommunityIcons name="plus" size={28} color={colors.onPrimary} />
       </Pressable>
 
       {activeHouseholdId && (
@@ -208,13 +208,9 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.secondaryContainer,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     ...shadows.float,
-  },
-  fabIcon: {
-    ...typography.headlineMd,
-    color: colors.onSecondaryContainer,
   },
 });

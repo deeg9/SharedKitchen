@@ -5,6 +5,7 @@ import {
   GroceryItemInsert,
   GroceryList,
   GrocerySummary,
+  FrequentItem,
   Ingredient,
 } from '../types/database';
 import { aggregateIngredients, computeSummary, groupBySection } from '../lib/grocery-utils';
@@ -17,6 +18,7 @@ interface RecipeWithIngredients {
 interface GroceryState {
   items: GroceryItem[];
   activeListId: string | null;
+  frequentItems: FrequentItem[];
   loading: boolean;
   error: string | null;
 
@@ -42,6 +44,7 @@ interface GroceryState {
     section?: string,
     estimatedPrice?: number
   ) => Promise<void>;
+  fetchFrequentItems: (householdId: string, excludeListId?: string | null) => Promise<void>;
   removeItem: (itemId: string) => Promise<void>;
   updateItem: (
     itemId: string,
@@ -57,6 +60,7 @@ interface GroceryState {
 export const useGroceryStore = create<GroceryState>((set, get) => ({
   items: [],
   activeListId: null,
+  frequentItems: [],
   loading: false,
   error: null,
 
@@ -241,6 +245,75 @@ export const useGroceryStore = create<GroceryState>((set, get) => ({
       }));
     } catch (error: any) {
       set({ error: error.message ?? 'Failed to add item' });
+    }
+  },
+
+  fetchFrequentItems: async (householdId, excludeListId) => {
+    try {
+      // Get recent lists for this household (last 8 weeks)
+      let query = supabase
+        .from('grocery_lists')
+        .select('id')
+        .eq('household_id', householdId)
+        .order('week_start', { ascending: false })
+        .limit(8);
+
+      if (excludeListId) {
+        query = query.neq('id', excludeListId);
+      }
+
+      const { data: lists } = await query;
+      if (!lists || lists.length === 0) {
+        set({ frequentItems: [] });
+        return;
+      }
+
+      const listIds = lists.map((l) => l.id);
+      const { data: rawItems } = await supabase
+        .from('grocery_items')
+        .select('name, quantity, section, estimated_price, created_at')
+        .in('grocery_list_id', listIds);
+
+      if (!rawItems || rawItems.length === 0) {
+        set({ frequentItems: [] });
+        return;
+      }
+
+      // Aggregate by normalized name, pick most recent defaults
+      const map = new Map<string, FrequentItem & { latestAt: string }>();
+      for (const item of rawItems) {
+        const key = item.name.toLowerCase().trim();
+        const existing = map.get(key);
+        if (existing) {
+          existing.count += 1;
+          if (item.created_at > existing.latestAt) {
+            existing.name = item.name;
+            existing.quantity = item.quantity;
+            existing.section = item.section;
+            existing.estimated_price = item.estimated_price;
+            existing.latestAt = item.created_at;
+          }
+        } else {
+          map.set(key, {
+            name: item.name,
+            quantity: item.quantity,
+            section: item.section,
+            estimated_price: item.estimated_price,
+            count: 1,
+            latestAt: item.created_at,
+          });
+        }
+      }
+
+      const frequent = Array.from(map.values())
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 20)
+        .map(({ latestAt, ...rest }) => rest);
+
+      set({ frequentItems: frequent });
+    } catch {
+      // Non-critical — silently fail
+      set({ frequentItems: [] });
     }
   },
 

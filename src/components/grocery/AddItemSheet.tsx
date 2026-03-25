@@ -7,8 +7,9 @@ import { typography, fontFamily } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
 import { shadows } from '../../theme/shadows';
 import { useGroceryStore } from '../../stores/groceryStore';
-import { GroceryItem as GroceryItemType } from '../../types/database';
+import { GroceryItem as GroceryItemType, FrequentItem } from '../../types/database';
 import { useGroceryCategoryStore } from '../../stores/groceryCategoryStore';
+import { QuickAddChips } from './QuickAddChips';
 
 const UNIT_OPTIONS = ['Unit', 'lb', 'oz', 'Gallon', 'cups', 'bunch', 'bag', 'pk'] as const;
 
@@ -37,6 +38,8 @@ export function AddItemSheet({ isOpen, onClose, listId, editItem }: AddItemSheet
   const [price, setPrice] = useState('');
   const addManualItem = useGroceryStore((s) => s.addManualItem);
   const updateItem = useGroceryStore((s) => s.updateItem);
+  const currentItems = useGroceryStore((s) => s.items);
+  const frequentItems = useGroceryStore((s) => s.frequentItems);
   const categories = useGroceryCategoryStore((s) => s.categories);
 
   const isEditMode = !!editItem;
@@ -66,6 +69,22 @@ export function AddItemSheet({ isOpen, onClose, listId, editItem }: AddItemSheet
   }, [editItem, isOpen]);
 
   const selectedSection = categories.find((s) => s.label === sectionLabel);
+
+  // Filter frequent items to exclude those already on the current list
+  const currentNames = new Set(currentItems.map((i) => i.name.toLowerCase().trim()));
+  const filteredFrequent = isEditMode
+    ? []
+    : frequentItems.filter((fi) => !currentNames.has(fi.name.toLowerCase().trim()));
+
+  const handleQuickAdd = async (item: FrequentItem) => {
+    await addManualItem(
+      listId,
+      item.name,
+      item.quantity ?? undefined,
+      item.section ?? undefined,
+      item.estimated_price ?? undefined
+    );
+  };
 
   const handleSubmit = async () => {
     if (!name.trim()) return;
@@ -116,6 +135,11 @@ export function AddItemSheet({ isOpen, onClose, listId, editItem }: AddItemSheet
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
+          {/* Quick Add */}
+          {filteredFrequent.length > 0 && (
+            <QuickAddChips items={filteredFrequent} onQuickAdd={handleQuickAdd} />
+          )}
+
           {/* Item Name */}
           <View style={styles.section}>
             <Text style={styles.fieldLabel}>Item Name</Text>
@@ -189,9 +213,9 @@ export function AddItemSheet({ isOpen, onClose, listId, editItem }: AddItemSheet
             </View>
           </View>
 
-          {/* Store Section */}
+          {/* Category */}
           <View style={styles.section}>
-            <Text style={styles.fieldLabel}>Store Section</Text>
+            <Text style={styles.fieldLabel}>Category</Text>
             <View style={styles.sectionChips}>
               {categories.map((s) => (
                 <Pressable

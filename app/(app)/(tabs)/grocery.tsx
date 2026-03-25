@@ -45,6 +45,7 @@ export default function GroceryScreen() {
     groupedItems,
     fetchGroceryList,
     generateGroceryList,
+    fetchFrequentItems,
   } = useGroceryStore();
 
   // Realtime sync
@@ -65,6 +66,12 @@ export default function GroceryScreen() {
     const weekStart = toDateString(weekDays[0]);
     fetchGroceryList(activeHouseholdId, weekStart);
   }, [activeHouseholdId]);
+
+  // Pre-load frequent items for quick add
+  useEffect(() => {
+    if (!activeHouseholdId) return;
+    fetchFrequentItems(activeHouseholdId, activeListId);
+  }, [activeHouseholdId, activeListId]);
 
   const handleGenerate = useCallback(async () => {
     if (!activeHouseholdId) return;
@@ -285,7 +292,7 @@ const styles = StyleSheet.create({
     right: spacing.md,
     width: 56,
     height: 56,
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.full,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',

@@ -5,21 +5,27 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Pressable,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import * as Sharing from 'expo-sharing';
 import { useHouseholdStore } from '../../../src/stores/householdStore';
 import { InviteCard } from '../../../src/components/household/InviteCard';
 import { colors } from '../../../src/theme/colors';
+import { typography } from '../../../src/theme/typography';
+import { spacing, borderRadius } from '../../../src/theme/spacing';
 
 export default function InviteScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const activeHousehold = useHouseholdStore((s) => s.activeHousehold)();
 
   if (!activeHousehold) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: insets.top }]}>
         <Text style={styles.errorText}>No active household found.</Text>
       </View>
     );
@@ -35,8 +41,6 @@ export default function InviteScreen() {
     try {
       const isAvailable = await Sharing.isAvailableAsync();
       if (isAvailable) {
-        // expo-sharing shares files, so we use the share sheet via clipboard + alert approach
-        // For a better UX, use Share from react-native directly
         const { Share } = require('react-native');
         await Share.share({
           message: `Join my household on SharedKitchen! Use code: ${activeHousehold.invite_code}\n\nOr open this link: ${inviteLink}`,
@@ -50,11 +54,15 @@ export default function InviteScreen() {
   };
 
   const handleDone = () => {
-    router.replace('/(app)/(tabs)/plan');
+    router.back();
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <Pressable style={styles.backButton} onPress={() => router.back()}>
+        <MaterialCommunityIcons name="arrow-left" size={24} color={colors.onSurface} />
+      </Pressable>
+
       <View style={styles.content}>
         <Text style={styles.title}>Invite Members</Text>
         <Text style={styles.subtitle}>
@@ -83,46 +91,55 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.surface,
-    padding: 24,
+    padding: spacing.lg,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: borderRadius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.sm,
   },
   content: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
+    ...typography.headlineLg,
     color: colors.onSurface,
-    marginBottom: 8,
+    textAlign: 'center',
+    marginBottom: spacing.sm,
   },
   subtitle: {
-    fontSize: 16,
+    ...typography.bodyLg,
     color: colors.onSurfaceVariant,
-    marginBottom: 32,
+    textAlign: 'center',
+    marginBottom: spacing.xl,
     lineHeight: 22,
   },
   hint: {
-    fontSize: 14,
+    ...typography.bodyMd,
     color: colors.outline,
     textAlign: 'center',
-    marginTop: 24,
+    marginTop: spacing.lg,
     lineHeight: 20,
   },
   errorText: {
-    fontSize: 16,
+    ...typography.bodyLg,
     color: colors.error,
     textAlign: 'center',
   },
   doneButton: {
     backgroundColor: colors.primary,
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   doneButtonText: {
+    ...typography.titleMd,
     color: colors.onPrimary,
-    fontSize: 18,
-    fontWeight: '600',
   },
 });

@@ -443,6 +443,15 @@ export type Leftover = Database['public']['Tables']['leftovers']['Row'];
 export type LeftoverInsert = Database['public']['Tables']['leftovers']['Insert'];
 export type LeftoverUpdate = Database['public']['Tables']['leftovers']['Update'];
 
+/** A frequently-added grocery item derived from past lists */
+export interface FrequentItem {
+  name: string;
+  quantity: string | null;
+  section: string | null;
+  estimated_price: number | null;
+  count: number;
+}
+
 /** Summary statistics for a grocery list */
 export interface GrocerySummary {
   totalItems: number;
