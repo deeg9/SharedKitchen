@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 5: AI Fix & Payment Foundation** - Fix broken recipe import, build Stripe subscription checkout, server-authoritative premium gating
 - [ ] **Phase 6: Push Notifications** - Token registration, cooking reminders, leftover alerts, budget warnings
-- [ ] **Phase 7: Real-Time Presence** - Live avatar stacks and activity toasts for household collaboration visibility
+- [x] **Phase 7: Real-Time Presence** - Live avatar stacks and activity toasts for household collaboration visibility (completed 2026-03-25)
 - [ ] **Phase 8: Enhanced AI & Cooking Mode** - Smarter recipe extraction, AI meal generator, fullscreen step-by-step cooking
 - [ ] **Phase 9: E2E Testing** - Maestro flows covering all user journeys and negative paths
 
@@ -81,11 +81,11 @@ Plans:
   2. User sees avatar stacks on recipe detail screens showing who else is viewing the same recipe
   3. User sees toast notifications when a household member checks off a grocery item or modifies the meal plan
   4. Presence state syncs smoothly without phantom avatar flickering (debounced Supabase Presence)
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 07-01-PLAN.md — Build usePresence hook, useActivityToast hook, PresenceAvatarStack, and ActivityToast components with tests
-- [ ] 07-02-PLAN.md — Wire presence and activity toasts into grocery and recipe detail screens
+- [x] 07-02-PLAN.md — Wire presence and activity toasts into grocery and recipe detail screens
 
 **UI hint**: yes
 
@@ -127,6 +127,6 @@ Phases execute in numeric order: 5 -> 6 -> 7 -> 8 -> 9
 | 4. Onboarding and Freemium | v1.0 | 2/2 | Complete | 2026-03-23 |
 | 5. AI Fix & Payment Foundation | v2.0 | 0/3 | Planned    |  |
 | 6. Push Notifications | v2.0 | 0/2 | Planned | - |
-| 7. Real-Time Presence | v2.0 | 0/2 | Planned | - |
+| 7. Real-Time Presence | v2.0 | 2/2 | Complete   | 2026-03-25 |
 | 8. Enhanced AI & Cooking Mode | v2.0 | 0/0 | Not started | - |
 | 9. E2E Testing | v2.0 | 0/0 | Not started | - |
