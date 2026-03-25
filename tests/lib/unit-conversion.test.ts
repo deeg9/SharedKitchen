@@ -40,15 +40,15 @@ describe('unit-conversion', () => {
     });
 
     it('converts tbsp to ml', () => {
-      expect(convertUnit(1, 'tbsp', 'metric')).toEqual({ amount: 15, unit: 'ml' });
+      expect(convertUnit(1, 'tbsp', 'metric')).toEqual({ amount: 14.8, unit: 'ml' });
     });
 
     it('converts tsp to ml', () => {
-      expect(convertUnit(1, 'tsp', 'metric')).toEqual({ amount: 5, unit: 'ml' });
+      expect(convertUnit(1, 'tsp', 'metric')).toEqual({ amount: 4.9, unit: 'ml' });
     });
 
     it('converts oz to g', () => {
-      expect(convertUnit(1, 'oz', 'metric')).toEqual({ amount: 28, unit: 'g' });
+      expect(convertUnit(1, 'oz', 'metric')).toEqual({ amount: 28.3, unit: 'g' });
     });
 
     // Metric to imperial
@@ -107,7 +107,7 @@ describe('unit-conversion', () => {
 
     it('handles multiple conversions in one string', () => {
       const result = convertInstructionText('Mix 1 cup flour and 2 tbsp sugar', 'metric');
-      expect(result).toBe('Mix 237 ml flour and 30 ml sugar');
+      expect(result).toBe('Mix 237 ml flour and 29.6 ml sugar');
     });
   });
 });
