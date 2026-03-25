@@ -10,7 +10,7 @@ import { SuggestionCard } from '../../../src/components/plan/SuggestionCard';
 import { usePlanStore } from '../../../src/stores/planStore';
 import { useHouseholdStore } from '../../../src/stores/householdStore';
 import { useRecipeStore } from '../../../src/stores/recipeStore';
-import { usePremiumStore } from '../../../src/stores/premiumStore';
+import { useSubscriptionStore } from '../../../src/stores/subscriptionStore';
 import { UpgradePrompt } from '../../../src/components/premium/UpgradePrompt';
 import { toDateString, makePlanKey } from '../../../src/lib/dates';
 import { generateSuggestions } from '../../../src/lib/suggestions';
@@ -35,7 +35,7 @@ export default function PlanScreen() {
     fetchMealPlan,
   } = usePlanStore();
 
-  const premiumStore = usePremiumStore();
+  const subscription = useSubscriptionStore();
 
   const [editSheetOpen, setEditSheetOpen] = useState(false);
   const [surpriseVisible, setSurpriseVisible] = useState(false);
@@ -141,14 +141,14 @@ export default function PlanScreen() {
           <View style={styles.suggestionsSection}>
             <View style={styles.suggestionsTitleRow}>
               <Text style={styles.suggestionsTitle}>Suggestions</Text>
-              {!premiumStore.canAccess('advanced_suggestions') && (
+              {!subscription.canAccess('advanced_suggestions') && (
                 <View style={styles.proIndicator}>
                   <Text style={styles.proIndicatorText}>PRO</Text>
                 </View>
               )}
               <Pressable
                 onPress={() => {
-                  if (!premiumStore.canAccess('advanced_suggestions')) {
+                  if (!subscription.canAccess('advanced_suggestions')) {
                     setShowUpgradePrompt(true);
                   }
                 }}

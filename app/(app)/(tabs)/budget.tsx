@@ -14,14 +14,14 @@ import { typography } from '../../../src/theme/typography';
 import { spacing, borderRadius } from '../../../src/theme/spacing';
 import { shadows } from '../../../src/theme/shadows';
 import { TAB_BAR_HEIGHT } from '../../../src/lib/constants';
-import { usePremiumStore } from '../../../src/stores/premiumStore';
+import { useSubscriptionStore } from '../../../src/stores/subscriptionStore';
 import { UpgradePrompt } from '../../../src/components/premium/UpgradePrompt';
 
 export default function BudgetScreen() {
   const insets = useSafeAreaInsets();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
-  const premiumStore = usePremiumStore();
+  const subscription = useSubscriptionStore();
 
   const { activeHouseholdId } = useHouseholdStore();
   const {
@@ -79,7 +79,7 @@ export default function BudgetScreen() {
         <View style={styles.headerRight}>
           <Pressable
             onPress={() => {
-              if (premiumStore.canAccess('analytics_dashboard')) {
+              if (subscription.canAccess('analytics_dashboard')) {
                 Alert.alert('Coming Soon', 'Analytics dashboard coming soon in a future update.');
               } else {
                 setShowUpgradePrompt(true);

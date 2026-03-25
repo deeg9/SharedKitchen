@@ -6,7 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuthStore } from '../../../src/stores/authStore';
 import { useHouseholdStore, HouseholdMemberWithProfile } from '../../../src/stores/householdStore';
 import { usePlanStore } from '../../../src/stores/planStore';
-import { usePremiumStore } from '../../../src/stores/premiumStore';
+import { useSubscriptionStore } from '../../../src/stores/subscriptionStore';
 import { PremiumBadge } from '../../../src/components/premium/PremiumBadge';
 import { Avatar } from '../../../src/components/ui/Avatar';
 import { Button } from '../../../src/components/ui/Button';
@@ -50,7 +50,7 @@ export default function ProfileScreen() {
 
   const { mealPlan } = usePlanStore();
   const { isDark, toggleColorScheme } = useColorScheme();
-  const premiumStore = usePremiumStore();
+  const subscription = useSubscriptionStore();
 
   const [showHouseholdPicker, setShowHouseholdPicker] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
@@ -67,7 +67,7 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     initialize();
-    premiumStore.initialize();
+    subscription.initialize();
 
     // Load dietary preferences
     AsyncStorage.getItem('dietary_preferences').then((val) => {
@@ -276,12 +276,12 @@ export default function ProfileScreen() {
             <Card variant="filled" style={styles.subscriptionCard}>
               <View style={styles.subscriptionRow}>
                 <MaterialCommunityIcons
-                  name={premiumStore.isPremium() ? 'crown' : 'star-outline'}
+                  name={subscription.isPremium() ? 'crown' : 'star-outline'}
                   size={22}
-                  color={premiumStore.isPremium() ? colors.secondary : colors.onSurfaceVariant}
+                  color={subscription.isPremium() ? colors.secondary : colors.onSurfaceVariant}
                 />
                 <Text style={styles.subscriptionLabel}>
-                  {premiumStore.isPremium() ? 'Premium' : 'Free Plan'}
+                  {subscription.isPremium() ? 'Premium' : 'Free Plan'}
                 </Text>
                 <MaterialCommunityIcons name="chevron-right" size={20} color={colors.onSurfaceVariant} />
               </View>
