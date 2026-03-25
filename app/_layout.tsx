@@ -20,6 +20,8 @@ import { useHouseholdStore } from '../src/stores/householdStore';
 import { ColorSchemeProvider } from '../src/lib/color-scheme';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { useSubscriptionStore } from '../src/stores/subscriptionStore';
+import { useNotificationSetup, usePermissionPrompt } from '../src/hooks/useNotifications';
+import { PermissionPrompt } from '../src/components/notifications/PermissionPrompt';
 
 // Prevent auto-hiding splash screen
 SplashScreen.preventAutoHideAsync();
@@ -31,6 +33,10 @@ export default function RootLayout() {
   const { completed: onboardingCompleted, initialized: onboardingInitialized, checkOnboardingStatus } = useOnboardingStore();
   const { households, fetchHouseholds } = useHouseholdStore();
   const [onboardingChecked, setOnboardingChecked] = useState(false);
+
+  // Push notification setup
+  useNotificationSetup();
+  const { showPrompt, handleEnable, handleDismiss } = usePermissionPrompt();
 
   const [fontsLoaded] = useFonts({
     PlusJakartaSans_700Bold,
@@ -121,6 +127,7 @@ export default function RootLayout() {
     <StripeProvider publishableKey={process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''}>
       <ColorSchemeProvider>
         <Slot />
+        <PermissionPrompt isOpen={showPrompt} onEnable={handleEnable} onDismiss={handleDismiss} />
       </ColorSchemeProvider>
     </StripeProvider>
   );
