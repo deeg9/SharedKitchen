@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: AI, Payments & Polish
-status: Ready to execute
-stopped_at: Completed 08-01-PLAN.md
-last_updated: "2026-03-25T23:07:41.808Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 08-03-PLAN.md
+last_updated: "2026-03-25T23:15:20.950Z"
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 10
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -49,6 +49,7 @@ Plan: 3 of 3
 | Phase 07 P02 | 2min | 2 tasks | 2 files |
 | Phase 08 P02 | 4min | 2 tasks | 6 files |
 | Phase 08 P01 | 4min | 2 tasks | 5 files |
+| Phase 08 P03 | 5min | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,9 @@ Recent decisions affecting current work:
 - [Phase 08]: Rate limit 5/day free, 20/day premium for meal generation (separate from recipe parsing)
 - [Phase 08]: Inline JSON-LD functions in Deno Edge Function; src/lib/jsonld.ts is canonical test target
 - [Phase 08]: JSON-LD-first extraction requires name + ingredients + instructions to skip OpenAI
+- [Phase 08]: Smart rounding uses magnitude-based precision for readable cooking measurements
+- [Phase 08]: Wall-clock timer (Date.now - startTime) for accuracy across iOS app backgrounding
+- [Phase 08]: Unit preference defaults to imperial, persisted to AsyncStorage key unit_preference
 
 ### Pending Todos
 
@@ -104,6 +108,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T23:07:41.806Z
-Stopped at: Completed 08-01-PLAN.md
+Last session: 2026-03-25T23:15:20.947Z
+Stopped at: Completed 08-03-PLAN.md
 Resume file: None

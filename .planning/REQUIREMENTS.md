@@ -136,10 +136,10 @@
 
 ### Cooking Mode
 
-- [ ] **COOK-01**: User can enter fullscreen step-by-step cooking mode from recipe detail showing one instruction per screen
-- [ ] **COOK-02**: Cooking mode has step pagination (prev/next arrows), "Step X of Y" indicator, and progress bar
-- [ ] **COOK-03**: Steps with time references show embedded tappable countdown timers (start/pause/reset)
-- [ ] **COOK-04**: User can toggle between metric and imperial units for ingredients and instruction text
+- [x] **COOK-01**: User can enter fullscreen step-by-step cooking mode from recipe detail showing one instruction per screen
+- [x] **COOK-02**: Cooking mode has step pagination (prev/next arrows), "Step X of Y" indicator, and progress bar
+- [x] **COOK-03**: Steps with time references show embedded tappable countdown timers (start/pause/reset)
+- [x] **COOK-04**: User can toggle between metric and imperial units for ingredients and instruction text
 - [x] **COOK-05**: AI extraction parses time durations from instruction text to auto-generate timer data for cooking mode
 
 ### E2E Testing
@@ -203,10 +203,10 @@
 | AI-04 | Phase 8 | Complete |
 | AI-05 | Phase 8 | Complete |
 | AI-06 | Phase 8 | Complete |
-| COOK-01 | Phase 8 | Pending |
-| COOK-02 | Phase 8 | Pending |
-| COOK-03 | Phase 8 | Pending |
-| COOK-04 | Phase 8 | Pending |
+| COOK-01 | Phase 8 | Complete |
+| COOK-02 | Phase 8 | Complete |
+| COOK-03 | Phase 8 | Complete |
+| COOK-04 | Phase 8 | Complete |
 | COOK-05 | Phase 8 | Complete |
 | TEST-01 | Phase 9 | Pending |
 | TEST-02 | Phase 9 | Pending |

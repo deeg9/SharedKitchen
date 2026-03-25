@@ -104,7 +104,7 @@ Plans:
 Plans:
 - [x] 08-01-PLAN.md — JSON-LD extraction, nutrition/image/timer fields, enhanced parse-recipe-url Edge Function
 - [x] 08-02-PLAN.md — AI meal generator Edge Function and MealGeneratorSheet UI
-- [ ] 08-03-PLAN.md — Fullscreen cooking mode with step navigation, timers, and unit conversion
+- [x] 08-03-PLAN.md — Fullscreen cooking mode with step navigation, timers, and unit conversion
 
 **UI hint**: yes
 
