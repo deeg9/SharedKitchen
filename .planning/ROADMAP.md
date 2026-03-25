@@ -66,7 +66,11 @@ Plans:
   3. User receives a local notification reminding them to start cooking before meal prep time
   4. User receives a push alert when a leftover item is approaching its use-by date
   5. User receives a push alert when household spending crosses 80% or 100% of the monthly budget
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Notification service, push token registration, permission pre-prompt, DB migration
+- [ ] 06-02-PLAN.md — Wire scheduling into stores (cooking reminders, leftover alerts, budget warnings) and profile toggles
 
 ### Phase 7: Real-Time Presence
 **Goal**: Users can see who else in their household is viewing the same screen and get live activity updates
@@ -117,7 +121,7 @@ Phases execute in numeric order: 5 -> 6 -> 7 -> 8 -> 9
 | 3. Supporting Features | v1.0 | 2/2 | Complete | 2026-03-23 |
 | 4. Onboarding and Freemium | v1.0 | 2/2 | Complete | 2026-03-23 |
 | 5. AI Fix & Payment Foundation | v2.0 | 0/3 | Planned    |  |
-| 6. Push Notifications | v2.0 | 0/0 | Not started | - |
+| 6. Push Notifications | v2.0 | 0/2 | Planned | - |
 | 7. Real-Time Presence | v2.0 | 0/0 | Not started | - |
 | 8. Enhanced AI & Cooking Mode | v2.0 | 0/0 | Not started | - |
 | 9. E2E Testing | v2.0 | 0/0 | Not started | - |
