@@ -29,6 +29,7 @@ const thirdUser: PresenceMember = {
 };
 
 beforeEach(() => {
+  jest.clearAllMocks();
   jest.useFakeTimers();
   channelHandlers = {};
   mockUnsubscribe = jest.fn();
@@ -59,7 +60,6 @@ beforeEach(() => {
   });
 
   (supabase as any).removeChannel = jest.fn();
-  jest.clearAllMocks();
 });
 
 afterEach(() => {
@@ -130,19 +130,10 @@ describe('usePresence', () => {
   });
 
   it('debounces sync events -- two rapid sync events produce only one state update', () => {
-    const stateValues: Record<string, PresenceMember[]>[] = [
-      {
-        'user-2': [{ user_id: 'user-2', display_name: 'Bob', avatar_url: null }],
-      },
-      {
-        'user-2': [{ user_id: 'user-2', display_name: 'Bob', avatar_url: null }],
-        'user-3': [{ user_id: 'user-3', display_name: 'Charlie', avatar_url: null }],
-      },
-    ];
-
-    let callCount = 0;
-    mockPresenceState.mockImplementation(() => {
-      return stateValues[callCount++] || stateValues[stateValues.length - 1];
+    // presenceState always returns the "latest" state
+    mockPresenceState.mockReturnValue({
+      'user-2': [{ user_id: 'user-2', display_name: 'Bob', avatar_url: null }],
+      'user-3': [{ user_id: 'user-3', display_name: 'Charlie', avatar_url: null }],
     });
 
     const { result } = renderHook(() => usePresence('grocery:list-1', currentUser));
@@ -157,6 +148,9 @@ describe('usePresence', () => {
       jest.advanceTimersByTime(100);
     });
 
+    // presenceState should NOT have been called yet (debounce not elapsed)
+    expect(mockPresenceState).not.toHaveBeenCalled();
+
     act(() => {
       channelHandlers['sync']?.();
     });
@@ -166,7 +160,10 @@ describe('usePresence', () => {
       jest.advanceTimersByTime(300);
     });
 
-    // Should only have the second sync result (2 members minus self = 2)
+    // presenceState should be called exactly once (debounced)
+    expect(mockPresenceState).toHaveBeenCalledTimes(1);
+
+    // Should have 2 other members (self filtered out)
     expect(result.current).toHaveLength(2);
     expect(result.current.map((m) => m.user_id)).toContain('user-2');
     expect(result.current.map((m) => m.user_id)).toContain('user-3');
