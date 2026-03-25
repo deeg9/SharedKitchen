@@ -1,22 +1,25 @@
-import React, { useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SubscriptionSheet } from '../../src/components/premium/SubscriptionSheet';
-import { usePremiumStore } from '../../src/stores/premiumStore';
+import { useSubscriptionStore } from '../../src/stores/subscriptionStore';
 import { colors } from '../../src/theme/colors';
 import { typography } from '../../src/theme/typography';
 import { spacing } from '../../src/theme/spacing';
 
 export default function SubscriptionScreen() {
   const router = useRouter();
-  const { tier, initialize } = usePremiumStore();
-  const isPremium = tier === 'premium';
+  const { status, loading } = useSubscriptionStore();
+  const isPremium = useSubscriptionStore((s) => s.isPremium);
 
-  useEffect(() => {
-    initialize();
-  }, []);
+  // Refresh subscription status on screen focus
+  useFocusEffect(
+    useCallback(() => {
+      useSubscriptionStore.getState().refreshSubscription();
+    }, [])
+  );
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -35,7 +38,7 @@ export default function SubscriptionScreen() {
       >
         {/* Hero Section */}
         <View style={styles.hero}>
-          {isPremium ? (
+          {isPremium() ? (
             <>
               <MaterialCommunityIcons name="crown" size={48} color={colors.secondary} />
               <Text style={styles.heroTitle}>You're on Premium!</Text>

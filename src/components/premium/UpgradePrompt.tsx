@@ -1,9 +1,9 @@
-import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Pressable, Alert, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheet } from '../ui/BottomSheet';
 import { Button } from '../ui/Button';
-import { usePremiumStore } from '../../stores/premiumStore';
+import { openCheckout } from '../../lib/stripe';
 import { colors } from '../../theme/colors';
 import { typography, fontFamily } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
@@ -22,11 +22,20 @@ const FEATURE_LIST = [
 ];
 
 export function UpgradePrompt({ visible, onDismiss, feature }: UpgradePromptProps) {
-  const upgradeToPremium = usePremiumStore((s) => s.upgradeToPremium);
+  const [loading, setLoading] = useState(false);
 
   const handleUpgrade = async () => {
-    await upgradeToPremium();
-    onDismiss();
+    setLoading(true);
+    try {
+      const success = await openCheckout();
+      if (success) {
+        onDismiss();
+      }
+    } catch (err: any) {
+      Alert.alert('Payment Error', err.message ?? 'Payment could not be completed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -65,9 +74,10 @@ export function UpgradePrompt({ visible, onDismiss, feature }: UpgradePromptProp
           variant="secondary"
           size="lg"
           onPress={handleUpgrade}
+          disabled={loading}
           style={styles.upgradeButton}
         >
-          Upgrade to Premium
+          {loading ? <ActivityIndicator size={18} color="#ffffff" /> : 'Upgrade to Premium'}
         </Button>
 
         {/* Maybe Later */}

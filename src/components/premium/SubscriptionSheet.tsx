@@ -1,10 +1,11 @@
-import React from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { PremiumBadge } from './PremiumBadge';
-import { usePremiumStore } from '../../stores/premiumStore';
+import { useSubscriptionStore } from '../../stores/subscriptionStore';
+import { openCheckout, openBillingPortal } from '../../lib/stripe';
 import { colors } from '../../theme/colors';
 import { typography, fontFamily } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
@@ -28,23 +29,67 @@ const FREE_VS_PREMIUM: { feature: string; free: boolean; premium: boolean }[] = 
 ];
 
 export function SubscriptionSheet() {
-  const { tier, upgradeToPremium } = usePremiumStore();
-  const isPremium = tier === 'premium';
+  const { status, currentPeriodEnd, cancelAtPeriodEnd, loading } = useSubscriptionStore();
+  const isPremium = useSubscriptionStore((s) => s.isPremium);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
-  const handleManageSubscription = () => {
-    Alert.alert(
-      'Coming Soon',
-      'Subscription management will be available in a future update.'
-    );
+  const handleManageSubscription = async () => {
+    setPortalLoading(true);
+    try {
+      await openBillingPortal();
+    } catch (err: any) {
+      Alert.alert('Error', err.message ?? 'Could not open billing portal. Please try again later.');
+    } finally {
+      setTimeout(() => setPortalLoading(false), 1000);
+    }
   };
 
   const handleUpgrade = async () => {
-    await upgradeToPremium();
+    setCheckoutLoading(true);
+    setCheckoutError(null);
+    try {
+      const success = await openCheckout();
+      if (!success) {
+        // User canceled -- do nothing
+      }
+    } catch (err: any) {
+      setCheckoutError(err.message ?? 'Payment could not be completed');
+    } finally {
+      setCheckoutLoading(false);
+    }
   };
 
-  if (isPremium) {
+  if (isPremium()) {
     return (
       <View style={styles.container}>
+        {/* Past due warning banner */}
+        {status === 'past_due' && (
+          <View style={styles.warningBanner}>
+            <MaterialCommunityIcons name="alert-circle" size={20} color={colors.error} />
+            <View style={styles.warningContent}>
+              <Text style={styles.warningText}>Your payment failed. Update your payment method to keep Premium access.</Text>
+              <Button variant="secondary" size="sm" onPress={handleManageSubscription}>
+                Update Payment
+              </Button>
+            </View>
+          </View>
+        )}
+
+        {/* Canceled notice */}
+        {status === 'canceled' && (
+          <View style={styles.canceledBanner}>
+            <Text style={styles.canceledText}>
+              Your Premium access ends on {currentPeriodEnd ? new Date(currentPeriodEnd).toLocaleDateString() : 'soon'}.
+              Resubscribe anytime.
+            </Text>
+            <Button variant="secondary" size="sm" onPress={handleUpgrade}>
+              Resubscribe
+            </Button>
+          </View>
+        )}
+
         {/* Premium Plan Card */}
         <Card variant="elevated" style={styles.planCard}>
           <View style={styles.planHeader}>
@@ -77,9 +122,10 @@ export function SubscriptionSheet() {
           variant="tertiary"
           size="md"
           onPress={handleManageSubscription}
+          disabled={portalLoading}
           style={styles.manageButton}
         >
-          Manage Subscription
+          {portalLoading ? <ActivityIndicator size="small" color={colors.primary} /> : 'Manage Subscription'}
         </Button>
       </View>
     );
@@ -140,10 +186,24 @@ export function SubscriptionSheet() {
         variant="secondary"
         size="lg"
         onPress={handleUpgrade}
+        disabled={checkoutLoading}
         style={styles.upgradeButton}
       >
-        Upgrade to Premium
+        {checkoutLoading ? <ActivityIndicator size={18} color="#ffffff" /> : 'Upgrade to Premium'}
       </Button>
+      {checkoutLoading && (
+        <Text style={styles.checkoutLoadingText}>Preparing secure checkout...</Text>
+      )}
+
+      {/* Checkout error display */}
+      {checkoutError && (
+        <View style={styles.errorCard}>
+          <MaterialCommunityIcons name="alert-circle" size={20} color={colors.error} />
+          <Text style={styles.errorHeading}>Payment could not be completed</Text>
+          <Text style={styles.errorBody}>Your card was not charged. Please check your payment details and try again.</Text>
+          <Button variant="secondary" size="md" onPress={handleUpgrade}>Retry Payment</Button>
+        </View>
+      )}
     </View>
   );
 }
@@ -249,4 +309,38 @@ const styles = StyleSheet.create({
   upgradeButton: {
     marginBottom: spacing.lg,
   },
+  warningBanner: {
+    flexDirection: 'row',
+    backgroundColor: '#ffdad6',
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    marginBottom: spacing.md,
+    gap: spacing.sm,
+  },
+  warningContent: { flex: 1, gap: spacing.sm },
+  warningText: { ...typography.bodyMd, color: colors.onSurface },
+  canceledBanner: {
+    backgroundColor: '#eae8e4',
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    marginBottom: spacing.md,
+    gap: spacing.sm,
+  },
+  canceledText: { ...typography.bodyMd, color: colors.onSurface },
+  checkoutLoadingText: {
+    ...typography.bodySm,
+    color: colors.onSurfaceVariant,
+    textAlign: 'center',
+    marginTop: spacing.xs,
+  },
+  errorCard: {
+    backgroundColor: '#ffdad6',
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginTop: spacing.md,
+    gap: spacing.sm,
+    alignItems: 'center',
+  },
+  errorHeading: { ...typography.bodyMd, color: colors.onSurface },
+  errorBody: { ...typography.bodySm, color: colors.onSurfaceVariant, textAlign: 'center' },
 });
