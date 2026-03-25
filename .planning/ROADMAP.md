@@ -84,7 +84,7 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — Build usePresence hook, useActivityToast hook, PresenceAvatarStack, and ActivityToast components with tests
+- [x] 07-01-PLAN.md — Build usePresence hook, useActivityToast hook, PresenceAvatarStack, and ActivityToast components with tests
 - [ ] 07-02-PLAN.md — Wire presence and activity toasts into grocery and recipe detail screens
 
 **UI hint**: yes

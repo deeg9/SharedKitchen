@@ -129,10 +129,10 @@
 
 ### Real-Time Collaboration
 
-- [ ] **RT-01**: User sees live avatar stacks on grocery list screen showing who else is currently viewing
-- [ ] **RT-02**: User sees live avatar stacks on recipe detail screen showing who else is currently viewing
-- [ ] **RT-03**: User sees toast notifications when household members check off grocery items or modify meal plans
-- [ ] **RT-04**: Presence state uses Supabase Realtime Presence with debounced sync events (separate from data channels)
+- [x] **RT-01**: User sees live avatar stacks on grocery list screen showing who else is currently viewing
+- [x] **RT-02**: User sees live avatar stacks on recipe detail screen showing who else is currently viewing
+- [x] **RT-03**: User sees toast notifications when household members check off grocery items or modify meal plans
+- [x] **RT-04**: Presence state uses Supabase Realtime Presence with debounced sync events (separate from data channels)
 
 ### Cooking Mode
 
@@ -196,10 +196,10 @@
 | NOTIF-03 | Phase 6 | Complete |
 | NOTIF-04 | Phase 6 | Complete |
 | NOTIF-05 | Phase 6 | Complete |
-| RT-01 | Phase 7 | Pending |
-| RT-02 | Phase 7 | Pending |
-| RT-03 | Phase 7 | Pending |
-| RT-04 | Phase 7 | Pending |
+| RT-01 | Phase 7 | Complete |
+| RT-02 | Phase 7 | Complete |
+| RT-03 | Phase 7 | Complete |
+| RT-04 | Phase 7 | Complete |
 | AI-04 | Phase 8 | Pending |
 | AI-05 | Phase 8 | Pending |
 | AI-06 | Phase 8 | Pending |
