@@ -50,9 +50,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 0/3 plans executed
 
 Plans:
-- [ ] 05-01-PLAN.md — Fix recipe import (gpt-5-mini + structured outputs) and add AI rate limiting/caching
-- [ ] 05-02-PLAN.md — Create subscriptions table, Stripe webhook handler, and subscriptionStore
-- [ ] 05-03-PLAN.md — Wire Stripe checkout + billing portal to UI, rewire all premium components
+- [x] 05-01-PLAN.md — Fix recipe import (gpt-5-mini + structured outputs) and add AI rate limiting/caching
+- [x] 05-02-PLAN.md — Create subscriptions table, Stripe webhook handler, and subscriptionStore
+- [x] 05-03-PLAN.md — Wire Stripe checkout + billing portal to UI, rewire all premium components
 
 **UI hint**: yes
 
