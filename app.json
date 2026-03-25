@@ -35,6 +35,10 @@
       ["@stripe/stripe-react-native", {
         "merchantIdentifier": "merchant.com.mise.app",
         "enableApplePay": true
+      }],
+      ["expo-notifications", {
+        "icon": "./assets/icon.png",
+        "color": "#334537"
       }]
     ]
   }

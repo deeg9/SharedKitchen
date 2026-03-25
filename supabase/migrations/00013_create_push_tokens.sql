@@ -1,0 +1,23 @@
+CREATE TABLE push_tokens (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  expo_push_token TEXT NOT NULL,
+  device_id TEXT,
+  platform TEXT DEFAULT 'ios',
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(user_id, expo_push_token)
+);
+
+ALTER TABLE push_tokens ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can read own tokens"
+  ON push_tokens FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own tokens"
+  ON push_tokens FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own tokens"
+  ON push_tokens FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete own tokens"
+  ON push_tokens FOR DELETE USING (auth.uid() = user_id);
+
+CREATE INDEX idx_push_tokens_user_id ON push_tokens(user_id);
