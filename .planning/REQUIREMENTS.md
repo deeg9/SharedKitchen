@@ -121,8 +121,8 @@
 
 ### Push Notifications
 
-- [ ] **NOTIF-01**: App registers Expo push tokens and stores them in `push_tokens` table with device info
-- [ ] **NOTIF-02**: User sees contextual permission explanation before notification access prompt
+- [x] **NOTIF-01**: App registers Expo push tokens and stores them in `push_tokens` table with device info
+- [x] **NOTIF-02**: User sees contextual permission explanation before notification access prompt
 - [ ] **NOTIF-03**: User receives local scheduled cooking reminders before meal prep time
 - [ ] **NOTIF-04**: User receives push alert when a leftover is approaching its use-by date (1 day before, day of)
 - [ ] **NOTIF-05**: User receives push alert when household spending exceeds 80% or 100% of monthly budget target
@@ -191,8 +191,8 @@
 | PAY-05 | Phase 5 | Complete |
 | AI-03 | Phase 5 | Complete |
 | AI-07 | Phase 5 | Complete |
-| NOTIF-01 | Phase 6 | Pending |
-| NOTIF-02 | Phase 6 | Pending |
+| NOTIF-01 | Phase 6 | Complete |
+| NOTIF-02 | Phase 6 | Complete |
 | NOTIF-03 | Phase 6 | Pending |
 | NOTIF-04 | Phase 6 | Pending |
 | NOTIF-05 | Phase 6 | Pending |

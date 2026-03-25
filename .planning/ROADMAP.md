@@ -69,7 +69,7 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — Notification service, push token registration, permission pre-prompt, DB migration
+- [x] 06-01-PLAN.md — Notification service, push token registration, permission pre-prompt, DB migration
 - [ ] 06-02-PLAN.md — Wire scheduling into stores (cooking reminders, leftover alerts, budget warnings) and profile toggles
 
 ### Phase 7: Real-Time Presence
