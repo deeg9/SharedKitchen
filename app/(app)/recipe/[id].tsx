@@ -360,6 +360,15 @@ export default function RecipeDetailScreen() {
 
       {/* ── Bottom Action Bar ── */}
       <View style={[s.bottomBar, { paddingBottom: insets.bottom + spacing.md }]}>
+        {recipe.instructions && (recipe.instructions as InstructionStepType[]).length > 0 && (
+          <Pressable
+            onPress={() => router.push(`/recipe/cook/${id}`)}
+            style={s.startCookingBtn}
+          >
+            <MaterialCommunityIcons name="pot-steam" size={22} color={colors.onSecondary} />
+            <Text style={s.startCookingText}>Start Cooking</Text>
+          </Pressable>
+        )}
         <Pressable onPress={() => setShowPlanSheet(true)} style={s.addToPlanBtn}>
           <MaterialCommunityIcons name="calendar-plus" size={22} color={colors.onPrimary} />
           <Text style={s.addToPlanText}>Add to Plan</Text>
@@ -532,6 +541,15 @@ const s = StyleSheet.create({
     paddingHorizontal: spacing.md, paddingTop: spacing.md,
     backgroundColor: 'rgba(251,249,245,0.9)',
     borderTopWidth: 1, borderTopColor: colors.outlineVariant,
+  },
+  startCookingBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: spacing.sm, backgroundColor: colors.secondaryContainer, height: 56,
+    borderRadius: borderRadius.xl, paddingHorizontal: spacing.md, ...shadows.float,
+  },
+  startCookingText: {
+    fontFamily: fontFamily.headlineBold, fontWeight: '800', fontSize: 14,
+    color: colors.onSecondary, textTransform: 'uppercase', letterSpacing: 1.5,
   },
   addToPlanBtn: {
     flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
