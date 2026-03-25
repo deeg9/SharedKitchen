@@ -50,10 +50,9 @@ This phase introduces no new typography roles. All text uses existing tokens fro
 
 | Role | Token | Size | Weight | Line Height | Phase 7 Usage |
 |------|-------|------|--------|-------------|---------------|
-| Body | bodyMd | 14px | 400 (Inter_400Regular) | 20px | Toast action message text |
+| Body | bodySm | 12px | 400 (Inter_400Regular) | 16px | Toast action message text |
 | Label | labelLg | 14px | 600 (Inter_600SemiBold) | 20px | Toast display name (bold actor) |
-| Label | labelMd | 12px | 500 (Inter_500Medium) | 16px | Presence "viewing" label (if shown) |
-| Label | labelSm | 10px | 500 (Inter_500Medium) | 14px | Overflow badge "+N" text (uppercase) |
+| Label | labelSm | 10px | 600 (Inter_600SemiBold) | 14px | Overflow badge "+N" text (uppercase), presence "viewing" label (if shown) |
 
 Source: Existing `src/theme/typography.ts`
 
@@ -116,7 +115,7 @@ Source: Existing `src/theme/colors.ts`
 | Overlap offset | -8px marginLeft per avatar after the first |
 | Z-index stacking | First avatar highest z-index (leftmost on top) |
 | Max visible | 3 avatars before overflow badge |
-| Overflow badge | 32px diameter circle, bg: primaryContainer (#4a5d4e), text: onPrimaryContainer (#c0d5c2), fontSize 11px, fontWeight 700 |
+| Overflow badge | 32px diameter circle, bg: primaryContainer (#4a5d4e), text: onPrimaryContainer (#c0d5c2), fontSize 10px, fontWeight 600 |
 | Empty state | Component returns null (renders nothing when members.length === 0) |
 
 **Placement:**
@@ -124,7 +123,7 @@ Source: Existing `src/theme/colors.ts`
 | Screen | Position | Alignment |
 |--------|----------|-----------|
 | Grocery list (grocery.tsx) | Left side of titleRow, before screen title | verticalCenter with title text |
-| Recipe detail (recipe/[id].tsx) | Hero overlay area, right side, aligned with action buttons | position: absolute, right: 60px, top: insets.top + spacing.xs + 6 |
+| Recipe detail (recipe/[id].tsx) | Hero overlay area, right side, aligned with action buttons | position: absolute, right: 60px, top: insets.top + spacing.xs + 8 |
 
 ---
 
@@ -134,7 +133,7 @@ Source: Existing `src/theme/colors.ts`
 
 | Property | Value |
 |----------|-------|
-| Position | absolute, top: 60px (below status bar + nav), left: spacing.md (16px), right: spacing.md (16px) |
+| Position | absolute, top: 56px (below status bar + nav), left: spacing.md (16px), right: spacing.md (16px) |
 | Background | surfaceContainerLowest (#ffffff) |
 | Border | 1px solid outlineVariant (#c3c8c1) — ghost border per design system |
 | Border radius | borderRadius.lg (16px) |
