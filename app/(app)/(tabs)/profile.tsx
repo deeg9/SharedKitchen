@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, ScrollView, StyleSheet, Pressable, Switch } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Pressable, Switch, Alert } from 'react-native';
+import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -18,6 +19,7 @@ import { colors } from '../../../src/theme/colors';
 import { typography } from '../../../src/theme/typography';
 import { spacing, borderRadius } from '../../../src/theme/spacing';
 import { TAB_BAR_HEIGHT } from '../../../src/lib/constants';
+import { requestPermission, NotificationSettings } from '../../../src/lib/notifications';
 
 const DIETARY_OPTIONS = [
   'Vegetarian',
@@ -27,13 +29,6 @@ const DIETARY_OPTIONS = [
   'Nut-Free',
   'Vegan',
 ];
-
-interface NotificationSettings {
-  cookingReminders: boolean;
-  leftoverAlerts: boolean;
-  budgetWarnings: boolean;
-  householdActivity: boolean;
-}
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -58,6 +53,7 @@ export default function ProfileScreen() {
   const [dietaryPrefs, setDietaryPrefs] = useState<string[]>([]);
   const [defaultServings, setDefaultServings] = useState(4);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [permissionGranted, setPermissionGranted] = useState<boolean | null>(null);
   const [notifSettings, setNotifSettings] = useState<NotificationSettings>({
     cookingReminders: true,
     leftoverAlerts: true,
@@ -82,6 +78,11 @@ export default function ProfileScreen() {
     // Load notification settings
     AsyncStorage.getItem('notification_settings').then((val) => {
       if (val) setNotifSettings(JSON.parse(val));
+    });
+
+    // Check notification permission status
+    Notifications.getPermissionsAsync().then(({ status }) => {
+      setPermissionGranted(status === 'granted');
     });
   }, []);
 
@@ -119,14 +120,24 @@ export default function ProfileScreen() {
   }, []);
 
   const updateNotifSetting = useCallback(
-    (key: keyof NotificationSettings, value: boolean) => {
-      setNotifSettings((prev) => {
-        const next = { ...prev, [key]: value };
-        AsyncStorage.setItem('notification_settings', JSON.stringify(next));
-        return next;
-      });
+    async (key: keyof NotificationSettings, value: boolean) => {
+      if (value && !permissionGranted) {
+        const granted = await requestPermission();
+        setPermissionGranted(granted);
+        if (!granted) {
+          Alert.alert(
+            'Notifications Disabled',
+            'Please enable notifications in your device Settings to receive alerts.',
+            [{ text: 'OK' }]
+          );
+          return;
+        }
+      }
+      const next = { ...notifSettings, [key]: value };
+      setNotifSettings(next);
+      AsyncStorage.setItem('notification_settings', JSON.stringify(next));
     },
-    []
+    [notifSettings, permissionGranted]
   );
 
   const currentHousehold = activeHousehold();
