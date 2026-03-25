@@ -3,7 +3,7 @@
 **Defined:** 2026-03-22
 **Core Value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
 
-## v1 Requirements
+## v1 Requirements (Complete)
 
 ### Meal Planning
 
@@ -103,106 +103,96 @@
 
 ## v2 Requirements
 
-### Premium Dashboard
+### Payments & Premium
+
+- [ ] **PAY-01**: User can purchase a premium subscription ($9.99/mo) via Stripe checkout
+- [ ] **PAY-02**: Subscription state is server-authoritative (Supabase `subscriptions` table updated by Stripe webhooks, not AsyncStorage)
+- [ ] **PAY-03**: Stripe webhook Edge Function handles subscription lifecycle events (created, updated, canceled, payment failed) with idempotent processing
+- [ ] **PAY-04**: User can manage subscription via Stripe-hosted billing portal (cancel, update payment method)
+- [ ] **PAY-05**: Premium features are enforced server-side via RLS policies, not just client-side checks
+
+### AI Features
+
+- [ ] **AI-03**: Recipe import uses gpt-5-mini with structured outputs replacing deprecated gpt-4o-mini
+- [ ] **AI-04**: Recipe extraction tries JSON-LD/schema.org structured data first, falls back to LLM only when missing
+- [ ] **AI-05**: AI extracts recipe images and nutrition info from source URLs when available
+- [ ] **AI-06**: AI-powered meal generator suggests new recipes based on dietary prefs, cooking history, current leftovers, and remaining budget
+- [ ] **AI-07**: AI features include per-user rate limiting and response caching to control costs
+
+### Push Notifications
+
+- [ ] **NOTIF-01**: App registers Expo push tokens and stores them in `push_tokens` table with device info
+- [ ] **NOTIF-02**: User sees contextual permission explanation before notification access prompt
+- [ ] **NOTIF-03**: User receives local scheduled cooking reminders before meal prep time
+- [ ] **NOTIF-04**: User receives push alert when a leftover is approaching its use-by date (1 day before, day of)
+- [ ] **NOTIF-05**: User receives push alert when household spending exceeds 80% or 100% of monthly budget target
+
+### Real-Time Collaboration
+
+- [ ] **RT-01**: User sees live avatar stacks on grocery list screen showing who else is currently viewing
+- [ ] **RT-02**: User sees live avatar stacks on recipe detail screen showing who else is currently viewing
+- [ ] **RT-03**: User sees toast notifications when household members check off grocery items or modify meal plans
+- [ ] **RT-04**: Presence state uses Supabase Realtime Presence with debounced sync events (separate from data channels)
+
+### Cooking Mode
+
+- [ ] **COOK-01**: User can enter fullscreen step-by-step cooking mode from recipe detail showing one instruction per screen
+- [ ] **COOK-02**: Cooking mode has step pagination (prev/next arrows), "Step X of Y" indicator, and progress bar
+- [ ] **COOK-03**: Steps with time references show embedded tappable countdown timers (start/pause/reset)
+- [ ] **COOK-04**: User can toggle between metric and imperial units for ingredients and instruction text
+- [ ] **COOK-05**: AI extraction parses time durations from instruction text to auto-generate timer data for cooking mode
+
+### E2E Testing
+
+- [ ] **TEST-01**: Maestro E2E flows cover auth (signup, login, logout) and onboarding
+- [ ] **TEST-02**: Maestro E2E flows cover recipe creation, AI import, and detail view
+- [ ] **TEST-03**: Maestro E2E flows cover meal planning (add, edit, clear, Surprise Me)
+- [ ] **TEST-04**: Maestro E2E flows cover grocery list (generate, check off, manual add, real-time sync)
+- [ ] **TEST-05**: Maestro E2E flows cover premium subscription checkout and gated feature access
+- [ ] **TEST-06**: Maestro E2E flows cover negative paths (failed payment, denied permissions, AI timeout)
+
+## Future Requirements
+
+### Premium Analytics (v2.1)
 
 - **DASH-01**: Cooking distribution chart (who cooked how many times)
 - **DASH-02**: Spending trend line chart (weekly dinner spending over 4-8 weeks)
 - **DASH-03**: Category breakdown chart (recipe categories used this month)
 - **DASH-04**: Top 5 highest-rated recipes list with "last made" date
 
-### Enhanced Features
+### Enhanced Features (v3+)
 
 - **ENH-01**: Drag-and-drop meal block reordering on weekly calendar
 - **ENH-02**: Android build
 - **ENH-03**: Apple Sign-In
-- **ENH-04**: In-app purchase / subscription payment processing
+- **ENH-04**: Household activity remote push notifications (server-triggered to other members)
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Real payment processing | Freemium shell only — validate PMF before investing in IAP |
-| Android build | iOS-first for v1; cross-platform foundation ready via Expo |
-| Web client | Mobile-first product, no web version planned |
-| Social features beyond household | No public profiles or cross-household recipe sharing |
-| Meal prep / batch cooking | Keep it simple per-day planning for v1 |
-| Grocery delivery integration | No Instacart/DoorDash integration |
-| Real-time chat | Household coordination via meal plan, not messaging |
-| Video content in recipes | Text + photos only; video adds storage/bandwidth complexity |
+| Apple IAP | Stripe external payment viable post-Epic v. Apple ruling; ~3% vs 15-30% commission |
+| Multi-tier premium | Single tier sufficient; binary free/premium simplifies Stripe + gating |
+| Android build | iOS-first for v2.0; Expo cross-platform foundation ready |
+| Real-time chat | Activity feed provides lightweight collaborative awareness |
+| AI-generated recipe images | Uncanny-valley food images reduce trust; extract from source URLs |
+| Offline-first sync engine | Optimistic UI + Supabase Realtime sufficient; offline edits defeat collaborative purpose |
+| Web client | Mobile-first product |
+| Meal prep / batch cooking | Per-day planning kept simple |
 
 ## Traceability
 
+Updated during roadmap creation.
+
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Complete |
-| AUTH-02 | Phase 1 | Complete |
-| AUTH-03 | Phase 1 | Complete |
-| HOUS-01 | Phase 1 | Complete |
-| HOUS-02 | Phase 1 | Complete |
-| HOUS-03 | Phase 1 | Complete |
-| HOUS-04 | Phase 1 | Complete |
-| HOUS-05 | Phase 1 | Complete |
-| DSGN-01 | Phase 1 | Complete |
-| DSGN-02 | Phase 1 | Complete |
-| DSGN-03 | Phase 1 | Complete |
-| DSGN-04 | Phase 1 | Complete |
-| DSGN-05 | Phase 1 | Complete |
-| DSGN-06 | Phase 1 | Complete |
-| PROF-01 | Phase 1 | Complete |
-| PROF-06 | Phase 1 | Complete |
-| RECP-01 | Phase 2 | Complete |
-| RECP-02 | Phase 2 | Complete |
-| RECP-03 | Phase 2 | Complete |
-| RECP-04 | Phase 2 | Complete |
-| RECP-05 | Phase 2 | Complete |
-| RECP-06 | Phase 2 | Complete |
-| RECP-07 | Phase 2 | Complete |
-| RECP-08 | Phase 2 | Complete |
-| RECP-09 | Phase 2 | Complete |
-| AI-01 | Phase 2 | Complete |
-| PLAN-01 | Phase 2 | Complete |
-| PLAN-02 | Phase 2 | Complete |
-| PLAN-03 | Phase 2 | Complete |
-| PLAN-04 | Phase 2 | Complete |
-| PLAN-05 | Phase 2 | Complete |
-| PLAN-06 | Phase 2 | Complete |
-| PLAN-07 | Phase 2 | Complete |
-| GROC-01 | Phase 2 | Complete |
-| GROC-02 | Phase 2 | Complete |
-| GROC-03 | Phase 2 | Complete |
-| GROC-04 | Phase 2 | Complete |
-| GROC-05 | Phase 2 | Complete |
-| GROC-06 | Phase 2 | Complete |
-| GROC-07 | Phase 2 | Complete |
-| GROC-08 | Phase 2 | Complete |
-| BUDG-01 | Phase 3 | Complete |
-| BUDG-02 | Phase 3 | Complete |
-| BUDG-03 | Phase 3 | Complete |
-| BUDG-04 | Phase 3 | Complete |
-| LEFT-01 | Phase 3 | Complete |
-| LEFT-02 | Phase 3 | Complete |
-| LEFT-03 | Phase 3 | Complete |
-| LEFT-04 | Phase 3 | Complete |
-| AI-02 | Phase 3 | Complete |
-| PROF-02 | Phase 3 | Complete |
-| PROF-03 | Phase 3 | Complete |
-| PROF-04 | Phase 3 | Complete |
-| PROF-05 | Phase 3 | Complete |
-| ONBR-01 | Phase 4 | Complete |
-| ONBR-02 | Phase 4 | Complete |
-| ONBR-03 | Phase 4 | Complete |
-| ONBR-04 | Phase 4 | Complete |
-| ONBR-05 | Phase 4 | Complete |
-| ONBR-06 | Phase 4 | Complete |
-| PREM-01 | Phase 4 | Complete |
-| PREM-02 | Phase 4 | Complete |
-| PREM-03 | Phase 4 | Complete |
+| (v2 requirements mapped below) | | |
 
 **Coverage:**
-- v1 requirements: 63 total
-- Mapped to phases: 63
-- Unmapped: 0
+- v2 requirements: 28 total
+- Mapped to phases: 0 (pending roadmap)
+- Unmapped: 28
 
 ---
 *Requirements defined: 2026-03-22*
-*Last updated: 2026-03-22 after roadmap creation*
+*Last updated: 2026-03-25 after v2.0 milestone requirements definition*
