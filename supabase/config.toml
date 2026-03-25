@@ -71,3 +71,6 @@ enabled = false
 [edge_runtime]
 enabled = true
 policy = "per_worker"
+
+[functions.stripe-webhooks]
+verify_jwt = false
