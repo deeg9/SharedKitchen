@@ -17,19 +17,7 @@ import { typography, fontFamily } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
 import { shadows } from '../../theme/shadows';
 import { RecipeInsert, Ingredient, InstructionStep } from '../../types/database';
-
-const CATEGORY_OPTIONS = [
-  'Mexican',
-  'Seafood',
-  'Chicken',
-  'Vegetarian',
-  'Pasta',
-  'Asian',
-  'Salads',
-  'Soups',
-  'Desserts',
-  'Other',
-];
+import { CATEGORIES } from '../../lib/categories';
 
 const TAG_OPTIONS = [
   'Spicy',
@@ -206,7 +194,7 @@ export function RecipeForm({ onSubmit, loading = false, initialData }: RecipeFor
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.chipRow}
           >
-            {CATEGORY_OPTIONS.map((cat) => (
+            {CATEGORIES.map((cat) => (
               <Pressable
                 key={cat}
                 onPress={() => setCategory(category === cat ? '' : cat)}
