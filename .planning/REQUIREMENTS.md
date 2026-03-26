@@ -7,9 +7,9 @@
 
 ### Recipe Discovery
 
-- [ ] **DISC-01**: FilterBar component committed and rendering in recipes tab with category/cost/time dropdowns
-- [ ] **DISC-02**: Manual recipe form includes category picker from standard category list
-- [ ] **DISC-03**: Recipe edit form includes category picker to update existing recipes
+- [x] **DISC-01**: FilterBar component committed and rendering in recipes tab with category/cost/time dropdowns
+- [x] **DISC-02**: Manual recipe form includes category picker from standard category list
+- [x] **DISC-03**: Recipe edit form includes category picker to update existing recipes
 - [ ] **DISC-04**: AI-imported recipes populate category field from extracted data (already works — verify)
 - [ ] **DISC-05**: Filtering by category, cost range, and prep time returns correct results client-side
 
@@ -43,9 +43,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DISC-01 | Phase 10 | Pending |
-| DISC-02 | Phase 10 | Pending |
-| DISC-03 | Phase 10 | Pending |
+| DISC-01 | Phase 10 | Complete |
+| DISC-02 | Phase 10 | Complete |
+| DISC-03 | Phase 10 | Complete |
 | DISC-04 | Phase 10 | Pending |
 | DISC-05 | Phase 10 | Pending |
 | PAY-01 | Phase 11 | Pending |

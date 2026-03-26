@@ -38,7 +38,7 @@ Mise delivers a collaborative dinner planning app for households. v1.0 (Phases 1
 - [ ] Phase 10: Recipe Discovery (2 plans) — Unify categories, commit FilterBar, verify filtering end-to-end
   - DISC-01, DISC-02, DISC-03, DISC-04, DISC-05
   - Plans:
-    - [ ] 10-01-PLAN.md — Unify category list into shared constant, update FilterBar + RecipeForm, commit
+    - [x] 10-01-PLAN.md — Unify category list into shared constant, update FilterBar + RecipeForm, commit
     - [ ] 10-02-PLAN.md — Unit tests for filteredRecipes(), verify AI import category contract
 - [ ] Phase 11: Stripe Test Mode E2E (est. 1 plan) — Document env vars, verify full checkout→webhook→subscription flow
   - PAY-01, PAY-02, PAY-03, PAY-04, PAY-05
@@ -58,7 +58,7 @@ Mise delivers a collaborative dinner planning app for households. v1.0 (Phases 1
 | 7. Real-Time Presence | v2.0 | 2/2 | Complete | 2026-03-25 |
 | 8. Enhanced AI & Cooking Mode | v2.0 | 3/3 | Complete | 2026-03-26 |
 | 9. E2E Testing | v2.0 | 3/3 | Complete | 2026-03-26 |
-| 10. Recipe Discovery | v2.1 | 0/2 | Planned | — |
+| 10. Recipe Discovery | v2.1 | 1/2 | In Progress|  |
 | 11. Stripe Test Mode E2E | v2.1 | 0/1 | Pending | — |
 | 12. Code Quality Polish | v2.1 | 0/2 | Pending | — |
 

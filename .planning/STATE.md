@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: Discovery, Checkout & Polish
-status: milestone init
-stopped_at: Requirements definition
-last_updated: "2026-03-25T12:00:00.000Z"
+status: Ready to execute
+stopped_at: Completed 10-01-PLAN.md
+last_updated: "2026-03-26T07:21:12.682Z"
 progress:
-  total_phases: 0
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_phases: 4
+  completed_phases: 4
+  total_plans: 10
+  completed_plans: 10
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** v2.1 milestone — requirements definition
+**Current focus:** Phase 10 — recipe-discovery
 
 ## Current Position
 
-Phase: Pre-roadmap
-Plan: Not started
+Phase: 10 (recipe-discovery) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -45,6 +45,7 @@ Recent decisions affecting current work:
 - [Phase 05]: No client-side write methods on subscriptionStore -- server-authoritative only via service_role
 - [Phase 08]: JSON-LD-first extraction requires name + ingredients + instructions to skip OpenAI
 - FilterBar component + recipeStore filter state built but not committed — category/cost/time dropdowns ready
+- [Phase 10]: Included High Protein as category since starter-recipes use it as DB category value
 
 ### Pending Todos
 
@@ -64,9 +65,10 @@ None yet.
 | 3 | Investigate RLS 403s and text node warnings | 2026-03-24 | 1f3ebc6 | [3-fix-rls-403s-on-grocery-items-and-expens](./quick/3-fix-rls-403s-on-grocery-items-and-expens/) |
 | 4 | Redesign add recipe form to match HTML mockup | 2026-03-24 | f71f1f6 | [4-redesign-add-recipe-form-to-match-html-m](./quick/4-redesign-add-recipe-form-to-match-html-m/) |
 | 5 | Grocery: edit items, collapsible sections | 2026-03-24 | 99e28e8 | [5-grocery-list-edit-items-collapsible-sect](./quick/5-grocery-list-edit-items-collapsible-sect/) |
+| Phase 10 P01 | 47s | 2 tasks | 3 files |
 
 ## Session Continuity
 
-Last session: 2026-03-25
-Stopped at: v2.1 milestone init
+Last session: 2026-03-26T07:21:12.680Z
+Stopped at: Completed 10-01-PLAN.md
 Resume file: None
