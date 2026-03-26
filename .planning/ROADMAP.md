@@ -61,7 +61,10 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
   3. Recipe detail "Start Cooking" and "Add to Plan" buttons are properly sized with clear spacing and no overlap
   4. Recipe detail hero image displays without a white card overlay obscuring it
   5. Opening the "What should we cook" popup fully covers the filter bar — no category/cost/time controls bleed through
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 13-01-PLAN.md — BottomSheet safe area insets + Profile screen safe area padding
+- [ ] 13-02-PLAN.md — Recipe detail button layout, hero overlay fix, FilterBar z-index containment
 **UI hint**: yes
 
 ### Phase 14: Edge Function & Auth Polish
@@ -103,9 +106,9 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 | 10. Recipe Discovery | v2.1 | 2/2 | Complete | 2026-03-26 |
 | 11. Stripe Test Mode E2E | v2.1 | 2/2 | Complete | 2026-03-26 |
 | 12. Code Quality Polish | v2.1 | 2/2 | Complete | 2026-03-26 |
-| 13. Layout & Safe Areas | v2.2 | 0/0 | Not started | - |
+| 13. Layout & Safe Areas | v2.2 | 0/2 | Planning | - |
 | 14. Edge Function & Auth Polish | v2.2 | 0/0 | Not started | - |
 | 15. Profile & Settings | v2.2 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-03-26 after v2.2 roadmap created*
+*Last updated: 2026-03-26 after Phase 13 planning*
