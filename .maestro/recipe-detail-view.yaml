@@ -1,0 +1,93 @@
+appId: com.mise.app
+---
+# Recipe Detail View Flow
+# Navigates to a recipe detail page and interacts with favorite, cook, and add-to-plan buttons.
+# Assumes the user is already logged in and at least one recipe exists.
+
+- launchApp
+
+# Navigate to Recipes tab
+- tapOn:
+    id: "recipes-tab"
+
+# Wait for recipes to load
+- extendedWaitUntil:
+    visible:
+      text: "Recipes"
+    timeout: 10000
+
+# Tap on the first visible recipe card
+# RecipeCard testIDs are dynamic (recipe-card-{uuid}), so we tap by partial text match
+- tapOn:
+    text: ".*"
+    index: 0
+    retryTapIfNoChange: false
+
+# Wait for recipe detail to load
+- extendedWaitUntil:
+    visible:
+      text: "Ingredients"
+    timeout: 10000
+
+# Assert recipe detail elements are visible
+- assertVisible:
+    text: "Ingredients"
+
+- assertVisible:
+    text: "Method"
+
+# Assert action buttons are visible at the bottom
+- scrollUntilVisible:
+    element:
+      id: "recipe-detail-favorite-button"
+    direction: DOWN
+
+# Tap favorite button
+- tapOn:
+    id: "recipe-detail-favorite-button"
+
+# Assert the favorite button is still visible (toggled state)
+- assertVisible:
+    id: "recipe-detail-favorite-button"
+
+# Tap start cooking button to verify cooking mode entry
+- tapOn:
+    id: "recipe-detail-cook-button"
+
+# Wait briefly for navigation
+- extendedWaitUntil:
+    notVisible:
+      id: "recipe-detail-cook-button"
+    timeout: 5000
+
+# Go back to recipe detail
+- back
+
+# Verify we're back on recipe detail
+- extendedWaitUntil:
+    visible:
+      id: "recipe-detail-favorite-button"
+    timeout: 5000
+
+# Tap Add to Plan button
+- tapOn:
+    id: "recipe-detail-add-to-plan"
+
+# Assert day picker sheet appears
+- extendedWaitUntil:
+    visible:
+      text: "Pick a Day"
+    timeout: 5000
+
+- assertVisible:
+    text: "Today"
+
+# Tap Today to add recipe to plan
+- tapOn:
+    text: "Today"
+
+# Verify sheet closes
+- extendedWaitUntil:
+    notVisible:
+      text: "Pick a Day"
+    timeout: 5000

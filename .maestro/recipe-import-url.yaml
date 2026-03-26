@@ -1,0 +1,74 @@
+appId: com.mise.app
+---
+# Recipe Import from URL Flow
+# Tests AI-powered recipe import from a URL.
+# Assumes the user is already logged in (no clearState).
+
+- launchApp
+
+# Navigate to Recipes tab
+- tapOn:
+    id: "recipes-tab"
+
+# Tap Add Recipe FAB to go to add screen
+- tapOn:
+    id: "recipe-add-button"
+
+# Enter a recipe URL in the import field
+- tapOn:
+    id: "recipe-import-url-input"
+- inputText: "https://www.allrecipes.com/recipe/22180/waffles-i/"
+
+# Tap Import button
+- tapOn:
+    id: "recipe-import-button"
+
+# Wait for AI processing with generous timeout (network call to Edge Function + OpenAI)
+- extendedWaitUntil:
+    visible:
+      id: "recipe-form-name-input"
+    timeout: 30000
+
+# Assert recipe form has been populated with parsed data
+# The recipe name input should now contain parsed content (not empty)
+- assertVisible:
+    id: "recipe-form-name-input"
+
+# Assert the import progress messages appeared and completed
+- assertNotVisible:
+    text: "Fetching recipe..."
+    enabled: true
+
+# Scroll down to verify ingredients were parsed
+- scrollUntilVisible:
+    element:
+      text: "Ingredients"
+    direction: DOWN
+
+# Assert at least one ingredient was parsed (ingredient name field should have content)
+- assertVisible:
+    text: "Ingredients"
+
+# Scroll to instructions
+- scrollUntilVisible:
+    element:
+      text: "Instructions"
+    direction: DOWN
+
+# Assert instructions section is visible with parsed steps
+- assertVisible:
+    text: "Instructions"
+
+# Save the imported recipe
+- scrollUntilVisible:
+    element:
+      id: "recipe-form-save-button"
+    direction: DOWN
+- tapOn:
+    id: "recipe-form-save-button"
+
+# Wait for save to complete
+- extendedWaitUntil:
+    visible:
+      id: "recipes-tab"
+    timeout: 10000

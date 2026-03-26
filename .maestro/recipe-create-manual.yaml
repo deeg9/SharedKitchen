@@ -1,0 +1,135 @@
+appId: com.mise.app
+---
+# Recipe Create Manual Flow
+# Creates a recipe via the manual form with name, category, ingredients, and instructions.
+# Assumes the user is already logged in (no clearState).
+
+- launchApp
+
+# Navigate to Recipes tab
+- tapOn:
+    id: "recipes-tab"
+
+# Tap Add Recipe FAB
+- tapOn:
+    id: "recipe-add-button"
+
+# Fill in recipe name
+- tapOn:
+    id: "recipe-form-name-input"
+- inputText: "Test Pasta Carbonara"
+
+# Select a category chip (tap "Pasta")
+- tapOn:
+    text: "Pasta"
+
+# Scroll down to metadata section
+- scrollUntilVisible:
+    element:
+      text: "PREP TIME"
+    direction: DOWN
+
+# Fill prep time
+- tapOn:
+    text: "PREP TIME"
+    index: 0
+- inputText: "15"
+
+# Fill cook time - tap on the cook time input area
+- scrollUntilVisible:
+    element:
+      text: "COOK TIME"
+    direction: DOWN
+- tapOn:
+    text: "COOK TIME"
+    index: 0
+- inputText: "30"
+
+# Scroll to ingredients section
+- scrollUntilVisible:
+    element:
+      text: "Ingredients"
+    direction: DOWN
+
+# Fill first ingredient name
+- tapOn:
+    text: "Ingredient name"
+    index: 0
+- inputText: "Spaghetti"
+
+# Fill first ingredient quantity
+- tapOn:
+    text: "Qty"
+    index: 0
+- inputText: "1"
+
+# Fill first ingredient unit
+- tapOn:
+    text: "unit"
+    index: 0
+- inputText: "lbs"
+
+# Add second ingredient
+- scrollUntilVisible:
+    element:
+      text: "Add Ingredient"
+    direction: DOWN
+- tapOn:
+    text: "Add Ingredient"
+
+# Fill second ingredient
+- tapOn:
+    text: "Ingredient name"
+    index: 1
+- inputText: "Bacon"
+- tapOn:
+    text: "Qty"
+    index: 1
+- inputText: "4"
+- tapOn:
+    text: "unit"
+    index: 1
+- inputText: "oz"
+
+# Scroll to instructions section
+- scrollUntilVisible:
+    element:
+      text: "Instructions"
+    direction: DOWN
+
+# Fill first instruction step
+- tapOn:
+    text: "Describe step 1..."
+- inputText: "Boil water and cook spaghetti according to package directions"
+
+# Add second instruction step
+- scrollUntilVisible:
+    element:
+      text: "Add Step"
+    direction: DOWN
+- tapOn:
+    text: "Add Step"
+
+# Fill second instruction
+- tapOn:
+    text: "Describe step 2..."
+- inputText: "Fry bacon until crispy, mix with pasta and eggs"
+
+# Scroll to save button and submit
+- scrollUntilVisible:
+    element:
+      id: "recipe-form-save-button"
+    direction: DOWN
+- tapOn:
+    id: "recipe-form-save-button"
+
+# Wait for save and navigation back to recipe list
+- extendedWaitUntil:
+    visible:
+      id: "recipes-tab"
+    timeout: 10000
+
+# Assert the new recipe appears in the list
+- assertVisible:
+    text: "Test Pasta Carbonara"
+    enabled: true
