@@ -14,7 +14,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mise.app"
+      "bundleIdentifier": "com.sharedkitchen.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -23,7 +26,7 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.mise.app"
+      "package": "com.sharedkitchen.app"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -32,14 +35,26 @@
     "plugins": [
       "expo-router",
       "expo-sharing",
-      ["@stripe/stripe-react-native", {
-        "merchantIdentifier": "merchant.com.mise.app",
-        "enableApplePay": true
-      }],
-      ["expo-notifications", {
-        "icon": "./assets/icon.png",
-        "color": "#334537"
-      }]
-    ]
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.com.sharedkitchen.app",
+          "enableApplePay": true
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#334537"
+        }
+      ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "64a49c7a-42df-4af8-8f18-43b1d7685e40"
+      }
+    }
   }
 }
