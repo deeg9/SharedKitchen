@@ -1,0 +1,19 @@
+appId: com.mise.app
+---
+- launchApp:
+    clearState: true
+- assertVisible: "Create Account"
+- tapOn:
+    id: "sign-up-email-input"
+- inputText: "testuser+${Date.now()}@example.com"
+- tapOn:
+    id: "sign-up-password-input"
+- inputText: "***REMOVED***"
+- tapOn:
+    id: "sign-up-confirm-password-input"
+- inputText: "***REMOVED***"
+- tapOn:
+    id: "sign-up-submit-button"
+- assertVisible:
+    text: ".*Welcome.*|.*Check your email.*"
+    timeout: 10000

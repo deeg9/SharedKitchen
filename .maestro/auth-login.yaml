@@ -1,0 +1,16 @@
+appId: com.mise.app
+---
+- launchApp:
+    clearState: true
+- assertVisible: "Sign In"
+- tapOn:
+    id: "sign-in-email-input"
+- inputText: "testuser@example.com"
+- tapOn:
+    id: "sign-in-password-input"
+- inputText: "***REMOVED***"
+- tapOn:
+    id: "sign-in-submit-button"
+- assertVisible:
+    text: ".*Plan.*|.*Recipes.*|.*Welcome.*"
+    timeout: 10000

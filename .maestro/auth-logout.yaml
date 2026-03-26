@@ -1,0 +1,12 @@
+appId: com.mise.app
+---
+- launchApp
+- tapOn:
+    id: "profile-tab"
+- scrollUntilVisible:
+    element:
+      id: "profile-sign-out-button"
+    direction: DOWN
+- tapOn:
+    id: "profile-sign-out-button"
+- assertVisible: "Sign In"
