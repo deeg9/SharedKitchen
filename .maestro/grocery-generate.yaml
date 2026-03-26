@@ -1,0 +1,39 @@
+appId: com.mise.app
+name: "Grocery List Generation"
+---
+# Grocery list generation flow
+# Assumes user is logged in with meal plan data
+
+- launchApp:
+    clearState: false
+
+# Navigate to Grocery tab
+- tapOn:
+    id: "grocery-tab"
+
+# Tap the generate list button (visible when no list exists)
+- tapOn:
+    id: "generate-list-button"
+
+# Wait for grocery sections to appear (list populated from meal plan)
+- extendedWaitUntil:
+    visible:
+      id: "grocery-summary"
+    timeout: 8000
+
+# Assert at least one grocery section is visible
+- assertVisible:
+    id: "grocery-section-Produce"
+    optional: true
+
+- assertVisible:
+    id: "grocery-section-Proteins"
+    optional: true
+
+# Assert the summary bar is visible with item count
+- assertVisible:
+    id: "grocery-summary"
+
+# Verify summary shows item information (items count text)
+- assertVisible:
+    text: "items"

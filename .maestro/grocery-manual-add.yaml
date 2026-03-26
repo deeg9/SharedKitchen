@@ -1,0 +1,47 @@
+appId: com.mise.app
+name: "Grocery Manual Item Add"
+---
+# Manual grocery item add flow
+# Assumes user is logged in with an existing grocery list
+
+- launchApp:
+    clearState: false
+
+# Navigate to Grocery tab
+- tapOn:
+    id: "grocery-tab"
+
+# Wait for the grocery list to load
+- extendedWaitUntil:
+    visible:
+      id: "grocery-summary"
+    timeout: 5000
+
+# Tap the FAB to open the add item sheet
+- tapOn:
+    id: "add-item-fab"
+
+# Wait for the add item sheet to appear
+- extendedWaitUntil:
+    visible:
+      id: "add-item-name"
+    timeout: 3000
+
+# Fill in the item name
+- tapOn:
+    id: "add-item-name"
+- inputText: "Extra Butter"
+
+# Tap the submit button to add the item
+- tapOn:
+    id: "add-item-button"
+
+# Wait for the item to be added and verify it appears
+- waitForAnimationToEnd
+
+# Close the sheet (tap close or press back)
+- back
+
+# Assert the new item appears in the grocery list
+- assertVisible:
+    text: "Extra Butter"

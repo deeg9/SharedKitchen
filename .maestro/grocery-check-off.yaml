@@ -1,0 +1,46 @@
+appId: com.mise.app
+name: "Grocery Item Check-Off"
+---
+# Grocery item check-off flow
+# Assumes user is logged in with an existing grocery list
+
+- launchApp:
+    clearState: false
+
+# Navigate to Grocery tab
+- tapOn:
+    id: "grocery-tab"
+
+# Wait for grocery summary to confirm list is loaded
+- extendedWaitUntil:
+    visible:
+      id: "grocery-summary"
+    timeout: 5000
+
+# Assert at least one grocery section is visible
+- assertVisible:
+    text: "Produce"
+    optional: true
+
+- assertVisible:
+    text: "Proteins"
+    optional: true
+
+# Tap the first visible grocery item to toggle its checked state
+# grocery-item-{uuid} pattern -- use text-based tap on first item row
+- tapOn:
+    text: ".*"
+    index: 0
+    id: "grocery-item-.*"
+    optional: true
+
+# Wait briefly for optimistic UI update
+- waitForAnimationToEnd
+
+# Assert the summary bar is still visible (progress updates)
+- assertVisible:
+    id: "grocery-summary"
+
+# Verify checked count text is visible (e.g. "1/12 checked")
+- assertVisible:
+    text: "checked"

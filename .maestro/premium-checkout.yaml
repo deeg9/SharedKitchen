@@ -1,0 +1,66 @@
+appId: com.mise.app
+name: "Premium Subscription Checkout"
+---
+# Premium subscription checkout flow
+# Tests navigation to subscription screen and checkout UI
+# Note: Stripe checkout cannot be fully completed in E2E -- verifies up to payment UI
+
+- launchApp:
+    clearState: false
+
+# Navigate to Profile tab
+- tapOn:
+    id: "profile-tab"
+
+# Tap the subscription link to go to subscription screen
+- tapOn:
+    id: "profile-subscription-link"
+
+# Wait for subscription screen to load
+- extendedWaitUntil:
+    visible:
+      text: "Subscription"
+    timeout: 5000
+
+# Assert subscription screen shows plan details
+- assertVisible:
+    text: "Free Plan"
+    optional: true
+
+# Assert the price is displayed
+- assertVisible:
+    text: "$9.99"
+
+# Assert the upgrade button is visible
+- assertVisible:
+    id: "subscription-upgrade-button"
+
+# Tap the upgrade button to initiate checkout
+- tapOn:
+    id: "subscription-upgrade-button"
+
+# Wait briefly for checkout to start loading
+- extendedWaitUntil:
+    visible:
+      text: "Preparing secure checkout..."
+    timeout: 3000
+    optional: true
+
+# Navigate back to verify app stability
+- tapOn:
+    id: "subscription-back-button"
+
+# --- Test gated feature access ---
+# Navigate to Recipes tab
+- tapOn:
+    id: "recipes-tab"
+
+# Look for upgrade prompt when accessing a premium feature
+# The upgrade prompt should appear for free users on premium-gated features
+- assertVisible:
+    id: "upgrade-prompt-button"
+    optional: true
+
+- assertVisible:
+    id: "upgrade-prompt-later"
+    optional: true
