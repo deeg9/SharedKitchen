@@ -88,7 +88,10 @@ Plans:
   1. Profile screen no longer shows a Dark Mode toggle or an App Settings section
   2. User can type to search and select dietary restrictions from a searchable dropdown instead of scrolling through static chips
   3. Household management area presents members, invite actions, and household switching in a clear, usable layout
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 15-01-PLAN.md — Remove App Settings section and add searchable dietary restrictions
+- [ ] 15-02-PLAN.md — Redesign household management and update tests
 **UI hint**: yes
 
 ## Progress
@@ -111,7 +114,7 @@ Plans:
 | 12. Code Quality Polish | v2.1 | 2/2 | Complete | 2026-03-26 |
 | 13. Layout & Safe Areas | v2.2 | 0/2 | Planning | - |
 | 14. Edge Function & Auth Polish | v2.2 | 0/2 | Planning | - |
-| 15. Profile & Settings | v2.2 | 0/0 | Not started | - |
+| 15. Profile & Settings | v2.2 | 0/2 | Planning | - |
 
 ---
 *Last updated: 2026-03-26 after Phase 14 planning*
