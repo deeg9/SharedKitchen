@@ -43,6 +43,30 @@ jest.mock('react-native-reanimated', () => {
   };
 });
 
+// Mock supabase (needed since profile.tsx imports it directly)
+jest.mock('../../src/lib/supabase', () => ({
+  supabase: {
+    auth: {
+      getUser: jest.fn(() => Promise.resolve({ data: { user: null }, error: null })),
+      onAuthStateChange: jest.fn(() => ({ data: { subscription: { unsubscribe: jest.fn() } } })),
+    },
+    from: jest.fn(() => ({
+      update: jest.fn(() => ({
+        eq: jest.fn(() => Promise.resolve({ data: null, error: null })),
+      })),
+    })),
+  },
+}));
+
+// Mock SearchableSelect
+jest.mock('../../src/components/ui/SearchableSelect', () => {
+  const { View } = require('react-native');
+  return {
+    SearchableSelect: (props: any) => <View testID="dietary-search-mock" />,
+    DIETARY_OPTIONS: ['Vegetarian', 'Gluten-Free', 'Dairy-Free'],
+  };
+});
+
 // Mock auth store
 const mockSignOut = jest.fn();
 jest.mock('../../src/stores/authStore', () => ({
@@ -60,23 +84,33 @@ jest.mock('../../src/stores/authStore', () => ({
   }),
 }));
 
-// Mock household store
+// Mock household store - default: no household
+const mockHouseholdStore = {
+  households: [] as any[],
+  activeHouseholdId: null as string | null,
+  members: [] as any[],
+  loading: false,
+  activeHousehold: () => null as any,
+  setActiveHousehold: jest.fn(),
+  initialize: jest.fn(),
+};
+
 jest.mock('../../src/stores/householdStore', () => ({
-  useHouseholdStore: () => ({
-    households: [],
-    activeHouseholdId: null,
-    members: [],
-    loading: false,
-    activeHousehold: () => null,
-    setActiveHousehold: jest.fn(),
-    initialize: jest.fn(),
-  }),
+  useHouseholdStore: () => mockHouseholdStore,
 }));
 
-import { render, screen, fireEvent } from '@testing-library/react-native';
+import { render, screen } from '@testing-library/react-native';
 import ProfileScreen from '../../app/(app)/(tabs)/profile';
 
 describe('ProfileScreen', () => {
+  beforeEach(() => {
+    // Reset to default no-household state
+    mockHouseholdStore.households = [];
+    mockHouseholdStore.activeHouseholdId = null;
+    mockHouseholdStore.members = [];
+    mockHouseholdStore.activeHousehold = () => null;
+  });
+
   it('renders user display name', () => {
     render(<ProfileScreen />);
     expect(screen.getByText('Test User')).toBeTruthy();
@@ -100,5 +134,39 @@ describe('ProfileScreen', () => {
   it('shows create household CTA when no household', () => {
     render(<ProfileScreen />);
     expect(screen.getByText('Create a Household')).toBeTruthy();
+  });
+
+  it('does not render App Settings section', () => {
+    render(<ProfileScreen />);
+    expect(screen.queryByText('App Settings')).toBeNull();
+    expect(screen.queryByText('Dark Mode')).toBeNull();
+  });
+
+  it('renders dietary search input', () => {
+    render(<ProfileScreen />);
+    expect(screen.getByTestId('dietary-search-mock')).toBeTruthy();
+  });
+
+  it('renders Invite Members row when household exists', () => {
+    const household = { id: 'h1', name: 'Test Kitchen', invite_code: 'abc', created_by: 'u1', created_at: '' };
+    mockHouseholdStore.households = [household];
+    mockHouseholdStore.activeHouseholdId = 'h1';
+    mockHouseholdStore.activeHousehold = () => household;
+    mockHouseholdStore.members = [
+      {
+        id: 'm1',
+        household_id: 'h1',
+        user_id: 'u1',
+        role: 'admin',
+        joined_at: '',
+        profiles: { id: 'u1', display_name: 'Chef Alice', avatar_url: null },
+      },
+    ];
+
+    render(<ProfileScreen />);
+    expect(screen.getByText('Invite Members')).toBeTruthy();
+    expect(screen.getByText('Test Kitchen')).toBeTruthy();
+    expect(screen.getByText('Chef Alice')).toBeTruthy();
+    expect(screen.getByText('1 member')).toBeTruthy();
   });
 });
