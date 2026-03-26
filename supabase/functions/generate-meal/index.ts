@@ -173,76 +173,43 @@ Deno.serve(async (req: Request) => {
 
     prompt += 'For each suggestion, provide the recipe name, a brief appetizing description (1-2 sentences), estimated cost in USD, estimated prep time in minutes, whether it uses leftovers, and which leftover items it uses.';
 
-    // Call OpenAI with structured output
-    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openaiApiKey) {
+    // Call Gemini API for meal suggestions
+    const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
+    if (!geminiApiKey) {
       return new Response(
-        JSON.stringify({ error: 'OpenAI API key not configured' }),
+        JSON.stringify({ error: 'Gemini API key not configured' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const modelName = Deno.env.get('OPENAI_MODEL') ?? 'gpt-4o-mini';
+    const modelName = Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.0-flash';
 
     // 25-second timeout to avoid Edge Function timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 25000);
 
-    let openaiResponse: Response;
+    const systemPrompt = 'You are a helpful home cooking assistant. Suggest practical, delicious dinner ideas based on the user\'s context. Return exactly 3 suggestions as a JSON object with a "suggestions" array. Each suggestion must have: name (string), description (string), estimated_cost (number or null), prep_time_minutes (number or null), uses_leftovers (boolean), leftover_items (array of strings).';
+
+    let geminiResponse: Response;
     try {
-      openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openaiApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        signal: controller.signal,
-        body: JSON.stringify({
-          model: modelName,
-          response_format: {
-            type: 'json_schema',
-            json_schema: {
-              name: 'meal_suggestions',
-              strict: true,
-              schema: {
-                type: 'object',
-                properties: {
-                  suggestions: {
-                    type: 'array',
-                    items: {
-                      type: 'object',
-                      properties: {
-                        name: { type: 'string' },
-                        description: { type: 'string' },
-                        estimated_cost: { type: ['number', 'null'] },
-                        prep_time_minutes: { type: ['number', 'null'] },
-                        uses_leftovers: { type: 'boolean' },
-                        leftover_items: { type: 'array', items: { type: 'string' } },
-                      },
-                      required: ['name', 'description', 'estimated_cost', 'prep_time_minutes', 'uses_leftovers', 'leftover_items'],
-                      additionalProperties: false,
-                    },
-                  },
-                },
-                required: ['suggestions'],
-                additionalProperties: false,
-              },
+      geminiResponse = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiApiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body: JSON.stringify({
+            contents: [
+              { role: 'user', parts: [{ text: systemPrompt + '\n\n' + prompt }] },
+            ],
+            generationConfig: {
+              temperature: 0.8,
+              maxOutputTokens: 1500,
+              responseMimeType: 'application/json',
             },
-          },
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a helpful home cooking assistant. Suggest practical, delicious dinner ideas based on the user\'s context. Return exactly 3 suggestions in the required JSON format.',
-            },
-            {
-              role: 'user',
-              content: prompt,
-            },
-          ],
-          temperature: 0.8,
-          max_tokens: 1500,
-        }),
-      });
+          }),
+        }
+      );
     } catch (fetchError: any) {
       if (fetchError.name === 'AbortError') {
         return new Response(
@@ -255,17 +222,17 @@ Deno.serve(async (req: Request) => {
       clearTimeout(timeoutId);
     }
 
-    if (!openaiResponse.ok) {
-      const errorText = await openaiResponse.text();
-      console.error('OpenAI API error:', errorText);
+    if (!geminiResponse.ok) {
+      const errorText = await geminiResponse.text();
+      console.error('Gemini API error:', errorText);
       return new Response(
         JSON.stringify({ error: 'Failed to generate meal suggestions. The AI service is temporarily unavailable.' }),
         { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const completion = await openaiResponse.json();
-    const content = completion.choices?.[0]?.message?.content;
+    const geminiResult = await geminiResponse.json();
+    const content = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!content) {
       return new Response(
@@ -291,7 +258,7 @@ Deno.serve(async (req: Request) => {
       household_id: household_id,
       prompt_context: promptContext,
       suggestions: suggestions,
-      tokens_used: completion.usage?.total_tokens ?? null,
+      tokens_used: geminiResult.usageMetadata?.totalTokenCount ?? null,
     });
 
     return new Response(
