@@ -411,8 +411,8 @@ const s = StyleSheet.create({
   hero: { position: 'relative', height: 360 },
   heroImage: { width: '100%', height: '100%' },
   heroGradient: {
-    position: 'absolute', bottom: 0, left: 0, right: 0, height: 160,
-    backgroundColor: colors.surface, opacity: 0.85,
+    position: 'absolute', bottom: 0, left: 0, right: 0, height: 80,
+    backgroundColor: colors.surface, opacity: 0.3,
   },
   headerBtn: {
     position: 'absolute', width: 40, height: 40, borderRadius: borderRadius.full,
@@ -545,9 +545,9 @@ const s = StyleSheet.create({
     borderTopWidth: 1, borderTopColor: colors.outlineVariant,
   },
   startCookingBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: spacing.sm, backgroundColor: colors.secondaryContainer, height: 56,
-    borderRadius: borderRadius.xl, paddingHorizontal: spacing.md, ...shadows.float,
+    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: spacing.sm, backgroundColor: colors.secondaryContainer, height: 52,
+    borderRadius: borderRadius.xl, paddingHorizontal: spacing.sm, ...shadows.float,
   },
   startCookingText: {
     fontFamily: fontFamily.headlineBold, fontWeight: '800', fontSize: 14,
@@ -555,15 +555,15 @@ const s = StyleSheet.create({
   },
   addToPlanBtn: {
     flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: spacing.sm, backgroundColor: colors.primary, height: 56,
-    borderRadius: borderRadius.xl, ...shadows.float,
+    gap: spacing.sm, backgroundColor: colors.primary, height: 52,
+    borderRadius: borderRadius.xl, paddingHorizontal: spacing.sm, ...shadows.float,
   },
   addToPlanText: {
     fontFamily: fontFamily.headlineBold, fontWeight: '800', fontSize: 14,
     color: colors.onPrimary, textTransform: 'uppercase', letterSpacing: 1.5,
   },
   favButton: {
-    width: 56, height: 56, borderRadius: borderRadius.xl,
+    width: 48, height: 48, borderRadius: borderRadius.xl,
     backgroundColor: colors.surfaceContainerLowest, borderWidth: 1, borderColor: colors.outlineVariant,
     alignItems: 'center', justifyContent: 'center', ...shadows.editorial,
   },
