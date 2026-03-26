@@ -182,7 +182,7 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const modelName = Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.0-flash';
+    const modelName = Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.5-flash';
 
     // 25-second timeout to avoid Edge Function timeout
     const controller = new AbortController();
