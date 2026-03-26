@@ -22,6 +22,7 @@ interface ButtonProps extends Omit<PressableProps, 'children'> {
   loading?: boolean;
   disabled?: boolean;
   children: React.ReactNode;
+  testID?: string;
 }
 
 const sizeStyles: Record<ButtonSize, { container: ViewStyle; text: TextStyle }> = {
@@ -74,6 +75,7 @@ export function Button({
   disabled = false,
   children,
   style,
+  testID,
   ...rest
 }: ButtonProps) {
   const variantStyle = variantStyles[variant];
@@ -91,6 +93,7 @@ export function Button({
         style as ViewStyle,
       ]}
       disabled={isDisabled}
+      testID={testID}
       {...rest}
     >
       {loading ? (

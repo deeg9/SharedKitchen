@@ -163,6 +163,7 @@ export function MealGeneratorSheet({
             <Pressable
               style={({ pressed }) => [styles.tryNewButton, pressed && styles.tryNewButtonPressed]}
               onPress={handleTryNew}
+              testID="meal-generator-try-new"
             >
               <MaterialCommunityIcons name="refresh" size={18} color={colors.primary} />
               <Text style={styles.tryNewText}>Try New Suggestions</Text>

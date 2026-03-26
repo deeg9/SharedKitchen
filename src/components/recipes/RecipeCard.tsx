@@ -22,7 +22,7 @@ export function RecipeCard({ recipe, isFavorite = false }: RecipeCardProps) {
   };
 
   return (
-    <Pressable onPress={handlePress} style={styles.pressable}>
+    <Pressable onPress={handlePress} style={styles.pressable} testID={`recipe-card-${recipe.id}`}>
       <Card variant="elevated" style={styles.card}>
         {/* Image */}
         <View style={styles.imageContainer}>

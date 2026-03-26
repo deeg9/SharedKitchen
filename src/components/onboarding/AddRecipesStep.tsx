@@ -138,6 +138,7 @@ export function AddRecipesStep() {
           ]}
           onPress={nextStep}
           disabled={!canContinue}
+          testID="onboarding-recipes-continue"
         >
           <Text style={styles.continueText}>Continue</Text>
         </Pressable>

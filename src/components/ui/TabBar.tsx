@@ -33,6 +33,7 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
       ]}
     >
       {state.routes.map((route, index) => {
+        const { options } = descriptors[route.key];
         const isFocused = state.index === index;
         const config = TAB_CONFIG[route.name] ?? {
           icon: 'circle' as IconName,
@@ -64,6 +65,7 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             accessibilityRole="button"
             accessibilityState={isFocused ? { selected: true } : {}}
             accessibilityLabel={config.label}
+            testID={options.tabBarTestID ?? `${route.name}-tab`}
             onPress={onPress}
             onLongPress={onLongPress}
             style={styles.tab}

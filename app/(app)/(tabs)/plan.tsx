@@ -178,6 +178,7 @@ export default function PlanScreen() {
       <Pressable
         style={styles.fab}
         onPress={() => setSurpriseVisible(true)}
+        testID="plan-surprise-me"
       >
         <MaterialCommunityIcons name="dice-multiple" size={24} color={colors.onPrimary} />
         <Text style={styles.fabText}>Surprise Me</Text>

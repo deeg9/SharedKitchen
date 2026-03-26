@@ -16,6 +16,7 @@ interface InputProps extends Omit<TextInputProps, 'style'> {
   value: string;
   onChangeText: (text: string) => void;
   error?: string;
+  testID?: string;
 }
 
 export function Input({
@@ -24,6 +25,7 @@ export function Input({
   value,
   onChangeText,
   error,
+  testID,
   ...rest
 }: InputProps) {
   const [isFocused, setIsFocused] = useState(false);
@@ -45,6 +47,7 @@ export function Input({
         onChangeText={onChangeText}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
+        testID={testID}
         {...rest}
       />
       {error && <Text style={styles.error}>{error}</Text>}

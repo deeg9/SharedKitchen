@@ -76,12 +76,13 @@ export function UpgradePrompt({ visible, onDismiss, feature }: UpgradePromptProp
           onPress={handleUpgrade}
           disabled={loading}
           style={styles.upgradeButton}
+          testID="upgrade-prompt-button"
         >
           {loading ? <ActivityIndicator size={18} color="#ffffff" /> : 'Upgrade to Premium'}
         </Button>
 
         {/* Maybe Later */}
-        <Pressable onPress={onDismiss} style={styles.laterButton}>
+        <Pressable onPress={onDismiss} style={styles.laterButton} testID="upgrade-prompt-later">
           <Text style={styles.laterText}>Maybe Later</Text>
         </Pressable>
       </View>

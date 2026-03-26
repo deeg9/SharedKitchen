@@ -51,6 +51,7 @@ export default function RecipesScreen() {
       <Pressable
         onPress={() => setShowGenerator(true)}
         style={[styles.generatorFab, { bottom: TAB_BAR_HEIGHT + spacing.md + 72 }]}
+        testID="recipe-generator-button"
       >
         <MaterialCommunityIcons name="chef-hat" size={24} color={colors.onSecondaryContainer} />
       </Pressable>
@@ -59,6 +60,7 @@ export default function RecipesScreen() {
       <Pressable
         onPress={() => router.push('/recipe/add')}
         style={[styles.fab, { bottom: TAB_BAR_HEIGHT + spacing.md }]}
+        testID="recipe-add-button"
       >
         <MaterialCommunityIcons name="plus" size={28} color={colors.onPrimary} />
       </Pressable>

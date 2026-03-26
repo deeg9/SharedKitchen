@@ -107,6 +107,7 @@ export function AddExpenseSheet({ isOpen, onClose, householdId }: AddExpenseShee
           disabled={!isValid}
           loading={submitting}
           style={styles.submitButton}
+          testID="budget-expense-submit"
         >
           Add Expense
         </Button>

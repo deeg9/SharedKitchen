@@ -193,6 +193,7 @@ export function RecipeForm({ onSubmit, loading = false, initialData }: RecipeFor
             placeholderTextColor={colors.outlineVariant}
             value={name}
             onChangeText={setName}
+            testID="recipe-form-name-input"
           />
           {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
         </View>
@@ -424,6 +425,7 @@ export function RecipeForm({ onSubmit, loading = false, initialData }: RecipeFor
           onPress={handleSubmit}
           disabled={loading}
           style={[styles.saveButton, loading && styles.saveButtonDisabled]}
+          testID="recipe-form-save-button"
         >
           <MaterialCommunityIcons name="check-circle" size={24} color={colors.onPrimary} />
           <Text style={styles.saveButtonText}>

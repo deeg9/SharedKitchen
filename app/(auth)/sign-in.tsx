@@ -120,6 +120,7 @@ export default function SignInScreen() {
             autoCapitalize="none"
             keyboardType="email-address"
             autoComplete="email"
+            testID="sign-in-email-input"
           />
           <TextInput
             style={styles.input}
@@ -128,12 +129,14 @@ export default function SignInScreen() {
             onChangeText={setPassword}
             secureTextEntry
             autoComplete="password"
+            testID="sign-in-password-input"
           />
 
           <TouchableOpacity
             style={[styles.button, styles.primaryButton]}
             onPress={handleSignIn}
             disabled={loading}
+            testID="sign-in-submit-button"
           >
             {loading ? (
               <ActivityIndicator color={colors.onPrimary} />
@@ -152,6 +155,7 @@ export default function SignInScreen() {
             style={[styles.button, styles.googleButton]}
             onPress={handleGoogleSignIn}
             disabled={loading}
+            testID="sign-in-google-button"
           >
             <Text style={styles.googleButtonText}>Sign in with Google</Text>
           </TouchableOpacity>
@@ -160,7 +164,7 @@ export default function SignInScreen() {
         <View style={styles.footer}>
           <Text style={styles.footerText}>Don't have an account? </Text>
           <Link href="/(auth)/sign-up" asChild>
-            <TouchableOpacity>
+            <TouchableOpacity testID="sign-in-signup-link">
               <Text style={styles.linkText}>Sign Up</Text>
             </TouchableOpacity>
           </Link>

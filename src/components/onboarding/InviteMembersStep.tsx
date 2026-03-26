@@ -62,6 +62,7 @@ export function InviteMembersStep() {
           <Pressable
             style={({ pressed }) => [styles.shareButton, pressed && styles.pressed]}
             onPress={handleShare}
+            testID="onboarding-invite-share"
           >
             <MaterialCommunityIcons name="message-text-outline" size={20} color={colors.onPrimary} />
             <Text style={styles.shareText}>Share via Text</Text>
@@ -89,7 +90,7 @@ export function InviteMembersStep() {
       </View>
 
       <View style={styles.footer}>
-        <Pressable onPress={nextStep} style={styles.skipLink}>
+        <Pressable onPress={nextStep} style={styles.skipLink} testID="onboarding-invite-skip">
           <Text style={styles.skipText}>Skip for now</Text>
         </Pressable>
       </View>

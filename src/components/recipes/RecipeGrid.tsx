@@ -55,6 +55,7 @@ export function RecipeGrid({ favorites }: RecipeGridProps) {
         placeholder="Search recipes..."
         value={searchQuery}
         onChangeText={setSearchQuery}
+        testID="recipe-search-input"
       />
 
       {/* Filter dropdowns */}

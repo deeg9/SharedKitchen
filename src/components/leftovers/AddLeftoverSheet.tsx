@@ -136,6 +136,7 @@ export function AddLeftoverSheet({ isOpen, onClose, householdId }: AddLeftoverSh
           loading={submitting}
           disabled={!isValid}
           style={styles.submitButton}
+          testID="leftovers-submit-button"
         >
           Add Leftover
         </Button>

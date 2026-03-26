@@ -81,6 +81,7 @@ export function CookingTimer({ durationSeconds, label, onComplete }: CookingTime
           accessibilityLabel={
             isComplete ? 'Reset timer' : isRunning ? 'Pause timer' : `Start timer, ${label}`
           }
+          testID={isRunning ? 'cooking-timer-pause' : 'cooking-timer-start'}
         >
           <MaterialCommunityIcons
             name={isComplete ? 'refresh' : isRunning ? 'pause' : 'play'}

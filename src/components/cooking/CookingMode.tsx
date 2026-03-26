@@ -155,6 +155,7 @@ export function CookingMode({ recipe, onClose }: CookingModeProps) {
             disabled={currentStep === 0}
             accessibilityRole="button"
             accessibilityLabel="Previous step"
+            testID="cooking-prev-step"
           >
             <MaterialCommunityIcons
               name="chevron-left"
@@ -169,6 +170,7 @@ export function CookingMode({ recipe, onClose }: CookingModeProps) {
               style={s.doneBtn}
               accessibilityRole="button"
               accessibilityLabel="Done cooking"
+              testID="cooking-done-button"
             >
               <Text style={s.doneBtnText}>Done Cooking</Text>
             </Pressable>
@@ -178,6 +180,7 @@ export function CookingMode({ recipe, onClose }: CookingModeProps) {
               style={s.navBtn}
               accessibilityRole="button"
               accessibilityLabel="Next step"
+              testID="cooking-next-step"
             >
               <MaterialCommunityIcons
                 name="chevron-right"

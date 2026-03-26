@@ -146,6 +146,7 @@ export function AllSetStep() {
         <Pressable
           style={({ pressed }) => [styles.goButton, pressed && styles.pressed]}
           onPress={handleFinish}
+          testID="onboarding-allset-done"
         >
           <Text style={styles.goText}>Go to my kitchen</Text>
           <MaterialCommunityIcons name="arrow-right" size={20} color={colors.onPrimary} />

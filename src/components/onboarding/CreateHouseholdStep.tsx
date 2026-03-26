@@ -63,6 +63,7 @@ export function CreateHouseholdStep() {
           onChangeText={setName}
           error={error ?? undefined}
           autoFocus
+          testID="onboarding-household-name-input"
         />
 
         <View style={styles.infoBanner}>
@@ -82,6 +83,7 @@ export function CreateHouseholdStep() {
           ]}
           onPress={handleNext}
           disabled={!isValid || loading}
+          testID="onboarding-household-continue"
         >
           {loading ? (
             <ActivityIndicator color={colors.onPrimary} size="small" />

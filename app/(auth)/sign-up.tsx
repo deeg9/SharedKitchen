@@ -78,6 +78,7 @@ export default function SignUpScreen() {
             autoCapitalize="none"
             keyboardType="email-address"
             autoComplete="email"
+            testID="sign-up-email-input"
           />
           <TextInput
             style={styles.input}
@@ -86,6 +87,7 @@ export default function SignUpScreen() {
             onChangeText={setPassword}
             secureTextEntry
             autoComplete="new-password"
+            testID="sign-up-password-input"
           />
           <TextInput
             style={styles.input}
@@ -94,12 +96,14 @@ export default function SignUpScreen() {
             onChangeText={setConfirmPassword}
             secureTextEntry
             autoComplete="new-password"
+            testID="sign-up-confirm-password-input"
           />
 
           <TouchableOpacity
             style={[styles.button, styles.primaryButton]}
             onPress={handleSignUp}
             disabled={loading}
+            testID="sign-up-submit-button"
           >
             {loading ? (
               <ActivityIndicator color={colors.onPrimary} />
@@ -112,7 +116,7 @@ export default function SignUpScreen() {
         <View style={styles.footer}>
           <Text style={styles.footerText}>Already have an account? </Text>
           <Link href="/(auth)/sign-in" asChild>
-            <TouchableOpacity>
+            <TouchableOpacity testID="sign-up-signin-link">
               <Text style={styles.linkText}>Sign In</Text>
             </TouchableOpacity>
           </Link>

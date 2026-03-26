@@ -114,6 +114,7 @@ export function PlanWeekStep() {
         <Pressable
           style={({ pressed }) => [styles.confirmButton, pressed && styles.pressed]}
           onPress={handleConfirm}
+          testID="onboarding-plan-continue"
         >
           <Text style={styles.confirmText}>Looks good!</Text>
         </Pressable>

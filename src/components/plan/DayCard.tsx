@@ -166,7 +166,7 @@ export function DaySection({ date, meals, isToday, onMealPress }: DaySectionProp
   const label = formatDayLabel(date);
 
   return (
-    <View style={sectionStyles.container}>
+    <View style={sectionStyles.container} testID={`plan-day-${label.weekday}`}>
       <View style={sectionStyles.row}>
         {/* Date header */}
         <View style={sectionStyles.dateCol}>

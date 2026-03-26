@@ -24,7 +24,7 @@ export function WeekHeader({
 
   return (
     <View style={styles.container}>
-      <Pressable onPress={onPrevWeek} style={styles.arrow} hitSlop={12}>
+      <Pressable onPress={onPrevWeek} style={styles.arrow} hitSlop={12} testID="week-header-prev">
         <MaterialCommunityIcons
           name="chevron-left"
           size={28}
@@ -35,13 +35,13 @@ export function WeekHeader({
       <View style={styles.center}>
         <Text style={styles.label}>{weekLabel}</Text>
         {!isCurrentWeek && (
-          <Pressable onPress={onToday} style={styles.todayPill}>
+          <Pressable onPress={onToday} style={styles.todayPill} testID="week-header-today">
             <Text style={styles.todayText}>Today</Text>
           </Pressable>
         )}
       </View>
 
-      <Pressable onPress={onNextWeek} style={styles.arrow} hitSlop={12}>
+      <Pressable onPress={onNextWeek} style={styles.arrow} hitSlop={12} testID="week-header-next">
         <MaterialCommunityIcons
           name="chevron-right"
           size={28}

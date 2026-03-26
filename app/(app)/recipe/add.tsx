@@ -161,6 +161,7 @@ export default function AddRecipeScreen() {
             autoCorrect={false}
             keyboardType="url"
             editable={!importing}
+            testID="recipe-import-url-input"
           />
           <Button
             variant="secondary"
@@ -168,6 +169,7 @@ export default function AddRecipeScreen() {
             onPress={handleImport}
             loading={importing}
             disabled={importing}
+            testID="recipe-import-button"
           >
             Import
           </Button>

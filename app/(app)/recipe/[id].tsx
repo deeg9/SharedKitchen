@@ -342,6 +342,7 @@ export default function RecipeDetailScreen() {
               value={noteText}
               onChangeText={setNoteText}
               onSubmitEditing={handleAddNote}
+              testID="recipe-detail-note-input"
             />
           </View>
         </View>
@@ -364,16 +365,17 @@ export default function RecipeDetailScreen() {
           <Pressable
             onPress={() => router.push(`/recipe/cook/${id}`)}
             style={s.startCookingBtn}
+            testID="recipe-detail-cook-button"
           >
             <MaterialCommunityIcons name="pot-steam" size={22} color={colors.onSecondary} />
             <Text style={s.startCookingText}>Start Cooking</Text>
           </Pressable>
         )}
-        <Pressable onPress={() => setShowPlanSheet(true)} style={s.addToPlanBtn}>
+        <Pressable onPress={() => setShowPlanSheet(true)} style={s.addToPlanBtn} testID="recipe-detail-add-to-plan">
           <MaterialCommunityIcons name="calendar-plus" size={22} color={colors.onPrimary} />
           <Text style={s.addToPlanText}>Add to Plan</Text>
         </Pressable>
-        <Pressable onPress={handleFavorite} style={s.favButton}>
+        <Pressable onPress={handleFavorite} style={s.favButton} testID="recipe-detail-favorite-button">
           <MaterialCommunityIcons
             name={isFavorite ? 'heart' : 'heart-outline'}
             size={28}

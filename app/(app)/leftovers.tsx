@@ -101,6 +101,7 @@ export default function LeftoversScreen() {
       <Pressable
         style={styles.fab}
         onPress={() => setAddSheetOpen(true)}
+        testID="leftovers-add-button"
       >
         <MaterialCommunityIcons name="plus" size={24} color={colors.onPrimary} />
       </Pressable>

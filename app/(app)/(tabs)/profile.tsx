@@ -194,6 +194,7 @@ export default function ProfileScreen() {
             size="sm"
             onPress={() => router.push('/(app)/edit-profile')}
             style={{ marginTop: spacing.md }}
+            testID="profile-edit-button"
           >
             Edit Profile
           </Button>
@@ -283,7 +284,7 @@ export default function ProfileScreen() {
         {/* Subscription */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Subscription</Text>
-          <Pressable onPress={() => router.push('/(app)/subscription' as any)}>
+          <Pressable onPress={() => router.push('/(app)/subscription' as any)} testID="profile-subscription-link">
             <Card variant="filled" style={styles.subscriptionCard}>
               <View style={styles.subscriptionRow}>
                 <MaterialCommunityIcons
@@ -388,6 +389,7 @@ export default function ProfileScreen() {
             loading={signingOut}
             onPress={handleSignOut}
             style={styles.signOutButton}
+            testID="profile-sign-out-button"
           >
             <Text style={styles.signOutText}>Sign Out</Text>
           </Button>

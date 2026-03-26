@@ -168,6 +168,7 @@ export function PlanEditSheet({
           placeholderTextColor={colors.outlineVariant}
           value={search}
           onChangeText={setSearch}
+          testID="plan-edit-search-input"
         />
         <FlatList
           data={filteredRecipes}
@@ -214,7 +215,7 @@ export function PlanEditSheet({
 
         {/* Actions */}
         <View style={styles.actions}>
-          <Button variant="primary" onPress={handleSave} loading={saving} disabled={!selectedRecipeId}>
+          <Button variant="primary" onPress={handleSave} loading={saving} disabled={!selectedRecipeId} testID="plan-edit-save">
             Save
           </Button>
           {existingPlan && (

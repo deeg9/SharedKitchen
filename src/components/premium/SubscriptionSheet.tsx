@@ -124,6 +124,7 @@ export function SubscriptionSheet() {
           onPress={handleManageSubscription}
           disabled={portalLoading}
           style={styles.manageButton}
+          testID="subscription-manage-button"
         >
           {portalLoading ? <ActivityIndicator size="small" color={colors.primary} /> : 'Manage Subscription'}
         </Button>
@@ -188,6 +189,7 @@ export function SubscriptionSheet() {
         onPress={handleUpgrade}
         disabled={checkoutLoading}
         style={styles.upgradeButton}
+        testID="subscription-upgrade-button"
       >
         {checkoutLoading ? <ActivityIndicator size={18} color="#ffffff" /> : 'Upgrade to Premium'}
       </Button>

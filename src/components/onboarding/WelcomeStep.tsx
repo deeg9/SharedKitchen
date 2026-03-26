@@ -40,6 +40,7 @@ export function WelcomeStep() {
             pressed && styles.pressed,
           ]}
           onPress={nextStep}
+          testID="onboarding-welcome-continue"
         >
           <Text style={styles.continueText}>Continue</Text>
           <MaterialCommunityIcons
@@ -52,6 +53,7 @@ export function WelcomeStep() {
         <Pressable
           onPress={() => router.push('/(auth)/sign-in')}
           style={styles.signInLink}
+          testID="onboarding-welcome-signin"
         >
           <Text style={styles.signInText}>
             Already have an account?{' '}

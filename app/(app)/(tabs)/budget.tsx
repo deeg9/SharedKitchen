@@ -86,6 +86,7 @@ export default function BudgetScreen() {
               }
             }}
             style={styles.trendsButton}
+            testID="budget-trends-button"
           >
             <MaterialCommunityIcons name="chart-line" size={20} color={colors.primary} />
             <Text style={styles.trendsText}>Trends</Text>
@@ -132,6 +133,7 @@ export default function BudgetScreen() {
       <Pressable
         style={styles.fab}
         onPress={() => setSheetOpen(true)}
+        testID="budget-add-expense-button"
       >
         <MaterialCommunityIcons name="plus" size={28} color={colors.onPrimary} />
       </Pressable>

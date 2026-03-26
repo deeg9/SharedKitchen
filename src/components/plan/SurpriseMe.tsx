@@ -175,6 +175,7 @@ export function SurpriseMe({
                 <Pressable
                   onPress={generateSuggestions}
                   style={styles.shuffleButton}
+                  testID="plan-surprise-shuffle"
                 >
                   <MaterialCommunityIcons
                     name="shuffle-variant"
