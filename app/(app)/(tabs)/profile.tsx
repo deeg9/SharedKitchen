@@ -19,6 +19,7 @@ import { colors } from '../../../src/theme/colors';
 import { typography } from '../../../src/theme/typography';
 import { spacing, borderRadius } from '../../../src/theme/spacing';
 import { TAB_BAR_HEIGHT } from '../../../src/lib/constants';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { requestPermission, NotificationSettings } from '../../../src/lib/notifications';
 
 const DIETARY_OPTIONS = [
@@ -31,6 +32,7 @@ const DIETARY_OPTIONS = [
 ];
 
 export default function ProfileScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const { user, signOut, loading: authLoading } = useAuthStore();
   const {
@@ -166,7 +168,7 @@ export default function ProfileScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.content,
-          { paddingBottom: TAB_BAR_HEIGHT + 32 },
+          { paddingTop: insets.top + spacing.lg, paddingBottom: TAB_BAR_HEIGHT + 32 },
         ]}
         showsVerticalScrollIndicator={false}
       >
