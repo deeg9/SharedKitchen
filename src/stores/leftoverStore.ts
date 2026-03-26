@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { Leftover } from '../types/database';
 import { scheduleLeftoverAlerts, cancelLeftoverAlerts } from '../lib/notifications';
+import { getErrorMessage } from '../lib/errors';
 
 export type FreshnessStatus = 'Fresh' | 'Use Soon' | 'Expired' | 'Frozen';
 
@@ -100,8 +101,8 @@ export const useLeftoverStore = create<LeftoverState>((set, get) => ({
       if (error) throw error;
 
       set({ leftovers: (data as Leftover[]) ?? [], loading: false });
-    } catch (error: any) {
-      set({ loading: false, error: error.message ?? 'Failed to fetch leftovers' });
+    } catch (error: unknown) {
+      set({ loading: false, error: getErrorMessage(error) });
     }
   },
 
@@ -138,8 +139,8 @@ export const useLeftoverStore = create<LeftoverState>((set, get) => ({
           await scheduleLeftoverAlerts(leftover.id, data.name, data.use_by_date);
         } catch {}
       }
-    } catch (error: any) {
-      set({ error: error.message ?? 'Failed to add leftover' });
+    } catch (error: unknown) {
+      set({ error: getErrorMessage(error) });
     }
   },
 

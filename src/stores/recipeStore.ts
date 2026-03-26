@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import {
-  Database,
   Ingredient,
   Recipe,
   RecipeInsert,
@@ -9,6 +8,7 @@ import {
   RecipeRating,
   RecipeNote,
 } from '../types/database';
+import { getErrorMessage } from '../lib/errors';
 
 interface RecipeState {
   recipes: Recipe[];
@@ -113,8 +113,8 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
       if (error) throw error;
 
       set({ recipes: (data as Recipe[]) ?? [], loading: false });
-    } catch (error: any) {
-      set({ loading: false, error: error.message ?? 'Failed to fetch recipes' });
+    } catch (error: unknown) {
+      set({ loading: false, error: getErrorMessage(error) });
     }
   },
 
@@ -135,8 +135,8 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
         loading: false,
       }));
       return created;
-    } catch (error: any) {
-      set({ loading: false, error: error.message ?? 'Failed to create recipe' });
+    } catch (error: unknown) {
+      set({ loading: false, error: getErrorMessage(error) });
       return null;
     }
   },
@@ -161,8 +161,8 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
             : state.selectedRecipe,
         loading: false,
       }));
-    } catch (error: any) {
-      set({ loading: false, error: error.message ?? 'Failed to update recipe' });
+    } catch (error: unknown) {
+      set({ loading: false, error: getErrorMessage(error) });
     }
   },
 
@@ -180,8 +180,8 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
         recipes: state.recipes.filter((r) => r.id !== id),
         loading: false,
       }));
-    } catch (error: any) {
-      set({ loading: false, error: error.message ?? 'Failed to delete recipe' });
+    } catch (error: unknown) {
+      set({ loading: false, error: getErrorMessage(error) });
     }
   },
 
@@ -219,8 +219,8 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
         notes: (notes as RecipeNote[]) ?? [],
         loading: false,
       });
-    } catch (error: any) {
-      set({ loading: false, error: error.message ?? 'Failed to fetch recipe detail' });
+    } catch (error: unknown) {
+      set({ loading: false, error: getErrorMessage(error) });
     }
   },
 
@@ -272,8 +272,8 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
         }
         return { ratings: [...state.ratings, data as RecipeRating] };
       });
-    } catch (error: any) {
-      set({ error: error.message ?? 'Failed to toggle favorite' });
+    } catch (error: unknown) {
+      set({ error: getErrorMessage(error) });
     }
   },
 
@@ -305,8 +305,8 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
         }
         return { ratings: [...state.ratings, data as RecipeRating] };
       });
-    } catch (error: any) {
-      set({ error: error.message ?? 'Failed to rate recipe' });
+    } catch (error: unknown) {
+      set({ error: getErrorMessage(error) });
     }
   },
 
@@ -323,8 +323,8 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
       set((state) => ({
         notes: [...state.notes, data as RecipeNote],
       }));
-    } catch (error: any) {
-      set({ error: error.message ?? 'Failed to add note' });
+    } catch (error: unknown) {
+      set({ error: getErrorMessage(error) });
     }
   },
 
@@ -339,8 +339,8 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
       if (error) throw error;
 
       set({ notes: (data as RecipeNote[]) ?? [] });
-    } catch (error: any) {
-      set({ error: error.message ?? 'Failed to fetch notes' });
+    } catch (error: unknown) {
+      set({ error: getErrorMessage(error) });
     }
   },
 }));

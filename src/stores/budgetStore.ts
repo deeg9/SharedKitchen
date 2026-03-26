@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { Expense } from '../types/database';
 import { checkBudgetThreshold } from '../lib/notifications';
+import { getErrorMessage } from '../lib/errors';
 
 export type ExpenseCategory = 'Groceries' | 'Dining Out' | 'Takeout';
 
@@ -149,7 +150,6 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
   weeklyBreakdown: () => {
     const { expenses, selectedMonth, budgetTarget } = get();
     const weeks = getWeeksOfMonth(selectedMonth);
-    const weeklyAvg = budgetTarget / weeks.length;
 
     return weeks.map((week) => {
       const weekExpenses = expenses.filter((e) => {
@@ -192,8 +192,8 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
       if (error) throw error;
 
       set({ expenses: (data as Expense[]) ?? [], loading: false });
-    } catch (error: any) {
-      set({ loading: false, error: error.message ?? 'Failed to fetch expenses' });
+    } catch (error: unknown) {
+      set({ loading: false, error: getErrorMessage(error) });
     }
   },
 
@@ -227,8 +227,8 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
       try {
         await checkBudgetThreshold(monthlyTotal(), budgetTarget, 'Your Household');
       } catch {}
-    } catch (error: any) {
-      set({ error: error.message ?? 'Failed to add expense' });
+    } catch (error: unknown) {
+      set({ error: getErrorMessage(error) });
     }
   },
 
@@ -251,8 +251,8 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
       if (data) {
         set({ budgetTarget: Number(data.monthly_target) });
       }
-    } catch (error: any) {
-      set({ error: error.message ?? 'Failed to fetch budget target' });
+    } catch (error: unknown) {
+      set({ error: getErrorMessage(error) });
     }
   },
 
@@ -274,8 +274,8 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
       if (error) throw error;
 
       set({ budgetTarget: Number(data.monthly_target) });
-    } catch (error: any) {
-      set({ error: error.message ?? 'Failed to set budget target' });
+    } catch (error: unknown) {
+      set({ error: getErrorMessage(error) });
     }
   },
 

@@ -47,8 +47,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
     try {
       await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
       set({ completed: true });
-    } catch (error) {
-      console.error('Failed to persist onboarding completion:', error);
+    } catch {
       // Still mark as completed in memory even if persistence fails
       set({ completed: true });
     }
@@ -58,8 +57,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
     try {
       const value = await AsyncStorage.getItem(ONBOARDING_KEY);
       set({ completed: value === 'true', initialized: true });
-    } catch (error) {
-      console.error('Failed to check onboarding status:', error);
+    } catch {
       set({ initialized: true });
     }
   },

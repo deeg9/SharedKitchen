@@ -4,6 +4,7 @@ import { getWeekDays, getWeekLabel, toDateString, makePlanKey } from '../lib/dat
 import { Recipe, Database, MealType } from '../types/database';
 import { scheduleCookingReminder, cancelNotification } from '../lib/notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getErrorMessage } from '../lib/errors';
 
 export type MealPlan = Database['public']['Tables']['meal_plans']['Row'];
 
@@ -66,16 +67,16 @@ export const usePlanStore = create<PlanState>((set, get) => ({
       if (error) throw error;
 
       const planMap = new Map<string, MealPlanWithRecipe>();
-      (data ?? []).forEach((entry: any) => {
+      (data ?? []).forEach((entry) => {
         // Default to 'dinner' if meal_type column doesn't exist yet
         const mealType = (entry.meal_type as MealType) || 'dinner';
-        entry.meal_type = mealType;
-        planMap.set(makePlanKey(entry.plan_date, mealType), entry as MealPlanWithRecipe);
+        const typed = { ...entry, meal_type: mealType } as MealPlanWithRecipe;
+        planMap.set(makePlanKey(typed.plan_date, mealType), typed);
       });
 
       set({ mealPlan: planMap, loading: false });
-    } catch (error: any) {
-      set({ loading: false, error: error.message ?? 'Failed to fetch meal plan' });
+    } catch (error: unknown) {
+      set({ loading: false, error: getErrorMessage(error) });
     }
   },
 
@@ -94,10 +95,10 @@ export const usePlanStore = create<PlanState>((set, get) => ({
       } = await supabase.auth.getUser();
 
       // Try with meal_type column; fall back to without if column doesn't exist yet
-      let data: any = null;
-      let error: any = null;
+      let data: MealPlanWithRecipe | null = null;
+      let error: { code?: string; message?: string } | null = null;
 
-      const payload: any = {
+      const payload: Record<string, unknown> = {
         household_id: householdId,
         recipe_id: recipeId,
         plan_date: date,
@@ -115,14 +116,14 @@ export const usePlanStore = create<PlanState>((set, get) => ({
 
       // Fallback: if meal_type column doesn't exist yet (PGRST204), retry without it
       if (error && (error.code === 'PGRST204' || error.message?.includes('meal_type'))) {
-        const { meal_type, ...fallbackPayload } = payload;
+        const { meal_type: _mt, ...fallbackPayload } = payload;
         ({ data, error } = await supabase
           .from('meal_plans')
           .upsert(fallbackPayload, { onConflict: 'household_id,plan_date' })
           .select('*, recipes(*)')
           .single());
         if (data) {
-          data.meal_type = mealType; // attach locally
+          (data as MealPlanWithRecipe).meal_type = mealType; // attach locally
         }
       }
 
@@ -150,8 +151,8 @@ export const usePlanStore = create<PlanState>((set, get) => ({
           }
         } catch {}
       }
-    } catch (error: any) {
-      set({ loading: false, error: error.message ?? 'Failed to assign recipe' });
+    } catch (error: unknown) {
+      set({ loading: false, error: getErrorMessage(error) });
     }
   },
 
@@ -192,8 +193,8 @@ export const usePlanStore = create<PlanState>((set, get) => ({
         newPlan.delete(makePlanKey(date, mealType));
         return { mealPlan: newPlan, loading: false };
       });
-    } catch (error: any) {
-      set({ loading: false, error: error.message ?? 'Failed to clear meal' });
+    } catch (error: unknown) {
+      set({ loading: false, error: getErrorMessage(error) });
     }
   },
 
@@ -209,8 +210,8 @@ export const usePlanStore = create<PlanState>((set, get) => ({
 
       const randomIndex = Math.floor(Math.random() * data.length);
       return data[randomIndex] as Recipe;
-    } catch (error: any) {
-      set({ error: error.message ?? 'Failed to get suggestion' });
+    } catch (error: unknown) {
+      set({ error: getErrorMessage(error) });
       return null;
     }
   },

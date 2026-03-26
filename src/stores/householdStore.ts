@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Crypto from 'expo-crypto';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/database';
+import { getErrorMessage } from '../lib/errors';
 
 type Household = Database['public']['Tables']['households']['Row'];
 type HouseholdMember = Database['public']['Tables']['household_members']['Row'];
@@ -55,8 +56,8 @@ export const useHouseholdStore = create<HouseholdState>((set, get) => ({
         set({ activeHouseholdId: savedId });
       }
       await get().fetchHouseholds();
-    } catch (error) {
-      console.error('Failed to initialize household store:', error);
+    } catch (error: unknown) {
+      set({ error: getErrorMessage(error) });
     }
   },
 
@@ -106,8 +107,8 @@ export const useHouseholdStore = create<HouseholdState>((set, get) => ({
         // Refresh members for the active household
         await get().fetchMembers(state.activeHouseholdId);
       }
-    } catch (error: any) {
-      set({ loading: false, error: error.message ?? 'Failed to fetch households' });
+    } catch (error: unknown) {
+      set({ loading: false, error: getErrorMessage(error) });
     }
   },
 
@@ -157,8 +158,8 @@ export const useHouseholdStore = create<HouseholdState>((set, get) => ({
 
       set({ loading: false });
       return household;
-    } catch (error: any) {
-      set({ loading: false, error: error.message ?? 'Failed to create household' });
+    } catch (error: unknown) {
+      set({ loading: false, error: getErrorMessage(error) });
       return null;
     }
   },
@@ -208,8 +209,8 @@ export const useHouseholdStore = create<HouseholdState>((set, get) => ({
 
       set({ loading: false });
       return household;
-    } catch (error: any) {
-      set({ loading: false, error: error.message ?? 'Failed to join household' });
+    } catch (error: unknown) {
+      set({ loading: false, error: getErrorMessage(error) });
       return null;
     }
   },
@@ -224,8 +225,8 @@ export const useHouseholdStore = create<HouseholdState>((set, get) => ({
       if (error) throw error;
 
       set({ members: (data as HouseholdMemberWithProfile[]) ?? [] });
-    } catch (error: any) {
-      console.error('Failed to fetch members:', error);
+    } catch (error: unknown) {
+      set({ error: getErrorMessage(error) });
     }
   },
 }));

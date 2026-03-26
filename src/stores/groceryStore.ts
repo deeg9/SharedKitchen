@@ -9,6 +9,7 @@ import {
   Ingredient,
 } from '../types/database';
 import { aggregateIngredients, computeSummary, groupBySection } from '../lib/grocery-utils';
+import { getErrorMessage } from '../lib/errors';
 
 interface RecipeWithIngredients {
   id: string;
@@ -140,8 +141,8 @@ export const useGroceryStore = create<GroceryState>((set, get) => ({
         activeListId: listId,
         loading: false,
       });
-    } catch (error: any) {
-      set({ loading: false, error: error.message ?? 'Failed to generate grocery list' });
+    } catch (error: unknown) {
+      set({ loading: false, error: getErrorMessage(error) });
     }
   },
 
@@ -177,8 +178,8 @@ export const useGroceryStore = create<GroceryState>((set, get) => ({
         activeListId: list.id,
         loading: false,
       });
-    } catch (error: any) {
-      set({ loading: false, error: error.message ?? 'Failed to fetch grocery list' });
+    } catch (error: unknown) {
+      set({ loading: false, error: getErrorMessage(error) });
     }
   },
 
@@ -243,8 +244,8 @@ export const useGroceryStore = create<GroceryState>((set, get) => ({
       set((state) => ({
         items: [...state.items, data as GroceryItem],
       }));
-    } catch (error: any) {
-      set({ error: error.message ?? 'Failed to add item' });
+    } catch (error: unknown) {
+      set({ error: getErrorMessage(error) });
     }
   },
 

@@ -55,7 +55,6 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
         .maybeSingle();
 
       if (error) {
-        console.error('Error fetching subscription:', error);
         set({ status: 'free', loading: false });
         return;
       }
