@@ -17,6 +17,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 import { supabase } from '../../src/lib/supabase';
 import { colors } from '../../src/theme/colors';
+import { AppLogo } from '../../src/components/ui/AppLogo';
 
 // Configure Google Sign-In (safe to call even without client IDs)
 try {
@@ -107,14 +108,18 @@ export default function SignInScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
-          <Text style={styles.title}>Welcome to SharedKitchen</Text>
-          <Text style={styles.subtitle}>Sign in to continue</Text>
+          <View style={styles.logoContainer}>
+            <AppLogo size={88} />
+          </View>
+          <Text style={styles.title}>SharedKitchen</Text>
+          <Text style={styles.subtitle}>Plan, cook, and share together</Text>
         </View>
 
         <View style={styles.form}>
           <TextInput
             style={styles.input}
             placeholder="Email"
+            placeholderTextColor={colors.outline}
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -125,6 +130,7 @@ export default function SignInScreen() {
           <TextInput
             style={styles.input}
             placeholder="Password"
+            placeholderTextColor={colors.outline}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -182,20 +188,27 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
-    padding: 24,
+    paddingHorizontal: 32,
+    paddingVertical: 24,
   },
   header: {
-    marginBottom: 32,
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  logoContainer: {
+    marginBottom: 16,
   },
   title: {
-    fontSize: 32,
-    fontWeight: '700',
+    fontSize: 28,
+    fontWeight: '800',
+    color: colors.primary,
+    textAlign: 'center',
     marginBottom: 8,
-    color: colors.onSurface,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 15,
     color: colors.onSurfaceVariant,
+    textAlign: 'center',
   },
   form: {
     marginBottom: 24,
@@ -207,10 +220,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 12,
     color: colors.onSurface,
+    borderWidth: 1,
+    borderColor: colors.outlineVariant,
   },
   button: {
-    borderRadius: 8,
-    padding: 16,
+    borderRadius: 12,
+    height: 52,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
@@ -239,6 +254,8 @@ const styles = StyleSheet.create({
   },
   googleButton: {
     backgroundColor: colors.surfaceContainerLow,
+    borderWidth: 1,
+    borderColor: colors.outlineVariant,
   },
   googleButtonText: {
     color: colors.onSurface,
@@ -253,7 +270,7 @@ const styles = StyleSheet.create({
     color: colors.onSurfaceVariant,
   },
   linkText: {
-    color: colors.primary,
+    color: colors.secondary,
     fontWeight: '600',
   },
 });
