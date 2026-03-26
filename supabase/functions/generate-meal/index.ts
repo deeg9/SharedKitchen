@@ -182,7 +182,7 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const modelName = Deno.env.get('OPENAI_MODEL') ?? 'gpt-5-mini';
+    const modelName = Deno.env.get('OPENAI_MODEL') ?? 'gpt-4o-mini';
 
     // 25-second timeout to avoid Edge Function timeout
     const controller = new AbortController();
