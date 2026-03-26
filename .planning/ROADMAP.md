@@ -74,7 +74,10 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Tapping "What should we cook" returns meal suggestion cards with cost/time/leftover badges — no error toasts or empty states
   2. Sign-in screen displays the SharedKitchen logo above the app title with a cohesive visual design matching the Culinary Curator design system
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 14-01-PLAN.md — Diagnose and fix generate-meal edge function deployment + secrets + client error handling
+- [ ] 14-02-PLAN.md — Create AppLogo component and redesign sign-in screen with branded styling
 **UI hint**: yes
 
 ### Phase 15: Profile & Settings
@@ -107,8 +110,8 @@ Plans:
 | 11. Stripe Test Mode E2E | v2.1 | 2/2 | Complete | 2026-03-26 |
 | 12. Code Quality Polish | v2.1 | 2/2 | Complete | 2026-03-26 |
 | 13. Layout & Safe Areas | v2.2 | 0/2 | Planning | - |
-| 14. Edge Function & Auth Polish | v2.2 | 0/0 | Not started | - |
+| 14. Edge Function & Auth Polish | v2.2 | 0/2 | Planning | - |
 | 15. Profile & Settings | v2.2 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-03-26 after Phase 13 planning*
+*Last updated: 2026-03-26 after Phase 14 planning*
