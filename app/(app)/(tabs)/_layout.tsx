@@ -1,7 +1,10 @@
 import { Tabs } from 'expo-router';
 import { TabBar } from '../../../src/components/ui/TabBar';
+import { useKitchenDataSync } from '../../../src/hooks/useKitchenDataSync';
 
 export default function TabsLayout() {
+  useKitchenDataSync();
+
   return (
     <Tabs
       tabBar={(props) => <TabBar {...props} />}

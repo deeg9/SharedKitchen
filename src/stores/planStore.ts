@@ -35,6 +35,7 @@ interface PlanState {
   ) => Promise<void>;
   clearMeal: (householdId: string, date: string, mealType: MealType) => Promise<void>;
   getRandomSuggestion: (householdId: string) => Promise<Recipe | null>;
+  clear: () => void;
 }
 
 export const usePlanStore = create<PlanState>((set, get) => ({
@@ -197,6 +198,8 @@ export const usePlanStore = create<PlanState>((set, get) => ({
       set({ loading: false, error: getErrorMessage(error) });
     }
   },
+
+  clear: () => set({ mealPlan: new Map(), loading: false, error: null, weekOffset: 0 }),
 
   getRandomSuggestion: async (householdId: string) => {
     try {
