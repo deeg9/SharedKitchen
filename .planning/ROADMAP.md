@@ -2,12 +2,13 @@
 
 ## Overview
 
-Mise delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP. v2.0 (Phases 5-9) added Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and E2E testing.
+Mise delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP. v2.0 (Phases 5-9) added Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and E2E testing. v2.1 (Phases 10-12) adds recipe discovery filters, completes Stripe test mode E2E, and polishes code quality.
 
 ## Milestones
 
 - ✅ **v1.0 MVP** — Phases 1-4 (shipped 2026-03-23) — [Archive](milestones/v1.0-ROADMAP.md)
 - ✅ **v2.0 AI, Payments & Polish** — Phases 5-9 (shipped 2026-03-26) — [Archive](milestones/v2.0-ROADMAP.md)
+- 🔄 **v2.1 Discovery, Checkout & Polish** — Phases 10-12
 
 ## Phases
 
@@ -32,6 +33,15 @@ Mise delivers a collaborative dinner planning app for households. v1.0 (Phases 1
 
 </details>
 
+### v2.1 Discovery, Checkout & Polish (Phases 10-12)
+
+- [ ] Phase 10: Recipe Discovery (est. 2 plans) — Commit FilterBar, add category picker to recipe create/edit forms, verify filtering
+  - DISC-01, DISC-02, DISC-03, DISC-04, DISC-05
+- [ ] Phase 11: Stripe Test Mode E2E (est. 1 plan) — Document env vars, verify full checkout→webhook→subscription flow
+  - PAY-01, PAY-02, PAY-03, PAY-04, PAY-05
+- [ ] Phase 12: Code Quality Polish (est. 2 plans) — Error boundaries, TypeScript fixes, console cleanup, empty states
+  - QUAL-01, QUAL-02, QUAL-03, QUAL-04, QUAL-05
+
 ## Progress
 
 | Phase | Milestone | Plans | Status | Completed |
@@ -45,6 +55,9 @@ Mise delivers a collaborative dinner planning app for households. v1.0 (Phases 1
 | 7. Real-Time Presence | v2.0 | 2/2 | Complete | 2026-03-25 |
 | 8. Enhanced AI & Cooking Mode | v2.0 | 3/3 | Complete | 2026-03-26 |
 | 9. E2E Testing | v2.0 | 3/3 | Complete | 2026-03-26 |
+| 10. Recipe Discovery | v2.1 | 0/2 | Pending | — |
+| 11. Stripe Test Mode E2E | v2.1 | 0/1 | Pending | — |
+| 12. Code Quality Polish | v2.1 | 0/2 | Pending | — |
 
 ---
-*Last updated: 2026-03-26 after v2.0 milestone complete*
+*Last updated: 2026-03-25 after v2.1 milestone init*
