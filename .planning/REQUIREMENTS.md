@@ -1,69 +1,64 @@
-# Requirements: Mise v2.1
+# Requirements: SharedKitchen v2.2 — UI Polish & Bug Fixes
 
-**Defined:** 2026-03-25
+**Defined:** 2026-03-26
 **Core Value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
+**Goal:** Fix visual bugs, layout issues, and broken features discovered during device testing
 
-## v2.1 Requirements
+## v2.2 Requirements
 
-### Recipe Discovery
+### Auth UI
 
-- [x] **DISC-01**: FilterBar component committed and rendering in recipes tab with category/cost/time dropdowns
-- [x] **DISC-02**: Manual recipe form includes category picker from standard category list
-- [x] **DISC-03**: Recipe edit form includes category picker to update existing recipes
-- [x] **DISC-04**: AI-imported recipes populate category field from extracted data (already works — verify)
-- [x] **DISC-05**: Filtering by category, cost range, and prep time returns correct results client-side
+- [ ] **AUTH-01**: Sign-in screen displays app logo above "SharedKitchen" title with polished visual design
 
-### Stripe Checkout
+### Layout & Safe Areas
 
-- [x] **PAY-01**: Stripe test env vars documented in .env.example (publishable key, price ID)
-- [x] **PAY-02**: Supabase Edge Function secrets documented for Stripe (secret key, webhook signing secret, price ID)
-- [x] **PAY-03**: Full checkout flow works in test mode: initiate → PaymentSheet → webhook → subscription row created
-- [ ] **PAY-04**: Subscription status reflects correctly in app after successful test checkout
-- [ ] **PAY-05**: Billing portal opens and allows subscription management in test mode
+- [ ] **LAYOUT-01**: All bottom sheets and modals respect safe area insets — X button and header never hidden behind status bar
+- [ ] **LAYOUT-02**: Profile screen content anchored below status bar — no scrolling behind clock/WiFi/battery
+- [ ] **LAYOUT-03**: Recipe detail bottom buttons (Start Cooking, Add to Plan) properly sized and spaced with no overlap
+- [ ] **LAYOUT-04**: Recipe detail removes white card overlay on food image — content starts below the image
 
-### Code Quality
+### Edge Functions
 
-- [x] **QUAL-01**: Client-side console.error calls in stores replaced with proper error handling pattern
-- [x] **QUAL-02**: All `as any` TypeScript casts replaced with proper type definitions
-- [x] **QUAL-03**: Unused imports removed across codebase
-- [x] **QUAL-04**: React error boundary wraps main app layout with user-friendly fallback UI
-- [x] **QUAL-05**: Empty state component shown on grocery screen when no items exist
+- [ ] **EDGE-01**: generate-meal edge function returns 200 with valid meal suggestions
 
-## Out of Scope
+### Recipes UI
 
-| Feature | Reason |
-|---------|--------|
-| Server-side recipe filtering | Client-side sufficient for household-sized recipe collections |
-| Premium analytics dashboard | Deferred to v3.0 — separate milestone |
-| i18n / string extraction | English-only for now |
-| Sentry / error reporting service | Would add value but out of scope for this polish pass |
-| Android build | iOS-first remains |
+- [ ] **RECIPE-01**: Filter bar (Category/Cost/Time) does not bleed through "What should we cook" popup — proper z-index layering
+
+### Profile & Settings
+
+- [ ] **SETTINGS-01**: Dark Mode toggle and App Settings section removed from profile screen
+- [ ] **SETTINGS-02**: Dietary restrictions replaced with searchable input instead of static chip list
+- [ ] **SETTINGS-03**: Household management area redesigned for better usability
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DISC-01 | Phase 10 | Complete |
-| DISC-02 | Phase 10 | Complete |
-| DISC-03 | Phase 10 | Complete |
-| DISC-04 | Phase 10 | Complete |
-| DISC-05 | Phase 10 | Complete |
-| PAY-01 | Phase 11 | Complete |
-| PAY-02 | Phase 11 | Complete |
-| PAY-03 | Phase 11 | Complete |
-| PAY-04 | Phase 11 | Pending |
-| PAY-05 | Phase 11 | Pending |
-| QUAL-01 | Phase 12 | Complete |
-| QUAL-02 | Phase 12 | Complete |
-| QUAL-03 | Phase 12 | Complete |
-| QUAL-04 | Phase 12 | Complete |
-| QUAL-05 | Phase 12 | Complete |
+| AUTH-01 | — | Pending |
+| LAYOUT-01 | — | Pending |
+| LAYOUT-02 | — | Pending |
+| LAYOUT-03 | — | Pending |
+| LAYOUT-04 | — | Pending |
+| EDGE-01 | — | Pending |
+| RECIPE-01 | — | Pending |
+| SETTINGS-01 | — | Pending |
+| SETTINGS-02 | — | Pending |
+| SETTINGS-03 | — | Pending |
 
 **Coverage:**
-- v2.1 requirements: 15 total
-- Mapped to phases: 15
-- Unmapped: 0
+- v2.2 requirements: 10 total
+- Mapped to phases: 0
+- Unmapped: 10
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Dark mode implementation | Removed entirely — toggle broken, not worth fixing now |
+| New feature development | Polish-only milestone |
+| Android-specific fixes | iOS-first remains |
+| Premium analytics dashboard | Deferred to v3.0 |
 
 ---
-*Requirements defined: 2026-03-25*
-*Last updated: 2026-03-25 after v2.1 milestone init*
+*Requirements defined: 2026-03-26*
