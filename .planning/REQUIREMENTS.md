@@ -8,7 +8,7 @@
 
 ### Auth UI
 
-- [ ] **AUTH-01**: Sign-in screen displays app logo above "SharedKitchen" title with polished visual design
+- [x] **AUTH-01**: Sign-in screen displays app logo above "SharedKitchen" title with polished visual design
 
 ### Layout & Safe Areas
 
@@ -35,7 +35,7 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 14 | Pending |
+| AUTH-01 | Phase 14 | Complete |
 | LAYOUT-01 | Phase 13 | Pending |
 | LAYOUT-02 | Phase 13 | Pending |
 | LAYOUT-03 | Phase 13 | Complete |
