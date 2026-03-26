@@ -127,11 +127,13 @@ Plans:
   3. Grocery tab shows only grocery lists and items for the active kitchen; switching kitchens immediately shows the other kitchen's groceries
   4. Budget tab shows only expenses and budget settings for the active kitchen; switching kitchens immediately shows the other kitchen's budget
   5. Switching kitchens triggers all Zustand stores to re-fetch their data — no stale data from the previous kitchen is visible
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 17-01-PLAN.md — Add store clear() methods, create useKitchenDataSync hook, wire into tab layout
 
 ## Progress
 
-**Execution Order:** Phases execute in numeric order: 13 → 14 → 15 → 16 → 17
+**Execution Order:** Phases execute in numeric order: 13 -> 14 -> 15 -> 16 -> 17
 
 | Phase | Milestone | Plans | Status | Completed |
 |-------|-----------|-------|--------|-----------|
@@ -151,7 +153,7 @@ Plans:
 | 14. Edge Function & Auth Polish | v2.2 | 0/2 | Not started | - |
 | 15. Profile & Settings | v2.2 | 0/2 | Not started | - |
 | 16. Kitchen Switcher & Management | v2.3 | 0/1 | Not started | - |
-| 17. Data Scoping | v2.3 | 0/? | Not started | - |
+| 17. Data Scoping | v2.3 | 0/1 | Not started | - |
 
 ---
-*Last updated: 2026-03-26 after Phase 16 planning*
+*Last updated: 2026-03-26 after Phase 17 planning*
