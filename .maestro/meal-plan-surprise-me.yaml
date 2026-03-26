@@ -1,0 +1,56 @@
+appId: com.mise.app
+---
+# Meal Plan Surprise Me Flow
+# Triggers Surprise Me, views the suggestion, and accepts it.
+# Assumes the user is logged in and at least one recipe exists in the library.
+
+- launchApp
+
+# Navigate to Plan tab
+- tapOn:
+    id: "plan-tab"
+
+# Wait for the plan to load
+- extendedWaitUntil:
+    visible:
+      id: "plan-surprise-me"
+    timeout: 10000
+
+# Tap Surprise Me FAB
+- tapOn:
+    id: "plan-surprise-me"
+
+# Wait for the Surprise Me modal to appear with a suggestion
+- extendedWaitUntil:
+    visible:
+      text: "Surprise Me!"
+    timeout: 10000
+
+# Assert a recipe suggestion is shown (the modal loaded with content)
+# The main suggestion card shows recipe name, and action buttons
+- assertVisible:
+    text: "Add to Plan"
+
+# Test shuffle - tap shuffle to get a different suggestion
+- tapOn:
+    id: "plan-surprise-shuffle"
+
+# Wait for new suggestion to load
+- extendedWaitUntil:
+    visible:
+      text: "Add to Plan"
+    timeout: 5000
+
+# Accept the suggestion by tapping Add to Plan
+- tapOn:
+    text: "Add to Plan"
+
+# Wait for modal to close after adding to plan
+- extendedWaitUntil:
+    notVisible:
+      text: "Surprise Me!"
+    timeout: 5000
+
+# Verify we're back on the plan screen
+- assertVisible:
+    id: "plan-surprise-me"

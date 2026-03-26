@@ -1,0 +1,100 @@
+appId: com.mise.app
+---
+# Meal Plan Add/Edit Flow
+# Adds a meal to a day on the plan, then edits it by changing the recipe.
+# Assumes the user is logged in and at least one recipe exists.
+
+- launchApp
+
+# Navigate to Plan tab
+- tapOn:
+    id: "plan-tab"
+
+# Wait for the plan to load
+- extendedWaitUntil:
+    visible:
+      id: "plan-surprise-me"
+    timeout: 10000
+
+# Tap on the first day card to open PlanEditSheet
+# DaySection testIDs use weekday names like plan-day-Mon, plan-day-Tue
+# Tap on the "Add Dinner" empty slot text on the first visible day
+- scrollUntilVisible:
+    element:
+      text: "Add Dinner"
+    direction: DOWN
+- tapOn:
+    text: "Add Dinner"
+    index: 0
+
+# PlanEditSheet should open
+- extendedWaitUntil:
+    visible:
+      text: "Choose Recipe"
+    timeout: 5000
+
+# Assert meal type selector is visible
+- assertVisible:
+    text: "Dinner"
+
+# Select the first recipe from the list
+- extendedWaitUntil:
+    visible:
+      id: "plan-edit-search-input"
+    timeout: 5000
+
+# Tap on the first recipe in the list
+- tapOn:
+    text: ".*"
+    index: 0
+    retryTapIfNoChange: false
+
+# Tap Save
+- tapOn:
+    id: "plan-edit-save"
+
+# Wait for sheet to close
+- extendedWaitUntil:
+    notVisible:
+      text: "Choose Recipe"
+    timeout: 5000
+
+# Now edit the same day - tap on the filled meal slot (it will show recipe name now)
+# The day card should now display the recipe name instead of "Add Dinner"
+# Scroll to plan area and tap a filled slot
+- scrollUntilVisible:
+    element:
+      text: "Dinner"
+    direction: UP
+
+# Tap on the filled dinner slot to re-open edit sheet
+- tapOn:
+    text: "Dinner"
+    index: 0
+
+# PlanEditSheet opens again with existing plan data
+- extendedWaitUntil:
+    visible:
+      text: "Choose Recipe"
+    timeout: 5000
+
+# Search for a different recipe to change the assignment
+- tapOn:
+    id: "plan-edit-search-input"
+- inputText: "a"
+
+# Select a different recipe from filtered results
+- tapOn:
+    text: ".*"
+    index: 0
+    retryTapIfNoChange: false
+
+# Save the updated plan
+- tapOn:
+    id: "plan-edit-save"
+
+# Verify sheet closes after save
+- extendedWaitUntil:
+    notVisible:
+      text: "Choose Recipe"
+    timeout: 5000

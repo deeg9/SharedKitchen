@@ -1,0 +1,56 @@
+appId: com.mise.app
+---
+# Meal Plan Clear Flow
+# Clears a meal from a day on the plan.
+# Assumes the user is logged in and at least one day has a meal assigned.
+# Best run after meal-plan-add-edit.yaml to ensure a meal exists.
+
+- launchApp
+
+# Navigate to Plan tab
+- tapOn:
+    id: "plan-tab"
+
+# Wait for plan to load
+- extendedWaitUntil:
+    visible:
+      id: "plan-surprise-me"
+    timeout: 10000
+
+# Tap on a filled dinner slot (shows recipe name and "Dinner" label)
+# Look for a meal slot that has a recipe assigned
+- scrollUntilVisible:
+    element:
+      text: "Dinner"
+    direction: DOWN
+- tapOn:
+    text: "Dinner"
+    index: 0
+
+# PlanEditSheet should open with existing plan data
+- extendedWaitUntil:
+    visible:
+      text: "Choose Recipe"
+    timeout: 5000
+
+# Tap Clear Meal button to remove the meal
+- scrollUntilVisible:
+    element:
+      text: "Clear Meal"
+    direction: DOWN
+- tapOn:
+    text: "Clear Meal"
+
+# Wait for sheet to close and meal to be cleared
+- extendedWaitUntil:
+    notVisible:
+      text: "Choose Recipe"
+    timeout: 5000
+
+# Assert the day card now shows the empty "Add Dinner" state
+- scrollUntilVisible:
+    element:
+      text: "Add Dinner"
+    direction: UP
+- assertVisible:
+    text: "Add Dinner"
