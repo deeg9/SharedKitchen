@@ -1,0 +1,66 @@
+appId: com.mise.app
+name: "Negative Path: Failed/Cancelled Payment"
+---
+# Failed/cancelled payment negative path
+# Tests that the app handles a cancelled checkout gracefully
+# Since Stripe checkout opens a webview that cannot be fully controlled in Maestro,
+# this flow navigates to checkout, dismisses it, and verifies user remains on free tier
+
+- launchApp:
+    clearState: false
+
+# Navigate to Profile tab
+- tapOn:
+    id: "profile-tab"
+
+# Tap subscription link
+- tapOn:
+    id: "profile-subscription-link"
+
+# Wait for subscription screen
+- extendedWaitUntil:
+    visible:
+      text: "Subscription"
+    timeout: 5000
+
+# Assert user is on free tier (upgrade button visible)
+- assertVisible:
+    id: "subscription-upgrade-button"
+
+# Assert free plan indicator is shown
+- assertVisible:
+    text: "Free Plan"
+    optional: true
+
+# Tap upgrade to initiate checkout
+- tapOn:
+    id: "subscription-upgrade-button"
+
+# Wait briefly for the checkout to load or fail
+- extendedWaitUntil:
+    visible:
+      text: ".*"
+    timeout: 5000
+    optional: true
+
+# Dismiss the checkout by navigating back (simulates cancelled payment)
+- back
+
+# Wait for the subscription screen to be visible again
+- extendedWaitUntil:
+    visible:
+      id: "subscription-upgrade-button"
+    timeout: 5000
+
+# Assert user is still on free tier after cancellation
+- assertVisible:
+    id: "subscription-upgrade-button"
+
+# Assert the subscription screen is stable (not crashed)
+- assertVisible:
+    text: "Subscription"
+
+# If a checkout error appeared, verify the error card is visible
+- assertVisible:
+    text: "Payment could not be completed"
+    optional: true

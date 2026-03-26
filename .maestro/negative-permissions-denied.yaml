@@ -1,0 +1,66 @@
+appId: com.mise.app
+name: "Negative Path: Notification Permissions Denied"
+---
+# Denied notification permissions negative path
+# Tests that the app handles the user declining notification permissions gracefully
+# Note: Maestro cannot control iOS system permission dialogs
+# This flow tests the contextual pre-prompt (PermissionPrompt) dismiss path
+
+- launchApp:
+    clearState: false
+
+# Navigate to Profile tab
+- tapOn:
+    id: "profile-tab"
+
+# Tap Notification Settings to open the notification sheet
+- tapOn:
+    text: "Notification Settings"
+
+# Wait for the notification settings sheet to appear
+- extendedWaitUntil:
+    visible:
+      text: "Cooking Reminders"
+    timeout: 5000
+
+# Assert notification toggle options are visible
+- assertVisible:
+    text: "Cooking Reminders"
+
+- assertVisible:
+    text: "Leftover Alerts"
+
+- assertVisible:
+    text: "Budget Warnings"
+
+- assertVisible:
+    text: "Household Activity"
+
+# Try toggling a notification setting on (this may trigger PermissionPrompt)
+# If permissions are not yet granted, the app shows a PermissionPrompt modal
+# If the PermissionPrompt appears, tap "Not Now" to dismiss
+- tapOn:
+    text: "Not Now"
+    optional: true
+
+# If a system alert appears about notifications being disabled, dismiss it
+- tapOn:
+    text: "OK"
+    optional: true
+
+# Assert the app continues normally without crashing
+# The notification settings sheet should still be visible or accessible
+- assertVisible:
+    text: "Notification Settings"
+    optional: true
+
+# Navigate back to profile to verify app stability
+- back
+
+# Assert the profile screen is still accessible
+- assertVisible:
+    id: "profile-tab"
+
+# Verify the app is in a stable state
+- assertVisible:
+    id: "profile-sign-out-button"

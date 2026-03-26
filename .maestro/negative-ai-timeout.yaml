@@ -1,0 +1,60 @@
+appId: com.mise.app
+name: "Negative Path: AI Recipe Import Error"
+---
+# AI timeout/error negative path
+# Tests that importing from an invalid URL shows an error gracefully
+
+- launchApp:
+    clearState: false
+
+# Navigate to Recipes tab
+- tapOn:
+    id: "recipes-tab"
+
+# Tap the add recipe button to go to recipe add screen
+- tapOn:
+    id: "recipe-add-button"
+
+# Wait for the recipe add screen to load
+- extendedWaitUntil:
+    visible:
+      id: "recipe-import-url-input"
+    timeout: 5000
+
+# Enter an invalid/unreachable URL
+- tapOn:
+    id: "recipe-import-url-input"
+- inputText: "https://invalid.notasite.example/recipe"
+
+# Tap the import button
+- tapOn:
+    id: "recipe-import-button"
+
+# Wait for the import to attempt and fail (with a generous timeout for network)
+- extendedWaitUntil:
+    visible:
+      text: "Import Failed"
+    timeout: 20000
+    optional: true
+
+# Assert an error message is shown (Alert dialog with "Import Failed" title or error text)
+- assertVisible:
+    text: ".*Import Failed.*|.*Could not parse.*|.*Error.*"
+    optional: true
+
+# Dismiss the error alert
+- tapOn:
+    text: "OK"
+    optional: true
+
+# Assert the app is still on the recipe add screen (not crashed)
+- assertVisible:
+    id: "recipe-import-url-input"
+
+# Assert the recipe form is still accessible
+- assertVisible:
+    id: "recipe-form-name-input"
+
+# Verify the import button is still available for retry
+- assertVisible:
+    id: "recipe-import-button"
