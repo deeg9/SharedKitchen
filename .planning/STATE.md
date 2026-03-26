@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: UI Polish & Bug Fixes
-status: planning
-stopped_at: Completed 15-02-PLAN.md
-last_updated: "2026-03-26T21:06:35.378Z"
-last_activity: 2026-03-26 — v2.2 roadmap created (3 phases, 10 requirements)
+status: executing
+stopped_at: Completed 17-01-PLAN.md
+last_updated: "2026-03-26T22:25:32Z"
+last_activity: 2026-03-26 — Completed 17-01 Data Scoping (kitchen-switch data sync)
 progress:
   total_phases: 3
   completed_phases: 2
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Phase 13 — Layout & Safe Areas
+**Current focus:** Phase 17 — Data Scoping
 
 ## Current Position
 
-Phase: 13 of 15 (Layout & Safe Areas)
-Plan: Ready to plan phase
-Status: Ready to plan
-Last activity: 2026-03-26 — v2.2 roadmap created (3 phases, 10 requirements)
+Phase: 17 (Data Scoping)
+Plan: 01 complete
+Status: Executing
+Last activity: 2026-03-26 — Completed 17-01 Data Scoping (kitchen-switch data sync)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
@@ -55,6 +55,8 @@ Recent decisions affecting current work:
 - [Phase 14]: Built AppLogo with Views + MaterialCommunityIcons instead of image asset for resolution independence
 - [Phase 15]: Removed entire App Settings section rather than fixing broken toggles
 - [Phase 15]: Used Alert.prompt on iOS for inline household name editing
+- [Phase 17]: Used useRef to skip initial mount in useKitchenDataSync; tabs handle own initial fetch
+- [Phase 17]: Used getState() for imperative store access in sync hook to avoid unnecessary re-renders
 
 ### Pending Todos
 
@@ -83,9 +85,10 @@ None yet.
 | Phase 14 P02 | 75 | 2 tasks | 2 files |
 | Phase 15 P01 | 187 | 2 tasks | 2 files |
 | Phase 15 P02 | 169 | 3 tasks | 2 files |
+| Phase 17 P01 | 82s | 2 tasks | 6 files |
 
 ## Session Continuity
 
-Last session: 2026-03-26T21:06:35.376Z
-Stopped at: Completed 15-02-PLAN.md
+Last session: 2026-03-26T22:25:32Z
+Stopped at: Completed 17-01-PLAN.md
 Resume file: None
