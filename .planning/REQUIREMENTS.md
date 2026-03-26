@@ -25,20 +25,20 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| KITCHEN-01 | — | Pending |
-| KITCHEN-02 | — | Pending |
-| KITCHEN-03 | — | Pending |
-| KITCHEN-04 | — | Pending |
-| SCOPE-01 | — | Pending |
-| SCOPE-02 | — | Pending |
-| SCOPE-03 | — | Pending |
-| SCOPE-04 | — | Pending |
-| SCOPE-05 | — | Pending |
+| KITCHEN-01 | Phase 16 | Pending |
+| KITCHEN-02 | Phase 16 | Pending |
+| KITCHEN-03 | Phase 16 | Pending |
+| KITCHEN-04 | Phase 16 | Pending |
+| SCOPE-01 | Phase 17 | Pending |
+| SCOPE-02 | Phase 17 | Pending |
+| SCOPE-03 | Phase 17 | Pending |
+| SCOPE-04 | Phase 17 | Pending |
+| SCOPE-05 | Phase 17 | Pending |
 
 **Coverage:**
 - v2.3 requirements: 9 total
-- Mapped to phases: 0
-- Unmapped: 9
+- Mapped to phases: 9
+- Unmapped: 0
 
 ## Out of Scope
 

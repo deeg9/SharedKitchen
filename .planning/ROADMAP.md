@@ -2,7 +2,7 @@
 
 ## Overview
 
-SharedKitchen delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP. v2.0 (Phases 5-9) added Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and E2E testing. v2.1 (Phases 10-12) added recipe discovery filters, Stripe test mode E2E, and code quality polish. v2.2 (Phases 13-15) fixes layout bugs, polishes the sign-in screen, repairs the meal generator edge function, and cleans up profile/settings.
+SharedKitchen delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP. v2.0 (Phases 5-9) added Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and E2E testing. v2.1 (Phases 10-12) added recipe discovery filters, Stripe test mode E2E, and code quality polish. v2.2 (Phases 13-15) fixes layout bugs, polishes the sign-in screen, repairs the meal generator edge function, and cleans up profile/settings. v2.3 (Phases 16-17) adds multi-kitchen switching so users can belong to multiple kitchens and have all app data scoped to the active one.
 
 ## Milestones
 
@@ -10,6 +10,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - ✅ **v2.0 AI, Payments & Polish** — Phases 5-9 (shipped 2026-03-26) — [Archive](milestones/v2.0-ROADMAP.md)
 - ✅ **v2.1 Discovery, Checkout & Polish** — Phases 10-12 (shipped 2026-03-26)
 - 🚧 **v2.2 UI Polish & Bug Fixes** — Phases 13-15
+- 📋 **v2.3 Kitchen Switching** — Phases 16-17
 
 ## Phases
 
@@ -43,11 +44,19 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 </details>
 
-### v2.2 UI Polish & Bug Fixes (Phases 13-15)
+<details>
+<summary>🚧 v2.2 UI Polish & Bug Fixes (Phases 13-15)</summary>
 
 - [ ] **Phase 13: Layout & Safe Areas** - Fix safe area violations, recipe detail layout, and filter bar z-index
 - [ ] **Phase 14: Edge Function & Auth Polish** - Repair generate-meal endpoint and redesign sign-in screen
 - [ ] **Phase 15: Profile & Settings** - Remove broken settings, searchable dietary input, household management
+
+</details>
+
+### v2.3 Kitchen Switching (Phases 16-17)
+
+- [ ] **Phase 16: Kitchen Switcher & Management** - Kitchen store, switcher dropdown on profile, create/join flows
+- [ ] **Phase 17: Data Scoping** - Wire all Zustand stores to filter by active household_id, re-fetch on switch
 
 ## Phase Details
 
@@ -94,9 +103,33 @@ Plans:
 - [ ] 15-02-PLAN.md — Redesign household management and update tests
 **UI hint**: yes
 
+### Phase 16: Kitchen Switcher & Management
+**Goal**: Users can see, switch between, create, and join kitchens from the profile page
+**Depends on**: Phase 15
+**Requirements**: KITCHEN-01, KITCHEN-02, KITCHEN-03, KITCHEN-04
+**Success Criteria** (what must be TRUE):
+  1. Profile page displays a dropdown listing every kitchen the user belongs to, with the active kitchen visually highlighted
+  2. Tapping a different kitchen in the dropdown switches the active kitchen, and the selection persists after closing and reopening the app
+  3. User can tap "Create Kitchen", enter a name, and see the new kitchen appear in the dropdown as the active kitchen
+  4. User can tap "Join Kitchen", enter an invite code, and see the joined kitchen appear in the dropdown
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 17: Data Scoping
+**Goal**: All app data reflects the active kitchen — switching kitchens shows that kitchen's plans, recipes, groceries, and budget
+**Depends on**: Phase 16
+**Requirements**: SCOPE-01, SCOPE-02, SCOPE-03, SCOPE-04, SCOPE-05
+**Success Criteria** (what must be TRUE):
+  1. Plan tab shows only meal plans belonging to the active kitchen; switching kitchens immediately shows the other kitchen's meal plans
+  2. Recipes tab shows only recipes belonging to the active kitchen; switching kitchens immediately shows the other kitchen's recipes
+  3. Grocery tab shows only grocery lists and items for the active kitchen; switching kitchens immediately shows the other kitchen's groceries
+  4. Budget tab shows only expenses and budget settings for the active kitchen; switching kitchens immediately shows the other kitchen's budget
+  5. Switching kitchens triggers all Zustand stores to re-fetch their data — no stale data from the previous kitchen is visible
+**Plans**: TBD
+
 ## Progress
 
-**Execution Order:** Phases execute in numeric order: 13 → 14 → 15
+**Execution Order:** Phases execute in numeric order: 13 → 14 → 15 → 16 → 17
 
 | Phase | Milestone | Plans | Status | Completed |
 |-------|-----------|-------|--------|-----------|
@@ -112,9 +145,11 @@ Plans:
 | 10. Recipe Discovery | v2.1 | 2/2 | Complete | 2026-03-26 |
 | 11. Stripe Test Mode E2E | v2.1 | 2/2 | Complete | 2026-03-26 |
 | 12. Code Quality Polish | v2.1 | 2/2 | Complete | 2026-03-26 |
-| 13. Layout & Safe Areas | v2.2 | 0/2 | Planning | - |
-| 14. Edge Function & Auth Polish | v2.2 | 0/2 | Planning | - |
-| 15. Profile & Settings | v2.2 | 0/2 | Planning | - |
+| 13. Layout & Safe Areas | v2.2 | 0/2 | Not started | - |
+| 14. Edge Function & Auth Polish | v2.2 | 0/2 | Not started | - |
+| 15. Profile & Settings | v2.2 | 0/2 | Not started | - |
+| 16. Kitchen Switcher & Management | v2.3 | 0/? | Not started | - |
+| 17. Data Scoping | v2.3 | 0/? | Not started | - |
 
 ---
-*Last updated: 2026-03-26 after Phase 14 planning*
+*Last updated: 2026-03-26 after v2.3 roadmap created*
