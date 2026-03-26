@@ -1,15 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.3
-milestone_name: Kitchen Switching
-status: Ready to plan
-stopped_at: null
-last_updated: "2026-03-26T21:45:00.000Z"
+milestone: v2.2
+milestone_name: UI Polish & Bug Fixes
+status: planning
+stopped_at: Completed 16-01-PLAN.md
+last_updated: "2026-03-26T22:12:21.016Z"
+last_activity: 2026-03-26 — v2.3 roadmap created (2 phases, 9 requirements)
 progress:
-  total_phases: 2
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_phases: 5
+  completed_phases: 3
+  total_plans: 7
+  completed_plans: 6
+  percent: 0
 ---
 
 # Project State
@@ -48,6 +50,7 @@ Recent decisions affecting current work:
 - [Phase 15]: Removed entire App Settings section rather than fixing broken toggles
 - [Phase 15]: Used Alert.prompt on iOS for inline household name editing
 - [v1.0]: Multi-household from day one — clean data isolation via household_id
+- [Phase 16]: Replaced BottomSheet household picker with always-visible inline kitchen list
 
 ### Pending Todos
 
@@ -60,6 +63,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T21:45:00.000Z
-Stopped at: v2.3 roadmap created, ready to plan Phase 16
+Last session: 2026-03-26T22:12:21.013Z
+Stopped at: Completed 16-01-PLAN.md
 Resume file: None

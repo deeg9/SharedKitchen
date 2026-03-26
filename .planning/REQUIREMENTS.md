@@ -8,10 +8,10 @@
 
 ### Kitchen Switcher UI
 
-- [ ] **KITCHEN-01**: Profile page shows a dropdown of all kitchens the user belongs to with the active one highlighted
-- [ ] **KITCHEN-02**: User can tap a kitchen in the dropdown to switch — active kitchen persists across app sessions
-- [ ] **KITCHEN-03**: Profile page has a "Create Kitchen" button that opens a flow to name and create a new kitchen
-- [ ] **KITCHEN-04**: Profile page has a "Join Kitchen" button that accepts an invite code to join an existing kitchen
+- [x] **KITCHEN-01**: Profile page shows a dropdown of all kitchens the user belongs to with the active one highlighted
+- [x] **KITCHEN-02**: User can tap a kitchen in the dropdown to switch — active kitchen persists across app sessions
+- [x] **KITCHEN-03**: Profile page has a "Create Kitchen" button that opens a flow to name and create a new kitchen
+- [x] **KITCHEN-04**: Profile page has a "Join Kitchen" button that accepts an invite code to join an existing kitchen
 
 ### Data Scoping
 
@@ -25,10 +25,10 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| KITCHEN-01 | Phase 16 | Pending |
-| KITCHEN-02 | Phase 16 | Pending |
-| KITCHEN-03 | Phase 16 | Pending |
-| KITCHEN-04 | Phase 16 | Pending |
+| KITCHEN-01 | Phase 16 | Complete |
+| KITCHEN-02 | Phase 16 | Complete |
+| KITCHEN-03 | Phase 16 | Complete |
+| KITCHEN-04 | Phase 16 | Complete |
 | SCOPE-01 | Phase 17 | Pending |
 | SCOPE-02 | Phase 17 | Pending |
 | SCOPE-03 | Phase 17 | Pending |
