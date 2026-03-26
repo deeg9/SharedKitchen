@@ -73,9 +73,16 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 
 ### Active
 
-**v2.1: Discovery, Checkout & Polish**
-- [ ] Stripe test mode E2E: env vars documented, full checkout → webhook → subscription activation verified
-- [ ] Code quality: remove client console.errors, fix `as any` casts, add error boundaries, clean unused imports
+**v2.2: UI Polish & Bug Fixes**
+- [ ] Sign-in screen redesign with logo and visual polish
+- [ ] Recipe detail layout: fix crowded bottom buttons, remove white overlay on food image
+- [ ] Fix generate-meal edge function returning non-2xx error
+- [ ] Fix filter bar z-index bleed behind popups
+- [ ] Fix bottom sheet/modal safe area bleeding into status bar
+- [ ] Profile screen safe area: content scrolling behind system UI
+- [ ] Remove broken Dark Mode toggle and App Settings section
+- [ ] Dietary restrictions: replace static chips with searchable input
+- [ ] Household management area improvements
 
 ### Out of Scope
 
