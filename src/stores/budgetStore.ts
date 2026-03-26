@@ -45,6 +45,7 @@ interface BudgetState {
   fetchBudgetTarget: (householdId: string) => Promise<void>;
   setBudgetTarget: (householdId: string, amount: number) => Promise<void>;
   setSelectedMonth: (date: Date) => void;
+  clear: () => void;
 }
 
 function getMonthRange(month: Date): { start: string; end: string } {
@@ -282,4 +283,6 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
   setSelectedMonth: (date) => {
     set({ selectedMonth: date });
   },
+
+  clear: () => set({ expenses: [], budgetTarget: 600, loading: false, error: null, selectedMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1) }),
 }));

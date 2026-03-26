@@ -41,6 +41,7 @@ interface RecipeState {
   rateRecipe: (recipeId: string, userId: string, rating: number) => Promise<void>;
   addNote: (recipeId: string, userId: string, content: string) => Promise<void>;
   fetchNotes: (recipeId: string) => Promise<void>;
+  clear: () => void;
 }
 
 /**
@@ -327,6 +328,8 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
       set({ error: getErrorMessage(error) });
     }
   },
+
+  clear: () => set({ recipes: [], loading: false, error: null, searchQuery: '', activeCategory: null, costRange: null, maxPrepTime: null, selectedRecipe: null, ratings: [], notes: [] }),
 
   fetchNotes: async (recipeId: string) => {
     try {

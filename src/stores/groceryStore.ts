@@ -56,6 +56,7 @@ interface GroceryState {
   _addItem: (item: GroceryItem) => void;
   _updateItem: (item: GroceryItem) => void;
   _removeItem: (itemId: string) => void;
+  clear: () => void;
 }
 
 export const useGroceryStore = create<GroceryState>((set, get) => ({
@@ -363,6 +364,8 @@ export const useGroceryStore = create<GroceryState>((set, get) => ({
       }));
     }
   },
+
+  clear: () => set({ items: [], activeListId: null, frequentItems: [], loading: false, error: null }),
 
   // Realtime helpers
   _addItem: (item) => {
