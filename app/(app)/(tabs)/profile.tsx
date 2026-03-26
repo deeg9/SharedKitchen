@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, ScrollView, StyleSheet, Pressable, Switch, Alert } from 'react-native';
-import * as Notifications from 'expo-notifications';
+import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
 import { useRouter, Href } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -14,22 +13,12 @@ import { Button } from '../../../src/components/ui/Button';
 import { Card } from '../../../src/components/ui/Card';
 import { Skeleton } from '../../../src/components/ui/Skeleton';
 import { BottomSheet } from '../../../src/components/ui/BottomSheet';
-import { useColorScheme } from '../../../src/lib/color-scheme';
+import { SearchableSelect, DIETARY_OPTIONS } from '../../../src/components/ui/SearchableSelect';
 import { colors } from '../../../src/theme/colors';
 import { typography } from '../../../src/theme/typography';
 import { spacing, borderRadius } from '../../../src/theme/spacing';
 import { TAB_BAR_HEIGHT } from '../../../src/lib/constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { requestPermission, NotificationSettings } from '../../../src/lib/notifications';
-
-const DIETARY_OPTIONS = [
-  'Vegetarian',
-  'Gluten-Free',
-  'Dairy-Free',
-  'Keto',
-  'Nut-Free',
-  'Vegan',
-];
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
@@ -46,7 +35,6 @@ export default function ProfileScreen() {
   } = useHouseholdStore();
 
   const { mealPlan } = usePlanStore();
-  const { isDark, toggleColorScheme } = useColorScheme();
   const subscription = useSubscriptionStore();
 
   const [showHouseholdPicker, setShowHouseholdPicker] = useState(false);
@@ -54,14 +42,6 @@ export default function ProfileScreen() {
   const [cookingCount, setCookingCount] = useState(0);
   const [dietaryPrefs, setDietaryPrefs] = useState<string[]>([]);
   const [defaultServings, setDefaultServings] = useState(4);
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [permissionGranted, setPermissionGranted] = useState<boolean | null>(null);
-  const [notifSettings, setNotifSettings] = useState<NotificationSettings>({
-    cookingReminders: true,
-    leftoverAlerts: true,
-    budgetWarnings: true,
-    householdActivity: true,
-  });
 
   useEffect(() => {
     initialize();
@@ -75,16 +55,6 @@ export default function ProfileScreen() {
     // Load default servings
     AsyncStorage.getItem('default_servings').then((val) => {
       if (val) setDefaultServings(parseInt(val, 10));
-    });
-
-    // Load notification settings
-    AsyncStorage.getItem('notification_settings').then((val) => {
-      if (val) setNotifSettings(JSON.parse(val));
-    });
-
-    // Check notification permission status
-    Notifications.getPermissionsAsync().then(({ status }) => {
-      setPermissionGranted(status === 'granted');
     });
   }, []);
 
@@ -100,19 +70,6 @@ export default function ProfileScreen() {
     setCookingCount(count);
   }, [mealPlan]);
 
-  const toggleDietaryPref = useCallback(
-    (pref: string) => {
-      setDietaryPrefs((prev) => {
-        const next = prev.includes(pref)
-          ? prev.filter((p) => p !== pref)
-          : [...prev, pref];
-        AsyncStorage.setItem('dietary_preferences', JSON.stringify(next));
-        return next;
-      });
-    },
-    []
-  );
-
   const updateServings = useCallback((delta: number) => {
     setDefaultServings((prev) => {
       const next = Math.max(1, prev + delta);
@@ -120,27 +77,6 @@ export default function ProfileScreen() {
       return next;
     });
   }, []);
-
-  const updateNotifSetting = useCallback(
-    async (key: keyof NotificationSettings, value: boolean) => {
-      if (value && !permissionGranted) {
-        const granted = await requestPermission();
-        setPermissionGranted(granted);
-        if (!granted) {
-          Alert.alert(
-            'Notifications Disabled',
-            'Please enable notifications in your device Settings to receive alerts.',
-            [{ text: 'OK' }]
-          );
-          return;
-        }
-      }
-      const next = { ...notifSettings, [key]: value };
-      setNotifSettings(next);
-      AsyncStorage.setItem('notification_settings', JSON.stringify(next));
-    },
-    [notifSettings, permissionGranted]
-  );
 
   const currentHousehold = activeHousehold();
   const displayName = user?.user_metadata?.full_name ?? user?.user_metadata?.display_name ?? 'User';
@@ -306,22 +242,16 @@ export default function ProfileScreen() {
         {/* Dietary Preferences */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Dietary Restrictions</Text>
-          <View style={styles.chipRow}>
-            {DIETARY_OPTIONS.map((opt) => {
-              const selected = dietaryPrefs.includes(opt);
-              return (
-                <Pressable
-                  key={opt}
-                  style={[styles.dietChip, selected && styles.dietChipSelected]}
-                  onPress={() => toggleDietaryPref(opt)}
-                >
-                  <Text style={[styles.dietChipText, selected && styles.dietChipTextSelected]}>
-                    {opt}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
+          <SearchableSelect
+            options={DIETARY_OPTIONS}
+            selected={dietaryPrefs}
+            onSelectionChange={(next) => {
+              setDietaryPrefs(next);
+              AsyncStorage.setItem('dietary_preferences', JSON.stringify(next));
+            }}
+            placeholder="Search dietary restrictions..."
+            testID="dietary-search"
+          />
 
           <View style={styles.servingsRow}>
             <Text style={styles.servingsLabel}>Default Servings</Text>
@@ -341,46 +271,6 @@ export default function ProfileScreen() {
               </Pressable>
             </View>
           </View>
-        </View>
-
-        {/* App Settings */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>App Settings</Text>
-
-          <View style={styles.settingRow}>
-            <MaterialCommunityIcons name="weather-night" size={20} color={colors.onSurface} />
-            <Text style={styles.settingLabel}>Dark Mode</Text>
-            <Switch
-              value={isDark}
-              onValueChange={toggleColorScheme}
-              trackColor={{ false: colors.outlineVariant, true: colors.primary }}
-              thumbColor={colors.surfaceContainerLowest}
-            />
-          </View>
-
-          <Pressable
-            style={styles.settingRow}
-            onPress={() => setShowNotifications(true)}
-          >
-            <MaterialCommunityIcons name="bell-outline" size={20} color={colors.onSurface} />
-            <Text style={[styles.settingLabel, { flex: 1 }]}>Notification Settings</Text>
-            <MaterialCommunityIcons name="chevron-right" size={20} color={colors.onSurfaceVariant} />
-          </Pressable>
-
-          <Pressable
-            style={styles.settingRow}
-            onPress={() => router.push('/(app)/leftovers' as Href)}
-          >
-            <MaterialCommunityIcons name="food-variant" size={20} color={colors.onSurface} />
-            <Text style={[styles.settingLabel, { flex: 1 }]}>Manage Leftovers</Text>
-            <MaterialCommunityIcons name="chevron-right" size={20} color={colors.onSurfaceVariant} />
-          </Pressable>
-
-          <Pressable style={styles.settingRow}>
-            <MaterialCommunityIcons name="download-outline" size={20} color={colors.onSurface} />
-            <Text style={[styles.settingLabel, { flex: 1 }]}>Data Export</Text>
-            <MaterialCommunityIcons name="chevron-right" size={20} color={colors.onSurfaceVariant} />
-          </Pressable>
         </View>
 
         {/* Sign Out */}
@@ -425,57 +315,6 @@ export default function ProfileScreen() {
               </Text>
             </Pressable>
           ))}
-        </View>
-      </BottomSheet>
-
-      {/* Notification Settings Bottom Sheet */}
-      <BottomSheet
-        isOpen={showNotifications}
-        onClose={() => setShowNotifications(false)}
-        snapPoints={['50%']}
-      >
-        <View style={styles.sheetContent}>
-          <Text style={styles.sheetTitle}>Notification Settings</Text>
-
-          <View style={styles.notifRow}>
-            <Text style={styles.notifLabel}>Cooking Reminders</Text>
-            <Switch
-              value={notifSettings.cookingReminders}
-              onValueChange={(v) => updateNotifSetting('cookingReminders', v)}
-              trackColor={{ false: colors.outlineVariant, true: colors.primary }}
-              thumbColor={colors.surfaceContainerLowest}
-            />
-          </View>
-
-          <View style={styles.notifRow}>
-            <Text style={styles.notifLabel}>Leftover Alerts</Text>
-            <Switch
-              value={notifSettings.leftoverAlerts}
-              onValueChange={(v) => updateNotifSetting('leftoverAlerts', v)}
-              trackColor={{ false: colors.outlineVariant, true: colors.primary }}
-              thumbColor={colors.surfaceContainerLowest}
-            />
-          </View>
-
-          <View style={styles.notifRow}>
-            <Text style={styles.notifLabel}>Budget Warnings</Text>
-            <Switch
-              value={notifSettings.budgetWarnings}
-              onValueChange={(v) => updateNotifSetting('budgetWarnings', v)}
-              trackColor={{ false: colors.outlineVariant, true: colors.primary }}
-              thumbColor={colors.surfaceContainerLowest}
-            />
-          </View>
-
-          <View style={styles.notifRow}>
-            <Text style={styles.notifLabel}>Household Activity</Text>
-            <Switch
-              value={notifSettings.householdActivity}
-              onValueChange={(v) => updateNotifSetting('householdActivity', v)}
-              trackColor={{ false: colors.outlineVariant, true: colors.primary }}
-              thumbColor={colors.surfaceContainerLowest}
-            />
-          </View>
         </View>
       </BottomSheet>
     </View>
@@ -627,33 +466,12 @@ const styles = StyleSheet.create({
     color: colors.onSurface,
     flex: 1,
   },
-  chipRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  dietChip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.surfaceContainerHigh,
-  },
-  dietChipSelected: {
-    backgroundColor: colors.primary,
-  },
-  dietChipText: {
-    ...typography.labelMd,
-    color: colors.onSurfaceVariant,
-  },
-  dietChipTextSelected: {
-    color: colors.onPrimary,
-  },
   servingsRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: spacing.sm,
+    marginTop: spacing.sm,
   },
   servingsLabel: {
     ...typography.bodyMd,
@@ -677,29 +495,5 @@ const styles = StyleSheet.create({
     color: colors.onSurface,
     minWidth: 20,
     textAlign: 'center',
-  },
-  settingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    paddingVertical: spacing.sm + 4,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.outlineVariant,
-  },
-  settingLabel: {
-    ...typography.bodyLg,
-    color: colors.onSurface,
-  },
-  notifRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: spacing.sm + 4,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.outlineVariant,
-  },
-  notifLabel: {
-    ...typography.bodyLg,
-    color: colors.onSurface,
   },
 });
