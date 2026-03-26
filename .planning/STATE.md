@@ -1,58 +1,38 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.0
-milestone_name: AI, Payments & Polish
-status: v2.0 milestone complete
-stopped_at: Completed 09-02-PLAN.md
-last_updated: "2026-03-26T02:23:00.377Z"
+milestone: v2.1
+milestone_name: Discovery, Checkout & Polish
+status: milestone init
+stopped_at: Requirements definition
+last_updated: "2026-03-25T12:00:00.000Z"
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 13
-  completed_plans: 13
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-24)
+See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Phase 09 — E2E Testing
+**Current focus:** v2.1 milestone — requirements definition
 
 ## Current Position
 
-Phase: 09
+Phase: Pre-roadmap
 Plan: Not started
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 10 (v1.0)
-- Average duration: —
+- Total plans completed: 23 (v1.0: 10, v2.0: 13)
+- Average duration: ~3min/plan
 - Total execution time: —
-
-**By Phase:**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 1. Foundation | 3 | — | — |
-| 2. Core Features | 3 | — | — |
-| 3. Supporting | 2 | — | — |
-| 4. Onboarding | 2 | — | — |
-| Phase 05 P02 | 2min | 3 tasks | 4 files |
-| Phase 06 P01 | 4min | 2 tasks | 8 files |
-| Phase 06 P02 | 2min | 2 tasks | 4 files |
-| Phase 07 P01 | 4min | 2 tasks | 8 files |
-| Phase 07 P02 | 2min | 2 tasks | 2 files |
-| Phase 08 P02 | 4min | 2 tasks | 6 files |
-| Phase 08 P01 | 4min | 2 tasks | 5 files |
-| Phase 08 P03 | 5min | 2 tasks | 13 files |
-| Phase 09 P01 | 8min | 2 tasks | 38 files |
-| Phase 09 P03 | 2min | 2 tasks | 7 files |
-| Phase 09 P02 | 4min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -61,37 +41,10 @@ Plan: Not started
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [Phase 04]: Simulated purchase via premiumStore.upgradeToPremium() with AsyncStorage persistence -- must be replaced with server-authoritative subscriptionStore in Phase 5
-- [Phase 04]: Feature gating via PREMIUM_FEATURES constant with canAccess() -- RLS enforcement needed in Phase 5
-- [Phase 02-02]: OpenAI gpt-4o-mini for recipe extraction -- deprecated Feb 2026, broken in production, Phase 5 priority fix
-- [Phase 03-02]: Dietary preferences stored in AsyncStorage -- AI-06 meal generator will need to read these
-- [Phase 03-02]: Notification settings stored in AsyncStorage -- Phase 6 will wire these to actual push notification delivery
-- [Roadmap v2.0]: AI-03 (gpt-5-mini fix) is first priority -- live production regression
-- [Roadmap v2.0]: COOK features depend on AI-04/AI-05 for timer parsing from instructions
-- [Phase 05]: SubtleCryptoProvider for Deno-compatible Stripe signature verification
-- [Phase 05]: No client-side write methods on subscriptionStore -- server-authoritative only via service_role
-- [Phase 05]: maybeSingle() for graceful free-tier handling (no subscription row)
-- [Phase 05]: OPENAI_MODEL env var for runtime model configurability (defaults to gpt-5-mini)
-- [Phase 05]: Graceful try/catch on subscriptions table query -- no build dependency on Plan 02
-- [Phase 05]: Cache hits log tokens_used: 0 for accurate rate limit counting
-- [Phase 06]: Modal-based PermissionPrompt instead of gorhom BottomSheet (no GestureHandlerRootView in root)
-- [Phase 06]: SchedulableTriggerInputTypes.DATE enum for type-safe notification triggers
-- [Phase 06]: Non-blocking notification side effects in stores wrapped in try/catch with empty catch blocks
-- [Phase 07]: Timer-based dismiss for ActivityToast instead of Reanimated withDelay+runOnJS for simpler testability
-- [Phase 07]: Separate useEffect hooks for grocery and meal plan subscriptions in useActivityToast for independent lifecycle
-- [Phase 07]: Replaced manual supabase.auth.getUser() with useAuthStore in grocery and recipe screens for reactive auth state
-- [Phase 07]: AppState-based channelKey nulling for presence lifecycle (background/foreground) instead of explicit untrack calls
-- [Phase 08]: buildMealPrompt and parseMealSuggestions exported as pure testable functions from ai.ts
-- [Phase 08]: Rate limit 5/day free, 20/day premium for meal generation (separate from recipe parsing)
-- [Phase 08]: Inline JSON-LD functions in Deno Edge Function; src/lib/jsonld.ts is canonical test target
-- [Phase 08]: JSON-LD-first extraction requires name + ingredients + instructions to skip OpenAI
-- [Phase 08]: Smart rounding uses magnitude-based precision for readable cooking measurements
-- [Phase 08]: Wall-clock timer (Date.now - startTime) for accuracy across iOS app backgrounding
-- [Phase 08]: Unit preference defaults to imperial, persisted to AsyncStorage key unit_preference
-- [Phase 09]: testID naming convention: {screen}-{element}-{qualifier} for consistent Maestro E2E selectors
-- [Phase 09]: Custom TabBar auto-assigns testID from route.name (e.g. plan-tab) since expo-router Tabs type lacks tabBarTestID
 - [Phase 09]: Stripe checkout tested up to payment UI only in Maestro E2E -- cannot complete without test credentials
-- [Phase 09]: Text-based selectors for elements without testID (Add Dinner, Clear Meal, Add to Plan in SurpriseMe)
+- [Phase 05]: No client-side write methods on subscriptionStore -- server-authoritative only via service_role
+- [Phase 08]: JSON-LD-first extraction requires name + ingredients + instructions to skip OpenAI
+- FilterBar component + recipeStore filter state built but not committed — category/cost/time dropdowns ready
 
 ### Pending Todos
 
@@ -99,9 +52,8 @@ None yet.
 
 ### Blockers/Concerns
 
-- Apple External Purchase Entitlement must be applied for before Stripe checkout ships (MEDIUM confidence on current process)
-- EAS credential setup for APNs has known sharp edges -- plan explicit time for Phase 6
-- Supabase free tier allows 200 concurrent Realtime connections -- presence doubles per-user connections
+- Apple External Purchase Entitlement must be applied for before Stripe checkout ships
+- Manual recipe creation does not set category field — filters won't work for manually-added recipes
 
 ### Quick Tasks Completed
 
@@ -115,6 +67,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T00:54:10.284Z
-Stopped at: Completed 09-02-PLAN.md
+Last session: 2026-03-25
+Stopped at: v2.1 milestone init
 Resume file: None

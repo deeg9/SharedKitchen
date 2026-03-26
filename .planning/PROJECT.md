@@ -68,7 +68,11 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 
 ### Active
 
-(None — next milestone requirements TBD)
+**v2.1: Discovery, Checkout & Polish**
+
+- [ ] Recipe filtering: commit FilterBar + store filter state, add category picker to manual recipe form
+- [ ] Stripe test mode E2E: env vars documented, full checkout → webhook → subscription activation verified
+- [ ] Code quality: remove client console.errors, fix `as any` casts, add error boundaries, clean unused imports
 
 ### Out of Scope
 
@@ -81,7 +85,7 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 - Video content in recipes — text + photos only
 - Apple IAP — Stripe external payment at ~3% vs 15-30%
 - AI-generated recipe images — extract from source URLs instead
-- Premium analytics dashboard — deferred to v2.1
+- Premium analytics dashboard — deferred to v3.0
 
 ## Context
 
@@ -123,4 +127,4 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-03-26 after v2.0 milestone complete*
+*Last updated: 2026-03-25 after v2.1 milestone init*
