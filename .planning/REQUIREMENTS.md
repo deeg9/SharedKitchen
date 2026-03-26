@@ -14,8 +14,8 @@
 
 - [ ] **LAYOUT-01**: All bottom sheets and modals respect safe area insets — X button and header never hidden behind status bar
 - [ ] **LAYOUT-02**: Profile screen content anchored below status bar — no scrolling behind clock/WiFi/battery
-- [ ] **LAYOUT-03**: Recipe detail bottom buttons (Start Cooking, Add to Plan) properly sized and spaced with no overlap
-- [ ] **LAYOUT-04**: Recipe detail removes white card overlay on food image — content starts below the image
+- [x] **LAYOUT-03**: Recipe detail bottom buttons (Start Cooking, Add to Plan) properly sized and spaced with no overlap
+- [x] **LAYOUT-04**: Recipe detail removes white card overlay on food image — content starts below the image
 
 ### Edge Functions
 
@@ -23,7 +23,7 @@
 
 ### Recipes UI
 
-- [ ] **RECIPE-01**: Filter bar (Category/Cost/Time) does not bleed through "What should we cook" popup — proper z-index layering
+- [x] **RECIPE-01**: Filter bar (Category/Cost/Time) does not bleed through "What should we cook" popup — proper z-index layering
 
 ### Profile & Settings
 
@@ -38,10 +38,10 @@
 | AUTH-01 | Phase 14 | Pending |
 | LAYOUT-01 | Phase 13 | Pending |
 | LAYOUT-02 | Phase 13 | Pending |
-| LAYOUT-03 | Phase 13 | Pending |
-| LAYOUT-04 | Phase 13 | Pending |
+| LAYOUT-03 | Phase 13 | Complete |
+| LAYOUT-04 | Phase 13 | Complete |
 | EDGE-01 | Phase 14 | Pending |
-| RECIPE-01 | Phase 13 | Pending |
+| RECIPE-01 | Phase 13 | Complete |
 | SETTINGS-01 | Phase 15 | Pending |
 | SETTINGS-02 | Phase 15 | Pending |
 | SETTINGS-03 | Phase 15 | Pending |
