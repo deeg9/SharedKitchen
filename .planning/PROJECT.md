@@ -67,6 +67,9 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 - ✓ 18 Maestro E2E test flows (auth, recipes, planning, grocery, premium, negative paths) — v2.0
 - ✓ Recipe filtering: FilterBar with category/cost/time dropdowns, unified 14-category list, category picker in create/edit forms — v2.1
 - ✓ filteredRecipes() unit tests covering all filter dimensions — v2.1
+- ✓ getErrorMessage utility, zero console.error in stores, zero `as any` casts — v2.1
+- ✓ ErrorBoundary wrapping root layout with fallback UI — v2.1
+- ✓ Reusable EmptyState component on grocery screen — v2.1
 
 ### Active
 
@@ -127,4 +130,4 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-03-26 after Phase 10 (Recipe Discovery) complete*
+*Last updated: 2026-03-26 after Phase 12 (Code Quality Polish) complete*
