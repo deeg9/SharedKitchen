@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Pressable, Alert, Platform } from 'react-native';
 import { useRouter, Href } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -14,6 +14,7 @@ import { Card } from '../../../src/components/ui/Card';
 import { Skeleton } from '../../../src/components/ui/Skeleton';
 import { BottomSheet } from '../../../src/components/ui/BottomSheet';
 import { SearchableSelect, DIETARY_OPTIONS } from '../../../src/components/ui/SearchableSelect';
+import { supabase } from '../../../src/lib/supabase';
 import { colors } from '../../../src/theme/colors';
 import { typography } from '../../../src/theme/typography';
 import { spacing, borderRadius } from '../../../src/theme/spacing';
@@ -97,6 +98,29 @@ export default function ProfileScreen() {
     setShowHouseholdPicker(false);
   };
 
+  const handleEditHouseholdName = () => {
+    if (!currentHousehold || !activeHouseholdId) return;
+    if (Platform.OS === 'ios') {
+      Alert.prompt(
+        'Edit Household Name',
+        'Enter a new name for your household',
+        async (newName) => {
+          if (newName && newName.trim()) {
+            await supabase
+              .from('households')
+              .update({ name: newName.trim() })
+              .eq('id', activeHouseholdId);
+            initialize();
+          }
+        },
+        'plain-text',
+        currentHousehold.name
+      );
+    } else {
+      Alert.alert('Edit Household Name', 'This feature is available on iOS. Android support coming soon.');
+    }
+  };
+
   const isLoading = authLoading || householdLoading;
 
   return (
@@ -139,32 +163,64 @@ export default function ProfileScreen() {
         </View>
 
         {/* Household Section */}
-        <View style={styles.section}>
+        <View style={[styles.section, { zIndex: 0 }]}>
           <Text style={styles.sectionTitle}>Household</Text>
 
           {isLoading ? (
             <Skeleton.Card />
           ) : currentHousehold ? (
             <Card variant="elevated" style={styles.householdCard}>
-              <Pressable
-                onPress={() =>
-                  households.length > 1 && setShowHouseholdPicker(true)
-                }
-                style={styles.householdHeader}
-              >
-                <Text style={styles.householdName}>
-                  {currentHousehold.name}
-                </Text>
-                {households.length > 1 && (
-                  <Text style={styles.switchText}>Switch</Text>
-                )}
-              </Pressable>
+              {/* Household Header Row */}
+              <View style={styles.householdHeader}>
+                <View style={styles.householdHeaderLeft}>
+                  <Text style={styles.householdName}>
+                    {currentHousehold.name}
+                  </Text>
+                  <Text style={styles.memberCountBadge}>
+                    {members.length} {members.length === 1 ? 'member' : 'members'}
+                  </Text>
+                </View>
+                <View style={styles.householdHeaderActions}>
+                  <Pressable
+                    onPress={handleEditHouseholdName}
+                    hitSlop={8}
+                    testID="household-edit-name"
+                  >
+                    <MaterialCommunityIcons
+                      name="pencil-outline"
+                      size={20}
+                      color={colors.onSurfaceVariant}
+                    />
+                  </Pressable>
+                  {households.length > 1 && (
+                    <Pressable
+                      onPress={() => setShowHouseholdPicker(true)}
+                      hitSlop={8}
+                      testID="household-switch"
+                    >
+                      <MaterialCommunityIcons
+                        name="swap-horizontal"
+                        size={20}
+                        color={colors.onSurfaceVariant}
+                      />
+                    </Pressable>
+                  )}
+                </View>
+              </View>
 
-              {/* Inline Member List - TODO: Replace with MemberList component from Plan 02 when available */}
+              {/* Members List */}
               <View style={styles.membersSection}>
-                <Text style={styles.membersTitle}>Members</Text>
-                {members.map((member) => (
-                  <View key={member.id} style={styles.memberRow}>
+                <View style={styles.membersTitleRow}>
+                  <Text style={styles.membersTitle}>Members</Text>
+                </View>
+                {members.map((member, index) => (
+                  <View
+                    key={member.id}
+                    style={[
+                      styles.memberRow,
+                      index < members.length - 1 && styles.memberRowBorder,
+                    ]}
+                  >
                     <Avatar
                       uri={member.profiles?.avatar_url}
                       name={member.profiles?.display_name ?? 'Member'}
@@ -180,17 +236,31 @@ export default function ProfileScreen() {
                 ))}
               </View>
 
-              <Button
-                variant="tertiary"
-                size="sm"
+              {/* Invite Action */}
+              <Pressable
+                style={styles.inviteRow}
                 onPress={() => router.push('/(app)/household/invite' as Href)}
-                style={{ marginTop: spacing.sm }}
               >
-                Invite Members
-              </Button>
+                <MaterialCommunityIcons
+                  name="account-plus-outline"
+                  size={22}
+                  color={colors.primary}
+                />
+                <Text style={styles.inviteText}>Invite Members</Text>
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={20}
+                  color={colors.primary}
+                />
+              </Pressable>
             </Card>
           ) : (
             <Card variant="filled" style={styles.noHouseholdCard}>
+              <MaterialCommunityIcons
+                name="home-plus-outline"
+                size={48}
+                color={colors.onSurfaceVariant}
+              />
               <Text style={styles.noHouseholdText}>
                 You are not part of any household yet.
               </Text>
@@ -363,29 +433,48 @@ const styles = StyleSheet.create({
   householdHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: spacing.md,
+  },
+  householdHeaderLeft: {
+    flex: 1,
   },
   householdName: {
     ...typography.titleLg,
     color: colors.onSurface,
   },
-  switchText: {
-    ...typography.labelMd,
-    color: colors.primary,
+  memberCountBadge: {
+    ...typography.labelSm,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xs,
+  },
+  householdHeaderActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingTop: spacing.xs,
   },
   membersSection: {
+    marginBottom: 0,
+  },
+  membersTitleRow: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.outlineVariant,
+    paddingBottom: spacing.sm,
     marginBottom: spacing.sm,
   },
   membersTitle: {
     ...typography.labelLg,
     color: colors.onSurfaceVariant,
-    marginBottom: spacing.sm,
   },
   memberRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.sm,
+    paddingVertical: spacing.sm,
+  },
+  memberRowBorder: {
+    borderBottomWidth: 0.5,
+    borderBottomColor: colors.outlineVariant,
   },
   memberInfo: {
     marginLeft: spacing.sm,
@@ -398,6 +487,20 @@ const styles = StyleSheet.create({
     ...typography.labelSm,
     color: colors.onSurfaceVariant,
   },
+  inviteRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingVertical: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.outlineVariant,
+    marginTop: spacing.sm,
+  },
+  inviteText: {
+    ...typography.bodyLg,
+    color: colors.primary,
+    flex: 1,
+  },
   noHouseholdCard: {
     alignItems: 'center',
     paddingVertical: spacing.xl,
@@ -406,6 +509,7 @@ const styles = StyleSheet.create({
     ...typography.bodyMd,
     color: colors.onSurfaceVariant,
     textAlign: 'center',
+    marginTop: spacing.md,
   },
   signOutSection: {
     marginTop: spacing.lg,
