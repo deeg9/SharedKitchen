@@ -147,9 +147,9 @@
 - [x] **TEST-01**: Maestro E2E flows cover auth (signup, login, logout) and onboarding
 - [ ] **TEST-02**: Maestro E2E flows cover recipe creation, AI import, and detail view
 - [ ] **TEST-03**: Maestro E2E flows cover meal planning (add, edit, clear, Surprise Me)
-- [ ] **TEST-04**: Maestro E2E flows cover grocery list (generate, check off, manual add, real-time sync)
-- [ ] **TEST-05**: Maestro E2E flows cover premium subscription checkout and gated feature access
-- [ ] **TEST-06**: Maestro E2E flows cover negative paths (failed payment, denied permissions, AI timeout)
+- [x] **TEST-04**: Maestro E2E flows cover grocery list (generate, check off, manual add, real-time sync)
+- [x] **TEST-05**: Maestro E2E flows cover premium subscription checkout and gated feature access
+- [x] **TEST-06**: Maestro E2E flows cover negative paths (failed payment, denied permissions, AI timeout)
 
 ## Future Requirements
 
@@ -211,9 +211,9 @@
 | TEST-01 | Phase 9 | Complete |
 | TEST-02 | Phase 9 | Pending |
 | TEST-03 | Phase 9 | Pending |
-| TEST-04 | Phase 9 | Pending |
-| TEST-05 | Phase 9 | Pending |
-| TEST-06 | Phase 9 | Pending |
+| TEST-04 | Phase 9 | Complete |
+| TEST-05 | Phase 9 | Complete |
+| TEST-06 | Phase 9 | Complete |
 
 **Coverage:**
 - v2 requirements: 30 total

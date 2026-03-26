@@ -122,8 +122,8 @@ Plans:
 
 Plans:
 - [x] 09-01-PLAN.md — Add testID props to all interactive elements and create auth/onboarding Maestro flows
-- [ ] 09-02-PLAN.md — Recipe management and meal planning Maestro flows
-- [ ] 09-03-PLAN.md — Grocery, premium checkout, and negative path Maestro flows
+- [x] 09-02-PLAN.md — Recipe management and meal planning Maestro flows
+- [x] 09-03-PLAN.md — Grocery, premium checkout, and negative path Maestro flows
 
 ## Progress
 
