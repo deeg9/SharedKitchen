@@ -144,7 +144,7 @@
 
 ### E2E Testing
 
-- [ ] **TEST-01**: Maestro E2E flows cover auth (signup, login, logout) and onboarding
+- [x] **TEST-01**: Maestro E2E flows cover auth (signup, login, logout) and onboarding
 - [ ] **TEST-02**: Maestro E2E flows cover recipe creation, AI import, and detail view
 - [ ] **TEST-03**: Maestro E2E flows cover meal planning (add, edit, clear, Surprise Me)
 - [ ] **TEST-04**: Maestro E2E flows cover grocery list (generate, check off, manual add, real-time sync)
@@ -208,7 +208,7 @@
 | COOK-03 | Phase 8 | Complete |
 | COOK-04 | Phase 8 | Complete |
 | COOK-05 | Phase 8 | Complete |
-| TEST-01 | Phase 9 | Pending |
+| TEST-01 | Phase 9 | Complete |
 | TEST-02 | Phase 9 | Pending |
 | TEST-03 | Phase 9 | Pending |
 | TEST-04 | Phase 9 | Pending |
