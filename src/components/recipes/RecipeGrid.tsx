@@ -59,7 +59,9 @@ export function RecipeGrid({ favorites }: RecipeGridProps) {
       />
 
       {/* Filter dropdowns */}
-      <FilterBar />
+      <View style={{ zIndex: 1, position: 'relative' }}>
+        <FilterBar />
+      </View>
 
       {/* Recipe grid */}
       {recipes.length === 0 ? (
