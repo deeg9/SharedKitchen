@@ -35,21 +35,21 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | — | Pending |
-| LAYOUT-01 | — | Pending |
-| LAYOUT-02 | — | Pending |
-| LAYOUT-03 | — | Pending |
-| LAYOUT-04 | — | Pending |
-| EDGE-01 | — | Pending |
-| RECIPE-01 | — | Pending |
-| SETTINGS-01 | — | Pending |
-| SETTINGS-02 | — | Pending |
-| SETTINGS-03 | — | Pending |
+| AUTH-01 | Phase 14 | Pending |
+| LAYOUT-01 | Phase 13 | Pending |
+| LAYOUT-02 | Phase 13 | Pending |
+| LAYOUT-03 | Phase 13 | Pending |
+| LAYOUT-04 | Phase 13 | Pending |
+| EDGE-01 | Phase 14 | Pending |
+| RECIPE-01 | Phase 13 | Pending |
+| SETTINGS-01 | Phase 15 | Pending |
+| SETTINGS-02 | Phase 15 | Pending |
+| SETTINGS-03 | Phase 15 | Pending |
 
 **Coverage:**
 - v2.2 requirements: 10 total
-- Mapped to phases: 0
-- Unmapped: 10
+- Mapped to phases: 10
+- Unmapped: 0
 
 ## Out of Scope
 

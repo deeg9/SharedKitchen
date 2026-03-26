@@ -1,14 +1,15 @@
-# Roadmap: Mise
+# Roadmap: SharedKitchen
 
 ## Overview
 
-Mise delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP. v2.0 (Phases 5-9) added Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and E2E testing. v2.1 (Phases 10-12) adds recipe discovery filters, completes Stripe test mode E2E, and polishes code quality.
+SharedKitchen delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP. v2.0 (Phases 5-9) added Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and E2E testing. v2.1 (Phases 10-12) added recipe discovery filters, Stripe test mode E2E, and code quality polish. v2.2 (Phases 13-15) fixes layout bugs, polishes the sign-in screen, repairs the meal generator edge function, and cleans up profile/settings.
 
 ## Milestones
 
 - ✅ **v1.0 MVP** — Phases 1-4 (shipped 2026-03-23) — [Archive](milestones/v1.0-ROADMAP.md)
 - ✅ **v2.0 AI, Payments & Polish** — Phases 5-9 (shipped 2026-03-26) — [Archive](milestones/v2.0-ROADMAP.md)
-- 🔄 **v2.1 Discovery, Checkout & Polish** — Phases 10-12
+- ✅ **v2.1 Discovery, Checkout & Polish** — Phases 10-12 (shipped 2026-03-26)
+- 🚧 **v2.2 UI Polish & Bug Fixes** — Phases 13-15
 
 ## Phases
 
@@ -33,25 +34,60 @@ Mise delivers a collaborative dinner planning app for households. v1.0 (Phases 1
 
 </details>
 
-### v2.1 Discovery, Checkout & Polish (Phases 10-12)
+<details>
+<summary>✅ v2.1 Discovery, Checkout & Polish (Phases 10-12) — SHIPPED 2026-03-26</summary>
 
-- [x] Phase 10: Recipe Discovery (2 plans) — Unify categories, commit FilterBar, verify filtering end-to-end (completed 2026-03-26)
-  - DISC-01, DISC-02, DISC-03, DISC-04, DISC-05
-  - Plans:
-    - [x] 10-01-PLAN.md — Unify category list into shared constant, update FilterBar + RecipeForm, commit
-    - [x] 10-02-PLAN.md — Unit tests for filteredRecipes(), verify AI import category contract
-- [ ] Phase 11: Stripe Test Mode E2E (2 plans) — Fix missing package + webhook bug, document env vars, verify full checkout flow
-  - PAY-01, PAY-02, PAY-03, PAY-04, PAY-05
-  - Plans:
-    - [x] 11-01-PLAN.md — Install @stripe/stripe-react-native, document env vars, fix webhook subscription ID bug, create setup guide
-    - [ ] 11-02-PLAN.md — Deploy Edge Functions, verify checkout + subscription + billing portal flows (checkpoint)
-- [x] Phase 12: Code Quality Polish (2 plans) — Error boundaries, TypeScript fixes, console cleanup, empty states (completed 2026-03-26)
-  - QUAL-01, QUAL-02, QUAL-03, QUAL-04, QUAL-05
-  - Plans:
-    - [x] 12-01-PLAN.md — Error utility, console.error cleanup, as-any elimination, typed catch blocks
-    - [x] 12-02-PLAN.md — ErrorBoundary component, EmptyState component, grocery screen refactor
+- [x] Phase 10: Recipe Discovery (2/2 plans) — Unify categories, FilterBar, verify filtering end-to-end
+- [x] Phase 11: Stripe Test Mode E2E (2/2 plans) — Package install, webhook fix, env docs, checkout flow
+- [x] Phase 12: Code Quality Polish (2/2 plans) — Error boundaries, TypeScript fixes, console cleanup, empty states
+
+</details>
+
+### v2.2 UI Polish & Bug Fixes (Phases 13-15)
+
+- [ ] **Phase 13: Layout & Safe Areas** - Fix safe area violations, recipe detail layout, and filter bar z-index
+- [ ] **Phase 14: Edge Function & Auth Polish** - Repair generate-meal endpoint and redesign sign-in screen
+- [ ] **Phase 15: Profile & Settings** - Remove broken settings, searchable dietary input, household management
+
+## Phase Details
+
+### Phase 13: Layout & Safe Areas
+**Goal**: All screens render correctly within safe area boundaries with no overlapping or hidden UI elements
+**Depends on**: Nothing (first phase of v2.2)
+**Requirements**: LAYOUT-01, LAYOUT-02, LAYOUT-03, LAYOUT-04, RECIPE-01
+**Success Criteria** (what must be TRUE):
+  1. Every bottom sheet and modal shows its X button and header fully visible below the status bar on notched iPhones
+  2. Profile screen content starts below the status bar and does not scroll behind clock/WiFi/battery indicators
+  3. Recipe detail "Start Cooking" and "Add to Plan" buttons are properly sized with clear spacing and no overlap
+  4. Recipe detail hero image displays without a white card overlay obscuring it
+  5. Opening the "What should we cook" popup fully covers the filter bar — no category/cost/time controls bleed through
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 14: Edge Function & Auth Polish
+**Goal**: Users can generate AI meal suggestions without errors and encounter a polished, branded sign-in experience
+**Depends on**: Phase 13
+**Requirements**: EDGE-01, AUTH-01
+**Success Criteria** (what must be TRUE):
+  1. Tapping "What should we cook" returns meal suggestion cards with cost/time/leftover badges — no error toasts or empty states
+  2. Sign-in screen displays the SharedKitchen logo above the app title with a cohesive visual design matching the Culinary Curator design system
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 15: Profile & Settings
+**Goal**: Profile screen offers only working settings with improved dietary input and household management
+**Depends on**: Phase 14
+**Requirements**: SETTINGS-01, SETTINGS-02, SETTINGS-03
+**Success Criteria** (what must be TRUE):
+  1. Profile screen no longer shows a Dark Mode toggle or an App Settings section
+  2. User can type to search and select dietary restrictions from a searchable dropdown instead of scrolling through static chips
+  3. Household management area presents members, invite actions, and household switching in a clear, usable layout
+**Plans**: TBD
+**UI hint**: yes
 
 ## Progress
+
+**Execution Order:** Phases execute in numeric order: 13 → 14 → 15
 
 | Phase | Milestone | Plans | Status | Completed |
 |-------|-----------|-------|--------|-----------|
@@ -64,9 +100,12 @@ Mise delivers a collaborative dinner planning app for households. v1.0 (Phases 1
 | 7. Real-Time Presence | v2.0 | 2/2 | Complete | 2026-03-25 |
 | 8. Enhanced AI & Cooking Mode | v2.0 | 3/3 | Complete | 2026-03-26 |
 | 9. E2E Testing | v2.0 | 3/3 | Complete | 2026-03-26 |
-| 10. Recipe Discovery | v2.1 | 2/2 | Complete    | 2026-03-26 |
-| 11. Stripe Test Mode E2E | v2.1 | 1/2 | In Progress|  |
-| 12. Code Quality Polish | v2.1 | 2/2 | Complete    | 2026-03-26 |
+| 10. Recipe Discovery | v2.1 | 2/2 | Complete | 2026-03-26 |
+| 11. Stripe Test Mode E2E | v2.1 | 2/2 | Complete | 2026-03-26 |
+| 12. Code Quality Polish | v2.1 | 2/2 | Complete | 2026-03-26 |
+| 13. Layout & Safe Areas | v2.2 | 0/0 | Not started | - |
+| 14. Edge Function & Auth Polish | v2.2 | 0/0 | Not started | - |
+| 15. Profile & Settings | v2.2 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-03-25 after Phase 11 planning*
+*Last updated: 2026-03-26 after v2.2 roadmap created*

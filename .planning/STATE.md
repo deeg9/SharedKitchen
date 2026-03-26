@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: UI Polish & Bug Fixes
-status: Defining requirements
-stopped_at: null
-last_updated: "2026-03-26T19:25:00.000Z"
+status: Ready to plan
+stopped_at: Roadmap created for v2.2
+last_updated: "2026-03-26T19:30:00.000Z"
 progress:
-  total_phases: 0
+  total_phases: 3
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -19,22 +19,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Defining v2.2 requirements
+**Current focus:** Phase 13 — Layout & Safe Areas
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-26 — Milestone v2.2 started
+Phase: 13 of 15 (Layout & Safe Areas)
+Plan: Ready to plan phase
+Status: Ready to plan
+Last activity: 2026-03-26 — v2.2 roadmap created (3 phases, 10 requirements)
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 23 (v1.0: 10, v2.0: 13)
+- Total plans completed: 23 (v1.0: 10, v2.0: 13, v2.1: 6)
 - Average duration: ~3min/plan
-- Total execution time: —
+- Total execution time: --
 
 ## Accumulated Context
 
@@ -43,15 +45,9 @@ Last activity: 2026-03-26 — Milestone v2.2 started
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [Phase 09]: Stripe checkout tested up to payment UI only in Maestro E2E -- cannot complete without test credentials
-- [Phase 05]: No client-side write methods on subscriptionStore -- server-authoritative only via service_role
-- [Phase 08]: JSON-LD-first extraction requires name + ingredients + instructions to skip OpenAI
-- FilterBar component + recipeStore filter state built but not committed — category/cost/time dropdowns ready
-- [Phase 10]: Included High Protein as category since starter-recipes use it as DB category value
-- [Phase 10]: Used Zustand getState/setState for direct store testing without React rendering
 - [Phase 12]: ErrorBoundary wraps Slot only, PermissionPrompt stays outside for error recovery access
-- [Phase 12]: Used getErrorMessage(error: unknown) utility pattern for all catch blocks instead of error.message
-- [Phase 11]: Left existing if(!customerId) upsert intact, added separate unconditional upsert after subscription creation for webhook matching
+- [Phase 12]: Used getErrorMessage(error: unknown) utility pattern for all catch blocks
+- [Phase 11]: Left existing if(!customerId) upsert intact, added separate unconditional upsert after subscription creation
 
 ### Pending Todos
 
@@ -60,7 +56,7 @@ None yet.
 ### Blockers/Concerns
 
 - Apple External Purchase Entitlement must be applied for before Stripe checkout ships
-- Manual recipe creation does not set category field — filters won't work for manually-added recipes
+- Manual recipe creation does not set category field -- filters won't work for manually-added recipes
 
 ### Quick Tasks Completed
 
@@ -79,6 +75,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T16:23:04.018Z
-Stopped at: Completed 11-01-PLAN.md
+Last session: 2026-03-26T19:30:00.000Z
+Stopped at: v2.2 roadmap created — ready to plan Phase 13
 Resume file: None
