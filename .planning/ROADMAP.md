@@ -112,7 +112,9 @@ Plans:
   2. Tapping a different kitchen in the dropdown switches the active kitchen, and the selection persists after closing and reopening the app
   3. User can tap "Create Kitchen", enter a name, and see the new kitchen appear in the dropdown as the active kitchen
   4. User can tap "Join Kitchen", enter an invite code, and see the joined kitchen appear in the dropdown
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 16-01-PLAN.md — Kitchen switcher dropdown on profile page with create/join action buttons
 **UI hint**: yes
 
 ### Phase 17: Data Scoping
@@ -148,8 +150,8 @@ Plans:
 | 13. Layout & Safe Areas | v2.2 | 0/2 | Not started | - |
 | 14. Edge Function & Auth Polish | v2.2 | 0/2 | Not started | - |
 | 15. Profile & Settings | v2.2 | 0/2 | Not started | - |
-| 16. Kitchen Switcher & Management | v2.3 | 0/? | Not started | - |
+| 16. Kitchen Switcher & Management | v2.3 | 0/1 | Not started | - |
 | 17. Data Scoping | v2.3 | 0/? | Not started | - |
 
 ---
-*Last updated: 2026-03-26 after v2.3 roadmap created*
+*Last updated: 2026-03-26 after Phase 16 planning*
