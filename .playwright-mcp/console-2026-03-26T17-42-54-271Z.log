@@ -1,0 +1,12 @@
+[    1171ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://jzwxutnqdpnjssvouohe.supabase.co/functions/v1/create-checkout-session:0
+[    1221ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://jzwxutnqdpnjssvouohe.supabase.co/favicon.ico:0
+[   15825ms] [ERROR] Failed to load resource: the server responded with a status of 500 () @ https://jzwxutnqdpnjssvouohe.supabase.co/auth/v1/token?grant_type=password:0
+[   62685ms] [ERROR] Failed to load resource: the server responded with a status of 500 () @ https://jzwxutnqdpnjssvouohe.supabase.co/auth/v1/token?grant_type=password:0
+[   97110ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://jzwxutnqdpnjssvouohe.supabase.co/auth/v1/signup:0
+[   97233ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://jzwxutnqdpnjssvouohe.supabase.co/auth/v1/token?grant_type=password:0
+[  128420ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://jzwxutnqdpnjssvouohe.supabase.co/functions/v1/create-checkout-session:0
+[  176668ms] [ERROR] Failed to load resource: the server responded with a status of 500 () @ https://jzwxutnqdpnjssvouohe.supabase.co/functions/v1/create-checkout-session:0
+[  232247ms] [ERROR] Failed to load resource: the server responded with a status of 500 () @ https://jzwxutnqdpnjssvouohe.supabase.co/functions/v1/create-checkout-session:0
+[  264388ms] [ERROR] Failed to load resource: the server responded with a status of 500 () @ https://jzwxutnqdpnjssvouohe.supabase.co/functions/v1/create-checkout-session:0
+[  346165ms] [ERROR] Failed to load resource: the server responded with a status of 402 () @ https://api.stripe.com/v1/payment_methods:0
+[  534577ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://jzwxutnqdpnjssvouohe.supabase.co/functions/v1/stripe-webhooks:0
