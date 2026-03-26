@@ -65,12 +65,12 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 - ✓ Metric/imperial unit conversion toggle — v2.0
 - ✓ AI-parsed timer durations from instruction text — v2.0
 - ✓ 18 Maestro E2E test flows (auth, recipes, planning, grocery, premium, negative paths) — v2.0
+- ✓ Recipe filtering: FilterBar with category/cost/time dropdowns, unified 14-category list, category picker in create/edit forms — v2.1
+- ✓ filteredRecipes() unit tests covering all filter dimensions — v2.1
 
 ### Active
 
 **v2.1: Discovery, Checkout & Polish**
-
-- [ ] Recipe filtering: commit FilterBar + store filter state, add category picker to manual recipe form
 - [ ] Stripe test mode E2E: env vars documented, full checkout → webhook → subscription activation verified
 - [ ] Code quality: remove client console.errors, fix `as any` casts, add error boundaries, clean unused imports
 
@@ -127,4 +127,4 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-03-25 after v2.1 milestone init*
+*Last updated: 2026-03-26 after Phase 10 (Recipe Discovery) complete*
