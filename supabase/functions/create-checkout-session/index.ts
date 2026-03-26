@@ -94,6 +94,16 @@ Deno.serve(async (req) => {
       metadata: { user_id: user.id },
     })
 
+    // Store subscription ID so webhooks can match this row (runs for ALL users)
+    await supabaseAdmin
+      .from('subscriptions')
+      .upsert({
+        user_id: user.id,
+        stripe_customer_id: customerId,
+        stripe_subscription_id: subscription.id,
+        status: 'free',
+      }, { onConflict: 'user_id' })
+
     const invoice = subscription.latest_invoice as Stripe.Invoice
     const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent
 
