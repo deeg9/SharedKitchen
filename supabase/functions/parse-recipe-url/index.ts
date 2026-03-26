@@ -1,5 +1,5 @@
 // Supabase Edge Function: parse-recipe-url
-// Tries JSON-LD structured data extraction first, falls back to OpenAI gpt-5-mini.
+// Tries JSON-LD structured data extraction first, falls back to Gemini Flash.
 // Includes per-user rate limiting, URL-based response caching, and structured outputs.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -382,136 +382,82 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // --- OpenAI fallback (JSON-LD missing or incomplete) ---
+    // --- Gemini fallback (JSON-LD missing or incomplete) ---
 
     // Truncate HTML to stay within token limits
     const truncatedHtml = html.slice(0, 50000);
 
-    // Call OpenAI to extract recipe data
-    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openaiApiKey) {
+    const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
+    if (!geminiApiKey) {
       return new Response(
-        JSON.stringify({ error: 'OpenAI API key not configured' }),
+        JSON.stringify({ error: 'Gemini API key not configured' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const modelName = Deno.env.get('OPENAI_MODEL') ?? 'gpt-5-mini';
+    const modelName = Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.5-flash';
 
-    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: modelName,
-        response_format: {
-          type: 'json_schema',
-          json_schema: {
-            name: 'recipe',
-            strict: true,
-            schema: {
-              type: 'object',
-              properties: {
-                name: { type: 'string' },
-                category: { type: ['string', 'null'] },
-                prep_time_minutes: { type: ['number', 'null'] },
-                cook_time_minutes: { type: ['number', 'null'] },
-                servings: { type: 'number' },
-                estimated_cost: { type: ['number', 'null'] },
-                source_image_url: { type: ['string', 'null'] },
-                nutrition_info: {
-                  type: ['object', 'null'],
-                  properties: {
-                    calories: { type: ['string', 'null'] },
-                    protein: { type: ['string', 'null'] },
-                    fat: { type: ['string', 'null'] },
-                    carbohydrates: { type: ['string', 'null'] },
-                  },
-                  required: ['calories', 'protein', 'fat', 'carbohydrates'],
-                  additionalProperties: false,
-                },
-                ingredients: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      amount: { type: 'number' },
-                      unit: { type: 'string' },
-                      name: { type: 'string' },
-                      section: { type: ['string', 'null'] },
-                    },
-                    required: ['amount', 'unit', 'name', 'section'],
-                    additionalProperties: false,
-                  },
-                },
-                instructions: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      step_number: { type: 'number' },
-                      text: { type: 'string' },
-                      timers: {
-                        type: 'array',
-                        items: {
-                          type: 'object',
-                          properties: {
-                            duration_seconds: { type: 'number' },
-                            label: { type: 'string' },
-                          },
-                          required: ['duration_seconds', 'label'],
-                          additionalProperties: false,
-                        },
-                      },
-                    },
-                    required: ['step_number', 'text', 'timers'],
-                    additionalProperties: false,
-                  },
-                },
-                tags: { type: 'array', items: { type: 'string' } },
-              },
-              required: [
-                'name', 'category', 'prep_time_minutes', 'cook_time_minutes',
-                'servings', 'estimated_cost', 'source_image_url', 'nutrition_info',
-                'ingredients', 'instructions', 'tags',
-              ],
-              additionalProperties: false,
+    const systemPrompt = `You are a recipe extraction assistant. Given HTML from a recipe webpage, extract the recipe into structured JSON. Return a JSON object with these fields:
+- name (string)
+- category (string or null)
+- prep_time_minutes (number or null)
+- cook_time_minutes (number or null)
+- servings (number, default 4)
+- estimated_cost (number or null)
+- source_image_url (string or null — from og:image meta tag or prominent recipe image)
+- nutrition_info (object with calories, protein, fat, carbohydrates as strings, or null)
+- ingredients (array of {amount: number, unit: string, name: string, section: string|null})
+- instructions (array of {step_number: number, text: string, timers: [{duration_seconds: number, label: string}]})
+- tags (array of strings)
+
+Parse time references in instructions into timers (e.g., "simmer for 20 minutes" → {duration_seconds: 1200, label: "simmer"}). Use null for unknown nullable fields.`;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+    let geminiResponse: Response;
+    try {
+      geminiResponse = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiApiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body: JSON.stringify({
+            contents: [
+              { role: 'user', parts: [{ text: systemPrompt + '\n\nExtract the recipe from this HTML:\n\n' + truncatedHtml }] },
+            ],
+            generationConfig: {
+              temperature: 0.1,
+              maxOutputTokens: 2000,
+              responseMimeType: 'application/json',
             },
-          },
-        },
-        messages: [
-          {
-            role: 'system',
-            content: `You are a recipe extraction assistant. Given HTML from a recipe webpage, extract the recipe into structured JSON matching the provided schema. If you cannot determine a field, use null for nullable fields or reasonable defaults for required ones.
+          }),
+        }
+      );
+    } catch (fetchError: any) {
+      if (fetchError.name === 'AbortError') {
+        return new Response(
+          JSON.stringify({ error: 'Request timed out. Please try again.' }),
+          { status: 504, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      throw fetchError;
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
-Additional extraction rules:
-- source_image_url: Extract the main recipe image URL from og:image meta tag or the first prominent recipe image on the page.
-- nutrition_info: Extract nutrition information if visible on the page (calories, protein, fat, carbohydrates). Use null if not found.
-- timers: For each instruction step, parse time references (e.g., "simmer for 20 minutes", "bake for 1 hour", "rest 5 minutes") into a timers array with duration_seconds and a descriptive label. If no time reference exists in a step, use an empty array.`,
-          },
-          {
-            role: 'user',
-            content: `Extract the recipe from this HTML:\n\n${truncatedHtml}`,
-          },
-        ],
-        temperature: 0.1,
-        max_tokens: 2000,
-      }),
-    });
-
-    if (!openaiResponse.ok) {
-      const errorText = await openaiResponse.text();
-      console.error('OpenAI API error:', errorText);
+    if (!geminiResponse.ok) {
+      const errorText = await geminiResponse.text();
+      console.error('Gemini API error:', errorText);
       return new Response(
         JSON.stringify({ error: 'Failed to parse recipe. The AI service is temporarily unavailable.' }),
         { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const completion = await openaiResponse.json();
-    const content = completion.choices?.[0]?.message?.content;
+    const geminiResult = await geminiResponse.json();
+    const content = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!content) {
       return new Response(
@@ -528,7 +474,7 @@ Additional extraction rules:
       function_name: 'parse-recipe-url',
       input_hash: urlHash,
       cached_response: recipe,
-      tokens_used: completion.usage?.total_tokens ?? null,
+      tokens_used: geminiResult.usageMetadata?.totalTokenCount ?? null,
     });
 
     return new Response(
