@@ -26,8 +26,8 @@
 - [ ] **QUAL-01**: Client-side console.error calls in stores replaced with proper error handling pattern
 - [ ] **QUAL-02**: All `as any` TypeScript casts replaced with proper type definitions
 - [ ] **QUAL-03**: Unused imports removed across codebase
-- [ ] **QUAL-04**: React error boundary wraps main app layout with user-friendly fallback UI
-- [ ] **QUAL-05**: Empty state component shown on grocery screen when no items exist
+- [x] **QUAL-04**: React error boundary wraps main app layout with user-friendly fallback UI
+- [x] **QUAL-05**: Empty state component shown on grocery screen when no items exist
 
 ## Out of Scope
 
@@ -56,8 +56,8 @@
 | QUAL-01 | Phase 12 | Pending |
 | QUAL-02 | Phase 12 | Pending |
 | QUAL-03 | Phase 12 | Pending |
-| QUAL-04 | Phase 12 | Pending |
-| QUAL-05 | Phase 12 | Pending |
+| QUAL-04 | Phase 12 | Complete |
+| QUAL-05 | Phase 12 | Complete |
 
 **Coverage:**
 - v2.1 requirements: 15 total
