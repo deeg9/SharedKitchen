@@ -2,136 +2,125 @@
 
 ## What This Is
 
-Mise is a collaborative dinner planning mobile app for couples, roommates, and families. It combines a shared weekly meal calendar, recipe library, auto-generated grocery lists with real-time sync, and budget tracking — all in one warm, inviting interface that feels like "Notion meets your favorite cookbook." Built with React Native + Expo for iOS, backed by Supabase.
+Mise is a collaborative dinner planning mobile app for couples, roommates, and families. It combines a shared weekly meal calendar, AI-powered recipe library with web extraction and meal generation, auto-generated grocery lists with real-time sync and live presence, push notifications, Stripe-powered premium subscriptions, fullscreen cooking mode with step-by-step timers, and budget tracking — all in one warm, inviting interface. Built with React Native + Expo for iOS, backed by Supabase.
 
 ## Core Value
 
 Households can collaboratively plan, shop for, and cook dinners together in real-time — eliminating the daily "what's for dinner?" friction.
 
-## Current Milestone: v2.0 AI, Payments & Polish
+## Current State
 
-**Goal:** Level up Mise with advanced AI features, real Stripe payments for premium, push notifications, real-time collaboration visibility, and comprehensive end-to-end testing across all features.
-
-**Target features:**
-- Enhanced AI recipe extraction from web URLs
-- AI-powered random meal generator based on preferences, history, dietary needs
-- Push notification system (cooking reminders, leftover alerts, budget warnings, household activity)
-- Real-time visibility when household members check off recipes or grocery items
-- Stripe integration for real payment processing (subscriptions, checkout, billing)
-- Premium tier system with actual gated features and paid unlock
-- Comprehensive end-to-end testing across all existing and new features
+**Shipped:** v2.0 AI, Payments & Polish (2026-03-26)
+**Codebase:** ~21,700 LOC across 152 source files (TypeScript, SQL, YAML)
+**Tech stack:** React Native + Expo (iOS), Supabase (Postgres, Auth, Realtime, Storage, Edge Functions), OpenAI gpt-5-mini, Stripe, expo-notifications, Maestro E2E
 
 ## Requirements
 
 ### Validated
 
-- ✓ Weekly dinner calendar with day cards — v1.0 Phase 2
-- ✓ Shared recipe library with search, filters, 2-column grid — v1.0 Phase 2
-- ✓ AI-powered recipe import from URL — v1.0 Phase 2
-- ✓ Manual recipe creation — v1.0 Phase 2
-- ✓ Recipe detail with scaling, ratings, notes — v1.0 Phase 2
-- ✓ Grocery list auto-generated, grouped by section — v1.0 Phase 2
-- ✓ Real-time grocery list sync via Supabase Realtime — v1.0 Phase 2
-- ✓ Manual grocery item additions — v1.0 Phase 2
-- ✓ Monthly budget dashboard with category breakdown — v1.0 Phase 3
-- ✓ Weekly spending breakdown — v1.0 Phase 3
-- ✓ Quick expense logging — v1.0 Phase 3
-- ✓ Household creation and management — v1.0 Phase 1
-- ✓ Multi-household support — v1.0 Phase 1
-- ✓ Household invite system — v1.0 Phase 1
-- ✓ Email/password and Google OAuth auth — v1.0 Phase 1
-- ✓ User profile with avatar, name, cooking stats — v1.0 Phase 1/3
-- ✓ "Surprise Me" random dinner generator — v1.0 Phase 2
-- ✓ Edit meal plan day via bottom sheet — v1.0 Phase 2
-- ✓ Leftover tracker with freshness badges — v1.0 Phase 3
-- ✓ AI suggestion cards — v1.0 Phase 3
-- ✓ Onboarding flow — v1.0 Phase 4
-- ✓ Dietary preferences/restrictions — v1.0 Phase 3
-- ✓ Dark mode — v1.0 Phase 3
-- ✓ Notification settings UI — v1.0 Phase 3
-- ✓ Freemium gating UI (shell only) — v1.0 Phase 4
-- ✓ 5-tab bottom navigation — v1.0 Phase 1
-- ✓ Culinary Curator design system — v1.0 Phase 1
+- ✓ Weekly dinner calendar with day cards — v1.0
+- ✓ Shared recipe library with search, filters, 2-column grid — v1.0
+- ✓ AI-powered recipe import from URL — v1.0, enhanced v2.0 (JSON-LD first)
+- ✓ Manual recipe creation — v1.0
+- ✓ Recipe detail with scaling, ratings, notes — v1.0
+- ✓ Grocery list auto-generated, grouped by section — v1.0
+- ✓ Real-time grocery list sync via Supabase Realtime — v1.0
+- ✓ Manual grocery item additions — v1.0
+- ✓ Monthly budget dashboard with category breakdown — v1.0
+- ✓ Weekly spending breakdown — v1.0
+- ✓ Quick expense logging — v1.0
+- ✓ Household creation and management — v1.0
+- ✓ Multi-household support — v1.0
+- ✓ Household invite system — v1.0
+- ✓ Email/password and Google OAuth auth — v1.0
+- ✓ User profile with avatar, name, cooking stats — v1.0
+- ✓ "Surprise Me" random dinner generator — v1.0
+- ✓ Edit meal plan day via bottom sheet — v1.0
+- ✓ Leftover tracker with freshness badges — v1.0
+- ✓ AI suggestion cards — v1.0
+- ✓ Onboarding flow — v1.0
+- ✓ Dietary preferences/restrictions — v1.0
+- ✓ Dark mode — v1.0
+- ✓ 5-tab bottom navigation — v1.0
+- ✓ Culinary Curator design system — v1.0
+- ✓ Stripe subscription checkout ($9.99/mo) — v2.0
+- ✓ Server-authoritative premium gating via RLS — v2.0
+- ✓ Stripe billing portal (cancel, update payment) — v2.0
+- ✓ Stripe webhook handler with idempotent processing — v2.0
+- ✓ Recipe import with gpt-5-mini structured outputs — v2.0
+- ✓ JSON-LD/schema.org extraction before LLM fallback — v2.0
+- ✓ Nutrition info and image extraction from URLs — v2.0
+- ✓ AI-powered meal generator (dietary, history, leftovers, budget) — v2.0
+- ✓ Per-user AI rate limiting and response caching — v2.0
+- ✓ Push token registration with Expo Push API — v2.0
+- ✓ Contextual notification permission pre-prompt — v2.0
+- ✓ Local cooking reminders before meal prep time — v2.0
+- ✓ Leftover expiry push alerts — v2.0
+- ✓ Budget threshold push alerts (80%/100%) — v2.0
+- ✓ Live presence avatars on grocery list — v2.0
+- ✓ Live presence avatars on recipe detail — v2.0
+- ✓ Activity toasts for household member actions — v2.0
+- ✓ Fullscreen step-by-step cooking mode — v2.0
+- ✓ Embedded countdown timers in cooking steps — v2.0
+- ✓ Metric/imperial unit conversion toggle — v2.0
+- ✓ AI-parsed timer durations from instruction text — v2.0
+- ✓ 18 Maestro E2E test flows (auth, recipes, planning, grocery, premium, negative paths) — v2.0
 
 ### Active
 
-- [ ] Enhanced AI recipe extraction from web (improved scraping, broader site support)
-- [ ] AI-powered random meal generator (preferences, history, dietary-aware suggestions)
-- [ ] Push notification system (cooking reminders, leftover alerts, budget warnings, household activity)
-- [ ] Real-time visibility for recipe/grocery check-offs (live avatars, activity indicators)
-- [ ] Stripe subscription integration (checkout, billing portal, webhook handling)
-- [ ] Premium tier with real payment gating (replace freemium shell with actual subscriptions)
-- [ ] Premium analytics dashboard (cooking distribution, spending trends, top rated meals)
-- [ ] Comprehensive E2E testing (all existing + new features)
+(None — next milestone requirements TBD)
 
 ### Out of Scope
 
-- Android build — iOS only for v2.0; cross-platform foundation ready via Expo
-- Web version — mobile-first, no web client
-- Social features beyond household (no public profiles, no recipe sharing outside household)
-- Meal prep / batch cooking workflows — keep it simple per-day planning
+- Android build — iOS-first; Expo cross-platform foundation ready
+- Web version — mobile-first product
+- Social features beyond household — no public profiles or recipe sharing
+- Meal prep / batch cooking — per-day planning kept simple
 - Grocery delivery integration (Instacart, etc.)
-- Real-time chat — household coordination via meal plan, not messaging
+- Real-time chat — activity feed provides lightweight awareness
 - Video content in recipes — text + photos only
+- Apple IAP — Stripe external payment at ~3% vs 15-30%
+- AI-generated recipe images — extract from source URLs instead
+- Premium analytics dashboard — deferred to v2.1
 
 ## Context
 
-- Architecture spec lives at `/Users/deeg/Desktop/mise-stitch-prompt.md` — comprehensive UI/screen definitions for all 5 tabs, detail pages, onboarding, and design notes
-- **Stitch UI screens** already generated at `stitch_ui/stitch_grocery_list/` — 16 screens as static HTML/Tailwind mockups with screenshots. These are the front-end reference designs to translate into React Native components:
-  - `plan_home` — Weekly dinner calendar (Tab 1)
-  - `recipes_library` — Recipe grid with search/filters (Tab 2)
-  - `refined_recipe_detail_street_tacos_al_pastor` — Recipe detail page
-  - `add_recipe_form` — Add/edit recipe form
-  - `grocery_list` — Grocery checklist grouped by section (Tab 3)
-  - `budget_dashboard` — Monthly spending dashboard (Tab 4)
-  - `profile_household_updated` — Profile & household management (Tab 5)
-  - `random_dinner_generator` — Surprise Me modal
-  - `household_invite_join_landing_page` — Invite/join household
-  - `onboarding_welcome`, `onboarding_create_household`, `onboarding_invite_members`, `onboarding_add_first_recipes`, `onboarding_all_set` — Onboarding flow
-  - `mise_waitlist_landing_page` — Marketing landing page
-  - `mise_en_place/DESIGN.md` — Full design system documentation ("The Culinary Curator")
-- Landing page already built at `index.html` (Tailwind CSS, static marketing page with waitlist)
-- Design language: warm cream/off-white backgrounds, deep olive/sage green primary (#334537), burnt orange accent (#904d00), Material Design 3 color tokens, Plus Jakarta Sans headers, Inter body text, rounded outlined Material Symbols icons
-- Design philosophy: "Tactile Sophistication" — no-line rule (use tonal layering not borders), ambient shadows, ghost borders, breathing room, intentional asymmetry
-- 8px spacing grid, rounded corners, subtle shadows, skeleton loading states, optimistic UI updates
-- Real-time collaboration is central — Supabase Realtime for grocery sync, household activity
+- **v1.0 MVP** shipped with 63 requirements across 4 phases (Foundation, Core Features, Supporting Features, Onboarding & Freemium)
+- **v2.0 AI, Payments & Polish** shipped with 30 requirements across 5 phases (AI Fix & Payment Foundation, Push Notifications, Real-Time Presence, Enhanced AI & Cooking Mode, E2E Testing)
+- Architecture spec: `/Users/deeg/Desktop/mise-stitch-prompt.md`
+- Design language: warm cream/off-white backgrounds, deep olive/sage green primary (#334537), burnt orange accent (#904d00), Material Design 3 color tokens, Plus Jakarta Sans headers, Inter body text
+- Design philosophy: "Tactile Sophistication" — no-line rule, tonal layering, ambient shadows, ghost borders
 
 ## Constraints
 
 - **Platform**: iOS only (React Native + Expo, EAS Build)
-- **Backend**: Supabase (Postgres, Auth, Realtime, Storage)
+- **Backend**: Supabase (Postgres, Auth, Realtime, Storage, Edge Functions)
 - **Auth**: Email/password + Google OAuth via Supabase Auth
-- **AI**: Need an LLM API for recipe URL parsing and suggestion generation (likely Claude or OpenAI)
-- **Design**: Must match the established Material Design 3 color system and typography from the landing page
-- **Monetization**: Freemium shell only — UI gates without payment processing
+- **AI**: OpenAI gpt-5-mini for recipe extraction and meal generation
+- **Payments**: Stripe external payments (post-Epic v. Apple ruling)
+- **Notifications**: expo-notifications with Expo Push API
+- **E2E Testing**: Maestro YAML flows (external CLI, no project deps)
+- **Design**: Culinary Curator MD3 design system (4 font sizes, 2 weights)
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| React Native + Expo over native Swift | Cross-platform foundation even though v1 is iOS-only; faster development with Expo tooling | — Pending |
-| Supabase over Firebase | Postgres flexibility, built-in Realtime for grocery sync, Row Level Security for household data isolation | — Pending |
-| Multi-household from day one | Users may have separate households (roommates + family); easier to architect upfront than retrofit | — Pending |
-| Freemium shell without payments | Ship faster, validate product-market fit before investing in IAP/subscription infrastructure | — Pending |
-| Real-time grocery sync from v1 | Core to the collaborative value prop — pull-to-refresh would undermine the "together" feeling | — Pending |
-| AI features in v1 | URL import reduces friction for recipe entry; suggestions drive engagement and re-engagement | — Pending |
+| React Native + Expo over native Swift | Cross-platform foundation; faster development | ✓ Good — enabled rapid iteration |
+| Supabase over Firebase | Postgres flexibility, Realtime, RLS | ✓ Good — RLS critical for premium gating |
+| Multi-household from day one | Easier to architect upfront | ✓ Good — clean data isolation |
+| Real-time grocery sync from v1 | Core to collaborative value prop | ✓ Good — extended to Presence in v2 |
+| gpt-5-mini replacing gpt-4o-mini | gpt-4o-mini deprecated Feb 2026 | ✓ Good — structured outputs cleaner |
+| JSON-LD extraction before LLM | ~80% of recipe sites have schema.org data | ✓ Good — eliminated LLM cost for majority |
+| Stripe external payments over Apple IAP | ~3% vs 15-30% commission | ✓ Good — post-Epic ruling enables this |
+| Server-authoritative subscriptions | AsyncStorage premium state bypassable | ✓ Good — RLS enforces server-side |
+| Local notifications for Phase 6 | No server push needed for cooking/leftover/budget | ✓ Good — simpler architecture |
+| Supabase Presence for avatars | Separate from postgres_changes channels | ✓ Good — clean separation of concerns |
+| Maestro over Detox for E2E | YAML-based, no project deps, EAS Workflows support | ✓ Good — 18 flows written quickly |
 
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
 
-**After each phase transition** (via `/gsd:transition`):
-1. Requirements invalidated? → Move to Out of Scope with reason
-2. Requirements validated? → Move to Validated with phase reference
-3. New requirements emerged? → Add to Active
-4. Decisions to log? → Add to Key Decisions
-5. "What This Is" still accurate? → Update if drifted
-
-**After each milestone** (via `/gsd:complete-milestone`):
-1. Full review of all sections
-2. Core Value check — still the right priority?
-3. Audit Out of Scope — reasons still valid?
-4. Update Context with current state
-
 ---
-*Last updated: 2026-03-24 after milestone v2.0 started*
+*Last updated: 2026-03-26 after v2.0 milestone complete*
