@@ -48,39 +48,24 @@ describe('ErrorBoundary', () => {
   });
 
   it('clears error and re-renders children when "Try Again" is pressed', () => {
-    // Use a wrapper that controls whether the child throws
-    function Wrapper() {
-      const [shouldThrow, setShouldThrow] = useState(true);
-      return (
-        <ErrorBoundary>
-          {shouldThrow ? (
-            <ThrowingChild shouldThrow />
-          ) : (
-            <Text>Recovered</Text>
-          )}
-        </ErrorBoundary>
-      );
-    }
-
-    // Since ErrorBoundary resets state, the child won't throw on re-render
-    // We need a different approach: the ThrowingChild only throws once
-    let throwCount = 0;
-    function ThrowOnce() {
-      throwCount++;
-      if (throwCount === 1) {
-        throw new Error('One-time error');
-      }
-      return <Text>Recovered content</Text>;
-    }
-
-    const { getByText } = render(
+    // First render the boundary with a throwing child to trigger error state
+    const { getByText, rerender } = render(
       <ErrorBoundary>
-        <ThrowOnce />
+        <ThrowingChild shouldThrow />
       </ErrorBoundary>
     );
 
     expect(getByText('Something went wrong')).toBeTruthy();
+
+    // Re-render with a non-throwing child, then press Try Again
+    // The ErrorBoundary will clear hasError and render the new children
+    rerender(
+      <ErrorBoundary>
+        <ThrowingChild shouldThrow={false} />
+      </ErrorBoundary>
+    );
+
     fireEvent.press(getByText('Try Again'));
-    expect(getByText('Recovered content')).toBeTruthy();
+    expect(getByText('Child content')).toBeTruthy();
   });
 });
