@@ -7,7 +7,7 @@ import { typography } from '../../../src/theme/typography';
 import { spacing, borderRadius } from '../../../src/theme/spacing';
 import { shadows } from '../../../src/theme/shadows';
 import { Skeleton } from '../../../src/components/ui/Skeleton';
-import { Button } from '../../../src/components/ui/Button';
+import { EmptyState } from '../../../src/components/ui/EmptyState';
 import { GrocerySection } from '../../../src/components/grocery/GrocerySection';
 import { GrocerySummary } from '../../../src/components/grocery/GrocerySummary';
 import { AddItemSheet } from '../../../src/components/grocery/AddItemSheet';
@@ -152,25 +152,14 @@ export default function GroceryScreen() {
     return (
       <View style={[styles.container, { paddingTop: insets.top }]}>
         <Text style={styles.screenTitle}>Grocery List</Text>
-        <View style={styles.emptyState}>
-          <MaterialCommunityIcons
-            name="cart-outline"
-            size={64}
-            color={colors.outlineVariant}
-          />
-          <Text style={styles.emptyTitle}>No grocery list yet</Text>
-          <Text style={styles.emptySubtitle}>
-            Generate a list from this week's meal plan
-          </Text>
-          <Button
-            onPress={handleGenerate}
-            loading={loading}
-            style={styles.generateButton}
-            testID="generate-list-button"
-          >
-            Generate List
-          </Button>
-        </View>
+        <EmptyState
+          icon="cart-outline"
+          title="No grocery list yet"
+          subtitle="Generate a list from this week's meal plan"
+          actionLabel="Generate List"
+          onAction={handleGenerate}
+          loading={loading}
+        />
       </View>
     );
   }
@@ -225,11 +214,11 @@ export default function GroceryScreen() {
         )}
 
         {items.length === 0 && (
-          <View style={styles.emptyList}>
-            <Text style={styles.emptyListText}>
-              No items in your list. Tap + to add items manually.
-            </Text>
-          </View>
+          <EmptyState
+            icon="playlist-plus"
+            title="No items in your list"
+            subtitle="Tap + to add items manually"
+          />
         )}
       </ScrollView>
 
@@ -305,36 +294,6 @@ const styles = StyleSheet.create({
   },
   skeletonContainer: {
     padding: spacing.md,
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: spacing.xl,
-  },
-  emptyTitle: {
-    ...typography.titleLg,
-    color: colors.onSurface,
-    marginTop: spacing.md,
-  },
-  emptySubtitle: {
-    ...typography.bodyMd,
-    color: colors.onSurfaceVariant,
-    textAlign: 'center',
-    marginTop: spacing.sm,
-    marginBottom: spacing.lg,
-  },
-  generateButton: {
-    minWidth: 180,
-  },
-  emptyList: {
-    padding: spacing.xl,
-    alignItems: 'center',
-  },
-  emptyListText: {
-    ...typography.bodyMd,
-    color: colors.onSurfaceVariant,
-    textAlign: 'center',
   },
   fab: {
     position: 'absolute',
