@@ -10,8 +10,8 @@
 - [x] **DISC-01**: FilterBar component committed and rendering in recipes tab with category/cost/time dropdowns
 - [x] **DISC-02**: Manual recipe form includes category picker from standard category list
 - [x] **DISC-03**: Recipe edit form includes category picker to update existing recipes
-- [ ] **DISC-04**: AI-imported recipes populate category field from extracted data (already works — verify)
-- [ ] **DISC-05**: Filtering by category, cost range, and prep time returns correct results client-side
+- [x] **DISC-04**: AI-imported recipes populate category field from extracted data (already works — verify)
+- [x] **DISC-05**: Filtering by category, cost range, and prep time returns correct results client-side
 
 ### Stripe Checkout
 
@@ -46,8 +46,8 @@
 | DISC-01 | Phase 10 | Complete |
 | DISC-02 | Phase 10 | Complete |
 | DISC-03 | Phase 10 | Complete |
-| DISC-04 | Phase 10 | Pending |
-| DISC-05 | Phase 10 | Pending |
+| DISC-04 | Phase 10 | Complete |
+| DISC-05 | Phase 10 | Complete |
 | PAY-01 | Phase 11 | Pending |
 | PAY-02 | Phase 11 | Pending |
 | PAY-03 | Phase 11 | Pending |
