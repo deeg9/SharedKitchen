@@ -1,17 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.2
-milestone_name: UI Polish & Bug Fixes
-status: planning
-stopped_at: Completed 15-02-PLAN.md
-last_updated: "2026-03-26T21:06:35.378Z"
-last_activity: 2026-03-26 — v2.2 roadmap created (3 phases, 10 requirements)
+milestone: v2.3
+milestone_name: Kitchen Switching
+status: Defining requirements
+stopped_at: null
+last_updated: "2026-03-26T21:30:00.000Z"
 progress:
-  total_phases: 3
-  completed_phases: 2
-  total_plans: 6
-  completed_plans: 5
-  percent: 0
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
@@ -21,13 +19,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Phase 13 — Layout & Safe Areas
+**Current focus:** Defining v2.3 requirements
 
 ## Current Position
 
-Phase: 13 of 15 (Layout & Safe Areas)
-Plan: Ready to plan phase
-Status: Ready to plan
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-26 — Milestone v2.3 started
 Last activity: 2026-03-26 — v2.2 roadmap created (3 phases, 10 requirements)
 
 Progress: [░░░░░░░░░░] 0%

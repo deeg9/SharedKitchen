@@ -73,16 +73,12 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 
 ### Active
 
-**v2.2: UI Polish & Bug Fixes**
-- [ ] Sign-in screen redesign with logo and visual polish
-- [ ] Recipe detail layout: fix crowded bottom buttons, remove white overlay on food image
-- [ ] Fix generate-meal edge function returning non-2xx error
-- [ ] Fix filter bar z-index bleed behind popups
-- [ ] Fix bottom sheet/modal safe area bleeding into status bar
-- [ ] Profile screen safe area: content scrolling behind system UI
-- [ ] Remove broken Dark Mode toggle and App Settings section
-- [ ] Dietary restrictions: replace static chips with searchable input
-- [ ] Household management area improvements
+**v2.3: Kitchen Switching**
+- [ ] Kitchen switcher dropdown on profile page showing all kitchens user belongs to
+- [ ] Create new kitchen flow from profile
+- [ ] Join kitchen via invite code from profile
+- [ ] Active kitchen context flows through all tabs (Plan, Recipes, Grocery, Budget)
+- [ ] All data queries scoped to active household_id
 
 ### Out of Scope
 
