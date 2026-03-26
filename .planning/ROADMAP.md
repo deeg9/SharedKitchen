@@ -43,7 +43,7 @@ Mise delivers a collaborative dinner planning app for households. v1.0 (Phases 1
 - [ ] Phase 11: Stripe Test Mode E2E (2 plans) — Fix missing package + webhook bug, document env vars, verify full checkout flow
   - PAY-01, PAY-02, PAY-03, PAY-04, PAY-05
   - Plans:
-    - [ ] 11-01-PLAN.md — Install @stripe/stripe-react-native, document env vars, fix webhook subscription ID bug, create setup guide
+    - [x] 11-01-PLAN.md — Install @stripe/stripe-react-native, document env vars, fix webhook subscription ID bug, create setup guide
     - [ ] 11-02-PLAN.md — Deploy Edge Functions, verify checkout + subscription + billing portal flows (checkpoint)
 - [x] Phase 12: Code Quality Polish (2 plans) — Error boundaries, TypeScript fixes, console cleanup, empty states (completed 2026-03-26)
   - QUAL-01, QUAL-02, QUAL-03, QUAL-04, QUAL-05
@@ -65,7 +65,7 @@ Mise delivers a collaborative dinner planning app for households. v1.0 (Phases 1
 | 8. Enhanced AI & Cooking Mode | v2.0 | 3/3 | Complete | 2026-03-26 |
 | 9. E2E Testing | v2.0 | 3/3 | Complete | 2026-03-26 |
 | 10. Recipe Discovery | v2.1 | 2/2 | Complete    | 2026-03-26 |
-| 11. Stripe Test Mode E2E | v2.1 | 0/2 | Pending | — |
+| 11. Stripe Test Mode E2E | v2.1 | 1/2 | In Progress|  |
 | 12. Code Quality Polish | v2.1 | 2/2 | Complete    | 2026-03-26 |
 
 ---

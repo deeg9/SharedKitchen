@@ -15,9 +15,9 @@
 
 ### Stripe Checkout
 
-- [ ] **PAY-01**: Stripe test env vars documented in .env.example (publishable key, price ID)
-- [ ] **PAY-02**: Supabase Edge Function secrets documented for Stripe (secret key, webhook signing secret, price ID)
-- [ ] **PAY-03**: Full checkout flow works in test mode: initiate → PaymentSheet → webhook → subscription row created
+- [x] **PAY-01**: Stripe test env vars documented in .env.example (publishable key, price ID)
+- [x] **PAY-02**: Supabase Edge Function secrets documented for Stripe (secret key, webhook signing secret, price ID)
+- [x] **PAY-03**: Full checkout flow works in test mode: initiate → PaymentSheet → webhook → subscription row created
 - [ ] **PAY-04**: Subscription status reflects correctly in app after successful test checkout
 - [ ] **PAY-05**: Billing portal opens and allows subscription management in test mode
 
@@ -48,9 +48,9 @@
 | DISC-03 | Phase 10 | Complete |
 | DISC-04 | Phase 10 | Complete |
 | DISC-05 | Phase 10 | Complete |
-| PAY-01 | Phase 11 | Pending |
-| PAY-02 | Phase 11 | Pending |
-| PAY-03 | Phase 11 | Pending |
+| PAY-01 | Phase 11 | Complete |
+| PAY-02 | Phase 11 | Complete |
+| PAY-03 | Phase 11 | Complete |
 | PAY-04 | Phase 11 | Pending |
 | PAY-05 | Phase 11 | Pending |
 | QUAL-01 | Phase 12 | Complete |

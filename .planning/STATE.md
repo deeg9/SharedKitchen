@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: Discovery, Checkout & Polish
-status: Milestone complete
-stopped_at: Completed 12-01-PLAN.md
-last_updated: "2026-03-26T15:15:57.624Z"
+status: Ready to execute
+stopped_at: Completed 11-01-PLAN.md
+last_updated: "2026-03-26T16:23:04.021Z"
 progress:
   total_phases: 4
   completed_phases: 4
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Phase 12 — code-quality-polish
+**Current focus:** Phase 11 — stripe-test-e2e
 
 ## Current Position
 
-Phase: 12
-Plan: Not started
+Phase: 11 (stripe-test-e2e) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -49,6 +49,7 @@ Recent decisions affecting current work:
 - [Phase 10]: Used Zustand getState/setState for direct store testing without React rendering
 - [Phase 12]: ErrorBoundary wraps Slot only, PermissionPrompt stays outside for error recovery access
 - [Phase 12]: Used getErrorMessage(error: unknown) utility pattern for all catch blocks instead of error.message
+- [Phase 11]: Left existing if(!customerId) upsert intact, added separate unconditional upsert after subscription creation for webhook matching
 
 ### Pending Todos
 
@@ -72,9 +73,10 @@ None yet.
 | Phase 10 P02 | 67s | 1 tasks | 1 files |
 | Phase 12 P02 | 190 | 2 tasks | 6 files |
 | Phase 12 P01 | 552s | 2 tasks | 21 files |
+| Phase 11 P01 | 71 | 2 tasks | 4 files |
 
 ## Session Continuity
 
-Last session: 2026-03-26T15:12:07.697Z
-Stopped at: Completed 12-01-PLAN.md
+Last session: 2026-03-26T16:23:04.018Z
+Stopped at: Completed 11-01-PLAN.md
 Resume file: None
