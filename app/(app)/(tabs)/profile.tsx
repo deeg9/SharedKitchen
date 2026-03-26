@@ -273,6 +273,42 @@ export default function ProfileScreen() {
                   </Pressable>
                 </>
               )}
+
+              {/* Create & Join Kitchen Actions */}
+              <Pressable
+                style={styles.actionRow}
+                onPress={() => router.push('/(app)/household/create' as Href)}
+                testID="kitchen-create-button"
+              >
+                <MaterialCommunityIcons
+                  name="plus-circle-outline"
+                  size={22}
+                  color={colors.primary}
+                />
+                <Text style={styles.actionRowText}>Create Kitchen</Text>
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={20}
+                  color={colors.primary}
+                />
+              </Pressable>
+              <Pressable
+                style={[styles.actionRow, { borderTopWidth: 0 }]}
+                onPress={() => router.push('/(app)/household/join' as Href)}
+                testID="kitchen-join-button"
+              >
+                <MaterialCommunityIcons
+                  name="account-group-outline"
+                  size={22}
+                  color={colors.primary}
+                />
+                <Text style={styles.actionRowText}>Join Kitchen</Text>
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={20}
+                  color={colors.primary}
+                />
+              </Pressable>
             </Card>
           ) : (
             <Card variant="filled" style={styles.noHouseholdCard}>
