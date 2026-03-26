@@ -12,7 +12,7 @@ import { Avatar } from '../../../src/components/ui/Avatar';
 import { Button } from '../../../src/components/ui/Button';
 import { Card } from '../../../src/components/ui/Card';
 import { Skeleton } from '../../../src/components/ui/Skeleton';
-import { BottomSheet } from '../../../src/components/ui/BottomSheet';
+
 import { SearchableSelect, DIETARY_OPTIONS } from '../../../src/components/ui/SearchableSelect';
 import { supabase } from '../../../src/lib/supabase';
 import { colors } from '../../../src/theme/colors';
@@ -38,7 +38,6 @@ export default function ProfileScreen() {
   const { mealPlan } = usePlanStore();
   const subscription = useSubscriptionStore();
 
-  const [showHouseholdPicker, setShowHouseholdPicker] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const [cookingCount, setCookingCount] = useState(0);
   const [dietaryPrefs, setDietaryPrefs] = useState<string[]>([]);
@@ -95,7 +94,6 @@ export default function ProfileScreen() {
 
   const handleSwitchHousehold = async (id: string) => {
     await setActiveHousehold(id);
-    setShowHouseholdPicker(false);
   };
 
   const handleEditHouseholdName = () => {
@@ -162,97 +160,119 @@ export default function ProfileScreen() {
           </Button>
         </View>
 
-        {/* Household Section */}
+        {/* Your Kitchens Section */}
         <View style={[styles.section, { zIndex: 0 }]}>
-          <Text style={styles.sectionTitle}>Household</Text>
+          <Text style={styles.sectionTitle}>Your Kitchens</Text>
 
           {isLoading ? (
             <Skeleton.Card />
-          ) : currentHousehold ? (
+          ) : households.length > 0 ? (
             <Card variant="elevated" style={styles.householdCard}>
-              {/* Household Header Row */}
-              <View style={styles.householdHeader}>
-                <View style={styles.householdHeaderLeft}>
-                  <Text style={styles.householdName}>
-                    {currentHousehold.name}
-                  </Text>
-                  <Text style={styles.memberCountBadge}>
-                    {members.length} {members.length === 1 ? 'member' : 'members'}
-                  </Text>
-                </View>
-                <View style={styles.householdHeaderActions}>
-                  <Pressable
-                    onPress={handleEditHouseholdName}
-                    hitSlop={8}
-                    testID="household-edit-name"
-                  >
-                    <MaterialCommunityIcons
-                      name="pencil-outline"
-                      size={20}
-                      color={colors.onSurfaceVariant}
-                    />
-                  </Pressable>
-                  {households.length > 1 && (
+              {/* Kitchen List */}
+              <View style={styles.kitchenList}>
+                {households.map((h, index) => {
+                  const isActive = h.id === activeHouseholdId;
+                  return (
                     <Pressable
-                      onPress={() => setShowHouseholdPicker(true)}
+                      key={h.id}
+                      style={[
+                        styles.kitchenRow,
+                        isActive && styles.kitchenRowActive,
+                        index < households.length - 1 && styles.kitchenRowBorder,
+                      ]}
+                      onPress={() => !isActive && handleSwitchHousehold(h.id)}
+                      testID={`kitchen-row-${h.id}`}
+                    >
+                      <Text style={[
+                        styles.kitchenRowText,
+                        isActive && styles.kitchenRowTextActive,
+                      ]}>
+                        {h.name}
+                      </Text>
+                      {isActive && (
+                        <MaterialCommunityIcons
+                          name="check-circle"
+                          size={20}
+                          color={colors.primary}
+                        />
+                      )}
+                    </Pressable>
+                  );
+                })}
+              </View>
+
+              {/* Active Kitchen Details */}
+              {currentHousehold && (
+                <>
+                  <View style={styles.activeKitchenHeader}>
+                    <View style={styles.householdHeaderLeft}>
+                      <Text style={styles.householdName}>
+                        {currentHousehold.name}
+                      </Text>
+                      <Text style={styles.memberCountBadge}>
+                        {members.length} {members.length === 1 ? 'member' : 'members'}
+                      </Text>
+                    </View>
+                    <Pressable
+                      onPress={handleEditHouseholdName}
                       hitSlop={8}
-                      testID="household-switch"
+                      testID="household-edit-name"
                     >
                       <MaterialCommunityIcons
-                        name="swap-horizontal"
+                        name="pencil-outline"
                         size={20}
                         color={colors.onSurfaceVariant}
                       />
                     </Pressable>
-                  )}
-                </View>
-              </View>
-
-              {/* Members List */}
-              <View style={styles.membersSection}>
-                <View style={styles.membersTitleRow}>
-                  <Text style={styles.membersTitle}>Members</Text>
-                </View>
-                {members.map((member, index) => (
-                  <View
-                    key={member.id}
-                    style={[
-                      styles.memberRow,
-                      index < members.length - 1 && styles.memberRowBorder,
-                    ]}
-                  >
-                    <Avatar
-                      uri={member.profiles?.avatar_url}
-                      name={member.profiles?.display_name ?? 'Member'}
-                      size="sm"
-                    />
-                    <View style={styles.memberInfo}>
-                      <Text style={styles.memberName}>
-                        {member.profiles?.display_name ?? 'Unknown'}
-                      </Text>
-                      <Text style={styles.memberRole}>{member.role}</Text>
-                    </View>
                   </View>
-                ))}
-              </View>
 
-              {/* Invite Action */}
-              <Pressable
-                style={styles.inviteRow}
-                onPress={() => router.push('/(app)/household/invite' as Href)}
-              >
-                <MaterialCommunityIcons
-                  name="account-plus-outline"
-                  size={22}
-                  color={colors.primary}
-                />
-                <Text style={styles.inviteText}>Invite Members</Text>
-                <MaterialCommunityIcons
-                  name="chevron-right"
-                  size={20}
-                  color={colors.primary}
-                />
-              </Pressable>
+                  {/* Members List */}
+                  <View style={styles.membersSection}>
+                    <View style={styles.membersTitleRow}>
+                      <Text style={styles.membersTitle}>Members</Text>
+                    </View>
+                    {members.map((member, index) => (
+                      <View
+                        key={member.id}
+                        style={[
+                          styles.memberRow,
+                          index < members.length - 1 && styles.memberRowBorder,
+                        ]}
+                      >
+                        <Avatar
+                          uri={member.profiles?.avatar_url}
+                          name={member.profiles?.display_name ?? 'Member'}
+                          size="sm"
+                        />
+                        <View style={styles.memberInfo}>
+                          <Text style={styles.memberName}>
+                            {member.profiles?.display_name ?? 'Unknown'}
+                          </Text>
+                          <Text style={styles.memberRole}>{member.role}</Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+
+                  {/* Invite Action */}
+                  <Pressable
+                    style={styles.inviteRow}
+                    onPress={() => router.push('/(app)/household/invite' as Href)}
+                  >
+                    <MaterialCommunityIcons
+                      name="account-plus-outline"
+                      size={22}
+                      color={colors.primary}
+                    />
+                    <Text style={styles.inviteText}>Invite Members</Text>
+                    <MaterialCommunityIcons
+                      name="chevron-right"
+                      size={20}
+                      color={colors.primary}
+                    />
+                  </Pressable>
+                </>
+              )}
             </Card>
           ) : (
             <Card variant="filled" style={styles.noHouseholdCard}>
@@ -262,16 +282,42 @@ export default function ProfileScreen() {
                 color={colors.onSurfaceVariant}
               />
               <Text style={styles.noHouseholdText}>
-                You are not part of any household yet.
+                You are not part of any kitchen yet.
               </Text>
-              <Button
-                variant="primary"
-                size="md"
+              <Pressable
+                style={styles.actionRow}
                 onPress={() => router.push('/(app)/household/create' as Href)}
-                style={{ marginTop: spacing.md }}
+                testID="kitchen-create-button"
               >
-                Create a Household
-              </Button>
+                <MaterialCommunityIcons
+                  name="plus-circle-outline"
+                  size={22}
+                  color={colors.primary}
+                />
+                <Text style={styles.actionRowText}>Create Kitchen</Text>
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={20}
+                  color={colors.primary}
+                />
+              </Pressable>
+              <Pressable
+                style={[styles.actionRow, { borderTopWidth: 0 }]}
+                onPress={() => router.push('/(app)/household/join' as Href)}
+                testID="kitchen-join-button"
+              >
+                <MaterialCommunityIcons
+                  name="account-group-outline"
+                  size={22}
+                  color={colors.primary}
+                />
+                <Text style={styles.actionRowText}>Join Kitchen</Text>
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={20}
+                  color={colors.primary}
+                />
+              </Pressable>
             </Card>
           )}
         </View>
@@ -358,35 +404,6 @@ export default function ProfileScreen() {
         </View>
       </ScrollView>
 
-      {/* Household Picker Bottom Sheet */}
-      <BottomSheet
-        isOpen={showHouseholdPicker}
-        onClose={() => setShowHouseholdPicker(false)}
-        snapPoints={['40%']}
-      >
-        <View style={styles.sheetContent}>
-          <Text style={styles.sheetTitle}>Switch Household</Text>
-          {households.map((h) => (
-            <Pressable
-              key={h.id}
-              style={[
-                styles.householdOption,
-                h.id === activeHouseholdId && styles.activeHouseholdOption,
-              ]}
-              onPress={() => handleSwitchHousehold(h.id)}
-            >
-              <Text
-                style={[
-                  styles.householdOptionText,
-                  h.id === activeHouseholdId && styles.activeHouseholdOptionText,
-                ]}
-              >
-                {h.name}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-      </BottomSheet>
     </View>
   );
 }
@@ -430,7 +447,36 @@ const styles = StyleSheet.create({
   householdCard: {
     // No extra styles needed beyond Card defaults
   },
-  householdHeader: {
+  kitchenList: {
+    marginBottom: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.outlineVariant,
+    paddingBottom: spacing.xs,
+  },
+  kitchenRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.sm + 4,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.md,
+  },
+  kitchenRowActive: {
+    backgroundColor: colors.primaryFixed,
+  },
+  kitchenRowBorder: {
+    borderBottomWidth: 0.5,
+    borderBottomColor: colors.outlineVariant,
+  },
+  kitchenRowText: {
+    ...typography.bodyLg,
+    color: colors.onSurface,
+  },
+  kitchenRowTextActive: {
+    color: colors.primary,
+    fontWeight: '600' as const,
+  },
+  activeKitchenHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
@@ -447,12 +493,6 @@ const styles = StyleSheet.create({
     ...typography.labelSm,
     color: colors.onSurfaceVariant,
     marginTop: spacing.xs,
-  },
-  householdHeaderActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    paddingTop: spacing.xs,
   },
   membersSection: {
     marginBottom: 0,
@@ -522,30 +562,20 @@ const styles = StyleSheet.create({
     ...typography.labelLg,
     color: colors.error,
   },
-  sheetContent: {
-    padding: spacing.lg,
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingVertical: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.outlineVariant,
+    marginTop: spacing.sm,
+    width: '100%',
   },
-  sheetTitle: {
-    ...typography.titleMd,
-    color: colors.onSurface,
-    marginBottom: spacing.md,
-  },
-  householdOption: {
-    paddingVertical: spacing.sm + 4,
-    paddingHorizontal: spacing.md,
-    borderRadius: borderRadius.md,
-    marginBottom: spacing.xs,
-  },
-  activeHouseholdOption: {
-    backgroundColor: colors.primaryFixed,
-  },
-  householdOptionText: {
+  actionRowText: {
     ...typography.bodyLg,
-    color: colors.onSurface,
-  },
-  activeHouseholdOptionText: {
     color: colors.primary,
-    fontWeight: '600',
+    flex: 1,
   },
   subscriptionCard: {
     // Card defaults are sufficient
