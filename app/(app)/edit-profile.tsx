@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getErrorMessage } from '../../src/lib/errors';
 import {
   View,
   Text,
@@ -106,8 +107,8 @@ export default function EditProfileScreen() {
       });
 
       router.back();
-    } catch (error: any) {
-      Alert.alert('Error', error.message ?? 'Failed to save profile');
+    } catch (error: unknown) {
+      Alert.alert('Error', getErrorMessage(error));
     } finally {
       setSaving(false);
     }

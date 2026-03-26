@@ -45,7 +45,7 @@ export function usePresence(
 
           for (const [key, presences] of Object.entries(state)) {
             if (key === currentUser.user_id) continue;
-            const latest = (presences as any[])?.[0];
+            const latest = (presences as unknown as PresenceMember[])?.[0];
             if (latest) {
               result.push({
                 user_id: latest.user_id,

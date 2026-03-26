@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   viewAllButton: {
-    marginLeft: 'auto' as any,
+    marginLeft: 'auto' as const,
   },
   viewAllText: {
     ...typography.labelMd,

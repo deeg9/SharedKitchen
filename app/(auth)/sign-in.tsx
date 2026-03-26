@@ -83,8 +83,8 @@ export default function SignInScreen() {
       if (error) {
         Alert.alert('Google Sign In Error', error.message);
       }
-    } catch (error: any) {
-      if (error?.code === 'SIGN_IN_CANCELLED') {
+    } catch (error: unknown) {
+      if (error instanceof Error && 'code' in error && (error as { code: string }).code === 'SIGN_IN_CANCELLED') {
         // User cancelled, no alert needed
         return;
       }

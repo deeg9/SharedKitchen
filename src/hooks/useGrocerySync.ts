@@ -59,7 +59,7 @@ export function useGrocerySync(
           filter: `grocery_list_id=eq.${listId}`,
         },
         (payload) => {
-          useGroceryStore.getState()._removeItem((payload.old as any).id);
+          useGroceryStore.getState()._removeItem((payload.old as { id: string }).id);
         }
       )
       .subscribe((status) => {

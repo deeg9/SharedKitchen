@@ -13,6 +13,7 @@ import { RecipeInsert } from '../../../src/types/database';
 import { colors } from '../../../src/theme/colors';
 import { typography } from '../../../src/theme/typography';
 import { spacing, borderRadius } from '../../../src/theme/spacing';
+import { getErrorMessage } from '../../../src/lib/errors';
 
 const PROGRESS_MESSAGES = [
   'Fetching recipe...',
@@ -61,8 +62,8 @@ export default function AddRecipeScreen() {
     try {
       const data = await parseRecipeUrl(importUrl.trim());
       setImportedData(data);
-    } catch (error: any) {
-      Alert.alert('Import Failed', error.message ?? 'Could not parse recipe from URL.');
+    } catch (error: unknown) {
+      Alert.alert('Import Failed', getErrorMessage(error));
     } finally {
       setImporting(false);
       stopProgress();
@@ -127,8 +128,8 @@ export default function AddRecipeScreen() {
       } else {
         Alert.alert('Error', 'Failed to create recipe. Please try again.');
       }
-    } catch (error: any) {
-      Alert.alert('Error', error.message ?? 'Something went wrong.');
+    } catch (error: unknown) {
+      Alert.alert('Error', getErrorMessage(error));
     } finally {
       setLoading(false);
     }

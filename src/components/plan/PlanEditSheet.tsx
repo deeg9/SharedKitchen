@@ -142,7 +142,7 @@ export function PlanEditSheet({
                 style={[styles.mealTypePill, isActive && styles.mealTypePillActive]}
               >
                 <MaterialCommunityIcons
-                  name={config.icon as any}
+                  name={config.icon}
                   size={18}
                   color={isActive ? colors.onPrimary : colors.onSurface}
                 />

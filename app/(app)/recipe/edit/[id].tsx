@@ -11,6 +11,7 @@ import { RecipeInsert, RecipeUpdate } from '../../../../src/types/database';
 import { colors } from '../../../../src/theme/colors';
 import { typography, fontFamily } from '../../../../src/theme/typography';
 import { spacing, borderRadius } from '../../../../src/theme/spacing';
+import { getErrorMessage } from '../../../../src/lib/errors';
 
 export default function EditRecipeScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -85,8 +86,8 @@ export default function EditRecipeScreen() {
 
       await updateRecipe(id, updates);
       router.back();
-    } catch (error: any) {
-      Alert.alert('Error', error.message ?? 'Failed to update recipe.');
+    } catch (error: unknown) {
+      Alert.alert('Error', getErrorMessage(error));
     } finally {
       setLoading(false);
     }

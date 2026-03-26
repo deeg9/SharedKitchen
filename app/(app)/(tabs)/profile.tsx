@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, Pressable, Switch, Alert } from 'react-native';
 import * as Notifications from 'expo-notifications';
-import { useRouter } from 'expo-router';
+import { useRouter, Href } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuthStore } from '../../../src/stores/authStore';
@@ -245,7 +245,7 @@ export default function ProfileScreen() {
               <Button
                 variant="tertiary"
                 size="sm"
-                onPress={() => router.push('/(app)/household/invite' as any)}
+                onPress={() => router.push('/(app)/household/invite' as Href)}
                 style={{ marginTop: spacing.sm }}
               >
                 Invite Members
@@ -259,7 +259,7 @@ export default function ProfileScreen() {
               <Button
                 variant="primary"
                 size="md"
-                onPress={() => router.push('/(app)/household/create' as any)}
+                onPress={() => router.push('/(app)/household/create' as Href)}
                 style={{ marginTop: spacing.md }}
               >
                 Create a Household
@@ -284,7 +284,7 @@ export default function ProfileScreen() {
         {/* Subscription */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Subscription</Text>
-          <Pressable onPress={() => router.push('/(app)/subscription' as any)} testID="profile-subscription-link">
+          <Pressable onPress={() => router.push('/(app)/subscription' as Href)} testID="profile-subscription-link">
             <Card variant="filled" style={styles.subscriptionCard}>
               <View style={styles.subscriptionRow}>
                 <MaterialCommunityIcons
@@ -367,7 +367,7 @@ export default function ProfileScreen() {
 
           <Pressable
             style={styles.settingRow}
-            onPress={() => router.push('/(app)/leftovers' as any)}
+            onPress={() => router.push('/(app)/leftovers' as Href)}
           >
             <MaterialCommunityIcons name="food-variant" size={20} color={colors.onSurface} />
             <Text style={[styles.settingLabel, { flex: 1 }]}>Manage Leftovers</Text>

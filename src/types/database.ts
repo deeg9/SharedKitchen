@@ -16,7 +16,7 @@ export type MealType = 'breakfast' | 'lunch' | 'dinner';
 
 export const MEAL_TYPES: MealType[] = ['breakfast', 'lunch', 'dinner'];
 
-export const MEAL_TYPE_CONFIG: Record<MealType, { label: string; icon: string }> = {
+export const MEAL_TYPE_CONFIG: Record<MealType, { label: string; icon: 'food-croissant' | 'food-apple' | 'food-variant' }> = {
   breakfast: { label: 'Breakfast', icon: 'food-croissant' },
   lunch: { label: 'Lunch', icon: 'food-apple' },
   dinner: { label: 'Dinner', icon: 'food-variant' },

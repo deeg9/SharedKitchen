@@ -1,6 +1,11 @@
 import { supabase } from './supabase';
 import { RecipeInsert } from '../types/database';
 
+/** Shape of the error context returned by supabase.functions.invoke for non-2xx responses. */
+interface SupabaseFunctionError extends Error {
+  context?: { status?: number };
+}
+
 // ── Meal Suggestion Types ──────────────────────────────────────────
 
 export interface MealSuggestion {
@@ -106,7 +111,7 @@ export async function parseRecipeUrl(
   if (error) {
     // Supabase functions.invoke returns the response body in error.context for non-2xx
     const errorBody = typeof error.message === 'string' ? error.message : '';
-    if (errorBody.includes('Rate limit exceeded') || (error as any).context?.status === 429) {
+    if (errorBody.includes('Rate limit exceeded') || (error as SupabaseFunctionError).context?.status === 429) {
       try {
         const parsed = JSON.parse(errorBody);
         throw new RateLimitError(
@@ -168,7 +173,7 @@ export async function generateMealSuggestions(
   // Check for rate limit response
   if (error) {
     const errorBody = typeof error.message === 'string' ? error.message : '';
-    if (errorBody.includes('Rate limit exceeded') || (error as any).context?.status === 429) {
+    if (errorBody.includes('Rate limit exceeded') || (error as SupabaseFunctionError).context?.status === 429) {
       try {
         const parsed = JSON.parse(errorBody);
         throw new RateLimitError(
