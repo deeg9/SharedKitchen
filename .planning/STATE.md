@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: UI Polish & Bug Fixes
 status: planning
-stopped_at: Completed 14-02-PLAN.md
-last_updated: "2026-03-26T20:33:06.076Z"
+stopped_at: Completed 15-02-PLAN.md
+last_updated: "2026-03-26T21:06:35.378Z"
 last_activity: 2026-03-26 — v2.2 roadmap created (3 phases, 10 requirements)
 progress:
   total_phases: 3
-  completed_phases: 1
-  total_plans: 4
-  completed_plans: 2
+  completed_phases: 2
+  total_plans: 6
+  completed_plans: 5
   percent: 0
 ---
 
@@ -53,6 +53,8 @@ Recent decisions affecting current work:
 - [Phase 13]: Reduced hero gradient from 160px/0.85 to 80px/0.3 for readability without obscuring food photo
 - [Phase 13]: Used wrapper View stacking context for FilterBar z-index containment instead of modifying FilterBar internals
 - [Phase 14]: Built AppLogo with Views + MaterialCommunityIcons instead of image asset for resolution independence
+- [Phase 15]: Removed entire App Settings section rather than fixing broken toggles
+- [Phase 15]: Used Alert.prompt on iOS for inline household name editing
 
 ### Pending Todos
 
@@ -79,9 +81,11 @@ None yet.
 | Phase 11 P01 | 71 | 2 tasks | 4 files |
 | Phase 13 P02 | 60s | 2 tasks | 2 files |
 | Phase 14 P02 | 75 | 2 tasks | 2 files |
+| Phase 15 P01 | 187 | 2 tasks | 2 files |
+| Phase 15 P02 | 169 | 3 tasks | 2 files |
 
 ## Session Continuity
 
-Last session: 2026-03-26T20:33:06.074Z
-Stopped at: Completed 14-02-PLAN.md
+Last session: 2026-03-26T21:06:35.376Z
+Stopped at: Completed 15-02-PLAN.md
 Resume file: None

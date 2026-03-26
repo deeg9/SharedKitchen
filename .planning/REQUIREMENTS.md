@@ -27,9 +27,9 @@
 
 ### Profile & Settings
 
-- [ ] **SETTINGS-01**: Dark Mode toggle and App Settings section removed from profile screen
-- [ ] **SETTINGS-02**: Dietary restrictions replaced with searchable input instead of static chip list
-- [ ] **SETTINGS-03**: Household management area redesigned for better usability
+- [x] **SETTINGS-01**: Dark Mode toggle and App Settings section removed from profile screen
+- [x] **SETTINGS-02**: Dietary restrictions replaced with searchable input instead of static chip list
+- [x] **SETTINGS-03**: Household management area redesigned for better usability
 
 ## Traceability
 
@@ -42,9 +42,9 @@
 | LAYOUT-04 | Phase 13 | Complete |
 | EDGE-01 | Phase 14 | Pending |
 | RECIPE-01 | Phase 13 | Complete |
-| SETTINGS-01 | Phase 15 | Pending |
-| SETTINGS-02 | Phase 15 | Pending |
-| SETTINGS-03 | Phase 15 | Pending |
+| SETTINGS-01 | Phase 15 | Complete |
+| SETTINGS-02 | Phase 15 | Complete |
+| SETTINGS-03 | Phase 15 | Complete |
 
 **Coverage:**
 - v2.2 requirements: 10 total
