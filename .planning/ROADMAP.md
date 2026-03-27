@@ -192,7 +192,10 @@ Plans:
   2. Grocery items populate from planned meals, user can check them off, and changes sync to other household members in real-time
   3. Budget tab loads with monthly cost tracking and weekly spending breakdown displaying correctly
   4. Leftovers screen loads and displays tracked items with freshness badges
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 21-01-PLAN.md — Expand planStore + groceryStore unit tests (error paths, Map population, generateGroceryList, realtime helpers)
+- [ ] 21-02-PLAN.md — Update appId in 6 Maestro flows (meal-plan + grocery) from com.mise.app to com.sharedkitchen.app
 
 ### Phase 22: Presence, Subscription, Notifications & Edge Cases QA
 **Goal**: Real-time presence, Stripe subscription, push notifications, and edge case handling all work correctly
@@ -231,8 +234,8 @@ Plans:
 | 18. Auth, Onboarding & Household QA | v2.4 | 2/2 | Complete    | 2026-03-27 |
 | 19. Recipe Browsing & Detail QA | v2.4 | 2/2 | Complete    | 2026-03-27 |
 | 20. Recipe Management & Cooking Mode QA | v2.4 | 2/2 | Complete    | 2026-03-27 |
-| 21. Planning, Grocery, Budget & Leftovers QA | v2.4 | 0/? | Not started | - |
+| 21. Planning, Grocery, Budget & Leftovers QA | v2.4 | 0/2 | Not started | - |
 | 22. Presence, Subscription, Notifications & Edge Cases QA | v2.4 | 0/? | Not started | - |
 
 ---
-*Last updated: 2026-03-27 after Phase 20 planning*
+*Last updated: 2026-03-27 after Phase 21 planning*
