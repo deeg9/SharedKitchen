@@ -30,26 +30,34 @@ export function useNotificationSetup() {
     }
 
     // Handle notification tap -> navigate to relevant screen
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(
-      (response) => {
-        const data = response.notification.request.content.data;
-        switch (data.type) {
-          case 'cooking_reminder':
-            router.push('/(app)/(tabs)/plan');
-            break;
-          case 'leftover_alert':
-            router.push('/(app)/leftovers');
-            break;
-          case 'budget_warning':
-            router.push('/(app)/(tabs)/budget');
-            break;
+    try {
+      responseListener.current = Notifications.addNotificationResponseReceivedListener(
+        (response) => {
+          const data = response.notification.request.content.data;
+          switch (data.type) {
+            case 'cooking_reminder':
+              router.push('/(app)/(tabs)/plan');
+              break;
+            case 'leftover_alert':
+              router.push('/(app)/leftovers');
+              break;
+            case 'budget_warning':
+              router.push('/(app)/(tabs)/budget');
+              break;
+          }
         }
-      }
-    );
+      );
+    } catch {
+      // Notification listeners not available in simulator
+    }
 
     return () => {
       if (responseListener.current) {
-        Notifications.removeNotificationSubscription(responseListener.current);
+        try {
+          Notifications.removeNotificationSubscription(responseListener.current);
+        } catch {
+          // Not available in simulator
+        }
       }
     };
   }, [session?.user?.id]);
