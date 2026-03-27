@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: UI Polish & Bug Fixes
 status: Ready to plan
-stopped_at: Completed 20-01-PLAN.md
-last_updated: "2026-03-27T22:38:36.652Z"
+stopped_at: Completed 21-01-PLAN.md
+last_updated: "2026-03-27T22:59:36.166Z"
 progress:
   total_phases: 10
-  completed_phases: 8
-  total_plans: 14
-  completed_plans: 14
+  completed_phases: 9
+  total_plans: 16
+  completed_plans: 16
 ---
 
 # Project State
@@ -19,11 +19,11 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Phase 20 — Recipe Management & Cooking Mode QA
+**Current focus:** Phase 21 — Planning, Grocery, Budget & Leftovers QA
 
 ## Current Position
 
-Phase: 21
+Phase: 22
 Plan: Not started
 
 ## Performance Metrics
@@ -50,6 +50,7 @@ Recent decisions affecting current work:
 - [Phase 19]: Error assertions use getErrorMessage fallback since supabase errors are plain objects, not Error instances
 - [Phase 19]: Skipped category dropdown Maestro test due to pre-existing zIndex:-1 layering; filter logic covered by unit tests
 - [Phase 20]: Used single-step recipe fixture to test Done Cooking button without FlatList swipe simulation
+- [Phase 21]: Skipped takeout auto-expense test: planStore.assignRecipe has no mealSource/mealCost params or budgetStore integration
 
 ### Pending Todos
 
@@ -86,9 +87,10 @@ None yet.
 | Phase 19 P02 | 632 | 2 tasks | 2 files |
 | Phase 20 P02 | 41 | 1 tasks | 3 files |
 | Phase 20 P01 | 156 | 2 tasks | 2 files |
+| Phase 21 P01 | 194s | 2 tasks | 2 files |
 
 ## Session Continuity
 
-Last session: 2026-03-27T22:34:59.817Z
-Stopped at: Completed 20-01-PLAN.md
+Last session: 2026-03-27T22:52:49.359Z
+Stopped at: Completed 21-01-PLAN.md
 Resume file: None

@@ -64,7 +64,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - [x] **Phase 18: Auth, Onboarding & Household QA** - Test auth flows, onboarding, profile management, and household create/invite/join (completed 2026-03-27)
 - [x] **Phase 19: Recipe Browsing & Detail QA** - Test recipe list, search, filters, detail display, ratings, favorites, notes, scaling (completed 2026-03-27)
 - [x] **Phase 20: Recipe Management & Cooking Mode QA** - Test recipe CRUD, URL import, cooking mode navigation, timers, unit toggle (completed 2026-03-27)
-- [ ] **Phase 21: Planning, Grocery, Budget & Leftovers QA** - Test meal planning, grocery list sync, budget tracking, leftovers
+- [x] **Phase 21: Planning, Grocery, Budget & Leftovers QA** - Test meal planning, grocery list sync, budget tracking, leftovers (completed 2026-03-27)
 - [ ] **Phase 22: Presence, Subscription, Notifications & Edge Cases QA** - Test presence avatars, Stripe flow, push notifications, offline/error states
 
 ## Phase Details
@@ -192,7 +192,7 @@ Plans:
   2. Grocery items populate from planned meals, user can check them off, and changes sync to other household members in real-time
   3. Budget tab loads with monthly cost tracking and weekly spending breakdown displaying correctly
   4. Leftovers screen loads and displays tracked items with freshness badges
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 21-01-PLAN.md — Expand planStore + groceryStore unit tests (error paths, Map population, generateGroceryList, realtime helpers)
 - [ ] 21-02-PLAN.md — Update appId in 6 Maestro flows (meal-plan + grocery) from com.mise.app to com.sharedkitchen.app
@@ -234,7 +234,7 @@ Plans:
 | 18. Auth, Onboarding & Household QA | v2.4 | 2/2 | Complete    | 2026-03-27 |
 | 19. Recipe Browsing & Detail QA | v2.4 | 2/2 | Complete    | 2026-03-27 |
 | 20. Recipe Management & Cooking Mode QA | v2.4 | 2/2 | Complete    | 2026-03-27 |
-| 21. Planning, Grocery, Budget & Leftovers QA | v2.4 | 0/2 | Not started | - |
+| 21. Planning, Grocery, Budget & Leftovers QA | v2.4 | 0/2 | Complete    | 2026-03-27 |
 | 22. Presence, Subscription, Notifications & Edge Cases QA | v2.4 | 0/? | Not started | - |
 
 ---
