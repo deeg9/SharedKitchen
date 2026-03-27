@@ -8,10 +8,10 @@
 
 ### Onboarding & Auth
 
-- [ ] **ONBOARD-01**: First-time user completes onboarding screens and is routed to the main app
-- [ ] **AUTH-01**: User can sign up with email and password
-- [ ] **AUTH-02**: User can sign in with existing credentials
-- [ ] **AUTH-03**: User session persists across app restart
+- [x] **ONBOARD-01**: First-time user completes onboarding screens and is routed to the main app
+- [x] **AUTH-01**: User can sign up with email and password
+- [x] **AUTH-02**: User can sign in with existing credentials
+- [x] **AUTH-03**: User session persists across app restart
 
 ### Recipe List
 
@@ -101,10 +101,10 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ONBOARD-01 | Phase 18 | Pending |
-| AUTH-01 | Phase 18 | Pending |
-| AUTH-02 | Phase 18 | Pending |
-| AUTH-03 | Phase 18 | Pending |
+| ONBOARD-01 | Phase 18 | Complete |
+| AUTH-01 | Phase 18 | Complete |
+| AUTH-02 | Phase 18 | Complete |
+| AUTH-03 | Phase 18 | Complete |
 | RLIST-01 | Phase 19 | Pending |
 | RLIST-02 | Phase 19 | Pending |
 | RLIST-03 | Phase 19 | Pending |
