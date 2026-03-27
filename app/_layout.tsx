@@ -23,6 +23,7 @@ import { useSubscriptionStore } from '../src/stores/subscriptionStore';
 import { useNotificationSetup, usePermissionPrompt } from '../src/hooks/useNotifications';
 import { PermissionPrompt } from '../src/components/notifications/PermissionPrompt';
 import { ErrorBoundary } from '../src/components/ErrorBoundary';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Prevent auto-hiding splash screen
 SplashScreen.preventAutoHideAsync();
@@ -125,13 +126,15 @@ export default function RootLayout() {
   }
 
   return (
-    <StripeProvider publishableKey={process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''}>
-      <ColorSchemeProvider>
-        <ErrorBoundary>
-          <Slot />
-        </ErrorBoundary>
-        <PermissionPrompt isOpen={showPrompt} onEnable={handleEnable} onDismiss={handleDismiss} />
-      </ColorSchemeProvider>
-    </StripeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <StripeProvider publishableKey={process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''}>
+        <ColorSchemeProvider>
+          <ErrorBoundary>
+            <Slot />
+          </ErrorBoundary>
+          <PermissionPrompt isOpen={showPrompt} onEnable={handleEnable} onDismiss={handleDismiss} />
+        </ColorSchemeProvider>
+      </StripeProvider>
+    </GestureHandlerRootView>
   );
 }
