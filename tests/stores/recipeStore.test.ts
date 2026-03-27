@@ -313,6 +313,90 @@ describe('recipeStore', () => {
     });
   });
 
+  describe('updateRecipe', () => {
+    it('updates recipe via supabase and refreshes local state', async () => {
+      // Seed store with a recipe
+      useRecipeStore.setState({
+        recipes: [
+          { id: 'recipe-1', name: 'Old Name', household_id: 'h1', category: 'Mexican' } as any,
+          { id: 'recipe-2', name: 'Other', household_id: 'h1', category: 'Italian' } as any,
+        ],
+      });
+
+      const mockChain = {
+        update: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ error: null }),
+      };
+      (supabase.from as jest.Mock).mockReturnValue(mockChain);
+
+      await useRecipeStore.getState().updateRecipe('recipe-1', { name: 'Updated Name' });
+
+      expect(supabase.from).toHaveBeenCalledWith('recipes');
+      expect(mockChain.update).toHaveBeenCalledWith({ name: 'Updated Name' });
+      expect(mockChain.eq).toHaveBeenCalledWith('id', 'recipe-1');
+
+      // Local state should be updated
+      const recipe = useRecipeStore.getState().recipes.find((r) => r.id === 'recipe-1');
+      expect(recipe?.name).toBe('Updated Name');
+      expect(useRecipeStore.getState().loading).toBe(false);
+    });
+
+    it('sets error on update failure', async () => {
+      const mockChain = {
+        update: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ error: { message: 'update failed' } }),
+      };
+      (supabase.from as jest.Mock).mockReturnValue(mockChain);
+
+      await useRecipeStore.getState().updateRecipe('recipe-1', { name: 'Fail' });
+
+      expect(useRecipeStore.getState().error).toBe('An unexpected error occurred');
+      expect(useRecipeStore.getState().loading).toBe(false);
+    });
+  });
+
+  describe('deleteRecipe', () => {
+    it('deletes recipe via supabase and removes from local state', async () => {
+      // Seed store with 2 recipes
+      useRecipeStore.setState({
+        recipes: [
+          { id: 'recipe-1', name: 'Delete Me', household_id: 'h1' } as any,
+          { id: 'recipe-2', name: 'Keep Me', household_id: 'h1' } as any,
+        ],
+      });
+
+      const mockChain = {
+        delete: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ error: null }),
+      };
+      (supabase.from as jest.Mock).mockReturnValue(mockChain);
+
+      await useRecipeStore.getState().deleteRecipe('recipe-1');
+
+      expect(supabase.from).toHaveBeenCalledWith('recipes');
+      expect(mockChain.delete).toHaveBeenCalled();
+      expect(mockChain.eq).toHaveBeenCalledWith('id', 'recipe-1');
+
+      const recipes = useRecipeStore.getState().recipes;
+      expect(recipes).toHaveLength(1);
+      expect(recipes[0].id).toBe('recipe-2');
+      expect(useRecipeStore.getState().loading).toBe(false);
+    });
+
+    it('sets error on delete failure', async () => {
+      const mockChain = {
+        delete: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ error: { message: 'delete failed' } }),
+      };
+      (supabase.from as jest.Mock).mockReturnValue(mockChain);
+
+      await useRecipeStore.getState().deleteRecipe('recipe-1');
+
+      expect(useRecipeStore.getState().error).toBe('An unexpected error occurred');
+      expect(useRecipeStore.getState().loading).toBe(false);
+    });
+  });
+
   describe('resetFilters', () => {
     it('clears all filters', () => {
       useRecipeStore.setState({
