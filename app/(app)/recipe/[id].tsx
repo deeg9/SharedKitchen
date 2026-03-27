@@ -411,8 +411,8 @@ const s = StyleSheet.create({
   hero: { position: 'relative', height: 360 },
   heroImage: { width: '100%', height: '100%' },
   heroGradient: {
-    position: 'absolute', bottom: 0, left: 0, right: 0, height: 80,
-    backgroundColor: colors.surface, opacity: 0.3,
+    position: 'absolute', bottom: 0, left: 0, right: 0, height: 120,
+    backgroundColor: 'rgba(251,249,245,0.7)',
   },
   headerBtn: {
     position: 'absolute', width: 40, height: 40, borderRadius: borderRadius.full,
@@ -546,26 +546,26 @@ const s = StyleSheet.create({
   },
   startCookingBtn: {
     flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: spacing.sm, backgroundColor: colors.secondaryContainer, height: 52,
-    borderRadius: borderRadius.xl, paddingHorizontal: spacing.sm, ...shadows.float,
+    gap: spacing.xs, backgroundColor: colors.surfaceContainerLow, height: 44,
+    borderRadius: borderRadius.full, borderWidth: 1, borderColor: colors.outlineVariant,
   },
   startCookingText: {
-    fontFamily: fontFamily.headlineBold, fontWeight: '800', fontSize: 14,
-    color: colors.onSecondary, textTransform: 'uppercase', letterSpacing: 1.5,
+    fontWeight: '600', fontSize: 13,
+    color: colors.primary, letterSpacing: 0.3,
   },
   addToPlanBtn: {
     flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: spacing.sm, backgroundColor: colors.primary, height: 52,
-    borderRadius: borderRadius.xl, paddingHorizontal: spacing.sm, ...shadows.float,
+    gap: spacing.xs, backgroundColor: colors.primary, height: 44,
+    borderRadius: borderRadius.full,
   },
   addToPlanText: {
-    fontFamily: fontFamily.headlineBold, fontWeight: '800', fontSize: 14,
-    color: colors.onPrimary, textTransform: 'uppercase', letterSpacing: 1.5,
+    fontWeight: '600', fontSize: 13,
+    color: colors.onPrimary, letterSpacing: 0.3,
   },
   favButton: {
-    width: 48, height: 48, borderRadius: borderRadius.xl,
+    width: 44, height: 44, borderRadius: borderRadius.full,
     backgroundColor: colors.surfaceContainerLowest, borderWidth: 1, borderColor: colors.outlineVariant,
-    alignItems: 'center', justifyContent: 'center', ...shadows.editorial,
+    alignItems: 'center', justifyContent: 'center',
   },
 
   // Day picker
