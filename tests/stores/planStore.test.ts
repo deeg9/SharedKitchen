@@ -81,6 +81,22 @@ describe('planStore', () => {
       await promise;
       expect(usePlanStore.getState().loading).toBe(false);
     });
+
+    it('sets error state on supabase failure', async () => {
+      const mockChain = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        gte: jest.fn().mockReturnThis(),
+        lte: jest.fn(() => Promise.resolve({ data: null, error: { message: 'Network error' } })),
+      };
+      mockFrom.mockReturnValue(mockChain);
+
+      await usePlanStore.getState().fetchMealPlan('h-1', '2026-03-23');
+
+      const state = usePlanStore.getState();
+      expect(state.error).toBeTruthy();
+      expect(state.loading).toBe(false);
+    });
   });
 
   describe('assignRecipe', () => {
@@ -111,6 +127,58 @@ describe('planStore', () => {
       expect(mockFrom).toHaveBeenCalledWith('meal_plans');
       expect(mockChain.upsert).toHaveBeenCalled();
     });
+
+    it('populates mealPlan Map with plan_date+meal_type key after assign', async () => {
+      const mockChain = {
+        upsert: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        single: jest.fn(() =>
+          Promise.resolve({
+            data: {
+              id: 'mp-1',
+              household_id: 'h-1',
+              recipe_id: 'r-1',
+              plan_date: '2026-03-23',
+              meal_type: 'dinner',
+              assigned_cook: 'u-1',
+              notes: null,
+              created_by: 'u-1',
+              created_at: '2026-03-23T00:00:00Z',
+              recipes: { id: 'r-1', name: 'Pasta', prep_time_minutes: 20 },
+            },
+            error: null,
+          })
+        ),
+      };
+      mockFrom.mockReturnValue(mockChain);
+
+      await usePlanStore.getState().assignRecipe('h-1', '2026-03-23', 'dinner', 'r-1', 'u-1');
+
+      const state = usePlanStore.getState();
+      expect(state.mealPlan.size).toBe(1);
+      const entry = state.mealPlan.values().next().value;
+      expect(entry.plan_date).toBe('2026-03-23');
+    });
+
+    it('sets error state on assign failure', async () => {
+      const mockChain = {
+        upsert: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        single: jest.fn(() =>
+          Promise.resolve({
+            data: null,
+            error: { message: 'Conflict' },
+          })
+        ),
+      };
+      mockFrom.mockReturnValue(mockChain);
+
+      await usePlanStore.getState().assignRecipe('h-1', '2026-03-23', 'dinner', 'r-1');
+
+      const state = usePlanStore.getState();
+      expect(state.error).toBeTruthy();
+      expect(state.loading).toBe(false);
+    });
   });
 
   describe('clearMeal', () => {
@@ -131,6 +199,28 @@ describe('planStore', () => {
       expect(mockFrom).toHaveBeenCalledWith('meal_plans');
       expect(mockChain.delete).toHaveBeenCalled();
       expect(mockChain.eq).toHaveBeenCalledWith('meal_type', 'dinner');
+    });
+  });
+
+  describe('clear', () => {
+    it('resets mealPlan, loading, error, weekOffset', () => {
+      // Set up dirty state
+      const dirtyMap = new Map();
+      dirtyMap.set('2026-03-23-dinner', { id: 'mp-1', plan_date: '2026-03-23' });
+      usePlanStore.setState({
+        mealPlan: dirtyMap,
+        weekOffset: 2,
+        error: 'old error',
+        loading: true,
+      });
+
+      usePlanStore.getState().clear();
+
+      const state = usePlanStore.getState();
+      expect(state.mealPlan.size).toBe(0);
+      expect(state.weekOffset).toBe(0);
+      expect(state.error).toBeNull();
+      expect(state.loading).toBe(false);
     });
   });
 
