@@ -61,7 +61,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 ### v2.4 Comprehensive QA Testing (Phases 18-22)
 
-- [ ] **Phase 18: Auth, Onboarding & Household QA** - Test auth flows, onboarding, profile management, and household create/invite/join
+- [x] **Phase 18: Auth, Onboarding & Household QA** - Test auth flows, onboarding, profile management, and household create/invite/join (completed 2026-03-27)
 - [ ] **Phase 19: Recipe Browsing & Detail QA** - Test recipe list, search, filters, detail display, ratings, favorites, notes, scaling
 - [ ] **Phase 20: Recipe Management & Cooking Mode QA** - Test recipe CRUD, URL import, cooking mode navigation, timers, unit toggle
 - [ ] **Phase 21: Planning, Grocery, Budget & Leftovers QA** - Test meal planning, grocery list sync, budget tracking, leftovers
@@ -149,10 +149,10 @@ Plans:
   2. An existing user can sign in with saved credentials, and their session persists across app restarts without re-authentication
   3. Profile screen displays the user's name, avatar, and cooking stats, and the user can successfully edit their display name and avatar
   4. User can create a new household, generate an invite code, and a second user can join via that invite code — both see the shared household
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 18-01-PLAN.md — Auth store + onboarding store unit tests (sign-up, sign-in, session, step navigation)
-- [ ] 18-02-PLAN.md — Profile screen test fixes, edit-profile tests, household store action tests (create, join, invite)
+- [x] 18-02-PLAN.md — Profile screen test fixes, edit-profile tests, household store action tests (create, join, invite)
 
 ### Phase 19: Recipe Browsing & Detail QA
 **Goal**: Recipe list browsing, search, filtering, and all recipe detail interactions work correctly
@@ -222,7 +222,7 @@ Plans:
 | 15. Profile & Settings | v2.2 | 0/2 | Not started | - |
 | 16. Kitchen Switcher & Management | v2.3 | 0/1 | Not started | - |
 | 17. Data Scoping | v2.3 | 0/1 | Not started | - |
-| 18. Auth, Onboarding & Household QA | v2.4 | 1/2 | In Progress|  |
+| 18. Auth, Onboarding & Household QA | v2.4 | 2/2 | Complete   | 2026-03-27 |
 | 19. Recipe Browsing & Detail QA | v2.4 | 0/? | Not started | - |
 | 20. Recipe Management & Cooking Mode QA | v2.4 | 0/? | Not started | - |
 | 21. Planning, Grocery, Budget & Leftovers QA | v2.4 | 0/? | Not started | - |

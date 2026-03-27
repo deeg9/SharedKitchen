@@ -68,14 +68,14 @@
 
 ### Household
 
-- [ ] **HOUSE-01**: User can create a new household
-- [ ] **HOUSE-02**: User can generate an invite link/code
-- [ ] **HOUSE-03**: User can join a household via invite code
+- [x] **HOUSE-01**: User can create a new household
+- [x] **HOUSE-02**: User can generate an invite link/code
+- [x] **HOUSE-03**: User can join a household via invite code
 
 ### Profile
 
-- [ ] **PROF-01**: Profile screen displays user info and cooking stats
-- [ ] **PROF-02**: User can edit display name and avatar
+- [x] **PROF-01**: Profile screen displays user info and cooking stats
+- [x] **PROF-02**: User can edit display name and avatar
 
 ### Presence
 
@@ -134,11 +134,11 @@
 | BUDG-01 | Phase 21 | Pending |
 | BUDG-02 | Phase 21 | Pending |
 | LEFT-01 | Phase 21 | Pending |
-| HOUSE-01 | Phase 18 | Pending |
-| HOUSE-02 | Phase 18 | Pending |
-| HOUSE-03 | Phase 18 | Pending |
-| PROF-01 | Phase 18 | Pending |
-| PROF-02 | Phase 18 | Pending |
+| HOUSE-01 | Phase 18 | Complete |
+| HOUSE-02 | Phase 18 | Complete |
+| HOUSE-03 | Phase 18 | Complete |
+| PROF-01 | Phase 18 | Complete |
+| PROF-02 | Phase 18 | Complete |
 | PRES-01 | Phase 22 | Pending |
 | SUB-01 | Phase 22 | Pending |
 | SUB-02 | Phase 22 | Pending |
