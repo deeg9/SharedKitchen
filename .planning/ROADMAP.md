@@ -65,7 +65,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - [x] **Phase 19: Recipe Browsing & Detail QA** - Test recipe list, search, filters, detail display, ratings, favorites, notes, scaling (completed 2026-03-27)
 - [x] **Phase 20: Recipe Management & Cooking Mode QA** - Test recipe CRUD, URL import, cooking mode navigation, timers, unit toggle (completed 2026-03-27)
 - [x] **Phase 21: Planning, Grocery, Budget & Leftovers QA** - Test meal planning, grocery list sync, budget tracking, leftovers (completed 2026-03-27)
-- [ ] **Phase 22: Presence, Subscription, Notifications & Edge Cases QA** - Test presence avatars, Stripe flow, push notifications, offline/error states
+- [x] **Phase 22: Presence, Subscription, Notifications & Edge Cases QA** - Test presence avatars, Stripe flow, push notifications, offline/error states (completed 2026-03-27)
 
 ## Phase Details
 
@@ -206,7 +206,7 @@ Plans:
   2. Subscription screen loads with pricing information and the Stripe checkout flow initiates correctly
   3. Permission prompt displays on first relevant action, and cooking timer completion triggers a notification
   4. App shows appropriate loading states on slow network, empty household state is handled gracefully, and screens handle missing/null data without crashes
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 22-01-PLAN.md — subscriptionStore unit tests + usePermissionPrompt/useNotificationSetup hook tests (edge cases)
 - [x] 22-02-PLAN.md — Update appId in 4 Maestro flows (premium-checkout, negative-*) from com.mise.app to com.sharedkitchen.app
@@ -238,7 +238,7 @@ Plans:
 | 19. Recipe Browsing & Detail QA | v2.4 | 2/2 | Complete    | 2026-03-27 |
 | 20. Recipe Management & Cooking Mode QA | v2.4 | 2/2 | Complete    | 2026-03-27 |
 | 21. Planning, Grocery, Budget & Leftovers QA | v2.4 | 0/2 | Complete    | 2026-03-27 |
-| 22. Presence, Subscription, Notifications & Edge Cases QA | v2.4 | 1/2 | In Progress|  |
+| 22. Presence, Subscription, Notifications & Edge Cases QA | v2.4 | 1/2 | Complete    | 2026-03-27 |
 
 ---
 *Last updated: 2026-03-27 after Phase 22 planning*
