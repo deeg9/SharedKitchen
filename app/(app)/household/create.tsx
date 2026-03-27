@@ -4,6 +4,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Pressable,
   StyleSheet,
   ActivityIndicator,
   Alert,
@@ -11,11 +12,14 @@ import {
   Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useHouseholdStore } from '../../../src/stores/householdStore';
 import { colors } from '../../../src/theme/colors';
 
 export default function CreateHouseholdScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { createHousehold, loading } = useHouseholdStore();
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -44,6 +48,13 @@ export default function CreateHouseholdScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+      <Pressable
+        onPress={() => router.back()}
+        style={[styles.backButton, { top: insets.top + 8 }]}
+      >
+        <MaterialCommunityIcons name="arrow-left" size={24} color={colors.onSurface} />
+      </Pressable>
+
       <View style={styles.content}>
         <Text style={styles.title}>Create a Household</Text>
         <Text style={styles.subtitle}>
@@ -90,6 +101,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.surface,
+  },
+  backButton: {
+    position: 'absolute',
+    left: 16,
+    zIndex: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.surfaceContainerLow,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     flex: 1,
