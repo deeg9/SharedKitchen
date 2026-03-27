@@ -6,6 +6,107 @@ interface SupabaseFunctionError extends Error {
   context?: { status?: number };
 }
 
+// ── Client-side JSON-LD Recipe Extraction ──────────────────────────
+
+function extractJsonLd(html: string, sourceUrl: string): Omit<RecipeInsert, 'household_id' | 'created_by'> | null {
+  try {
+    const jsonLdRegex = /<script\s+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+    let match;
+    while ((match = jsonLdRegex.exec(html)) !== null) {
+      try {
+        let parsed = JSON.parse(match[1]);
+        // Handle @graph arrays
+        if (parsed['@graph']) parsed = parsed['@graph'];
+        const items = Array.isArray(parsed) ? parsed : [parsed];
+        const recipe = items.find((item: any) =>
+          item['@type'] === 'Recipe' ||
+          (Array.isArray(item['@type']) && item['@type'].includes('Recipe'))
+        );
+        if (!recipe) continue;
+
+        // Parse ISO 8601 duration (PT1H30M → 90)
+        const parseDuration = (d: string | undefined): number | null => {
+          if (!d) return null;
+          const h = d.match(/(\d+)H/)?.[1];
+          const m = d.match(/(\d+)M/)?.[1];
+          return (parseInt(h ?? '0') * 60) + parseInt(m ?? '0') || null;
+        };
+
+        // Parse ingredients
+        const ingredients = (recipe.recipeIngredient ?? []).map((ing: string, i: number) => {
+          const amountMatch = ing.match(/^([\d./½¼¾⅓⅔]+)\s*/);
+          const amount = amountMatch ? parseFloat(amountMatch[1].replace('½', '0.5').replace('¼', '0.25').replace('¾', '0.75').replace('⅓', '0.33').replace('⅔', '0.67')) || 1 : 1;
+          const rest = amountMatch ? ing.slice(amountMatch[0].length) : ing;
+          const unitMatch = rest.match(/^(cups?|tbsp|tsp|tablespoons?|teaspoons?|oz|ounces?|lbs?|pounds?|g|kg|ml|l|cloves?|cans?|pieces?|slices?|pinch)\s+/i);
+          const unit = unitMatch ? unitMatch[1] : 'unit';
+          const name = unitMatch ? rest.slice(unitMatch[0].length) : rest;
+          return { amount, unit, name: name.trim(), section: null };
+        });
+
+        // Parse instructions
+        const rawInstructions = recipe.recipeInstructions ?? [];
+        const instructions = rawInstructions.map((step: any, i: number) => {
+          const text = typeof step === 'string' ? step : step.text ?? '';
+          const timers: { duration_seconds: number; label: string }[] = [];
+          const timeMatch = text.match(/(\d+)\s*(?:minutes?|mins?)/i);
+          if (timeMatch) timers.push({ duration_seconds: parseInt(timeMatch[1]) * 60, label: `Step ${i + 1}` });
+          return { step_number: i + 1, text, timers };
+        });
+
+        if (ingredients.length === 0 && instructions.length === 0) return null;
+
+        // Extract image
+        let imageUrl = null;
+        if (recipe.image) {
+          imageUrl = typeof recipe.image === 'string' ? recipe.image :
+                     Array.isArray(recipe.image) ? recipe.image[0] :
+                     recipe.image?.url ?? null;
+        }
+
+        // Extract nutrition
+        let nutritionInfo = null;
+        if (recipe.nutrition) {
+          nutritionInfo = {
+            calories: recipe.nutrition.calories ?? null,
+            protein: recipe.nutrition.proteinContent ?? null,
+            fat: recipe.nutrition.fatContent ?? null,
+            carbohydrates: recipe.nutrition.carbohydrateContent ?? null,
+          };
+        }
+
+        const category = recipe.recipeCategory
+          ? (Array.isArray(recipe.recipeCategory) ? recipe.recipeCategory[0] : recipe.recipeCategory)
+          : null;
+
+        const tags = [
+          ...(recipe.keywords ? (typeof recipe.keywords === 'string' ? recipe.keywords.split(',').map((k: string) => k.trim()) : recipe.keywords) : []),
+          ...(recipe.recipeCuisine ? (Array.isArray(recipe.recipeCuisine) ? recipe.recipeCuisine : [recipe.recipeCuisine]) : []),
+        ].slice(0, 5);
+
+        return {
+          name: recipe.name ?? 'Untitled Recipe',
+          category,
+          prep_time_minutes: parseDuration(recipe.prepTime),
+          cook_time_minutes: parseDuration(recipe.cookTime),
+          servings: parseInt(recipe.recipeYield?.[0] ?? recipe.recipeYield ?? '4') || 4,
+          estimated_cost: null,
+          source_url: sourceUrl,
+          source_image_url: imageUrl,
+          nutrition_info: nutritionInfo,
+          ingredients,
+          instructions,
+          tags,
+        };
+      } catch {
+        continue;
+      }
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 // ── Meal Suggestion Types ──────────────────────────────────────────
 
 export interface MealSuggestion {
@@ -97,9 +198,8 @@ export class RateLimitError extends Error {
 }
 
 /**
- * Parses a recipe URL using the Supabase Edge Function (Gemini-powered).
- * Fetches HTML client-side (avoids Supabase outbound HTTP restrictions),
- * then sends it to the edge function for JSON-LD extraction or Gemini parsing.
+ * Parses a recipe URL. Tries JSON-LD client-side first (instant, free),
+ * falls back to edge function + Gemini if JSON-LD is missing/incomplete.
  */
 export async function parseRecipeUrl(
   url: string
@@ -112,13 +212,28 @@ export async function parseRecipeUrl(
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     html = await response.text();
-    // Truncate to 50KB to stay within edge function limits
-    if (html.length > 50000) html = html.slice(0, 50000);
   } catch {
     throw new Error('Failed to fetch the recipe page. Please check the URL and try again.');
   }
 
-  // Use direct fetch instead of supabase.functions.invoke to get actual error messages
+  // Try JSON-LD extraction client-side first (instant, no AI needed)
+  const jsonLdRecipe = extractJsonLd(html, url);
+  if (jsonLdRecipe) {
+    return jsonLdRecipe;
+  }
+
+  // Fall back to edge function + Gemini
+  // Strip non-content HTML to reduce payload
+  let cleanHtml = html
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<nav[\s\S]*?<\/nav>/gi, '')
+    .replace(/<footer[\s\S]*?<\/footer>/gi, '')
+    .replace(/<header[\s\S]*?<\/header>/gi, '')
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/\s{2,}/g, ' ');
+  if (cleanHtml.length > 20000) cleanHtml = cleanHtml.slice(0, 20000);
+
   const session = await supabase.auth.getSession();
   const token = session.data.session?.access_token;
   const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
@@ -131,10 +246,17 @@ export async function parseRecipeUrl(
       'Authorization': `Bearer ${token}`,
       'apikey': anonKey ?? '',
     },
-    body: JSON.stringify({ url, html }),
+    body: JSON.stringify({ url, html: cleanHtml }),
   });
 
-  const data = await fnResponse.json();
+  let data: any;
+  const contentType = fnResponse.headers.get('content-type') ?? '';
+  if (contentType.includes('application/json')) {
+    data = await fnResponse.json();
+  } else {
+    const text = await fnResponse.text();
+    throw new Error(`Server error (${fnResponse.status}). Please try again.`);
+  }
 
   if (!fnResponse.ok) {
     if (fnResponse.status === 429) {
