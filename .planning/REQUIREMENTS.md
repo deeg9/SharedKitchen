@@ -32,18 +32,18 @@
 
 ### Recipe Management
 
-- [ ] **RMGMT-01**: User can create a recipe manually with all fields
-- [ ] **RMGMT-02**: User can import a recipe from URL (JSON-LD extraction)
-- [ ] **RMGMT-03**: User can edit an existing recipe and changes persist
-- [ ] **RMGMT-04**: Start Cooking opens fullscreen cooking mode with step navigation
+- [x] **RMGMT-01**: User can create a recipe manually with all fields
+- [x] **RMGMT-02**: User can import a recipe from URL (JSON-LD extraction)
+- [x] **RMGMT-03**: User can edit an existing recipe and changes persist
+- [x] **RMGMT-04**: Start Cooking opens fullscreen cooking mode with step navigation
 
 ### Cooking Mode
 
-- [ ] **COOK-01**: Steps display with horizontal swipe navigation and progress bar
-- [ ] **COOK-02**: Timers start, pause, reset, and show countdown
-- [ ] **COOK-03**: Unit toggle switches between metric/imperial in step text and ingredients
-- [ ] **COOK-04**: Ingredient sidebar opens/closes with correct scaled amounts
-- [ ] **COOK-05**: "Done Cooking" on last step returns to recipe detail
+- [x] **COOK-01**: Steps display with horizontal swipe navigation and progress bar
+- [x] **COOK-02**: Timers start, pause, reset, and show countdown
+- [x] **COOK-03**: Unit toggle switches between metric/imperial in step text and ingredients
+- [x] **COOK-04**: Ingredient sidebar opens/closes with correct scaled amounts
+- [x] **COOK-05**: "Done Cooking" on last step returns to recipe detail
 
 ### Meal Planning
 
@@ -116,15 +116,15 @@
 | RDETAIL-05 | Phase 19 | Complete |
 | RDETAIL-06 | Phase 19 | Complete |
 | RDETAIL-07 | Phase 19 | Complete |
-| RMGMT-01 | Phase 20 | Pending |
-| RMGMT-02 | Phase 20 | Pending |
-| RMGMT-03 | Phase 20 | Pending |
-| RMGMT-04 | Phase 20 | Pending |
-| COOK-01 | Phase 20 | Pending |
-| COOK-02 | Phase 20 | Pending |
-| COOK-03 | Phase 20 | Pending |
-| COOK-04 | Phase 20 | Pending |
-| COOK-05 | Phase 20 | Pending |
+| RMGMT-01 | Phase 20 | Complete |
+| RMGMT-02 | Phase 20 | Complete |
+| RMGMT-03 | Phase 20 | Complete |
+| RMGMT-04 | Phase 20 | Complete |
+| COOK-01 | Phase 20 | Complete |
+| COOK-02 | Phase 20 | Complete |
+| COOK-03 | Phase 20 | Complete |
+| COOK-04 | Phase 20 | Complete |
+| COOK-05 | Phase 20 | Complete |
 | PLAN-01 | Phase 21 | Pending |
 | PLAN-02 | Phase 21 | Pending |
 | PLAN-03 | Phase 21 | Pending |
