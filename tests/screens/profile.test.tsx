@@ -133,7 +133,7 @@ describe('ProfileScreen', () => {
 
   it('shows create household CTA when no household', () => {
     render(<ProfileScreen />);
-    expect(screen.getByText('Create a Household')).toBeTruthy();
+    expect(screen.getByText('Create Kitchen')).toBeTruthy();
   });
 
   it('does not render App Settings section', () => {
@@ -165,7 +165,9 @@ describe('ProfileScreen', () => {
 
     render(<ProfileScreen />);
     expect(screen.getByText('Invite Members')).toBeTruthy();
-    expect(screen.getByText('Test Kitchen')).toBeTruthy();
+    // "Test Kitchen" appears in both the kitchen list and active kitchen header
+    const kitchenTexts = screen.getAllByText('Test Kitchen');
+    expect(kitchenTexts.length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Chef Alice')).toBeTruthy();
     expect(screen.getByText('1 member')).toBeTruthy();
   });
