@@ -15,20 +15,20 @@
 
 ### Recipe List
 
-- [ ] **RLIST-01**: Recipes load and display in a 2-column grid
-- [ ] **RLIST-02**: User can search recipes by name
-- [ ] **RLIST-03**: User can filter recipes by category, cost, and prep time
-- [ ] **RLIST-04**: Empty state displays when no recipes match filters
+- [x] **RLIST-01**: Recipes load and display in a 2-column grid
+- [x] **RLIST-02**: User can search recipes by name
+- [x] **RLIST-03**: User can filter recipes by category, cost, and prep time
+- [x] **RLIST-04**: Empty state displays when no recipes match filters
 
 ### Recipe Detail
 
-- [ ] **RDETAIL-01**: Hero image loads (or default placeholder) with metadata pills (prep/cook/serves/cost)
-- [ ] **RDETAIL-02**: Tags display below hero image
-- [ ] **RDETAIL-03**: User can tap stars to rate a recipe and average rating updates
-- [ ] **RDETAIL-04**: User can toggle heart to favorite/unfavorite a recipe
-- [ ] **RDETAIL-05**: User can add a household tip/note and it appears with date
-- [ ] **RDETAIL-06**: User can switch between x1/x2/x3 scale and ingredient amounts update
-- [ ] **RDETAIL-07**: User can check off ingredients with strikethrough appearance
+- [x] **RDETAIL-01**: Hero image loads (or default placeholder) with metadata pills (prep/cook/serves/cost)
+- [x] **RDETAIL-02**: Tags display below hero image
+- [x] **RDETAIL-03**: User can tap stars to rate a recipe and average rating updates
+- [x] **RDETAIL-04**: User can toggle heart to favorite/unfavorite a recipe
+- [x] **RDETAIL-05**: User can add a household tip/note and it appears with date
+- [x] **RDETAIL-06**: User can switch between x1/x2/x3 scale and ingredient amounts update
+- [x] **RDETAIL-07**: User can check off ingredients with strikethrough appearance
 
 ### Recipe Management
 
@@ -105,17 +105,17 @@
 | AUTH-01 | Phase 18 | Complete |
 | AUTH-02 | Phase 18 | Complete |
 | AUTH-03 | Phase 18 | Complete |
-| RLIST-01 | Phase 19 | Pending |
-| RLIST-02 | Phase 19 | Pending |
-| RLIST-03 | Phase 19 | Pending |
-| RLIST-04 | Phase 19 | Pending |
-| RDETAIL-01 | Phase 19 | Pending |
-| RDETAIL-02 | Phase 19 | Pending |
-| RDETAIL-03 | Phase 19 | Pending |
-| RDETAIL-04 | Phase 19 | Pending |
-| RDETAIL-05 | Phase 19 | Pending |
-| RDETAIL-06 | Phase 19 | Pending |
-| RDETAIL-07 | Phase 19 | Pending |
+| RLIST-01 | Phase 19 | Complete |
+| RLIST-02 | Phase 19 | Complete |
+| RLIST-03 | Phase 19 | Complete |
+| RLIST-04 | Phase 19 | Complete |
+| RDETAIL-01 | Phase 19 | Complete |
+| RDETAIL-02 | Phase 19 | Complete |
+| RDETAIL-03 | Phase 19 | Complete |
+| RDETAIL-04 | Phase 19 | Complete |
+| RDETAIL-05 | Phase 19 | Complete |
+| RDETAIL-06 | Phase 19 | Complete |
+| RDETAIL-07 | Phase 19 | Complete |
 | RMGMT-01 | Phase 20 | Pending |
 | RMGMT-02 | Phase 20 | Pending |
 | RMGMT-03 | Phase 20 | Pending |

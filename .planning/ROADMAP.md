@@ -163,10 +163,10 @@ Plans:
   2. When no recipes match the active filters, an empty state message displays instead of a blank screen
   3. Recipe detail shows hero image (or placeholder), metadata pills (prep/cook/serves/cost), and tags below the hero
   4. User can rate a recipe with stars, toggle favorite, add a household note (visible with date), scale ingredients (x1/x2/x3), and check off ingredients with strikethrough
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
 - [ ] 19-01-PLAN.md — Expand recipeStore unit tests (cost/time filters, notes, fetchRecipeDetail, error handling)
-- [ ] 19-02-PLAN.md — Maestro E2E flows for recipe list search/filter and recipe detail interactions
+- [x] 19-02-PLAN.md — Maestro E2E flows for recipe list search/filter and recipe detail interactions
 
 ### Phase 20: Recipe Management & Cooking Mode QA
 **Goal**: Recipe creation, editing, URL import, and fullscreen cooking mode all function correctly
@@ -226,7 +226,7 @@ Plans:
 | 16. Kitchen Switcher & Management | v2.3 | 0/1 | Not started | - |
 | 17. Data Scoping | v2.3 | 0/1 | Not started | - |
 | 18. Auth, Onboarding & Household QA | v2.4 | 2/2 | Complete    | 2026-03-27 |
-| 19. Recipe Browsing & Detail QA | v2.4 | 0/2 | Not started | - |
+| 19. Recipe Browsing & Detail QA | v2.4 | 1/2 | In Progress|  |
 | 20. Recipe Management & Cooking Mode QA | v2.4 | 0/? | Not started | - |
 | 21. Planning, Grocery, Budget & Leftovers QA | v2.4 | 0/? | Not started | - |
 | 22. Presence, Subscription, Notifications & Edge Cases QA | v2.4 | 0/? | Not started | - |
