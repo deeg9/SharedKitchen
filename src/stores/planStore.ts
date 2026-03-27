@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { getWeekDays, getWeekLabel, toDateString, makePlanKey } from '../lib/dates';
-import { Recipe, Database, MealType } from '../types/database';
+import { Recipe, Database, MealType, MealSource, MEAL_SOURCE_CONFIG } from '../types/database';
+import { useBudgetStore } from './budgetStore';
 import { scheduleCookingReminder, cancelNotification } from '../lib/notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getErrorMessage } from '../lib/errors';
@@ -29,9 +30,11 @@ interface PlanState {
     householdId: string,
     date: string,
     mealType: MealType,
-    recipeId: string,
+    recipeId: string | null,
     cookId?: string,
-    notes?: string
+    notes?: string,
+    mealSource?: MealSource,
+    mealCost?: number
   ) => Promise<void>;
   clearMeal: (householdId: string, date: string, mealType: MealType) => Promise<void>;
   getRandomSuggestion: (householdId: string) => Promise<Recipe | null>;
@@ -85,9 +88,11 @@ export const usePlanStore = create<PlanState>((set, get) => ({
     householdId: string,
     date: string,
     mealType: MealType,
-    recipeId: string,
+    recipeId: string | null,
     cookId?: string,
-    notes?: string
+    notes?: string,
+    mealSource?: MealSource,
+    mealCost?: number
   ) => {
     set({ loading: true, error: null });
     try {
@@ -101,9 +106,11 @@ export const usePlanStore = create<PlanState>((set, get) => ({
 
       const payload: Record<string, unknown> = {
         household_id: householdId,
-        recipe_id: recipeId,
+        recipe_id: recipeId ?? null,
         plan_date: date,
         meal_type: mealType,
+        meal_source: mealSource ?? 'home-cooked',
+        meal_cost: mealCost ?? null,
         assigned_cook: cookId ?? null,
         notes: notes ?? null,
         created_by: user?.id ?? null,
@@ -150,6 +157,25 @@ export const usePlanStore = create<PlanState>((set, get) => ({
           if (notifId) {
             await AsyncStorage.setItem(`notif_meal_${data.id}`, notifId);
           }
+        } catch {}
+      }
+
+      // Auto-create expense for takeout/eating-out meals
+      const source = mealSource ?? 'home-cooked';
+      if ((source === 'takeout' || source === 'eating-out') && mealCost && mealCost > 0) {
+        try {
+          const category = source === 'takeout' ? 'Takeout' : 'Dining Out';
+          const recipeName = data?.recipes?.name;
+          const sourceLabel = MEAL_SOURCE_CONFIG[source].label;
+          const description = recipeName
+            ? `${recipeName} (${sourceLabel})`
+            : sourceLabel;
+          await useBudgetStore.getState().addExpense(householdId, {
+            amount: mealCost,
+            category,
+            description,
+            expense_date: date,
+          });
         } catch {}
       }
     } catch (error: unknown) {

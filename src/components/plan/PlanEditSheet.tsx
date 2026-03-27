@@ -8,7 +8,7 @@ import { useRecipeStore } from '../../stores/recipeStore';
 import { useHouseholdStore } from '../../stores/householdStore';
 import { usePlanStore, MealPlanWithRecipe } from '../../stores/planStore';
 import { formatDayLabel } from '../../lib/dates';
-import { Recipe, MealType, MEAL_TYPES, MEAL_TYPE_CONFIG } from '../../types/database';
+import { Recipe, MealType, MEAL_TYPES, MEAL_TYPE_CONFIG, MealSource, MEAL_SOURCES, MEAL_SOURCE_CONFIG } from '../../types/database';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
@@ -41,8 +41,12 @@ export function PlanEditSheet({
   const [notes, setNotes] = useState('');
   const [search, setSearch] = useState('');
   const [saving, setSaving] = useState(false);
+  const [mealSource, setMealSource] = useState<MealSource>('home-cooked');
+  const [mealCost, setMealCost] = useState('');
 
   const label = formatDayLabel(date);
+
+  const isNonHomeMade = mealSource === 'takeout' || mealSource === 'eating-out';
 
   // Pre-fill from existing plan or reset
   useEffect(() => {
@@ -51,10 +55,14 @@ export function PlanEditSheet({
       setSelectedRecipeId(existingPlan.recipe_id);
       setSelectedCookId(existingPlan.assigned_cook);
       setNotes(existingPlan.notes ?? '');
+      setMealSource((existingPlan.meal_source as MealSource) ?? 'home-cooked');
+      setMealCost(existingPlan.meal_cost != null ? String(existingPlan.meal_cost) : '');
     } else {
       setSelectedRecipeId(null);
       setSelectedCookId(null);
       setNotes('');
+      setMealSource('home-cooked');
+      setMealCost('');
     }
     setSearch('');
   }, [existingPlan, mealType, isOpen]);
@@ -65,17 +73,23 @@ export function PlanEditSheet({
     return recipes.filter((r) => r.name.toLowerCase().includes(q));
   }, [recipes, search]);
 
+  const canSave = isNonHomeMade
+    ? mealCost !== '' && parseFloat(mealCost) > 0
+    : !!selectedRecipeId;
+
   const handleSave = async () => {
-    if (!activeHouseholdId || !selectedRecipeId) return;
+    if (!activeHouseholdId || !canSave) return;
     setSaving(true);
     try {
       await assignRecipe(
         activeHouseholdId,
         dateString,
         selectedMealType,
-        selectedRecipeId,
+        isNonHomeMade ? selectedRecipeId : selectedRecipeId,
         selectedCookId ?? undefined,
-        notes || undefined
+        notes || undefined,
+        mealSource,
+        mealCost ? parseFloat(mealCost) : undefined
       );
       onClose();
     } finally {
@@ -154,9 +168,55 @@ export function PlanEditSheet({
           })}
         </View>
 
-        {/* Recipe Picker */}
+        {/* Meal Source Selector */}
+        <Text style={styles.sectionTitle}>Meal Source</Text>
+        <View style={styles.mealTypeRow}>
+          {MEAL_SOURCES.map((ms) => {
+            const config = MEAL_SOURCE_CONFIG[ms];
+            const isActive = ms === mealSource;
+            return (
+              <Pressable
+                key={ms}
+                onPress={() => setMealSource(ms)}
+                style={[styles.mealTypePill, isActive && styles.mealTypePillActive]}
+              >
+                <MaterialCommunityIcons
+                  name={config.icon}
+                  size={18}
+                  color={isActive ? colors.onPrimary : colors.onSurface}
+                />
+                <Text style={[styles.mealTypePillText, isActive && styles.mealTypePillTextActive]}>
+                  {config.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+
+        {/* Cost Input (for takeout/eating-out) */}
+        {isNonHomeMade && (
+          <>
+            <Text style={styles.sectionTitle}>Cost</Text>
+            <View style={styles.costRow}>
+              <Text style={styles.costPrefix}>$</Text>
+              <TextInput
+                style={styles.costInput}
+                placeholder="0.00"
+                placeholderTextColor={colors.outlineVariant}
+                value={mealCost}
+                onChangeText={setMealCost}
+                keyboardType="decimal-pad"
+                testID="plan-edit-cost-input"
+              />
+            </View>
+          </>
+        )}
+
+        {/* Recipe Picker (optional for non-home-cooked) */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Choose Recipe</Text>
+          <Text style={styles.sectionTitle}>
+            {isNonHomeMade ? 'Recipe (optional)' : 'Choose Recipe'}
+          </Text>
           <Pressable onPress={handleAddNewRecipe} style={styles.addRecipeLink}>
             <MaterialCommunityIcons name="plus" size={14} color={colors.primary} />
             <Text style={styles.addRecipeLinkText}>Add New</Text>
@@ -215,7 +275,7 @@ export function PlanEditSheet({
 
         {/* Actions */}
         <View style={styles.actions}>
-          <Button variant="primary" onPress={handleSave} loading={saving} disabled={!selectedRecipeId} testID="plan-edit-save">
+          <Button variant="primary" onPress={handleSave} loading={saving} disabled={!canSave} testID="plan-edit-save">
             Save
           </Button>
           {existingPlan && (
@@ -279,6 +339,26 @@ const styles = StyleSheet.create({
   },
   mealTypePillTextActive: {
     color: colors.onPrimary,
+  },
+  // Cost input
+  costRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surfaceContainer,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md,
+  },
+  costPrefix: {
+    ...typography.bodyMd,
+    color: colors.onSurfaceVariant,
+    fontWeight: '600',
+    marginRight: spacing.xs,
+  },
+  costInput: {
+    ...typography.bodyMd,
+    color: colors.onSurface,
+    flex: 1,
+    paddingVertical: spacing.sm,
   },
   // Add Recipe link
   addRecipeLink: {

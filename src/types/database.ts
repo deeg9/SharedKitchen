@@ -22,6 +22,17 @@ export const MEAL_TYPE_CONFIG: Record<MealType, { label: string; icon: 'food-cro
   dinner: { label: 'Dinner', icon: 'food-variant' },
 };
 
+/** Meal source for meal plan entries */
+export type MealSource = 'home-cooked' | 'takeout' | 'eating-out';
+
+export const MEAL_SOURCES: MealSource[] = ['home-cooked', 'takeout', 'eating-out'];
+
+export const MEAL_SOURCE_CONFIG: Record<MealSource, { label: string; icon: 'pot-steam' | 'motorbike' | 'silverware-fork-knife' }> = {
+  'home-cooked': { label: 'Home-cooked', icon: 'pot-steam' },
+  'takeout': { label: 'Takeout', icon: 'motorbike' },
+  'eating-out': { label: 'Eating Out', icon: 'silverware-fork-knife' },
+};
+
 /** Ingredient within a recipe's JSONB ingredients array */
 export interface Ingredient {
   amount: number;
@@ -212,6 +223,8 @@ export interface Database {
           recipe_id: string | null;
           plan_date: string;
           meal_type: MealType;
+          meal_source: MealSource;
+          meal_cost: number | null;
           assigned_cook: string | null;
           notes: string | null;
           created_by: string | null;
@@ -223,6 +236,8 @@ export interface Database {
           recipe_id?: string | null;
           plan_date: string;
           meal_type?: MealType;
+          meal_source?: MealSource;
+          meal_cost?: number | null;
           assigned_cook?: string | null;
           notes?: string | null;
           created_by?: string | null;
@@ -234,6 +249,8 @@ export interface Database {
           recipe_id?: string | null;
           plan_date?: string;
           meal_type?: MealType;
+          meal_source?: MealSource;
+          meal_cost?: number | null;
           assigned_cook?: string | null;
           notes?: string | null;
           created_by?: string | null;
