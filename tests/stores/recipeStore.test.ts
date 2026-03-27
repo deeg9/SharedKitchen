@@ -331,4 +331,119 @@ describe('recipeStore', () => {
       expect(state.maxPrepTime).toBeNull();
     });
   });
+
+  describe('fetchRecipeDetail', () => {
+    it('fetches recipe, ratings, and notes and sets state', async () => {
+      const mockRecipe = { id: 'r1', name: 'Tacos', household_id: 'h1' };
+      const mockRatings = [{ id: 'rr1', recipe_id: 'r1', user_id: 'u1', rating: 4, is_favorite: false }];
+      const mockNotes = [{ id: 'n1', recipe_id: 'r1', user_id: 'u1', content: 'Great!', created_at: '2026-01-01' }];
+
+      const recipeChain = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        single: jest.fn().mockResolvedValue({ data: mockRecipe, error: null }),
+      };
+      const ratingsChain = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: mockRatings, error: null }),
+      };
+      const notesChain = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: mockNotes, error: null }),
+      };
+
+      (supabase.from as jest.Mock)
+        .mockReturnValueOnce(recipeChain)
+        .mockReturnValueOnce(ratingsChain)
+        .mockReturnValueOnce(notesChain);
+
+      await useRecipeStore.getState().fetchRecipeDetail('r1');
+
+      expect(useRecipeStore.getState().selectedRecipe).toEqual(mockRecipe);
+      expect(useRecipeStore.getState().ratings).toEqual(mockRatings);
+      expect(useRecipeStore.getState().notes).toEqual(mockNotes);
+      expect(useRecipeStore.getState().loading).toBe(false);
+    });
+
+    it('sets error on recipe fetch failure', async () => {
+      const recipeChain = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        single: jest.fn().mockResolvedValue({ data: null, error: { message: 'Recipe not found' } }),
+      };
+
+      (supabase.from as jest.Mock).mockReturnValueOnce(recipeChain);
+
+      await useRecipeStore.getState().fetchRecipeDetail('bad-id');
+
+      expect(useRecipeStore.getState().error).toBe('An unexpected error occurred');
+      expect(useRecipeStore.getState().loading).toBe(false);
+    });
+  });
+
+  describe('addNote', () => {
+    it('inserts note and appends to state', async () => {
+      const newNote = { id: 'n1', recipe_id: 'r1', user_id: 'u1', content: 'Tip text', created_at: '2026-01-01' };
+
+      const mockChain = {
+        insert: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        single: jest.fn().mockResolvedValue({ data: newNote, error: null }),
+      };
+      (supabase.from as jest.Mock).mockReturnValue(mockChain);
+
+      await useRecipeStore.getState().addNote('r1', 'u1', 'Tip text');
+
+      expect(supabase.from).toHaveBeenCalledWith('recipe_notes');
+      expect(mockChain.insert).toHaveBeenCalledWith({ recipe_id: 'r1', user_id: 'u1', content: 'Tip text' });
+      expect(useRecipeStore.getState().notes).toEqual([newNote]);
+    });
+
+    it('sets error on note insert failure', async () => {
+      const mockChain = {
+        insert: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        single: jest.fn().mockResolvedValue({ data: null, error: { message: 'Insert failed' } }),
+      };
+      (supabase.from as jest.Mock).mockReturnValue(mockChain);
+
+      await useRecipeStore.getState().addNote('r1', 'u1', 'Tip text');
+
+      expect(useRecipeStore.getState().error).toBe('An unexpected error occurred');
+    });
+  });
+
+  describe('fetchNotes', () => {
+    it('fetches notes for recipe and sets state', async () => {
+      const mockNotes = [
+        { id: 'n1', recipe_id: 'r1', user_id: 'u1', content: 'Note 1', created_at: '2026-01-02' },
+        { id: 'n2', recipe_id: 'r1', user_id: 'u2', content: 'Note 2', created_at: '2026-01-01' },
+      ];
+
+      const mockChain = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockResolvedValue({ data: mockNotes, error: null }),
+      };
+      (supabase.from as jest.Mock).mockReturnValue(mockChain);
+
+      await useRecipeStore.getState().fetchNotes('r1');
+
+      expect(supabase.from).toHaveBeenCalledWith('recipe_notes');
+      expect(useRecipeStore.getState().notes).toEqual(mockNotes);
+    });
+
+    it('sets error on notes fetch failure', async () => {
+      const mockChain = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockResolvedValue({ data: null, error: { message: 'Fetch failed' } }),
+      };
+      (supabase.from as jest.Mock).mockReturnValue(mockChain);
+
+      await useRecipeStore.getState().fetchNotes('r1');
+
+      expect(useRecipeStore.getState().error).toBe('An unexpected error occurred');
+    });
+  });
 });
