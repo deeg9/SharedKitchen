@@ -2,6 +2,17 @@ import { supabase } from '../../src/lib/supabase';
 import { useGroceryStore } from '../../src/stores/groceryStore';
 import { GroceryItem } from '../../src/types/database';
 
+// Mock aggregateIngredients to return a predictable result
+jest.mock('../../src/lib/grocery-utils', () => {
+  const actual = jest.requireActual('../../src/lib/grocery-utils');
+  return {
+    ...actual,
+    aggregateIngredients: jest.fn(() => [
+      { name: 'Flour', quantity: '2 cups', section: 'Baking', estimated_price: 3.50, source_recipe_id: 'r-1', is_checked: false, is_manual: false },
+    ]),
+  };
+});
+
 // Reset store between tests
 beforeEach(() => {
   useGroceryStore.setState({
@@ -135,6 +146,172 @@ describe('groceryStore', () => {
       await useGroceryStore.getState().fetchGroceryList('h-1', '2026-03-23');
 
       expect(supabase.from).toHaveBeenCalledWith('grocery_lists');
+    });
+  });
+
+  describe('generateGroceryList', () => {
+    it('creates list when none exists and populates items from recipe ingredients', async () => {
+      const mockFrom = supabase.from as jest.Mock;
+      let groceryListsCallCount = 0;
+
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'grocery_lists') {
+          groceryListsCallCount++;
+          if (groceryListsCallCount === 1) {
+            // First call: select existing list - returns not found
+            return {
+              select: jest.fn().mockReturnValue({
+                eq: jest.fn().mockReturnValue({
+                  eq: jest.fn().mockReturnValue({
+                    single: jest.fn().mockResolvedValue({
+                      data: null,
+                      error: { code: 'PGRST116', message: 'Not found' },
+                    }),
+                  }),
+                }),
+              }),
+            };
+          }
+          // Second call: insert new list
+          return {
+            insert: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: { id: 'list-new' },
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
+        if (table === 'grocery_items') {
+          // Could be insert or select
+          return {
+            insert: jest.fn().mockResolvedValue({ error: null }),
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                order: jest.fn().mockResolvedValue({
+                  data: [makeGroceryItem({ id: 'gi-1', name: 'Flour', grocery_list_id: 'list-new' })],
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
+        return {};
+      });
+
+      await useGroceryStore.getState().generateGroceryList('h-1', '2026-03-23', [
+        { id: 'r-1', ingredients: [{ name: 'Flour', amount: 2, unit: 'cups' }] } as any,
+      ]);
+
+      const state = useGroceryStore.getState();
+      expect(state.items).toHaveLength(1);
+      expect(state.activeListId).toBe('list-new');
+    });
+
+    it('sets error on list fetch failure (non-PGRST116)', async () => {
+      const mockFrom = supabase.from as jest.Mock;
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'grocery_lists') {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                eq: jest.fn().mockReturnValue({
+                  single: jest.fn().mockResolvedValue({
+                    data: null,
+                    error: { code: 'PGRST500', message: 'Server error' },
+                  }),
+                }),
+              }),
+            }),
+          };
+        }
+        return {};
+      });
+
+      await useGroceryStore.getState().generateGroceryList('h-1', '2026-03-23', []);
+
+      const state = useGroceryStore.getState();
+      expect(state.error).toBeTruthy();
+    });
+  });
+
+  describe('removeItem', () => {
+    it('optimistically removes item from state', async () => {
+      const item1 = makeGroceryItem({ id: 'item-1', name: 'Apples' });
+      const item2 = makeGroceryItem({ id: 'item-2', name: 'Bananas' });
+      useGroceryStore.setState({ items: [item1, item2] });
+
+      const mockFrom = supabase.from as jest.Mock;
+      mockFrom.mockReturnValue({
+        delete: jest.fn().mockReturnValue({
+          eq: jest.fn().mockResolvedValue({ error: null }),
+        }),
+      });
+
+      await useGroceryStore.getState().removeItem('item-1');
+
+      const state = useGroceryStore.getState();
+      expect(state.items).toHaveLength(1);
+      expect(state.items.find((i) => i.id === 'item-1')).toBeUndefined();
+    });
+
+    it('reverts on delete failure', async () => {
+      const item1 = makeGroceryItem({ id: 'item-1', name: 'Apples' });
+      useGroceryStore.setState({ items: [item1] });
+
+      const mockFrom = supabase.from as jest.Mock;
+      mockFrom.mockReturnValue({
+        delete: jest.fn().mockReturnValue({
+          eq: jest.fn().mockResolvedValue({ error: { message: 'Delete failed' } }),
+        }),
+      });
+
+      await useGroceryStore.getState().removeItem('item-1');
+
+      const state = useGroceryStore.getState();
+      expect(state.items.find((i) => i.id === 'item-1')).toBeDefined();
+      expect(state.error).toBeTruthy();
+    });
+  });
+
+  describe('realtime helpers', () => {
+    it('_addItem adds new item to state', () => {
+      const item1 = makeGroceryItem({ id: 'item-1' });
+      useGroceryStore.setState({ items: [item1] });
+
+      useGroceryStore.getState()._addItem(makeGroceryItem({ id: 'item-2', name: 'Butter' }));
+
+      expect(useGroceryStore.getState().items).toHaveLength(2);
+    });
+
+    it('_addItem skips duplicate ids', () => {
+      const item1 = makeGroceryItem({ id: 'item-1' });
+      useGroceryStore.setState({ items: [item1] });
+
+      useGroceryStore.getState()._addItem(makeGroceryItem({ id: 'item-1' }));
+
+      expect(useGroceryStore.getState().items).toHaveLength(1);
+    });
+
+    it('_updateItem replaces item by id', () => {
+      const item1 = makeGroceryItem({ id: 'item-1', name: 'test item' });
+      useGroceryStore.setState({ items: [item1] });
+
+      useGroceryStore.getState()._updateItem(makeGroceryItem({ id: 'item-1', name: 'Updated' }));
+
+      expect(useGroceryStore.getState().items[0].name).toBe('Updated');
+    });
+
+    it('_removeItem removes item by id', () => {
+      const item1 = makeGroceryItem({ id: 'item-1' });
+      const item2 = makeGroceryItem({ id: 'item-2' });
+      useGroceryStore.setState({ items: [item1, item2] });
+
+      useGroceryStore.getState()._removeItem('item-1');
+
+      expect(useGroceryStore.getState().items).toHaveLength(1);
     });
   });
 });
