@@ -230,7 +230,7 @@ Plans:
 | 17. Data Scoping | v2.3 | 0/1 | Not started | - |
 | 18. Auth, Onboarding & Household QA | v2.4 | 2/2 | Complete    | 2026-03-27 |
 | 19. Recipe Browsing & Detail QA | v2.4 | 2/2 | Complete    | 2026-03-27 |
-| 20. Recipe Management & Cooking Mode QA | v2.4 | 2/2 | Complete   | 2026-03-27 |
+| 20. Recipe Management & Cooking Mode QA | v2.4 | 2/2 | Complete    | 2026-03-27 |
 | 21. Planning, Grocery, Budget & Leftovers QA | v2.4 | 0/? | Not started | - |
 | 22. Presence, Subscription, Notifications & Edge Cases QA | v2.4 | 0/? | Not started | - |
 
