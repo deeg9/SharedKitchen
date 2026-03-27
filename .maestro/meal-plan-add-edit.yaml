@@ -1,4 +1,4 @@
-appId: com.mise.app
+appId: com.sharedkitchen.app
 ---
 # Meal Plan Add/Edit Flow
 # Adds a meal to a day on the plan, then edits it by changing the recipe.

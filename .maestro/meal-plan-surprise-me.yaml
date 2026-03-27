@@ -1,4 +1,4 @@
-appId: com.mise.app
+appId: com.sharedkitchen.app
 ---
 # Meal Plan Surprise Me Flow
 # Triggers Surprise Me, views the suggestion, and accepts it.
