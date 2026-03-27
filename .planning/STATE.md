@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: UI Polish & Bug Fixes
-status: Ready to execute
-stopped_at: Completed 20-02-PLAN.md
-last_updated: "2026-03-27T22:30:44.210Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 20-01-PLAN.md
+last_updated: "2026-03-27T22:34:59.820Z"
 progress:
   total_phases: 10
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 14
-  completed_plans: 13
+  completed_plans: 14
 ---
 
 # Project State
@@ -49,6 +49,7 @@ Recent decisions affecting current work:
 - [Phase 18]: Created reusable createQueryBuilder mock helper for Supabase chained queries in store tests
 - [Phase 19]: Error assertions use getErrorMessage fallback since supabase errors are plain objects, not Error instances
 - [Phase 19]: Skipped category dropdown Maestro test due to pre-existing zIndex:-1 layering; filter logic covered by unit tests
+- [Phase 20]: Used single-step recipe fixture to test Done Cooking button without FlatList swipe simulation
 
 ### Pending Todos
 
@@ -84,9 +85,10 @@ None yet.
 | Phase 19 P01 | 237s | 2 tasks | 1 files |
 | Phase 19 P02 | 632 | 2 tasks | 2 files |
 | Phase 20 P02 | 41 | 1 tasks | 3 files |
+| Phase 20 P01 | 156 | 2 tasks | 2 files |
 
 ## Session Continuity
 
-Last session: 2026-03-27T22:30:44.207Z
-Stopped at: Completed 20-02-PLAN.md
+Last session: 2026-03-27T22:34:59.817Z
+Stopped at: Completed 20-01-PLAN.md
 Resume file: None

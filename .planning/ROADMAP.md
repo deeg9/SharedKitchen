@@ -63,7 +63,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 - [x] **Phase 18: Auth, Onboarding & Household QA** - Test auth flows, onboarding, profile management, and household create/invite/join (completed 2026-03-27)
 - [x] **Phase 19: Recipe Browsing & Detail QA** - Test recipe list, search, filters, detail display, ratings, favorites, notes, scaling (completed 2026-03-27)
-- [ ] **Phase 20: Recipe Management & Cooking Mode QA** - Test recipe CRUD, URL import, cooking mode navigation, timers, unit toggle
+- [x] **Phase 20: Recipe Management & Cooking Mode QA** - Test recipe CRUD, URL import, cooking mode navigation, timers, unit toggle (completed 2026-03-27)
 - [ ] **Phase 21: Planning, Grocery, Budget & Leftovers QA** - Test meal planning, grocery list sync, budget tracking, leftovers
 - [ ] **Phase 22: Presence, Subscription, Notifications & Edge Cases QA** - Test presence avatars, Stripe flow, push notifications, offline/error states
 
@@ -178,9 +178,9 @@ Plans:
   3. Cooking mode opens fullscreen with step-by-step navigation, progress bar, and horizontal swiping between steps
   4. Timers start, pause, and reset correctly; unit toggle switches between metric/imperial in both step text and ingredients; ingredient sidebar shows correct scaled amounts
   5. Tapping "Done Cooking" on the last step returns the user to the recipe detail screen
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
-- [ ] 20-01-PLAN.md — Recipe store CRUD tests (updateRecipe, deleteRecipe) + expanded CookingMode component tests
+- [x] 20-01-PLAN.md — Recipe store CRUD tests (updateRecipe, deleteRecipe) + expanded CookingMode component tests
 - [x] 20-02-PLAN.md — Maestro E2E flows: fix appId on recipe-create/import, new cooking-mode flow
 
 ### Phase 21: Planning, Grocery, Budget & Leftovers QA
@@ -230,7 +230,7 @@ Plans:
 | 17. Data Scoping | v2.3 | 0/1 | Not started | - |
 | 18. Auth, Onboarding & Household QA | v2.4 | 2/2 | Complete    | 2026-03-27 |
 | 19. Recipe Browsing & Detail QA | v2.4 | 2/2 | Complete    | 2026-03-27 |
-| 20. Recipe Management & Cooking Mode QA | v2.4 | 1/2 | In Progress|  |
+| 20. Recipe Management & Cooking Mode QA | v2.4 | 2/2 | Complete   | 2026-03-27 |
 | 21. Planning, Grocery, Budget & Leftovers QA | v2.4 | 0/? | Not started | - |
 | 22. Presence, Subscription, Notifications & Edge Cases QA | v2.4 | 0/? | Not started | - |
 
