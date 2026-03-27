@@ -47,24 +47,24 @@
 
 ### Meal Planning
 
-- [ ] **PLAN-01**: User can add a recipe to the meal plan from recipe detail
-- [ ] **PLAN-02**: Day picker sheet shows 7 days and assigns recipe to selected day
-- [ ] **PLAN-03**: Plan tab displays assigned meals on correct days
+- [x] **PLAN-01**: User can add a recipe to the meal plan from recipe detail
+- [x] **PLAN-02**: Day picker sheet shows 7 days and assigns recipe to selected day
+- [x] **PLAN-03**: Plan tab displays assigned meals on correct days
 
 ### Grocery List
 
-- [ ] **GROC-01**: Grocery items populate from planned meals
-- [ ] **GROC-02**: User can check off grocery items
-- [ ] **GROC-03**: Grocery list syncs across household members in real-time
+- [x] **GROC-01**: Grocery items populate from planned meals
+- [x] **GROC-02**: User can check off grocery items
+- [x] **GROC-03**: Grocery list syncs across household members in real-time
 
 ### Budget
 
-- [ ] **BUDG-01**: Budget tab loads and displays monthly cost tracking
-- [ ] **BUDG-02**: Weekly spending breakdown displays correctly
+- [x] **BUDG-01**: Budget tab loads and displays monthly cost tracking
+- [x] **BUDG-02**: Weekly spending breakdown displays correctly
 
 ### Leftovers
 
-- [ ] **LEFT-01**: Leftovers screen loads and displays tracked items with freshness badges
+- [x] **LEFT-01**: Leftovers screen loads and displays tracked items with freshness badges
 
 ### Household
 
@@ -84,7 +84,7 @@
 ### Subscription
 
 - [ ] **SUB-01**: Subscription screen loads with pricing information
-- [ ] **SUB-02**: Stripe checkout flow initiates correctly
+- [x] **SUB-02**: Stripe checkout flow initiates correctly
 
 ### Notifications
 
@@ -93,9 +93,9 @@
 
 ### Edge Cases
 
-- [ ] **EDGE-01**: App shows appropriate loading states on slow network
-- [ ] **EDGE-02**: Empty household state is handled gracefully
-- [ ] **EDGE-03**: Screens handle missing/null data without crashes
+- [x] **EDGE-01**: App shows appropriate loading states on slow network
+- [x] **EDGE-02**: Empty household state is handled gracefully
+- [x] **EDGE-03**: Screens handle missing/null data without crashes
 
 ## Traceability
 
@@ -125,15 +125,15 @@
 | COOK-03 | Phase 20 | Complete |
 | COOK-04 | Phase 20 | Complete |
 | COOK-05 | Phase 20 | Complete |
-| PLAN-01 | Phase 21 | Pending |
-| PLAN-02 | Phase 21 | Pending |
-| PLAN-03 | Phase 21 | Pending |
-| GROC-01 | Phase 21 | Pending |
-| GROC-02 | Phase 21 | Pending |
-| GROC-03 | Phase 21 | Pending |
-| BUDG-01 | Phase 21 | Pending |
-| BUDG-02 | Phase 21 | Pending |
-| LEFT-01 | Phase 21 | Pending |
+| PLAN-01 | Phase 21 | Complete |
+| PLAN-02 | Phase 21 | Complete |
+| PLAN-03 | Phase 21 | Complete |
+| GROC-01 | Phase 21 | Complete |
+| GROC-02 | Phase 21 | Complete |
+| GROC-03 | Phase 21 | Complete |
+| BUDG-01 | Phase 21 | Complete |
+| BUDG-02 | Phase 21 | Complete |
+| LEFT-01 | Phase 21 | Complete |
 | HOUSE-01 | Phase 18 | Complete |
 | HOUSE-02 | Phase 18 | Complete |
 | HOUSE-03 | Phase 18 | Complete |
@@ -141,12 +141,12 @@
 | PROF-02 | Phase 18 | Complete |
 | PRES-01 | Phase 22 | Pending |
 | SUB-01 | Phase 22 | Pending |
-| SUB-02 | Phase 22 | Pending |
+| SUB-02 | Phase 22 | Complete |
 | NOTIF-01 | Phase 22 | Pending |
 | NOTIF-02 | Phase 22 | Pending |
-| EDGE-01 | Phase 22 | Pending |
-| EDGE-02 | Phase 22 | Pending |
-| EDGE-03 | Phase 22 | Pending |
+| EDGE-01 | Phase 22 | Complete |
+| EDGE-02 | Phase 22 | Complete |
+| EDGE-03 | Phase 22 | Complete |
 
 **Coverage:**
 - v2.4 requirements: 46 total
