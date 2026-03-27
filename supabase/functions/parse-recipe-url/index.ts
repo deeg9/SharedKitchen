@@ -275,7 +275,7 @@ Deno.serve(async (req: Request) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
-    const { url } = await req.json();
+    const { url, html: clientHtml } = await req.json();
 
     if (!url || typeof url !== 'string') {
       return new Response(
@@ -345,21 +345,25 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // Fetch the recipe page HTML
+    // Use client-provided HTML if available, otherwise fetch server-side
     let html: string;
-    try {
-      const response = await fetch(url, {
-        headers: { 'User-Agent': 'SharedKitchen Recipe Parser/1.0' },
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+    if (clientHtml && typeof clientHtml === 'string' && clientHtml.length > 100) {
+      html = clientHtml;
+    } else {
+      try {
+        const response = await fetch(url, {
+          headers: { 'User-Agent': 'SharedKitchen Recipe Parser/1.0' },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        html = await response.text();
+      } catch (fetchError) {
+        return new Response(
+          JSON.stringify({ error: 'Failed to fetch the URL. Please check the link and try again.' }),
+          { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
       }
-      html = await response.text();
-    } catch (fetchError) {
-      return new Response(
-        JSON.stringify({ error: 'Failed to fetch the URL. Please check the link and try again.' }),
-        { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
     }
 
     // --- JSON-LD extraction (try first, skip OpenAI if successful) ---

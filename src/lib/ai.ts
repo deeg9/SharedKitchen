@@ -97,14 +97,29 @@ export class RateLimitError extends Error {
 }
 
 /**
- * Parses a recipe URL using the Supabase Edge Function (OpenAI-powered).
- * Returns structured recipe data ready for insertion (without household_id/created_by).
+ * Parses a recipe URL using the Supabase Edge Function (Gemini-powered).
+ * Fetches HTML client-side (avoids Supabase outbound HTTP restrictions),
+ * then sends it to the edge function for JSON-LD extraction or Gemini parsing.
  */
 export async function parseRecipeUrl(
   url: string
 ): Promise<Omit<RecipeInsert, 'household_id' | 'created_by'>> {
+  // Fetch HTML client-side — mobile browsers aren't blocked by recipe sites
+  let html: string;
+  try {
+    const response = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)' },
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    html = await response.text();
+    // Truncate to 50KB to stay within edge function limits
+    if (html.length > 50000) html = html.slice(0, 50000);
+  } catch {
+    throw new Error('Failed to fetch the recipe page. Please check the URL and try again.');
+  }
+
   const { data, error } = await supabase.functions.invoke('parse-recipe-url', {
-    body: { url },
+    body: { url, html },
   });
 
   // Check for rate limit response
