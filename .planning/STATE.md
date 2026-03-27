@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.2
-milestone_name: UI Polish & Bug Fixes
-status: executing
-stopped_at: Completed 17-01-PLAN.md
-last_updated: "2026-03-26T22:25:32Z"
-last_activity: 2026-03-26 — Completed 17-01 Data Scoping (kitchen-switch data sync)
+milestone: v2.4
+milestone_name: Comprehensive QA Testing
+status: defining_requirements
+stopped_at: null
+last_updated: "2026-03-27T00:00:00Z"
+last_activity: 2026-03-27 — Milestone v2.4 started
 progress:
-  total_phases: 3
-  completed_phases: 2
-  total_plans: 6
-  completed_plans: 5
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
   percent: 0
 ---
 
@@ -18,17 +18,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-26)
+See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Phase 17 — Data Scoping
+**Current focus:** Defining requirements for v2.4 QA Testing
 
 ## Current Position
 
-Phase: 17 (Data Scoping)
-Plan: 01 complete
-Status: Executing
-Last activity: 2026-03-26 — Completed 17-01 Data Scoping (kitchen-switch data sync)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-27 — Milestone v2.4 started
 
 Progress: [██████░░░░] 60%
 

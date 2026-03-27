@@ -73,12 +73,36 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 
 ### Active
 
-**v2.3: Kitchen Switching**
-- [ ] Kitchen switcher dropdown on profile page showing all kitchens user belongs to
-- [ ] Create new kitchen flow from profile
-- [ ] Join kitchen via invite code from profile
-- [ ] Active kitchen context flows through all tabs (Plan, Recipes, Grocery, Budget)
-- [ ] All data queries scoped to active household_id
+**v2.4: Comprehensive QA Testing**
+- [ ] Validate onboarding flow completes and routes correctly
+- [ ] Validate recipes list: load, search, filter by category/cost/prep time, empty state
+- [ ] Validate recipe detail: hero image, metadata pills, tags display
+- [ ] Validate recipe interactions: rating, favorites, notes, scaling, ingredient checklist
+- [ ] Validate recipe management: add (manual + URL import), edit, save persistence
+- [ ] Validate meal planning: add to plan, day picker, plan tab display
+- [ ] Validate grocery list: populate from plans, check off items, sync
+- [ ] Validate budget tracking: tab loads, cost display
+- [ ] Validate leftovers: screen loads and functions
+- [ ] Validate household: create, invite, join
+- [ ] Validate profile: view, edit display name/avatar
+- [ ] Validate presence: avatar stack on recipe detail
+- [ ] Validate subscription/Stripe: screen loads, payment flow
+- [ ] Validate notifications: permission prompt, timer notifications
+- [ ] Validate offline/edge cases: no network, slow loading, empty household
+
+## Current Milestone: v2.4 Comprehensive QA Testing
+
+**Goal:** Systematically test and validate every feature area of SharedKitchen to ensure production readiness
+
+**Target features:**
+- Onboarding, auth flows, profile management
+- Recipe CRUD (create, read, update), recipe interactions (rating, favorites, notes, scaling)
+- Meal planning and grocery list generation/sync
+- Budget tracking and leftovers
+- Household management (create, invite, join)
+- Real-time presence, push notifications
+- Stripe subscription flow
+- Offline/edge case resilience
 
 ### Out of Scope
 
@@ -133,4 +157,4 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-03-26 after Phase 12 (Code Quality Polish) complete*
+*Last updated: 2026-03-27 after milestone v2.4 started*
