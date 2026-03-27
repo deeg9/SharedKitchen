@@ -1,0 +1,40 @@
+appId: com.sharedkitchen.app
+---
+# Phase 18: Auth, Onboarding & Household QA Verification
+# Tests: AUTH-02, AUTH-03, PROF-01, HOUSE-01, HOUSE-02, HOUSE-03
+
+# AUTH-02/03: App launches with user already signed in (session persisted)
+- launchApp
+- assertVisible: "PLAN"
+- takeScreenshot: verify-01-auth-session
+
+# Navigate to Profile
+- tapOn: "PROFILE"
+- assertVisible: "Edit Profile"
+
+# PROF-01: Profile shows user info
+- assertVisible: "buyer@example.com"
+
+# HOUSE-01: Household exists
+- assertVisible: "Chris's Kitchen"
+
+# HOUSE-02: Invite available
+- assertVisible:
+    text: ".*Invite Members.*"
+
+# HOUSE-03: Join kitchen available
+- assertVisible:
+    id: "kitchen-join-button"
+- assertVisible:
+    id: "kitchen-create-button"
+- takeScreenshot: verify-02-profile-and-household
+
+# Navigate to Recipes tab
+- tapOn: "RECIPES"
+- takeScreenshot: verify-03-recipes-tab
+
+# Navigate to Plan tab
+- tapOn: "PLAN"
+- assertVisible:
+    text: ".*Mar.*"
+- takeScreenshot: verify-04-plan-tab
