@@ -433,7 +433,7 @@ Parse time references in instructions into timers (e.g., "simmer for 20 minutes"
             ],
             generationConfig: {
               temperature: 0.1,
-              maxOutputTokens: 2000,
+              maxOutputTokens: 8000,
               responseMimeType: 'application/json',
             },
           }),
@@ -453,9 +453,9 @@ Parse time references in instructions into timers (e.g., "simmer for 20 minutes"
 
     if (!geminiResponse.ok) {
       const errorText = await geminiResponse.text();
-      console.error('Gemini API error:', errorText);
+      console.error('Gemini API error:', geminiResponse.status, errorText);
       return new Response(
-        JSON.stringify({ error: 'Failed to parse recipe. The AI service is temporarily unavailable.' }),
+        JSON.stringify({ error: `Gemini ${geminiResponse.status}: ${errorText.substring(0, 150)}` }),
         { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -464,19 +464,25 @@ Parse time references in instructions into timers (e.g., "simmer for 20 minutes"
     const content = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!content) {
+      const finishReason = geminiResult.candidates?.[0]?.finishReason;
+      const blockReason = geminiResult.candidates?.[0]?.safetyRatings?.find((r: any) => r.blocked)?.category;
       return new Response(
-        JSON.stringify({ error: 'Failed to extract recipe data from the page.' }),
+        JSON.stringify({ error: `No content from AI. Finish: ${finishReason || 'unknown'}. Block: ${blockReason || 'none'}. Try a different URL.` }),
         { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     let recipe: any;
     try {
-      recipe = JSON.parse(content);
+      // Strip markdown code fences if Gemini wraps the JSON
+      let jsonStr = content.trim();
+      if (jsonStr.startsWith('```')) {
+        jsonStr = jsonStr.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?```\s*$/, '');
+      }
+      recipe = JSON.parse(jsonStr);
     } catch (parseErr) {
-      console.error('Failed to parse Gemini JSON:', content?.substring(0, 200));
       return new Response(
-        JSON.stringify({ error: 'AI returned invalid JSON. Please try a different URL.' }),
+        JSON.stringify({ error: `AI response not valid JSON. Preview: ${content.substring(0, 100)}` }),
         { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
