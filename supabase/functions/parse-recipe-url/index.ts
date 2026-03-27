@@ -371,14 +371,14 @@ Deno.serve(async (req: Request) => {
     if (jsonLdRecipe && jsonLdRecipe.name && jsonLdRecipe.recipeIngredient && jsonLdRecipe.recipeIngredient.length > 0 && jsonLdRecipe.recipeInstructions) {
       const mappedRecipe = mapSchemaOrgToRecipe(jsonLdRecipe);
 
-      // Log JSON-LD hit with tokens_used: 0 (no LLM cost)
-      await supabaseAdmin.from('ai_usage_log').insert({
+      // Log JSON-LD hit (non-blocking)
+      supabaseAdmin.from('ai_usage_log').insert({
         user_id: user.id,
         function_name: 'parse-recipe-url',
         input_hash: urlHash,
         cached_response: mappedRecipe,
         tokens_used: 0,
-      });
+      }).then(() => {}).catch(() => {});
 
       return new Response(
         JSON.stringify(mappedRecipe),
@@ -470,25 +470,34 @@ Parse time references in instructions into timers (e.g., "simmer for 20 minutes"
       );
     }
 
-    const recipe = JSON.parse(content);
+    let recipe: any;
+    try {
+      recipe = JSON.parse(content);
+    } catch (parseErr) {
+      console.error('Failed to parse Gemini JSON:', content?.substring(0, 200));
+      return new Response(
+        JSON.stringify({ error: 'AI returned invalid JSON. Please try a different URL.' }),
+        { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-    // Log usage with cached response for future lookups
-    await supabaseAdmin.from('ai_usage_log').insert({
+    // Log usage (non-blocking — don't crash if this fails)
+    supabaseAdmin.from('ai_usage_log').insert({
       user_id: user.id,
       function_name: 'parse-recipe-url',
       input_hash: urlHash,
       cached_response: recipe,
       tokens_used: geminiResult.usageMetadata?.totalTokenCount ?? null,
-    });
+    }).then(() => {}).catch(() => {});
 
     return new Response(
       JSON.stringify(recipe),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error) {
-    console.error('Parse recipe error:', error);
+  } catch (error: any) {
+    console.error('Parse recipe error:', error?.message, error?.stack?.substring(0, 300));
     return new Response(
-      JSON.stringify({ error: 'An unexpected error occurred while parsing the recipe.' }),
+      JSON.stringify({ error: error?.message ?? 'An unexpected error occurred while parsing the recipe.' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
