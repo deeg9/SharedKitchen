@@ -1,4 +1,5 @@
 import { usePlanStore } from '../../src/stores/planStore';
+import { useBudgetStore } from '../../src/stores/budgetStore';
 import { supabase } from '../../src/lib/supabase';
 
 // Get the mock from setup.tsx
@@ -158,6 +159,43 @@ describe('planStore', () => {
       expect(state.mealPlan.size).toBe(1);
       const entry = state.mealPlan.values().next().value;
       expect(entry.plan_date).toBe('2026-03-23');
+    });
+
+    it('auto-creates expense for takeout meals via budgetStore', async () => {
+      const mockChain = {
+        upsert: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        single: jest.fn(() =>
+          Promise.resolve({
+            data: {
+              id: 'mp-2',
+              household_id: 'h-1',
+              recipe_id: 'r-1',
+              plan_date: '2026-03-23',
+              meal_type: 'dinner',
+              assigned_cook: 'u-1',
+              notes: null,
+              created_by: 'u-1',
+              created_at: '2026-03-23T00:00:00Z',
+              recipes: { id: 'r-1', name: 'Pizza', prep_time_minutes: 0 },
+            },
+            error: null,
+          })
+        ),
+      };
+      mockFrom.mockReturnValue(mockChain);
+
+      // Mock budgetStore.addExpense
+      const mockAddExpense = jest.fn().mockResolvedValue(undefined);
+      useBudgetStore.setState({ addExpense: mockAddExpense } as any);
+
+      await usePlanStore.getState().assignRecipe('h-1', '2026-03-23', 'dinner', 'r-1', 'u-1', undefined, 'takeout', 15.99);
+
+      expect(mockAddExpense).toHaveBeenCalledWith('h-1', expect.objectContaining({
+        amount: 15.99,
+        category: 'Takeout',
+        expense_date: '2026-03-23',
+      }));
     });
 
     it('sets error state on assign failure', async () => {
