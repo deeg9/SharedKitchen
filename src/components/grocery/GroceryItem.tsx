@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Image, Alert } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { colors } from '../../theme/colors';
@@ -8,6 +8,7 @@ import { spacing, borderRadius } from '../../theme/spacing';
 import { GroceryItem as GroceryItemType } from '../../types/database';
 import { useGroceryStore } from '../../stores/groceryStore';
 import { useHouseholdStore } from '../../stores/householdStore';
+import { useBudgetStore } from '../../stores/budgetStore';
 
 interface GroceryItemProps {
   item: GroceryItemType;
@@ -17,8 +18,10 @@ interface GroceryItemProps {
 
 export function GroceryItem({ item, userId, onEdit }: GroceryItemProps) {
   const toggleItem = useGroceryStore((s) => s.toggleItem);
+  const updateItem = useGroceryStore((s) => s.updateItem);
   const removeItem = useGroceryStore((s) => s.removeItem);
   const members = useHouseholdStore((s) => s.members);
+  const activeHouseholdId = useHouseholdStore((s) => s.activeHouseholdId);
 
   const checkerProfile = item.checked_by
     ? members.find((m) => m.user_id === item.checked_by)?.profiles
@@ -26,7 +29,48 @@ export function GroceryItem({ item, userId, onEdit }: GroceryItemProps) {
 
   const handleToggle = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    toggleItem(item.id, !item.is_checked, userId);
+
+    // When unchecking, just toggle directly
+    if (item.is_checked) {
+      toggleItem(item.id, false, userId);
+      return;
+    }
+
+    // When checking on, prompt for cost
+    Alert.prompt(
+      'Item Cost',
+      `How much was ${item.name}?`,
+      [
+        {
+          text: 'Skip',
+          style: 'cancel',
+          onPress: () => {
+            toggleItem(item.id, true, userId);
+          },
+        },
+        {
+          text: 'Save',
+          onPress: (value?: string) => {
+            const parsedCost = parseFloat(value || '0');
+            toggleItem(item.id, true, userId);
+            if (parsedCost > 0) {
+              updateItem(item.id, { estimated_price: parsedCost });
+              if (activeHouseholdId) {
+                useBudgetStore.getState().addExpense(activeHouseholdId, {
+                  amount: parsedCost,
+                  category: 'Groceries',
+                  description: item.name,
+                  expense_date: new Date().toISOString().split('T')[0],
+                });
+              }
+            }
+          },
+        },
+      ],
+      'plain-text',
+      item.estimated_price ? item.estimated_price.toFixed(2) : '',
+      'decimal-pad'
+    );
   };
 
   const handleDelete = async () => {
