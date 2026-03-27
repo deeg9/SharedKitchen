@@ -62,7 +62,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 ### v2.4 Comprehensive QA Testing (Phases 18-22)
 
 - [x] **Phase 18: Auth, Onboarding & Household QA** - Test auth flows, onboarding, profile management, and household create/invite/join (completed 2026-03-27)
-- [ ] **Phase 19: Recipe Browsing & Detail QA** - Test recipe list, search, filters, detail display, ratings, favorites, notes, scaling
+- [x] **Phase 19: Recipe Browsing & Detail QA** - Test recipe list, search, filters, detail display, ratings, favorites, notes, scaling (completed 2026-03-27)
 - [ ] **Phase 20: Recipe Management & Cooking Mode QA** - Test recipe CRUD, URL import, cooking mode navigation, timers, unit toggle
 - [ ] **Phase 21: Planning, Grocery, Budget & Leftovers QA** - Test meal planning, grocery list sync, budget tracking, leftovers
 - [ ] **Phase 22: Presence, Subscription, Notifications & Edge Cases QA** - Test presence avatars, Stripe flow, push notifications, offline/error states
@@ -163,7 +163,7 @@ Plans:
   2. When no recipes match the active filters, an empty state message displays instead of a blank screen
   3. Recipe detail shows hero image (or placeholder), metadata pills (prep/cook/serves/cost), and tags below the hero
   4. User can rate a recipe with stars, toggle favorite, add a household note (visible with date), scale ingredients (x1/x2/x3), and check off ingredients with strikethrough
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 19-01-PLAN.md — Expand recipeStore unit tests (cost/time filters, notes, fetchRecipeDetail, error handling)
 - [x] 19-02-PLAN.md — Maestro E2E flows for recipe list search/filter and recipe detail interactions
@@ -226,7 +226,7 @@ Plans:
 | 16. Kitchen Switcher & Management | v2.3 | 0/1 | Not started | - |
 | 17. Data Scoping | v2.3 | 0/1 | Not started | - |
 | 18. Auth, Onboarding & Household QA | v2.4 | 2/2 | Complete    | 2026-03-27 |
-| 19. Recipe Browsing & Detail QA | v2.4 | 1/2 | In Progress|  |
+| 19. Recipe Browsing & Detail QA | v2.4 | 1/2 | Complete    | 2026-03-27 |
 | 20. Recipe Management & Cooking Mode QA | v2.4 | 0/? | Not started | - |
 | 21. Planning, Grocery, Budget & Leftovers QA | v2.4 | 0/? | Not started | - |
 | 22. Presence, Subscription, Notifications & Edge Cases QA | v2.4 | 0/? | Not started | - |
