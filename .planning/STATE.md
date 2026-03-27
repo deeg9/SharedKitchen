@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v2.4
 milestone_name: Comprehensive QA Testing
-status: defining_requirements
+status: ready_to_plan
 stopped_at: null
 last_updated: "2026-03-27T00:00:00Z"
-last_activity: 2026-03-27 — Milestone v2.4 started
+last_activity: 2026-03-27 — v2.4 roadmap created (phases 18-22)
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Defining requirements for v2.4 QA Testing
+**Current focus:** Phase 18 — Auth, Onboarding & Household QA
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-27 — Milestone v2.4 started
+Phase: 18 of 22 (Auth, Onboarding & Household QA)
+Plan: 0 of ? in current phase
+Status: Ready to plan
+Last activity: 2026-03-27 — v2.4 roadmap created with 5 QA testing phases (18-22)
 
 Progress: [██████░░░░] 60%
 
@@ -47,16 +47,9 @@ Progress: [██████░░░░] 60%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [Phase 12]: ErrorBoundary wraps Slot only, PermissionPrompt stays outside for error recovery access
-- [Phase 12]: Used getErrorMessage(error: unknown) utility pattern for all catch blocks
-- [Phase 11]: Left existing if(!customerId) upsert intact, added separate unconditional upsert after subscription creation
-- [Phase 13]: Reduced hero gradient from 160px/0.85 to 80px/0.3 for readability without obscuring food photo
-- [Phase 13]: Used wrapper View stacking context for FilterBar z-index containment instead of modifying FilterBar internals
-- [Phase 14]: Built AppLogo with Views + MaterialCommunityIcons instead of image asset for resolution independence
-- [Phase 15]: Removed entire App Settings section rather than fixing broken toggles
-- [Phase 15]: Used Alert.prompt on iOS for inline household name editing
 - [Phase 17]: Used useRef to skip initial mount in useKitchenDataSync; tabs handle own initial fetch
 - [Phase 17]: Used getState() for imperative store access in sync hook to avoid unnecessary re-renders
+- [v2.4]: QA milestone structured as 5 testing phases grouped by feature affinity (46 requirements)
 
 ### Pending Todos
 
@@ -86,9 +79,10 @@ None yet.
 | Phase 15 P01 | 187 | 2 tasks | 2 files |
 | Phase 15 P02 | 169 | 3 tasks | 2 files |
 | Phase 17 P01 | 82s | 2 tasks | 6 files |
+| 260327-iw7 | Add meal source type + grocery cost tracking | 2026-03-27 | 8a49ca4 | [260327-iw7-add-meal-source-type-home-cooked-takeout](./quick/260327-iw7-add-meal-source-type-home-cooked-takeout/) |
 
 ## Session Continuity
 
-Last session: 2026-03-26T22:25:32Z
-Stopped at: Completed 17-01-PLAN.md
+Last session: 2026-03-27
+Stopped at: Completed quick task 260327-iw7 (meal source + grocery cost)
 Resume file: None
