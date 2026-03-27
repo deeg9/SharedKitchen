@@ -158,7 +158,6 @@ export default function RecipeDetailScreen() {
         {/* ── Hero Image ── */}
         <View style={s.hero}>
           <Image source={{ uri: heroUri }} style={s.heroImage} />
-          <View style={s.heroGradient} />
           <Pressable
             onPress={() => router.canGoBack() ? router.back() : router.replace('/(app)/(tabs)/recipes')}
             style={[s.headerBtn, { left: spacing.md, top: insets.top + spacing.xs }]}
@@ -176,19 +175,20 @@ export default function RecipeDetailScreen() {
               <PresenceAvatarStack members={presenceMembers} />
             </View>
           )}
-          {/* Tags on image */}
-          <View style={s.heroTags}>
-            {recipe.category && (
-              <View style={s.heroTag}>
-                <Text style={s.heroTagText}>{recipe.category}</Text>
-              </View>
-            )}
-            {recipe.tags?.slice(0, 2).map((tag: string) => (
-              <View key={tag} style={[s.heroTag, s.heroTagSecondary]}>
-                <Text style={s.heroTagSecondaryText}>{tag}</Text>
-              </View>
-            ))}
-          </View>
+        </View>
+
+        {/* ── Tags below image ── */}
+        <View style={s.tagsRow}>
+          {recipe.category && (
+            <View style={s.heroTag}>
+              <Text style={s.heroTagText}>{recipe.category}</Text>
+            </View>
+          )}
+          {recipe.tags?.slice(0, 2).map((tag: string) => (
+            <View key={tag} style={[s.heroTag, s.heroTagSecondary]}>
+              <Text style={s.heroTagSecondaryText}>{tag}</Text>
+            </View>
+          ))}
         </View>
 
         {/* ── Title & Rating ── */}
@@ -410,17 +410,13 @@ const s = StyleSheet.create({
   // Hero
   hero: { position: 'relative', height: 360 },
   heroImage: { width: '100%', height: '100%' },
-  heroGradient: {
-    position: 'absolute', bottom: 0, left: 0, right: 0, height: 120,
-    backgroundColor: 'rgba(251,249,245,0.7)',
-  },
   headerBtn: {
     position: 'absolute', width: 40, height: 40, borderRadius: borderRadius.full,
     backgroundColor: 'rgba(255,255,255,0.85)', justifyContent: 'center', alignItems: 'center',
   },
-  heroTags: {
-    position: 'absolute', bottom: spacing.lg, left: spacing.md,
+  tagsRow: {
     flexDirection: 'row', gap: spacing.xs,
+    paddingHorizontal: spacing.md, paddingTop: spacing.md, paddingBottom: spacing.xs,
   },
   heroTag: {
     paddingHorizontal: spacing.md, paddingVertical: spacing.xs + 2,
@@ -432,7 +428,7 @@ const s = StyleSheet.create({
   heroTagSecondaryText: { fontSize: 9, fontWeight: '800', color: '#663500', textTransform: 'uppercase', letterSpacing: 1.5 },
 
   // Title
-  titleSection: { paddingHorizontal: spacing.md, marginTop: -spacing.md },
+  titleSection: { paddingHorizontal: spacing.md },
   title: {
     fontFamily: fontFamily.headlineBold, fontSize: 32, fontWeight: '800',
     color: colors.primary, letterSpacing: -0.5, lineHeight: 38, marginBottom: spacing.md,
