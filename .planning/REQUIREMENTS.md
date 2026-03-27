@@ -101,57 +101,57 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ONBOARD-01 | — | Pending |
-| AUTH-01 | — | Pending |
-| AUTH-02 | — | Pending |
-| AUTH-03 | — | Pending |
-| RLIST-01 | — | Pending |
-| RLIST-02 | — | Pending |
-| RLIST-03 | — | Pending |
-| RLIST-04 | — | Pending |
-| RDETAIL-01 | — | Pending |
-| RDETAIL-02 | — | Pending |
-| RDETAIL-03 | — | Pending |
-| RDETAIL-04 | — | Pending |
-| RDETAIL-05 | — | Pending |
-| RDETAIL-06 | — | Pending |
-| RDETAIL-07 | — | Pending |
-| RMGMT-01 | — | Pending |
-| RMGMT-02 | — | Pending |
-| RMGMT-03 | — | Pending |
-| RMGMT-04 | — | Pending |
-| COOK-01 | — | Pending |
-| COOK-02 | — | Pending |
-| COOK-03 | — | Pending |
-| COOK-04 | — | Pending |
-| COOK-05 | — | Pending |
-| PLAN-01 | — | Pending |
-| PLAN-02 | — | Pending |
-| PLAN-03 | — | Pending |
-| GROC-01 | — | Pending |
-| GROC-02 | — | Pending |
-| GROC-03 | — | Pending |
-| BUDG-01 | — | Pending |
-| BUDG-02 | — | Pending |
-| LEFT-01 | — | Pending |
-| HOUSE-01 | — | Pending |
-| HOUSE-02 | — | Pending |
-| HOUSE-03 | — | Pending |
-| PROF-01 | — | Pending |
-| PROF-02 | — | Pending |
-| PRES-01 | — | Pending |
-| SUB-01 | — | Pending |
-| SUB-02 | — | Pending |
-| NOTIF-01 | — | Pending |
-| NOTIF-02 | — | Pending |
-| EDGE-01 | — | Pending |
-| EDGE-02 | — | Pending |
-| EDGE-03 | — | Pending |
+| ONBOARD-01 | Phase 18 | Pending |
+| AUTH-01 | Phase 18 | Pending |
+| AUTH-02 | Phase 18 | Pending |
+| AUTH-03 | Phase 18 | Pending |
+| RLIST-01 | Phase 19 | Pending |
+| RLIST-02 | Phase 19 | Pending |
+| RLIST-03 | Phase 19 | Pending |
+| RLIST-04 | Phase 19 | Pending |
+| RDETAIL-01 | Phase 19 | Pending |
+| RDETAIL-02 | Phase 19 | Pending |
+| RDETAIL-03 | Phase 19 | Pending |
+| RDETAIL-04 | Phase 19 | Pending |
+| RDETAIL-05 | Phase 19 | Pending |
+| RDETAIL-06 | Phase 19 | Pending |
+| RDETAIL-07 | Phase 19 | Pending |
+| RMGMT-01 | Phase 20 | Pending |
+| RMGMT-02 | Phase 20 | Pending |
+| RMGMT-03 | Phase 20 | Pending |
+| RMGMT-04 | Phase 20 | Pending |
+| COOK-01 | Phase 20 | Pending |
+| COOK-02 | Phase 20 | Pending |
+| COOK-03 | Phase 20 | Pending |
+| COOK-04 | Phase 20 | Pending |
+| COOK-05 | Phase 20 | Pending |
+| PLAN-01 | Phase 21 | Pending |
+| PLAN-02 | Phase 21 | Pending |
+| PLAN-03 | Phase 21 | Pending |
+| GROC-01 | Phase 21 | Pending |
+| GROC-02 | Phase 21 | Pending |
+| GROC-03 | Phase 21 | Pending |
+| BUDG-01 | Phase 21 | Pending |
+| BUDG-02 | Phase 21 | Pending |
+| LEFT-01 | Phase 21 | Pending |
+| HOUSE-01 | Phase 18 | Pending |
+| HOUSE-02 | Phase 18 | Pending |
+| HOUSE-03 | Phase 18 | Pending |
+| PROF-01 | Phase 18 | Pending |
+| PROF-02 | Phase 18 | Pending |
+| PRES-01 | Phase 22 | Pending |
+| SUB-01 | Phase 22 | Pending |
+| SUB-02 | Phase 22 | Pending |
+| NOTIF-01 | Phase 22 | Pending |
+| NOTIF-02 | Phase 22 | Pending |
+| EDGE-01 | Phase 22 | Pending |
+| EDGE-02 | Phase 22 | Pending |
+| EDGE-03 | Phase 22 | Pending |
 
 **Coverage:**
 - v2.4 requirements: 46 total
-- Mapped to phases: 0
-- Unmapped: 46
+- Mapped to phases: 46
+- Unmapped: 0
 
 ## Out of Scope
 
@@ -165,4 +165,4 @@
 
 ---
 *Requirements defined: 2026-03-27*
-*Last updated: 2026-03-27 after initial definition*
+*Last updated: 2026-03-27 after roadmap creation (traceability mapped)*
