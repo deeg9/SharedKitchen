@@ -69,34 +69,6 @@ export default function BudgetScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <View style={styles.avatar}>
-            <MaterialCommunityIcons name="account-circle" size={36} color={colors.primary} />
-          </View>
-          <Text style={styles.appTitle}>SharedKitchen</Text>
-        </View>
-        <View style={styles.headerRight}>
-          <Pressable
-            onPress={() => {
-              if (subscription.canAccess('analytics_dashboard')) {
-                Alert.alert('Coming Soon', 'Analytics dashboard coming soon in a future update.');
-              } else {
-                setShowUpgradePrompt(true);
-              }
-            }}
-            style={styles.trendsButton}
-            testID="budget-trends-button"
-          >
-            <MaterialCommunityIcons name="chart-line" size={20} color={colors.primary} />
-            <Text style={styles.trendsText}>Trends</Text>
-          </Pressable>
-          <Pressable>
-            <MaterialCommunityIcons name="bell-outline" size={24} color={colors.onSurface} />
-          </Pressable>
-        </View>
-      </View>
-
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[

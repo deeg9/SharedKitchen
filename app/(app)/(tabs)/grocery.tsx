@@ -285,6 +285,7 @@ const styles = StyleSheet.create({
     ...typography.headlineMd,
     color: colors.onSurface,
     textAlign: 'center',
+    flex: 1,
   },
   scrollView: {
     flex: 1,
