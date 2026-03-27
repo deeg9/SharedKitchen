@@ -178,7 +178,10 @@ Plans:
   3. Cooking mode opens fullscreen with step-by-step navigation, progress bar, and horizontal swiping between steps
   4. Timers start, pause, and reset correctly; unit toggle switches between metric/imperial in both step text and ingredients; ingredient sidebar shows correct scaled amounts
   5. Tapping "Done Cooking" on the last step returns the user to the recipe detail screen
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 20-01-PLAN.md — Recipe store CRUD tests (updateRecipe, deleteRecipe) + expanded CookingMode component tests
+- [ ] 20-02-PLAN.md — Maestro E2E flows: fix appId on recipe-create/import, new cooking-mode flow
 
 ### Phase 21: Planning, Grocery, Budget & Leftovers QA
 **Goal**: Meal planning, grocery list generation and sync, budget tracking, and leftover management all work correctly
@@ -226,10 +229,10 @@ Plans:
 | 16. Kitchen Switcher & Management | v2.3 | 0/1 | Not started | - |
 | 17. Data Scoping | v2.3 | 0/1 | Not started | - |
 | 18. Auth, Onboarding & Household QA | v2.4 | 2/2 | Complete    | 2026-03-27 |
-| 19. Recipe Browsing & Detail QA | v2.4 | 1/2 | Complete    | 2026-03-27 |
-| 20. Recipe Management & Cooking Mode QA | v2.4 | 0/? | Not started | - |
+| 19. Recipe Browsing & Detail QA | v2.4 | 2/2 | Complete    | 2026-03-27 |
+| 20. Recipe Management & Cooking Mode QA | v2.4 | 0/2 | Not started | - |
 | 21. Planning, Grocery, Budget & Leftovers QA | v2.4 | 0/? | Not started | - |
 | 22. Presence, Subscription, Notifications & Edge Cases QA | v2.4 | 0/? | Not started | - |
 
 ---
-*Last updated: 2026-03-27 after Phase 19 planning*
+*Last updated: 2026-03-27 after Phase 20 planning*
