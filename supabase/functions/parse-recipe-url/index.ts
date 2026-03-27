@@ -388,8 +388,16 @@ Deno.serve(async (req: Request) => {
 
     // --- Gemini fallback (JSON-LD missing or incomplete) ---
 
-    // Truncate HTML to stay within token limits
-    const truncatedHtml = html.slice(0, 50000);
+    // Strip non-content HTML to reduce tokens sent to Gemini
+    let cleanedHtml = html
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+      .replace(/<style[\s\S]*?<\/style>/gi, '')
+      .replace(/<nav[\s\S]*?<\/nav>/gi, '')
+      .replace(/<footer[\s\S]*?<\/footer>/gi, '')
+      .replace(/<header[\s\S]*?<\/header>/gi, '')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/\s{2,}/g, ' ');
+    const truncatedHtml = cleanedHtml.slice(0, 30000);
 
     const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
     if (!geminiApiKey) {
@@ -417,7 +425,7 @@ Deno.serve(async (req: Request) => {
 Parse time references in instructions into timers (e.g., "simmer for 20 minutes" → {duration_seconds: 1200, label: "simmer"}). Use null for unknown nullable fields.`;
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 25000);
+    const timeoutId = setTimeout(() => controller.abort(), 55000);
 
     let geminiResponse: Response;
     try {
