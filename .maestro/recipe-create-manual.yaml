@@ -1,4 +1,4 @@
-appId: com.mise.app
+appId: com.sharedkitchen.app
 ---
 # Recipe Create Manual Flow
 # Creates a recipe via the manual form with name, category, ingredients, and instructions.

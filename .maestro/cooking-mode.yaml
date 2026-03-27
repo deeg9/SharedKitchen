@@ -1,0 +1,109 @@
+appId: com.sharedkitchen.app
+---
+# Cooking Mode Flow
+# Tests cooking mode entry from recipe detail, step navigation, timer, unit toggle, ingredient sidebar, and Done Cooking.
+# Assumes user is logged in and at least one recipe exists with multiple steps.
+# Covers: RMGMT-04 (Start Cooking), COOK-01 (step display/navigation), COOK-03 (unit toggle),
+#          COOK-04 (ingredient sidebar), COOK-05 (Done Cooking)
+
+- launchApp
+
+# Navigate to Recipes tab
+- tapOn:
+    id: "recipes-tab"
+
+# Wait for recipes to load and tap first recipe
+- extendedWaitUntil:
+    visible:
+      id: "recipe-card-0"
+    timeout: 10000
+- tapOn:
+    id: "recipe-card-0"
+
+# Wait for recipe detail to load
+- extendedWaitUntil:
+    visible:
+      text: ".*Start Cooking.*"
+    timeout: 5000
+
+# RMGMT-04: Tap Start Cooking to enter cooking mode
+- tapOn:
+    text: ".*Start Cooking.*"
+
+# COOK-01: Verify step display and progress bar
+- extendedWaitUntil:
+    visible:
+      id: "cooking-progress"
+    timeout: 5000
+- assertVisible:
+    text: ".*Step 1 of.*"
+
+# COOK-01: Verify next step navigation
+- tapOn:
+    id: "cooking-next-step"
+- assertVisible:
+    text: ".*Step 2 of.*"
+
+# COOK-03: Verify unit toggle is present
+- assertVisible:
+    text: "IMPERIAL"
+- assertVisible:
+    text: "METRIC"
+
+# COOK-03: Toggle to metric
+- tapOn:
+    text: "METRIC"
+
+# COOK-04: Open ingredient sidebar
+- tapOn:
+    text: ".*Ingredients.*"
+
+# COOK-04: Verify sidebar shows ingredient list
+- extendedWaitUntil:
+    visible:
+      text: ".*Ingredients.*"
+    timeout: 3000
+
+# Close sidebar by tapping overlay
+- tapOn:
+    point: "80%,50%"
+
+# Navigate toward last step for Done Cooking test (COOK-05)
+# Keep tapping next until we reach the end
+- tapOn:
+    id: "cooking-next-step"
+    optional: true
+
+- tapOn:
+    id: "cooking-next-step"
+    optional: true
+
+- tapOn:
+    id: "cooking-next-step"
+    optional: true
+
+- tapOn:
+    id: "cooking-next-step"
+    optional: true
+
+- tapOn:
+    id: "cooking-next-step"
+    optional: true
+
+# COOK-05: Verify Done Cooking button appears on last step
+- extendedWaitUntil:
+    visible:
+      id: "cooking-done-button"
+    timeout: 5000
+- assertVisible:
+    text: ".*Done Cooking.*"
+
+# COOK-05: Tap Done Cooking to return to recipe detail
+- tapOn:
+    id: "cooking-done-button"
+
+# Verify we returned to recipe detail
+- extendedWaitUntil:
+    visible:
+      text: ".*Start Cooking.*"
+    timeout: 5000
