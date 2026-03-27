@@ -206,7 +206,10 @@ Plans:
   2. Subscription screen loads with pricing information and the Stripe checkout flow initiates correctly
   3. Permission prompt displays on first relevant action, and cooking timer completion triggers a notification
   4. App shows appropriate loading states on slow network, empty household state is handled gracefully, and screens handle missing/null data without crashes
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 22-01-PLAN.md — subscriptionStore unit tests + usePermissionPrompt/useNotificationSetup hook tests (edge cases)
+- [ ] 22-02-PLAN.md — Update appId in 4 Maestro flows (premium-checkout, negative-*) from com.mise.app to com.sharedkitchen.app
 
 ## Progress
 
@@ -235,7 +238,7 @@ Plans:
 | 19. Recipe Browsing & Detail QA | v2.4 | 2/2 | Complete    | 2026-03-27 |
 | 20. Recipe Management & Cooking Mode QA | v2.4 | 2/2 | Complete    | 2026-03-27 |
 | 21. Planning, Grocery, Budget & Leftovers QA | v2.4 | 0/2 | Complete    | 2026-03-27 |
-| 22. Presence, Subscription, Notifications & Edge Cases QA | v2.4 | 0/? | Not started | - |
+| 22. Presence, Subscription, Notifications & Edge Cases QA | v2.4 | 0/2 | Not started | - |
 
 ---
-*Last updated: 2026-03-27 after Phase 21 planning*
+*Last updated: 2026-03-27 after Phase 22 planning*
