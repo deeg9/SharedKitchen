@@ -118,33 +118,33 @@ export async function parseRecipeUrl(
     throw new Error('Failed to fetch the recipe page. Please check the URL and try again.');
   }
 
-  const { data, error } = await supabase.functions.invoke('parse-recipe-url', {
-    body: { url, html },
+  // Use direct fetch instead of supabase.functions.invoke to get actual error messages
+  const session = await supabase.auth.getSession();
+  const token = session.data.session?.access_token;
+  const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+
+  const fnResponse = await fetch(`${supabaseUrl}/functions/v1/parse-recipe-url`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      'apikey': anonKey ?? '',
+    },
+    body: JSON.stringify({ url, html }),
   });
 
-  // Check for rate limit response
-  if (error) {
-    // Supabase functions.invoke returns the response body in error.context for non-2xx
-    const errorBody = typeof error.message === 'string' ? error.message : '';
-    if (errorBody.includes('Rate limit exceeded') || (error as SupabaseFunctionError).context?.status === 429) {
-      try {
-        const parsed = JSON.parse(errorBody);
-        throw new RateLimitError(
-          `Daily import limit reached (${parsed.limit}/${parsed.limit})`,
-          parsed.limit ?? 10,
-          0
-        );
-      } catch (e) {
-        if (e instanceof RateLimitError) throw e;
-        throw new RateLimitError('Daily import limit reached. Try again tomorrow.', 10, 0);
-      }
-    }
-  }
+  const data = await fnResponse.json();
 
-  if (error) {
-    throw new Error(
-      error.message ?? 'Failed to parse recipe from URL. Please try again.'
-    );
+  if (!fnResponse.ok) {
+    if (fnResponse.status === 429) {
+      throw new RateLimitError(
+        `Daily import limit reached (${data.limit ?? 10})`,
+        data.limit ?? 10,
+        0
+      );
+    }
+    throw new Error(data.error ?? `Import failed (${fnResponse.status})`);
   }
 
   // Validate response shape
