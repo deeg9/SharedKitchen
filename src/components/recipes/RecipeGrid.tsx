@@ -59,7 +59,7 @@ export function RecipeGrid({ favorites }: RecipeGridProps) {
       />
 
       {/* Filter dropdowns */}
-      <View style={{ zIndex: 1, position: 'relative' }}>
+      <View style={{ zIndex: -1, elevation: -1 }}>
         <FilterBar />
       </View>
 
