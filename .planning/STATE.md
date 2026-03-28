@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.2
-milestone_name: UI Polish & Bug Fixes
-status: executing
-stopped_at: Completed 17-01-PLAN.md
-last_updated: "2026-03-26T22:25:32Z"
-last_activity: 2026-03-28 — Completed quick task 260328-iwq: Fix ai.test.ts fetch mock + worktree cleanup
+milestone: v3.0
+milestone_name: Video Recipe Import
+status: Defining requirements
+stopped_at: null
+last_updated: "2026-03-28T21:00:00Z"
+last_activity: 2026-03-28 — Milestone v3.0 started
 progress:
-  total_phases: 3
-  completed_phases: 2
-  total_plans: 6
-  completed_plans: 5
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
   percent: 0
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Phase 17 — Data Scoping
+**Current focus:** Milestone v3.0 — Video Recipe Import
 
 ## Current Position
 
-Phase: 17 (Data Scoping)
-Plan: 01 complete
-Status: Executing
-Last activity: 2026-03-26 — Completed 17-01 Data Scoping (kitchen-switch data sync)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-28 — Milestone v3.0 started
 
-Progress: [██████░░░░] 60%
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 

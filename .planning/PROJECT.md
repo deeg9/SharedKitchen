@@ -1,8 +1,8 @@
-# Mise
+# SharedKitchen
 
 ## What This Is
 
-Mise is a collaborative dinner planning mobile app for couples, roommates, and families. It combines a shared weekly meal calendar, AI-powered recipe library with web extraction and meal generation, auto-generated grocery lists with real-time sync and live presence, push notifications, Stripe-powered premium subscriptions, fullscreen cooking mode with step-by-step timers, and budget tracking — all in one warm, inviting interface. Built with React Native + Expo for iOS, backed by Supabase.
+SharedKitchen is a collaborative dinner planning mobile app for couples, roommates, and families. It combines a shared weekly meal calendar, AI-powered recipe library with web extraction and meal generation, auto-generated grocery lists with real-time sync and live presence, push notifications, Stripe-powered premium subscriptions, fullscreen cooking mode with step-by-step timers, and budget tracking — all in one warm, inviting interface. Built with React Native + Expo for iOS, backed by Supabase.
 
 ## Core Value
 
@@ -73,36 +73,28 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 
 ### Active
 
-**v2.4: Comprehensive QA Testing**
-- [ ] Validate onboarding flow completes and routes correctly
-- [ ] Validate recipes list: load, search, filter by category/cost/prep time, empty state
-- [ ] Validate recipe detail: hero image, metadata pills, tags display
-- [ ] Validate recipe interactions: rating, favorites, notes, scaling, ingredient checklist
-- [ ] Validate recipe management: add (manual + URL import), edit, save persistence
-- [ ] Validate meal planning: add to plan, day picker, plan tab display
-- [ ] Validate grocery list: populate from plans, check off items, sync
-- [ ] Validate budget tracking: tab loads, cost display
-- [ ] Validate leftovers: screen loads and functions
-- [ ] Validate household: create, invite, join
-- [ ] Validate profile: view, edit display name/avatar
-- [ ] Validate presence: avatar stack on recipe detail
-- [ ] Validate subscription/Stripe: screen loads, payment flow
-- [ ] Validate notifications: permission prompt, timer notifications
-- [ ] Validate offline/edge cases: no network, slow loading, empty household
+**v3.0: Video Recipe Import**
+- [ ] Share sheet receives video URLs from TikTok, Instagram, YouTube
+- [ ] Paste URL field accepts video URLs in existing import flow
+- [ ] Edge Function detects video URLs and routes to transcript extraction
+- [ ] Transcript extracted from video via third-party API
+- [ ] Gemini Flash parses transcript into structured recipe format
+- [ ] Video import count tracked per user (3/month free, unlimited premium)
+- [ ] Import results in complete recipe entry with ingredients, steps, metadata
 
-## Current Milestone: v2.4 Comprehensive QA Testing
+## Current Milestone: v3.0 Video Recipe Import
 
-**Goal:** Systematically test and validate every feature area of SharedKitchen to ensure production readiness
+**Goal:** Users can import recipes from TikTok, Instagram, YouTube, and any video URL — via share sheet or paste — with transcript-based AI extraction
 
 **Target features:**
-- Onboarding, auth flows, profile management
-- Recipe CRUD (create, read, update), recipe interactions (rating, favorites, notes, scaling)
-- Meal planning and grocery list generation/sync
-- Budget tracking and leftovers
-- Household management (create, invite, join)
-- Real-time presence, push notifications
-- Stripe subscription flow
-- Offline/edge case resilience
+- Share sheet integration (expo-share-intent) — receive URLs from other apps
+- Paste URL fallback in existing import flow
+- Video URL detection in parse-recipe-url Edge Function
+- Transcript extraction via third-party API (Supadata or similar)
+- Gemini Flash transcript → structured recipe parsing
+- Support for TikTok, Instagram Reels, YouTube, and generic video URLs
+- Free tier: 3 video imports/month, unlimited for premium subscribers
+- LLM best-guess for ambiguous measurements
 
 ### Out of Scope
 
@@ -157,4 +149,4 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-03-27 after milestone v2.4 started*
+*Last updated: 2026-03-28 after milestone v3.0 started*
