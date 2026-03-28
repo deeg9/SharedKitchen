@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Alert, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useShareIntentContext } from 'expo-share-intent';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { RecipeForm } from '../../../src/components/recipes/RecipeForm';
@@ -42,6 +43,10 @@ export default function AddRecipeScreen() {
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
 
+  // Share intent handling
+  const { fromShare } = useLocalSearchParams<{ fromShare?: string }>();
+  const { hasShareIntent, shareIntent, resetShareIntent } = useShareIntentContext();
+
   useEffect(() => {
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -70,17 +75,12 @@ export default function AddRecipeScreen() {
     setProgressMsg('');
   };
 
-  const handleImport = async () => {
-    if (!importUrl.trim()) {
-      Alert.alert('Error', 'Please enter a recipe URL.');
-      return;
-    }
-
-    const urlIsVideo = isVideoUrl(importUrl.trim());
+  const handleImportUrl = async (url: string) => {
+    const urlIsVideo = isVideoUrl(url);
     setImporting(true);
     startProgress(urlIsVideo);
     try {
-      const data = await parseRecipeUrl(importUrl.trim());
+      const data = await parseRecipeUrl(url);
       setImportedData(data);
       // Refresh usage counter after successful video import
       if (urlIsVideo) {
@@ -101,6 +101,28 @@ export default function AddRecipeScreen() {
       stopProgress();
     }
   };
+
+  const handleImport = async () => {
+    if (!importUrl.trim()) {
+      Alert.alert('Error', 'Please enter a recipe URL.');
+      return;
+    }
+    await handleImportUrl(importUrl.trim());
+  };
+
+  // Auto-import when a URL arrives via share sheet
+  useEffect(() => {
+    if (hasShareIntent && shareIntent?.webUrl) {
+      const sharedUrl = shareIntent.webUrl;
+      setImportUrl(sharedUrl);
+      resetShareIntent();
+      // Auto-trigger import after a brief delay for UI to render
+      const timer = setTimeout(() => {
+        handleImportUrl(sharedUrl);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [hasShareIntent, shareIntent]);
 
   const handleSubmit = async (
     recipeData: Omit<RecipeInsert, 'household_id' | 'created_by'>,

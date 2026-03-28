@@ -24,6 +24,7 @@ import { useNotificationSetup, usePermissionPrompt } from '../src/hooks/useNotif
 import { PermissionPrompt } from '../src/components/notifications/PermissionPrompt';
 import { ErrorBoundary } from '../src/components/ErrorBoundary';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { ShareIntentProvider } from 'expo-share-intent';
 
 // Prevent auto-hiding splash screen
 SplashScreen.preventAutoHideAsync();
@@ -127,14 +128,16 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <StripeProvider publishableKey={process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''}>
-        <ColorSchemeProvider>
-          <ErrorBoundary>
-            <Slot />
-          </ErrorBoundary>
-          <PermissionPrompt isOpen={showPrompt} onEnable={handleEnable} onDismiss={handleDismiss} />
-        </ColorSchemeProvider>
-      </StripeProvider>
+      <ShareIntentProvider>
+        <StripeProvider publishableKey={process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''}>
+          <ColorSchemeProvider>
+            <ErrorBoundary>
+              <Slot />
+            </ErrorBoundary>
+            <PermissionPrompt isOpen={showPrompt} onEnable={handleEnable} onDismiss={handleDismiss} />
+          </ColorSchemeProvider>
+        </StripeProvider>
+      </ShareIntentProvider>
     </GestureHandlerRootView>
   );
 }
