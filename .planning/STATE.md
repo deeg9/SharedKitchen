@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Video Recipe Import
 status: Ready to execute
-stopped_at: Completed 23-01-PLAN.md
-last_updated: "2026-03-28T23:02:19.065Z"
+stopped_at: Completed 23-02-PLAN.md
+last_updated: "2026-03-28T23:06:12.347Z"
 progress:
   total_phases: 2
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 Phase: 23 (core-video-import-pipeline) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 
 ## Performance Metrics
 
@@ -47,6 +47,7 @@ Recent decisions affecting current work:
 - [v3.0]: Extend existing parse-recipe-url Edge Function with video branch (same response shape, same auth)
 - [v3.0]: Free tier: 3 video imports/month, unlimited premium -- uses existing ai_usage_log table
 - [Phase 23]: Moved premium status check before both video and article branches for shared access
+- [Phase 23]: VideoRateLimitError as separate class from RateLimitError for distinct UI handling
 
 ### Pending Todos
 
@@ -81,9 +82,10 @@ None yet.
 | Phase 17 P01 | 82s | 2 tasks | 6 files |
 | 260328-iwq | Fix failing ai.test.ts fetch mock and worktree duplicates | 2026-03-28 | 1db6aa5 | [260328-iwq-fix-failing-ai-test-ts-fetch-mock-and-cl](./quick/260328-iwq-fix-failing-ai-test-ts-fetch-mock-and-cl/) |
 | Phase 23 P01 | 170 | 2 tasks | 3 files |
+| Phase 23 P02 | 142 | 2 tasks | 2 files |
 
 ## Session Continuity
 
-Last session: 2026-03-28T23:02:19.061Z
-Stopped at: Completed 23-01-PLAN.md
+Last session: 2026-03-28T23:06:12.344Z
+Stopped at: Completed 23-02-PLAN.md
 Resume file: None

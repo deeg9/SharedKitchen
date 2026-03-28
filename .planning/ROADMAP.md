@@ -94,7 +94,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 **Plans**: 3 plans
 Plans:
 - [x] 23-01-PLAN.md — Video URL detection (TDD) + Edge Function video branch (Supadata + Gemini + rate limiting)
-- [ ] 23-02-PLAN.md — Client ai.ts video routing + add-recipe UI (progress, usage counter, upgrade prompt)
+- [x] 23-02-PLAN.md — Client ai.ts video routing + add-recipe UI (progress, usage counter, upgrade prompt)
 - [ ] 23-03-PLAN.md — Human verification of end-to-end video import flow
 **UI hint**: yes
 
@@ -137,7 +137,7 @@ Plans:
 | 20. Recipe Management & Cooking Mode QA | v2.4 | 2/2 | Complete | 2026-03-27 |
 | 21. Planning, Grocery, Budget & Leftovers QA | v2.4 | 2/2 | Complete | 2026-03-27 |
 | 22. Presence, Subscription, Notifications & Edge Cases QA | v2.4 | 2/2 | Complete | 2026-03-27 |
-| 23. Core Video Import Pipeline | v3.0 | 1/3 | In Progress|  |
+| 23. Core Video Import Pipeline | v3.0 | 2/3 | In Progress|  |
 | 24. Share Sheet Integration | v3.0 | 0/0 | Not started | - |
 
 ---

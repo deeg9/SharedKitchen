@@ -27,10 +27,10 @@
 
 ### Client Import Flow
 
-- [ ] **IMPORT-01**: User can paste a video URL in the existing recipe import field and it triggers video import
-- [ ] **IMPORT-02**: User sees a preview of the extracted recipe with option to edit before saving
-- [ ] **IMPORT-03**: Saved recipe includes a link back to the original source video
-- [ ] **IMPORT-04**: Import shows appropriate loading state while transcript + parsing completes
+- [x] **IMPORT-01**: User can paste a video URL in the existing recipe import field and it triggers video import
+- [x] **IMPORT-02**: User sees a preview of the extracted recipe with option to edit before saving
+- [x] **IMPORT-03**: Saved recipe includes a link back to the original source video
+- [x] **IMPORT-04**: Import shows appropriate loading state while transcript + parsing completes
 
 ### Share Sheet
 
@@ -42,8 +42,8 @@
 
 - [x] **RATE-01**: Free users are limited to 3 video imports per calendar month
 - [x] **RATE-02**: Premium subscribers have unlimited video imports
-- [ ] **RATE-03**: Import flow shows usage counter ("2 of 3 imports used this month")
-- [ ] **RATE-04**: User hitting the free limit sees an upgrade prompt
+- [x] **RATE-03**: Import flow shows usage counter ("2 of 3 imports used this month")
+- [x] **RATE-04**: User hitting the free limit sees an upgrade prompt
 
 ## Future Requirements
 
@@ -78,17 +78,17 @@
 | PARSE-01 | Phase 23 | Complete |
 | PARSE-02 | Phase 23 | Complete |
 | PARSE-03 | Phase 23 | Complete |
-| IMPORT-01 | Phase 23 | Pending |
-| IMPORT-02 | Phase 23 | Pending |
-| IMPORT-03 | Phase 23 | Pending |
-| IMPORT-04 | Phase 23 | Pending |
+| IMPORT-01 | Phase 23 | Complete |
+| IMPORT-02 | Phase 23 | Complete |
+| IMPORT-03 | Phase 23 | Complete |
+| IMPORT-04 | Phase 23 | Complete |
 | SHARE-01 | Phase 24 | Pending |
 | SHARE-02 | Phase 24 | Pending |
 | SHARE-03 | Phase 24 | Pending |
 | RATE-01 | Phase 23 | Complete |
 | RATE-02 | Phase 23 | Complete |
-| RATE-03 | Phase 23 | Pending |
-| RATE-04 | Phase 23 | Pending |
+| RATE-03 | Phase 23 | Complete |
+| RATE-04 | Phase 23 | Complete |
 
 **Coverage:**
 - v3.0 requirements: 21 total
