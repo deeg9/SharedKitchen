@@ -86,9 +86,10 @@ None yet.
 | Phase 15 P01 | 187 | 2 tasks | 2 files |
 | Phase 15 P02 | 169 | 3 tasks | 2 files |
 | Phase 17 P01 | 82s | 2 tasks | 6 files |
+| 260328-iwq | Fix failing ai.test.ts fetch mock and worktree duplicates | 2026-03-28 | 1db6aa5 | [260328-iwq-fix-failing-ai-test-ts-fetch-mock-and-cl](./quick/260328-iwq-fix-failing-ai-test-ts-fetch-mock-and-cl/) |
 
 ## Session Continuity
 
-Last session: 2026-03-26T22:25:32Z
-Stopped at: Completed 17-01-PLAN.md
+Last session: 2026-03-28T20:41:15Z
+Stopped at: Completed quick task 260328-iwq
 Resume file: None
