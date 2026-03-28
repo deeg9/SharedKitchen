@@ -1,132 +1,138 @@
-# Feature Landscape
+# Feature Landscape: Video Recipe Import
 
-**Domain:** Collaborative dinner planning app - v2.0 AI, Payments & Polish
-**Researched:** 2026-03-24
+**Domain:** Video recipe import for collaborative dinner planning app
+**Researched:** 2026-03-28
+**Confidence:** MEDIUM-HIGH (competitive landscape well-documented; API capabilities verified via official docs)
 
 ## Table Stakes
 
-Features users expect for a v2.0 upgrade. Missing = the upgrade feels hollow.
+Features users expect from video recipe import. Missing = feature feels incomplete or broken compared to CookingGuru, RecipeBro, Flavorish, and REX.
 
-| Feature | Why Expected | Complexity | Dependencies on Existing | Notes |
-|---------|--------------|------------|--------------------------|-------|
-| Stripe subscription checkout | Freemium shell already shows pricing UI ($9.99/mo). Users who tap "Upgrade" expect it to work. | High | `premiumStore.ts` (replace AsyncStorage-based tier with server-verified subscription), `SubscriptionSheet.tsx` (wire real Stripe PaymentSheet) | **Critical legal nuance:** Post-Epic v. Apple (April 2025), US iOS apps CAN link to external payment for digital goods via Stripe. However, this only applies to the US App Store. For a meal planning app (not a "reader" app), safest approach is Stripe via external checkout link, not in-app PaymentSheet for digital subscriptions. Stripe processing fee ~2.9% + $0.30 vs Apple's 15-30%. Must implement server-side webhook handling in Supabase Edge Functions to verify subscription status. |
-| Subscription billing portal | Users who pay expect to manage/cancel their subscription without contacting support. | Medium | Stripe Customer Portal (hosted by Stripe, link from profile) | Stripe hosts this entirely -- just generate a portal session URL from Edge Function and open in-app browser. |
-| Premium feature gating (real) | Current `canAccess()` checks AsyncStorage -- trivially bypassable and not tied to actual payment. | Medium | `premiumStore.ts` needs full rewrite to check `subscriptions` table in Supabase, `PREMIUM_FEATURES` list already defined | Server-side RLS policies should enforce gating, not just client-side checks. Add `subscriptions` table with `status`, `stripe_customer_id`, `stripe_subscription_id`, `current_period_end`. |
-| Push notifications (remote) | Notification settings UI already exists in profile. Users expect actual notifications after toggling settings on. | High | Notification settings UI (already built), Supabase for storing push tokens, Expo Push Service for delivery | Requires EAS Build (not Expo Go). Need `expo-notifications` + `expo-device`. Store Expo push tokens in `push_tokens` table. Send via Supabase Edge Functions calling Expo Push API. |
-| Local scheduled notifications (cooking reminders) | Standard for any meal planning app -- remind me to start cooking at 5pm. | Medium | `meal_plans` table (has `plan_date` + `meal_type`), `expo-notifications` scheduleNotificationAsync | Schedule locally on device when meal plan is created/updated. Cancel when meal plan is removed. No server round-trip needed. |
-| AI recipe extraction (working) | **BROKEN: gpt-4o-mini deprecated Feb 2026.** Existing Edge Function returns errors. Must swap to gpt-5-mini immediately. | Low | `parse-recipe-url` Edge Function, `src/lib/ai.ts` | Drop-in model swap: `gpt-4o-mini` -> `gpt-5-mini`. Also upgrade to structured outputs (`json_schema` response format) for guaranteed valid JSON. gpt-5-mini has 400K context window -- increase HTML truncation limit from 15K. |
-| E2E test coverage | App has zero E2E tests. For a v2.0 shipping with payments, this is non-negotiable. | High | All existing screens + new features | Maestro is the standard for Expo E2E testing (YAML-based, no build config changes, official EAS Workflows support). Requires dev build on simulator. |
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Paste URL import for video URLs | Every competitor supports this; users' primary interaction model | Low | Extend existing URL paste field to accept video URLs. Detect TikTok/Instagram/YouTube URL patterns in `parse-recipe-url` Edge Function. |
+| Share sheet integration (receive URLs) | Flavorish, RecipeBro, REX all support "share to app" from TikTok/Instagram/YouTube | Medium | Use `expo-share-intent` library. iOS Share Extension receives URLs, redirects to main app. This is how most users actually trigger import (not manual paste). |
+| TikTok URL support | TikTok is the #1 source of viral recipe content. CookingGuru, RecipeBro, Flavorish, REX all support it. | Medium | Supadata API handles TikTok transcript extraction. Only public videos accessible. |
+| Instagram Reels URL support | Second most common video recipe source. All competitors support it. | Medium | Supadata API handles Instagram transcript extraction. Only public posts accessible. |
+| YouTube URL support (Shorts + full videos) | Third major source. All competitors support it. YouTube has best transcript availability (native captions). | Low-Medium | Supadata API handles YouTube. Native captions usually available, reducing AI transcript cost. |
+| Structured recipe output (ingredients + steps) | Core value prop -- users want a usable recipe, not a transcript. Every competitor produces structured recipes. | Medium | Gemini Flash parses transcript into structured recipe format. Reuse existing recipe schema (ingredients, instructions, timers, nutrition). |
+| Progress/loading feedback during import | Video import takes 5-15 seconds (transcript extraction + LLM parsing). Users need feedback that something is happening. | Low | Loading spinner with status text ("Extracting transcript...", "Parsing recipe..."). |
+| Free tier with limited imports | Flavorish: 5 free, RecipeBro: 10 free, Honeydew: 10 free/month. Users expect to try before paying. | Low | PROJECT.md specifies 3/month free, unlimited premium. Track via `ai_usage_log` with new function name. |
+| Editable results before saving | RecipeBro and others let users fix extraction errors before committing. Transcript-based extraction is inherently imperfect. | Low | Already built -- existing recipe creation form can be pre-populated with imported data and edited before save. |
+| Source URL preserved on recipe | RecipeBro keeps video link. Users want to rewatch the original video for visual reference. | Low | Already supported -- `source_url` field exists on recipes table. Store original video URL there. |
 
 ## Differentiators
 
-Features that set Mise apart from generic meal planners. Not expected, but create the "wow" factor.
+Features that set SharedKitchen apart. Not expected by all users, but valued and not universally offered.
 
-| Feature | Value Proposition | Complexity | Dependencies on Existing | Notes |
-|---------|-------------------|------------|--------------------------|-------|
-| AI-powered meal generator | Goes beyond the existing "Surprise Me" (random pick from library). Uses dietary prefs, cooking history, household size, leftovers, and budget to generate NEW recipe suggestions the household hasn't tried. | High | `suggestions.ts` (current logic is pure heuristic -- rated 4+ stars, not cooked in 3 weeks), dietary prefs in profile, `leftovers` table, `budget_settings` table, `meal_plans` history | Implement as Supabase Edge Function calling OpenAI gpt-5-mini with structured outputs (JSON schema). Feed context: dietary restrictions, recent meal history (last 2-3 weeks), current leftovers, budget remaining, household size. Return structured recipe data matching `RecipeInsert` schema. Differentiation: context-aware suggestions, not just random picks. |
-| Enhanced AI recipe extraction | Current `parse-recipe-url` Edge Function works but is basic -- single LLM call on raw URL. Enhanced version handles recipe sites with heavy JS rendering, paywalled content fallbacks, and extracts nutrition data + images. | Medium | `ai.ts` (`parseRecipeUrl`), `parse-recipe-url` Edge Function | Improve extraction pipeline: 1) Fetch URL with proper User-Agent, 2) Look for JSON-LD structured data (`schema.org/Recipe`) first (free, no LLM cost), 3) Fall back to LLM extraction only when structured data is missing, 4) Add image URL extraction, 5) Add nutrition_info field to recipe schema. Schema.org/Recipe is used by ~80% of major recipe sites -- extracting it is near-free and more reliable than LLM parsing. |
-| Real-time presence indicators | When household members are viewing the grocery list or a recipe, show live avatar bubbles indicating who is active. Creates the "cooking together" feeling even when apart. | Medium | `useGrocerySync.ts` (already uses Supabase Realtime channels), `Avatar.tsx` component, `household_members` data | Use Supabase Realtime Presence (already available via `@supabase/supabase-js`). Track presence per screen: `{ user_id, display_name, avatar_url, screen: "grocery_list" | "recipe_detail" | "meal_plan" }`. Subscribe to presence `sync`/`join`/`leave` events. Render as stacked avatar component (like the Supabase RealtimeAvatarStack pattern). Key: presence data is ephemeral (not stored in DB) -- just tracks who's currently online and where. |
-| Real-time activity feed | Show live "Sarah just checked off Chicken Breast" or "Alex added Street Tacos to Wednesday" toast notifications within the app. | Low | `useGrocerySync.ts` already receives INSERT/UPDATE/DELETE events with full payload including `checked_by` | Extend existing Realtime subscriptions to include `profiles` join for display names. Show transient toast/snackbar for activity from OTHER household members. Low complexity because the Realtime infrastructure already exists -- just need UI layer. |
-| Premium analytics dashboard | Cooking distribution charts, spending trends over time, top-rated meals, most-cooked recipes. | Medium | `expenses` table, `meal_plans` table, `recipe_ratings` table, `budget_settings` table | Aggregate queries in Supabase (could be Postgres views or RPC functions). Charts via `react-native-svg` or similar. Gate behind premium tier. |
-| Leftover expiry push alerts | Proactive notification when a leftover is approaching its use-by date (1 day before, day of). | Low | `leftovers` table (`use_by_date` field), push notification infrastructure | Schedule local notification when leftover is added. Simple date math. High perceived value for low effort. |
-| Budget warning notifications | Alert when household spending exceeds 80% or 100% of monthly budget target. | Low | `budget_settings.monthly_target`, `expenses` table, push notification infrastructure | Check on each expense addition. If threshold crossed, send push to all household members. Edge Function trigger or client-side check + Expo Push. |
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| LLM best-guess for ambiguous measurements | Video creators say "a handful of cheese" or "some oil" -- LLM should produce reasonable numeric amounts (e.g., 1 cup, 2 tbsp) rather than leaving blanks. Competitors often leave these vague. | Low | Handled in Gemini Flash prompt engineering. Add instruction: "When measurements are vague or missing, provide reasonable cooking estimates." Already specified in PROJECT.md. |
+| Timer extraction from transcript | SharedKitchen already has embedded countdown timers in cooking mode. Extract "simmer for 20 minutes" from transcripts into timer metadata. No competitor integrates video import with cooking timers. | Low | Already built for web URL import. Gemini prompt already extracts timers. Transcript parsing inherits this. |
+| Nutrition info estimation | CookingGuru provides this; most others don't. SharedKitchen already has nutrition_info field. | Low | Gemini Flash can estimate nutrition from ingredients list. Already in the prompt for web import. |
+| Generic video URL support (any public video) | Supadata supports arbitrary public file URLs (MP4, WEBM, etc.). Most competitors only support TikTok/Instagram/YouTube. | Low | Supadata API accepts any public video URL. Fall through to generic handling if URL doesn't match known platforms. |
+| Household-shared video imports | Imported recipe automatically available to all household members. Competitors are individual-only apps. | None (free) | Already built -- recipes belong to households via `household_id` FK. No additional work needed. |
 
 ## Anti-Features
 
-Features to explicitly NOT build for v2.0.
+Features to explicitly NOT build. Tempting but wrong for SharedKitchen's scope or technical reality.
 
 | Anti-Feature | Why Avoid | What to Do Instead |
 |--------------|-----------|-------------------|
-| In-App Purchase (Apple IAP) for subscriptions | Unnecessary complexity and 15-30% commission. Post-Epic v. Apple ruling (April 2025), US apps can use external payment links. Mise is iOS-only in US market. RevenueCat/StoreKit integration adds significant native complexity. | Use Stripe with external checkout link (web-based Stripe Checkout opened in Safari/in-app browser). ~3% fees vs 15-30%. Simpler implementation via Supabase Edge Functions. |
-| Real-time chat between household members | Out of scope per PROJECT.md. Would require message storage, read receipts, typing indicators, notification routing -- massive scope creep for marginal value in a meal planning app. | Activity feed (toast notifications of actions) provides lightweight awareness without chat infrastructure. |
-| AI-generated recipe images | Tempting to generate food photos with DALL-E/Midjourney, but uncanny-valley food images reduce trust. Expensive per-image. | Extract images from source URLs during AI recipe import. Use placeholder illustrations for manual recipes. |
-| Meal prep / batch cooking workflows | Out of scope per PROJECT.md. Different UX paradigm (multi-day planning, portioning, storage tracking). | Keep per-day meal planning simple. Leftover tracker already handles "what to use up." |
-| Multi-tier premium (Basic/Pro/Enterprise) | Over-segmentation for a household app. One premium tier is enough. Simplifies Stripe integration, feature gating logic, and user decision. | Single premium tier at $9.99/mo. Binary free/premium. Keep `PremiumTier = 'free' | 'premium'` as-is. |
-| Offline-first sync engine | Massive complexity (conflict resolution, queue management). Supabase Realtime already handles connectivity. The app is inherently collaborative -- offline edits without sync defeat the purpose. | Optimistic UI updates (already in place) + graceful error handling when offline. Show "offline" banner, retry on reconnection. |
-| Android support in v2.0 | Out of scope per PROJECT.md. Expo foundation supports it later, but splitting focus now delays iOS quality. | Keep cross-platform-compatible code (React Native + Expo), but only test/build for iOS. Android is a future milestone. |
+| Video content embedded in recipe | PROJECT.md explicitly excludes this ("text + photos only"). Video hosting is expensive, copyright-fraught, and unnecessary when `source_url` links back. | Store `source_url` pointing to original video. Users tap to watch in native app. |
+| Visual/frame analysis of video content | CookingGuru claims "visual analysis" but transcript-based extraction is more reliable, cheaper, and faster. Computer vision for cooking videos is research-grade, not production-ready. | Use transcript-only extraction via Supadata. Gemini Flash parses text, not video frames. |
+| In-app video playback | Building a video player adds complexity (codec support, streaming, caching) for marginal value. Users already have TikTok/Instagram/YouTube installed. | Deep-link or open `source_url` in system browser/native app. |
+| Private/login-walled video access | TikTok and Instagram block automated access to private content. Attempting this creates legal risk, reliability problems, and user confusion. | Only support publicly accessible videos. Show clear error: "This video appears to be private. Please make sure the video is publicly accessible." |
+| OCR/on-screen text extraction | Some recipes show ingredients as on-screen text overlays without saying them aloud. OCR adds a separate AI pipeline, increases cost, and is unreliable with stylized fonts. | Rely on audio transcript. If transcript is empty or too short, show user-friendly error suggesting they try a different video or enter manually. |
+| Batch/bulk video import | Importing multiple videos at once adds queue management complexity and multiplies API costs. No competitor offers this as a primary feature. | Single URL import per action. Users can import multiple recipes sequentially. |
+| Caption/description-only extraction (no transcript) | RecipeBro claims to extract from "captions and descriptions" -- this works poorly for most video recipes where ingredients are spoken, not typed. | Always extract transcript. If available, combine transcript + caption for better results. Captions alone are insufficient. |
 
 ## Feature Dependencies
 
 ```
-AI Model Fix (gpt-4o-mini -> gpt-5-mini)
-  --> Enhanced AI Recipe Extraction (structured outputs, schema.org)
-  --> AI Meal Generator (uses same model + structured outputs)
+Share Sheet Integration (expo-share-intent)
+  --> URL Detection (is this a video URL?)
+    --> Transcript Extraction (Supadata API call)
+      --> LLM Recipe Parsing (Gemini Flash)
+        --> Recipe Preview/Edit Form (existing)
+          --> Recipe Save (existing recipeStore.addRecipe)
 
-Stripe Subscription Checkout
-  --> Premium Feature Gating (real)
-        --> Premium Analytics Dashboard
+Paste URL Field (existing)
+  --> URL Detection (is this a video URL?)
+    --> [same pipeline as above]
 
-Push Notification Infrastructure (expo-notifications + push tokens)
-  --> Cooking Reminder Notifications (local scheduled)
-  --> Leftover Expiry Alerts (local scheduled)
-  --> Budget Warning Notifications (remote push)
-  --> Household Activity Push Notifications (remote push)
-
-Real-time Presence Indicators
-  --> (builds on existing Supabase Realtime channels in useGrocerySync)
-
-Real-time Activity Feed
-  --> (builds on existing Supabase Realtime channels in useGrocerySync)
-  --> Real-time Presence Indicators (share presence channel)
-
-E2E Testing (Maestro)
-  --> All features above (tests should cover new + existing features)
-  --> Requires EAS dev build (not Expo Go)
+Video Import Rate Limiting
+  --> Premium Status Check (existing subscriptions table)
+  --> Usage Tracking (existing ai_usage_log table)
 ```
+
+### Integration Points with Existing Infrastructure
+
+| Existing Component | How Video Import Uses It | Changes Needed |
+|-------------------|-------------------------|----------------|
+| `parse-recipe-url` Edge Function | Add video URL detection branch. If video URL detected, call Supadata for transcript, then Gemini for recipe parsing. | Add URL pattern matching, Supadata API call, new Gemini prompt for transcripts. |
+| `parseRecipeUrl()` in `src/lib/ai.ts` | Client-side entry point. Detect video URL before fetching HTML (video pages don't have JSON-LD recipe data). Route to edge function directly. | Add video URL regex check, skip HTML fetch for video URLs, pass URL to edge function. |
+| `ai_usage_log` table | Track video imports separately (`function_name: 'parse-video-recipe'`) for rate limiting (3/month free vs 10/day for web URLs). | New function_name constant. Rate limit query filters by this name. |
+| `subscriptions` table | Check premium status for unlimited video imports. | No changes -- already queried in Edge Function. |
+| Recipe creation form | Pre-populate with parsed video recipe data for user review/edit before save. | No changes -- already accepts `RecipeInsert` shape. |
+| `source_url` field | Store original video URL. | No changes -- field already exists. |
+| `expo-share-intent` (NEW) | Receive shared URLs from iOS share sheet. | New dependency. Config plugin in app.json, `+native-intent.ts` handler, route to import flow. |
 
 ## MVP Recommendation
 
-Prioritize for v2.0 in this order:
+### Must Have (Phase 1 -- Core Pipeline)
 
-1. **Fix gpt-4o-mini deprecation** -- The existing recipe extraction feature is BROKEN right now. Swap to gpt-5-mini in the Edge Function. This is a 30-minute fix that unblocks everything else.
+1. **Video URL detection** in Edge Function -- regex patterns for TikTok, Instagram, YouTube URLs
+2. **Supadata transcript extraction** -- API integration in Edge Function
+3. **Transcript-to-recipe Gemini prompt** -- new prompt optimized for conversational/spoken recipe content
+4. **Video-specific rate limiting** -- 3/month free, unlimited premium, tracked in `ai_usage_log`
+5. **Paste URL support** -- extend existing paste field to accept video URLs (minimal client changes)
 
-2. **Stripe subscriptions + real premium gating** -- Monetization is the primary business goal. Replace the AsyncStorage shell with server-verified subscriptions. The freemium shell UI is already built, so this is "completing" an existing feature, not building from scratch.
+### Must Have (Phase 2 -- Share Sheet)
 
-3. **Push notification infrastructure + cooking reminders** -- Notification settings UI already exists and promises functionality. Local scheduled notifications (cooking reminders) are the highest-value, lowest-risk notification type. Build the infrastructure, ship cooking reminders first, then layer on leftover/budget alerts.
+6. **Share sheet integration** via `expo-share-intent` -- receive URLs from TikTok/Instagram/YouTube apps
+7. **Deep link routing** -- shared URL routes to import flow with URL pre-filled
 
-4. **Enhanced AI recipe extraction** -- Quick win. Adding JSON-LD/schema.org parsing to the existing Edge Function dramatically improves reliability with minimal effort. LLM fallback already works. This is an incremental improvement to an existing feature.
+### Should Have (included in MVP but lower priority)
 
-5. **Real-time presence indicators** -- Medium effort, high delight. Supabase Presence API is straightforward given the existing Realtime channel usage. Stacked avatar bubbles on grocery list and recipe detail screens create the collaborative feeling that is Mise's core value prop.
+8. **Progress feedback** -- multi-step loading states during import
+9. **Error handling for private videos** -- clear user-facing message
+10. **Generic video URL support** -- any public video URL, not just TikTok/Instagram/YouTube
 
-6. **AI meal generator** -- The signature differentiator. Build as a Supabase Edge Function with OpenAI gpt-5-mini structured outputs. Feed household context (dietary prefs, recent history, leftovers, budget). Return structured recipe suggestions. Higher complexity but highest differentiation.
+### Defer
 
-7. **Premium analytics dashboard** -- Gate behind premium. Aggregate existing data (expenses, meal plans, ratings) into charts. Motivates upgrades.
+- **Video thumbnail as recipe image**: Extract thumbnail from video metadata via Supadata or platform oEmbed endpoint. Nice-to-have but not critical for v3.0 launch.
+- **Caption + transcript combining**: Merge video caption/description text with transcript for richer context. Marginal improvement, add complexity.
 
-8. **E2E testing (Maestro)** -- Should be built incrementally alongside each feature above, not as a separate "testing phase." Write Maestro flows for each feature as it ships. Final phase is gap-fill testing for existing v1.0 features.
+## Competitive Landscape Summary
 
-**Defer to post-v2.0:**
-- Household activity push notifications (remote push to other members): Requires server-side trigger infrastructure in Supabase (database webhooks or pg_notify). Higher complexity than local notifications. Ship presence indicators first to validate demand for collaboration awareness.
+| App | Video Sources | Extraction Method | Free Tier | Paid Price | Differentiator |
+|-----|--------------|-------------------|-----------|------------|----------------|
+| **CookingGuru** | TikTok, Instagram, YouTube Shorts | Visual analysis + AI (claims) | Free with limits | Freemium (unspecified) | Claims to work on silent videos |
+| **RecipeBro** | TikTok, Instagram, YouTube, Pinterest, any website | Captions + descriptions + AI | 10 free imports | Subscription (unspecified) | 700+ food blog sites, manual support for failures |
+| **Flavorish** | TikTok, Instagram, YouTube, Facebook | Share-to-app AI extraction | 5 free social imports | $4.99/month | Nutrition breakdown, meal planning |
+| **REX** | YouTube, other platforms | AI extraction | Unknown | Unknown | Shopping list generator (coming soon) |
+| **Recify** | TikTok, Instagram, Pinterest | AI from video/caption | Unknown | Unknown | Standardizes casual formats |
+| **Honeydew** | TikTok, Instagram, Pinterest, YouTube | AI extraction | 10 AI imports/month | Subscription | Recipe organization + collections |
+| **SharedKitchen** (planned) | TikTok, Instagram, YouTube, any video URL | Transcript (Supadata) + Gemini Flash | 3 video/month | $9.99/month (existing plan) | Household sharing, cooking mode timers, integrated meal planning |
 
-## Complexity Budget
+### SharedKitchen's Position
 
-| Feature | Estimated Effort | Risk Level | Notes |
-|---------|-----------------|------------|-------|
-| AI model fix (gpt-5-mini swap) | 1-2 hours | LOW | Change model string + upgrade response_format in Edge Function |
-| Stripe subscriptions + billing | 2-3 weeks | HIGH | Webhook handling, Edge Functions, RLS policies, testing payment flows. Apple review risk if external payment link implementation is not compliant. |
-| Premium gating (real) | 1 week | LOW | Rewrite premiumStore to check Supabase `subscriptions` table. Add RLS. |
-| Push notification infra | 1-2 weeks | MEDIUM | EAS Build required. APNs credential setup. Token management. Permission flows. |
-| Cooking reminders (local) | 3-5 days | LOW | Local scheduling with expo-notifications. Straightforward. |
-| Leftover/budget alerts | 3-5 days | LOW | Built on push infra. Simple date/threshold logic. |
-| Enhanced AI extraction | 1 week | LOW | Add JSON-LD parsing layer + structured outputs to existing Edge Function. Incremental. |
-| AI meal generator | 1-2 weeks | MEDIUM | New Edge Function. Prompt engineering for quality suggestions. Structured output schema design. |
-| Real-time presence | 1 week | LOW | Supabase Presence is well-documented. Avatar stack UI component. |
-| Activity feed | 3-5 days | LOW | Extend existing Realtime subscriptions. Toast UI. |
-| Premium analytics | 1-2 weeks | MEDIUM | Chart library selection. Postgres aggregate queries. |
-| E2E testing (Maestro) | 2-3 weeks (spread) | MEDIUM | Learning curve for Maestro YAML. Need dev builds. CI integration with EAS Workflows. |
+SharedKitchen is entering a crowded space for video import but has unique advantages:
+- **Household collaboration** -- no competitor shares imported recipes with household members automatically
+- **Cooking mode integration** -- timer extraction from transcripts feeds directly into step-by-step cooking mode with countdown timers
+- **Meal planning integration** -- imported recipes slot directly into weekly dinner calendar
+- **Existing premium base** -- video import adds value to existing $9.99/month subscription rather than being the sole paid feature
 
-**Total estimated: 10-14 weeks** for full v2.0 scope.
+The 3/month free tier is aggressive (lower than competitors' 5-10) but acceptable given SharedKitchen's broader feature set and higher subscription price point.
 
 ## Sources
 
-- [Stripe Subscriptions - React Native](https://docs.stripe.com/billing/subscriptions/build-subscriptions?platform=react-native) - HIGH confidence
-- [Expo Stripe SDK docs](https://docs.expo.dev/versions/latest/sdk/stripe/) - HIGH confidence
-- [Can you use Stripe for in-app purchases after Epic v. Apple](https://adapty.io/blog/can-you-use-stripe-for-in-app-purchases/) - MEDIUM confidence (legal landscape still evolving)
-- [Stripe iOS digital goods docs](https://docs.stripe.com/mobile/digital-goods) - HIGH confidence
-- [Expo Notifications docs](https://docs.expo.dev/versions/latest/sdk/notifications/) - HIGH confidence
-- [Expo Push Notifications setup](https://docs.expo.dev/push-notifications/push-notifications-setup/) - HIGH confidence
-- [Supabase Realtime Presence](https://supabase.com/docs/guides/realtime/presence) - HIGH confidence
-- [OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs) - HIGH confidence
-- [OpenAI Model Deprecations](https://developers.openai.com/api/docs/deprecations) - HIGH confidence (gpt-4o-mini deprecated Feb 2026)
-- [GPT-5 mini Model](https://platform.openai.com/docs/models/gpt-5-mini) - HIGH confidence (replacement at $0.25/1M input)
-- [Maestro E2E with Expo](https://docs.expo.dev/eas/workflows/examples/e2e-tests/) - HIGH confidence
-- [Maestro React Native docs](https://docs.maestro.dev/get-started/supported-platform/react-native) - HIGH confidence
+- [CookingGuru](https://cooking.guru/) -- Competitor analysis (fetched 2026-03-28)
+- [Flavorish](https://www.flavorish.ai/) -- Competitor analysis (fetched 2026-03-28)
+- [RecipeBro Import](https://recipebro.com/import) -- Competitor analysis (fetched 2026-03-28)
+- [RecipeBro TikTok Import](https://recipebro.com/import-recipes/tiktok) -- Competitor analysis (fetched 2026-03-28)
+- [Supadata Transcript API](https://docs.supadata.ai/get-transcript) -- Official API docs (fetched 2026-03-28)
+- [expo-share-intent GitHub](https://github.com/achorein/expo-share-intent) -- Share sheet library (WebSearch 2026-03-28)
+- [Honeydew Blog - Recipe Apps for Social Media Imports](https://honeydewcook.com/blog/recipe-apps-social-media-imports) -- Market overview (WebSearch 2026-03-28)
+- [Recipe Notes - TikTok Import Guide](https://recipenotes.app/how-to-import-recipes-from-tiktok) -- Competitor analysis (WebSearch 2026-03-28)
