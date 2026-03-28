@@ -159,6 +159,7 @@ export function RecipeForm({ onSubmit, loading = false, initialData }: RecipeFor
         .filter((i) => i.text.trim())
         .map((s, idx) => ({ ...s, step_number: idx + 1 })),
       tags: selectedTags,
+      source_url: initialData?.source_url ?? null,
     };
     onSubmit(recipe, imageUri ?? undefined);
   };

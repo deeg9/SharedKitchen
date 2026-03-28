@@ -11,7 +11,7 @@
 - [x] **VURL-01**: App detects TikTok URLs (tiktok.com, vm.tiktok.com) as video import targets
 - [x] **VURL-02**: App detects Instagram Reel URLs (instagram.com/reel/, instagram.com/p/) as video import targets
 - [x] **VURL-03**: App detects YouTube URLs (youtube.com, youtu.be, YouTube Shorts) as video import targets
-- [x] **VURL-04**: App detects generic video URLs and routes them to the video import pipeline
+- [x] **VURL-04**: Unrecognized URLs fall through to the existing HTML import pipeline as graceful degradation
 
 ### Transcript Extraction
 
