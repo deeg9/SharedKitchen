@@ -2,16 +2,14 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Video Recipe Import
-status: Ready to plan
-stopped_at: null
-last_updated: "2026-03-28T21:15:00Z"
-last_activity: 2026-03-28 — v3.0 roadmap created
+status: Ready to execute
+stopped_at: Completed 23-01-PLAN.md
+last_updated: "2026-03-28T23:02:19.065Z"
 progress:
   total_phases: 2
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 3
+  completed_plans: 1
 ---
 
 # Project State
@@ -21,16 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Phase 23 — Core Video Import Pipeline
+**Current focus:** Phase 23 — core-video-import-pipeline
 
 ## Current Position
 
-Phase: 23 of 24 (Core Video Import Pipeline)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-03-28 — v3.0 roadmap created (2 phases, 21 requirements mapped)
-
-Progress: [░░░░░░░░░░] 0%
+Phase: 23 (core-video-import-pipeline) — EXECUTING
+Plan: 2 of 3
 
 ## Performance Metrics
 
@@ -52,6 +46,7 @@ Recent decisions affecting current work:
 - [v3.0]: 2-phase structure: pipeline first via paste-URL (Phase 23), share sheet second requiring native rebuild (Phase 24)
 - [v3.0]: Extend existing parse-recipe-url Edge Function with video branch (same response shape, same auth)
 - [v3.0]: Free tier: 3 video imports/month, unlimited premium -- uses existing ai_usage_log table
+- [Phase 23]: Moved premium status check before both video and article branches for shared access
 
 ### Pending Todos
 
@@ -85,9 +80,10 @@ None yet.
 | Phase 15 P02 | 169 | 3 tasks | 2 files |
 | Phase 17 P01 | 82s | 2 tasks | 6 files |
 | 260328-iwq | Fix failing ai.test.ts fetch mock and worktree duplicates | 2026-03-28 | 1db6aa5 | [260328-iwq-fix-failing-ai-test-ts-fetch-mock-and-cl](./quick/260328-iwq-fix-failing-ai-test-ts-fetch-mock-and-cl/) |
+| Phase 23 P01 | 170 | 2 tasks | 3 files |
 
 ## Session Continuity
 
-Last session: 2026-03-28
-Stopped at: v3.0 roadmap created, ready to plan Phase 23
+Last session: 2026-03-28T23:02:19.061Z
+Stopped at: Completed 23-01-PLAN.md
 Resume file: None

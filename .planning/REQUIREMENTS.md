@@ -8,22 +8,22 @@
 
 ### Video URL Detection
 
-- [ ] **VURL-01**: App detects TikTok URLs (tiktok.com, vm.tiktok.com) as video import targets
-- [ ] **VURL-02**: App detects Instagram Reel URLs (instagram.com/reel/, instagram.com/p/) as video import targets
-- [ ] **VURL-03**: App detects YouTube URLs (youtube.com, youtu.be, YouTube Shorts) as video import targets
-- [ ] **VURL-04**: App detects generic video URLs and routes them to the video import pipeline
+- [x] **VURL-01**: App detects TikTok URLs (tiktok.com, vm.tiktok.com) as video import targets
+- [x] **VURL-02**: App detects Instagram Reel URLs (instagram.com/reel/, instagram.com/p/) as video import targets
+- [x] **VURL-03**: App detects YouTube URLs (youtube.com, youtu.be, YouTube Shorts) as video import targets
+- [x] **VURL-04**: App detects generic video URLs and routes them to the video import pipeline
 
 ### Transcript Extraction
 
-- [ ] **TRANS-01**: Edge Function extracts transcript from video URL via Supadata API
-- [ ] **TRANS-02**: Edge Function handles Supadata async responses (HTTP 202) for longer videos with polling
-- [ ] **TRANS-03**: Edge Function completes transcript + recipe parse within 60-second timeout budget
+- [x] **TRANS-01**: Edge Function extracts transcript from video URL via Supadata API
+- [x] **TRANS-02**: Edge Function handles Supadata async responses (HTTP 202) for longer videos with polling
+- [x] **TRANS-03**: Edge Function completes transcript + recipe parse within 60-second timeout budget
 
 ### Recipe Parsing
 
-- [ ] **PARSE-01**: Gemini Flash converts video transcript into structured recipe (title, ingredients, steps, metadata)
-- [ ] **PARSE-02**: Gemini uses best-guess for ambiguous measurements ("a splash" → "1 tbsp")
-- [ ] **PARSE-03**: Non-recipe videos are detected and user sees a clear error instead of a hallucinated recipe
+- [x] **PARSE-01**: Gemini Flash converts video transcript into structured recipe (title, ingredients, steps, metadata)
+- [x] **PARSE-02**: Gemini uses best-guess for ambiguous measurements ("a splash" → "1 tbsp")
+- [x] **PARSE-03**: Non-recipe videos are detected and user sees a clear error instead of a hallucinated recipe
 
 ### Client Import Flow
 
@@ -40,8 +40,8 @@
 
 ### Rate Limiting
 
-- [ ] **RATE-01**: Free users are limited to 3 video imports per calendar month
-- [ ] **RATE-02**: Premium subscribers have unlimited video imports
+- [x] **RATE-01**: Free users are limited to 3 video imports per calendar month
+- [x] **RATE-02**: Premium subscribers have unlimited video imports
 - [ ] **RATE-03**: Import flow shows usage counter ("2 of 3 imports used this month")
 - [ ] **RATE-04**: User hitting the free limit sees an upgrade prompt
 
@@ -68,16 +68,16 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| VURL-01 | Phase 23 | Pending |
-| VURL-02 | Phase 23 | Pending |
-| VURL-03 | Phase 23 | Pending |
-| VURL-04 | Phase 23 | Pending |
-| TRANS-01 | Phase 23 | Pending |
-| TRANS-02 | Phase 23 | Pending |
-| TRANS-03 | Phase 23 | Pending |
-| PARSE-01 | Phase 23 | Pending |
-| PARSE-02 | Phase 23 | Pending |
-| PARSE-03 | Phase 23 | Pending |
+| VURL-01 | Phase 23 | Complete |
+| VURL-02 | Phase 23 | Complete |
+| VURL-03 | Phase 23 | Complete |
+| VURL-04 | Phase 23 | Complete |
+| TRANS-01 | Phase 23 | Complete |
+| TRANS-02 | Phase 23 | Complete |
+| TRANS-03 | Phase 23 | Complete |
+| PARSE-01 | Phase 23 | Complete |
+| PARSE-02 | Phase 23 | Complete |
+| PARSE-03 | Phase 23 | Complete |
 | IMPORT-01 | Phase 23 | Pending |
 | IMPORT-02 | Phase 23 | Pending |
 | IMPORT-03 | Phase 23 | Pending |
@@ -85,8 +85,8 @@
 | SHARE-01 | Phase 24 | Pending |
 | SHARE-02 | Phase 24 | Pending |
 | SHARE-03 | Phase 24 | Pending |
-| RATE-01 | Phase 23 | Pending |
-| RATE-02 | Phase 23 | Pending |
+| RATE-01 | Phase 23 | Complete |
+| RATE-02 | Phase 23 | Complete |
 | RATE-03 | Phase 23 | Pending |
 | RATE-04 | Phase 23 | Pending |
 
