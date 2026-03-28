@@ -275,7 +275,7 @@ Deno.serve(async (req: Request) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
-    const { url, html: clientHtml } = await req.json();
+    const { url, html: clientHtml, type } = await req.json();
 
     if (!url || typeof url !== 'string') {
       return new Response(
@@ -284,8 +284,282 @@ Deno.serve(async (req: Request) => {
       );
     }
 
+    // Determine premium status early (used by both video and article branches)
+    let isPremium = false;
+    try {
+      const { data: sub } = await supabaseAdmin
+        .from('subscriptions')
+        .select('status')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      isPremium = sub?.status === 'active' || sub?.status === 'trialing';
+    } catch {
+      // subscriptions table may not exist yet -- default to free tier limits
+      isPremium = false;
+    }
+
     // Hash the URL for cache lookup
     const urlHash = await hashUrl(url);
+
+    // ── Video import branch ──────────────────────────────────────────
+    if (type === 'video') {
+      // Video-specific cache check (separate function_name)
+      const { data: videoCached } = await supabaseAdmin
+        .from('ai_usage_log')
+        .select('cached_response')
+        .eq('input_hash', urlHash)
+        .eq('function_name', 'parse-video-recipe')
+        .not('cached_response', 'is', null)
+        .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (videoCached?.cached_response) {
+        // Log cache hit (non-blocking)
+        supabaseAdmin.from('ai_usage_log').insert({
+          user_id: user.id,
+          function_name: 'parse-video-recipe',
+          input_hash: urlHash,
+          cached_response: null,
+          tokens_used: 0,
+        }).then(() => {}).catch(() => {});
+
+        return new Response(
+          JSON.stringify(videoCached.cached_response),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Video-specific monthly rate limit (RATE-01, RATE-02)
+      const monthStart = new Date();
+      monthStart.setDate(1);
+      monthStart.setHours(0, 0, 0, 0);
+
+      const { count: videoCount } = await supabaseAdmin
+        .from('ai_usage_log')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('function_name', 'parse-video-recipe')
+        .gte('created_at', monthStart.toISOString());
+
+      const videoLimit = isPremium ? Infinity : 3;
+      if ((videoCount ?? 0) >= videoLimit) {
+        return new Response(
+          JSON.stringify({ error: 'Monthly video import limit reached', limit: 3, remaining: 0, used: videoCount ?? 0, type: 'video_limit_exceeded' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // ── Supadata transcript fetch (TRANS-01, TRANS-02, TRANS-03) ──
+      const supadataKey = Deno.env.get('SUPADATA_API_KEY');
+      if (!supadataKey) {
+        return new Response(
+          JSON.stringify({ error: 'Video import not configured' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const supadataController = new AbortController();
+      const supadataTimeout = setTimeout(() => supadataController.abort(), 40000);
+
+      let transcript: string;
+      try {
+        const transcriptUrl = `https://api.supadata.ai/v1/transcript?url=${encodeURIComponent(url)}&text=true&mode=auto`;
+        const transcriptResp = await fetch(transcriptUrl, {
+          headers: { 'x-api-key': supadataKey },
+          signal: supadataController.signal,
+        });
+
+        if (transcriptResp.status === 202) {
+          // Async job -- poll up to 3 times at 5s intervals
+          const { jobId } = await transcriptResp.json();
+          transcript = '';
+          for (let i = 0; i < 3; i++) {
+            await new Promise((r) => setTimeout(r, 5000));
+            const pollResp = await fetch(`https://api.supadata.ai/v1/transcript/${jobId}`, {
+              headers: { 'x-api-key': supadataKey },
+              signal: supadataController.signal,
+            });
+            const job = await pollResp.json();
+            if (job.status === 'completed') { transcript = job.content; break; }
+            if (job.status === 'failed') throw new Error('Transcript extraction failed');
+          }
+          if (!transcript) throw new Error('Transcript processing timed out. Try again in a minute.');
+        } else if (transcriptResp.status === 402 || transcriptResp.status === 403) {
+          return new Response(
+            JSON.stringify({ error: 'Video import temporarily unavailable' }),
+            { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        } else if (transcriptResp.ok) {
+          const data = await transcriptResp.json();
+          transcript = data.content;
+        } else {
+          throw new Error(`Failed to extract transcript (${transcriptResp.status})`);
+        }
+      } catch (fetchError: any) {
+        if (fetchError.name === 'AbortError') {
+          return new Response(
+            JSON.stringify({ error: 'Transcript extraction timed out. Please try again.' }),
+            { status: 504, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        return new Response(
+          JSON.stringify({ error: fetchError.message ?? 'Failed to extract transcript' }),
+          { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      } finally {
+        clearTimeout(supadataTimeout);
+      }
+
+      // Validate transcript length (>= 50 chars)
+      if (!transcript || transcript.length < 50) {
+        return new Response(
+          JSON.stringify({ error: 'Could not extract audio from this video. The video may be private or too short.' }),
+          { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // ── Gemini video-specific parsing (PARSE-01, PARSE-02, PARSE-03) ──
+      const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
+      if (!geminiApiKey) {
+        return new Response(
+          JSON.stringify({ error: 'Gemini API key not configured' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const videoModelName = Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.5-flash';
+
+      const videoSystemPrompt = `You are a recipe extraction assistant. Given a transcript from a cooking video, extract the recipe into structured JSON. The transcript is conversational speech -- speakers may be informal, skip measurements, or describe steps out of order.
+
+Your job:
+- Determine if this transcript contains a cooking recipe. Set is_recipe to false if it does not.
+- Infer precise measurements from casual language. Use these defaults for vague amounts: "a pinch" = 0.25 tsp, "a splash" = 1 tbsp, "some" = 2 tbsp, "a handful" = 0.5 cup, "a bit" = 1 tsp.
+- Order instructions logically even if the speaker jumps around
+- Estimate prep_time_minutes and cook_time_minutes from context
+- Default servings to 4 unless stated otherwise
+- Ignore non-recipe content (intros, sponsorships, outros, personal anecdotes)
+
+Return a JSON object with these fields:
+- is_recipe (boolean -- false if transcript does not contain a recipe)
+- name (string -- infer a clear recipe name)
+- category (string or null)
+- prep_time_minutes (number or null)
+- cook_time_minutes (number or null)
+- servings (number, default 4)
+- estimated_cost (number or null)
+- source_image_url (null)
+- nutrition_info (null)
+- ingredients (array of {amount: number, unit: string, name: string, section: string|null})
+- instructions (array of {step_number: number, text: string, timers: [{duration_seconds: number, label: string}]})
+- tags (array of strings)
+
+If is_recipe is false, set all other fields to null/empty.`;
+
+      const geminiController = new AbortController();
+      const geminiTimeout = setTimeout(() => geminiController.abort(), 15000);
+
+      let geminiResponse: Response;
+      try {
+        geminiResponse = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${videoModelName}:generateContent?key=${geminiApiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            signal: geminiController.signal,
+            body: JSON.stringify({
+              contents: [
+                { role: 'user', parts: [{ text: videoSystemPrompt + '\n\nExtract the recipe from this video transcript:\n\n' + transcript }] },
+              ],
+              generationConfig: {
+                temperature: 0.1,
+                maxOutputTokens: 8000,
+                responseMimeType: 'application/json',
+              },
+            }),
+          }
+        );
+      } catch (fetchError: any) {
+        if (fetchError.name === 'AbortError') {
+          return new Response(
+            JSON.stringify({ error: 'Recipe parsing timed out. Please try again.' }),
+            { status: 504, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        throw fetchError;
+      } finally {
+        clearTimeout(geminiTimeout);
+      }
+
+      if (!geminiResponse.ok) {
+        const errorText = await geminiResponse.text();
+        console.error('Gemini API error (video):', geminiResponse.status, errorText);
+        return new Response(
+          JSON.stringify({ error: `Gemini ${geminiResponse.status}: ${errorText.substring(0, 150)}` }),
+          { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const videoGeminiResult = await geminiResponse.json();
+      const videoContent = videoGeminiResult.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (!videoContent) {
+        const finishReason = videoGeminiResult.candidates?.[0]?.finishReason;
+        return new Response(
+          JSON.stringify({ error: `No content from AI. Finish: ${finishReason || 'unknown'}. Try a different video.` }),
+          { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      let videoRecipe: any;
+      try {
+        let jsonStr = videoContent.trim();
+        if (jsonStr.startsWith('```')) {
+          jsonStr = jsonStr.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?```\s*$/, '');
+        }
+        videoRecipe = JSON.parse(jsonStr);
+      } catch {
+        return new Response(
+          JSON.stringify({ error: `AI response not valid JSON. Preview: ${videoContent.substring(0, 100)}` }),
+          { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Non-recipe rejection (PARSE-03)
+      if (
+        videoRecipe.is_recipe === false ||
+        !Array.isArray(videoRecipe.ingredients) || videoRecipe.ingredients.length < 2 ||
+        !Array.isArray(videoRecipe.instructions) || videoRecipe.instructions.length === 0
+      ) {
+        return new Response(
+          JSON.stringify({ error: "This video doesn't appear to contain a recipe. Try a cooking video instead.", type: 'not_a_recipe' }),
+          { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Remove is_recipe field from response (internal-only)
+      delete videoRecipe.is_recipe;
+
+      // Set source_url to original video URL (IMPORT-03)
+      videoRecipe.source_url = url;
+
+      // Log usage (non-blocking)
+      supabaseAdmin.from('ai_usage_log').insert({
+        user_id: user.id,
+        function_name: 'parse-video-recipe',
+        input_hash: urlHash,
+        cached_response: videoRecipe,
+        tokens_used: videoGeminiResult.usageMetadata?.totalTokenCount ?? null,
+      }).then(() => {}).catch(() => {});
+
+      return new Response(
+        JSON.stringify(videoRecipe),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // ── Article import branch (existing behavior, unchanged) ─────────
 
     // Check cache: return cached response if same URL was parsed in last 24 hours
     const { data: cached } = await supabaseAdmin
@@ -323,19 +597,6 @@ Deno.serve(async (req: Request) => {
       .eq('function_name', 'parse-recipe-url')
       .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
 
-    // Determine premium status (gracefully handles missing subscriptions table)
-    let isPremium = false;
-    try {
-      const { data: sub } = await supabaseAdmin
-        .from('subscriptions')
-        .select('status')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      isPremium = sub?.status === 'active' || sub?.status === 'trialing';
-    } catch {
-      // subscriptions table may not exist yet -- default to free tier limits
-      isPremium = false;
-    }
     const limit = isPremium ? 50 : 10;
 
     if ((usageCount ?? 0) >= limit) {
