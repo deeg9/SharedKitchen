@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Video Recipe Import
 status: Ready to plan
-stopped_at: Completed 23-02-PLAN.md
-last_updated: "2026-03-28T23:12:45.282Z"
+stopped_at: Completed 24-01-PLAN.md
+last_updated: "2026-03-28T23:31:38.356Z"
 progress:
   total_phases: 2
   completed_phases: 0
-  total_plans: 3
-  completed_plans: 2
+  total_plans: 5
+  completed_plans: 3
 ---
 
 # Project State
@@ -48,6 +48,8 @@ Recent decisions affecting current work:
 - [v3.0]: Free tier: 3 video imports/month, unlimited premium -- uses existing ai_usage_log table
 - [Phase 23]: Moved premium status check before both video and article branches for shared access
 - [Phase 23]: VideoRateLimitError as separate class from RateLimitError for distinct UI handling
+- [Phase 24]: ShareIntentProvider placed inside GestureHandlerRootView but outside StripeProvider
+- [Phase 24]: handleImportUrl extracted as shared code path for manual paste and share sheet import
 
 ### Pending Todos
 
@@ -83,9 +85,10 @@ None yet.
 | 260328-iwq | Fix failing ai.test.ts fetch mock and worktree duplicates | 2026-03-28 | 1db6aa5 | [260328-iwq-fix-failing-ai-test-ts-fetch-mock-and-cl](./quick/260328-iwq-fix-failing-ai-test-ts-fetch-mock-and-cl/) |
 | Phase 23 P01 | 170 | 2 tasks | 3 files |
 | Phase 23 P02 | 142 | 2 tasks | 2 files |
+| Phase 24 P01 | 119 | 2 tasks | 5 files |
 
 ## Session Continuity
 
-Last session: 2026-03-28T23:06:12.344Z
-Stopped at: Completed 23-02-PLAN.md
+Last session: 2026-03-28T23:31:38.353Z
+Stopped at: Completed 24-01-PLAN.md
 Resume file: None

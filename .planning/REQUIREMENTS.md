@@ -34,9 +34,9 @@
 
 ### Share Sheet
 
-- [ ] **SHARE-01**: SharedKitchen appears in the iOS share sheet when sharing from TikTok, Instagram, or YouTube
-- [ ] **SHARE-02**: Tapping SharedKitchen in share sheet opens the app and begins video import automatically
-- [ ] **SHARE-03**: Share sheet works when app is in foreground, background, or killed
+- [x] **SHARE-01**: SharedKitchen appears in the iOS share sheet when sharing from TikTok, Instagram, or YouTube
+- [x] **SHARE-02**: Tapping SharedKitchen in share sheet opens the app and begins video import automatically
+- [x] **SHARE-03**: Share sheet works when app is in foreground, background, or killed
 
 ### Rate Limiting
 
@@ -82,9 +82,9 @@
 | IMPORT-02 | Phase 23 | Complete |
 | IMPORT-03 | Phase 23 | Complete |
 | IMPORT-04 | Phase 23 | Complete |
-| SHARE-01 | Phase 24 | Pending |
-| SHARE-02 | Phase 24 | Pending |
-| SHARE-03 | Phase 24 | Pending |
+| SHARE-01 | Phase 24 | Complete |
+| SHARE-02 | Phase 24 | Complete |
+| SHARE-03 | Phase 24 | Complete |
 | RATE-01 | Phase 23 | Complete |
 | RATE-02 | Phase 23 | Complete |
 | RATE-03 | Phase 23 | Complete |
