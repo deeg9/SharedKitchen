@@ -1,168 +1,100 @@
-# Requirements: SharedKitchen v2.4 — Comprehensive QA Testing
+# Requirements: SharedKitchen v3.0 — Video Recipe Import
 
-**Defined:** 2026-03-27
+**Defined:** 2026-03-28
 **Core Value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Goal:** Systematically test and validate every feature area of SharedKitchen to ensure production readiness
+**Goal:** Users can import recipes from TikTok, Instagram, YouTube, and any video URL — via share sheet or paste — with transcript-based AI extraction
 
-## v2.4 Requirements
+## v3.0 Requirements
 
-### Onboarding & Auth
+### Video URL Detection
 
-- [x] **ONBOARD-01**: First-time user completes onboarding screens and is routed to the main app
-- [x] **AUTH-01**: User can sign up with email and password
-- [x] **AUTH-02**: User can sign in with existing credentials
-- [x] **AUTH-03**: User session persists across app restart
+- [ ] **VURL-01**: App detects TikTok URLs (tiktok.com, vm.tiktok.com) as video import targets
+- [ ] **VURL-02**: App detects Instagram Reel URLs (instagram.com/reel/, instagram.com/p/) as video import targets
+- [ ] **VURL-03**: App detects YouTube URLs (youtube.com, youtu.be, YouTube Shorts) as video import targets
+- [ ] **VURL-04**: App detects generic video URLs and routes them to the video import pipeline
 
-### Recipe List
+### Transcript Extraction
 
-- [x] **RLIST-01**: Recipes load and display in a 2-column grid
-- [x] **RLIST-02**: User can search recipes by name
-- [x] **RLIST-03**: User can filter recipes by category, cost, and prep time
-- [x] **RLIST-04**: Empty state displays when no recipes match filters
+- [ ] **TRANS-01**: Edge Function extracts transcript from video URL via Supadata API
+- [ ] **TRANS-02**: Edge Function handles Supadata async responses (HTTP 202) for longer videos with polling
+- [ ] **TRANS-03**: Edge Function completes transcript + recipe parse within 60-second timeout budget
 
-### Recipe Detail
+### Recipe Parsing
 
-- [x] **RDETAIL-01**: Hero image loads (or default placeholder) with metadata pills (prep/cook/serves/cost)
-- [x] **RDETAIL-02**: Tags display below hero image
-- [x] **RDETAIL-03**: User can tap stars to rate a recipe and average rating updates
-- [x] **RDETAIL-04**: User can toggle heart to favorite/unfavorite a recipe
-- [x] **RDETAIL-05**: User can add a household tip/note and it appears with date
-- [x] **RDETAIL-06**: User can switch between x1/x2/x3 scale and ingredient amounts update
-- [x] **RDETAIL-07**: User can check off ingredients with strikethrough appearance
+- [ ] **PARSE-01**: Gemini Flash converts video transcript into structured recipe (title, ingredients, steps, metadata)
+- [ ] **PARSE-02**: Gemini uses best-guess for ambiguous measurements ("a splash" → "1 tbsp")
+- [ ] **PARSE-03**: Non-recipe videos are detected and user sees a clear error instead of a hallucinated recipe
 
-### Recipe Management
+### Client Import Flow
 
-- [x] **RMGMT-01**: User can create a recipe manually with all fields
-- [x] **RMGMT-02**: User can import a recipe from URL (JSON-LD extraction)
-- [x] **RMGMT-03**: User can edit an existing recipe and changes persist
-- [x] **RMGMT-04**: Start Cooking opens fullscreen cooking mode with step navigation
+- [ ] **IMPORT-01**: User can paste a video URL in the existing recipe import field and it triggers video import
+- [ ] **IMPORT-02**: User sees a preview of the extracted recipe with option to edit before saving
+- [ ] **IMPORT-03**: Saved recipe includes a link back to the original source video
+- [ ] **IMPORT-04**: Import shows appropriate loading state while transcript + parsing completes
 
-### Cooking Mode
+### Share Sheet
 
-- [x] **COOK-01**: Steps display with horizontal swipe navigation and progress bar
-- [x] **COOK-02**: Timers start, pause, reset, and show countdown
-- [x] **COOK-03**: Unit toggle switches between metric/imperial in step text and ingredients
-- [x] **COOK-04**: Ingredient sidebar opens/closes with correct scaled amounts
-- [x] **COOK-05**: "Done Cooking" on last step returns to recipe detail
+- [ ] **SHARE-01**: SharedKitchen appears in the iOS share sheet when sharing from TikTok, Instagram, or YouTube
+- [ ] **SHARE-02**: Tapping SharedKitchen in share sheet opens the app and begins video import automatically
+- [ ] **SHARE-03**: Share sheet works when app is in foreground, background, or killed
 
-### Meal Planning
+### Rate Limiting
 
-- [x] **PLAN-01**: User can add a recipe to the meal plan from recipe detail
-- [x] **PLAN-02**: Day picker sheet shows 7 days and assigns recipe to selected day
-- [x] **PLAN-03**: Plan tab displays assigned meals on correct days
+- [ ] **RATE-01**: Free users are limited to 3 video imports per calendar month
+- [ ] **RATE-02**: Premium subscribers have unlimited video imports
+- [ ] **RATE-03**: Import flow shows usage counter ("2 of 3 imports used this month")
+- [ ] **RATE-04**: User hitting the free limit sees an upgrade prompt
 
-### Grocery List
+## Future Requirements
 
-- [x] **GROC-01**: Grocery items populate from planned meals
-- [x] **GROC-02**: User can check off grocery items
-- [x] **GROC-03**: Grocery list syncs across household members in real-time
+### Enhanced Video Processing
 
-### Budget
-
-- [x] **BUDG-01**: Budget tab loads and displays monthly cost tracking
-- [x] **BUDG-02**: Weekly spending breakdown displays correctly
-
-### Leftovers
-
-- [x] **LEFT-01**: Leftovers screen loads and displays tracked items with freshness badges
-
-### Household
-
-- [x] **HOUSE-01**: User can create a new household
-- [x] **HOUSE-02**: User can generate an invite link/code
-- [x] **HOUSE-03**: User can join a household via invite code
-
-### Profile
-
-- [x] **PROF-01**: Profile screen displays user info and cooking stats
-- [x] **PROF-02**: User can edit display name and avatar
-
-### Presence
-
-- [ ] **PRES-01**: Avatar stack appears on recipe detail when multiple users view the same recipe
-
-### Subscription
-
-- [ ] **SUB-01**: Subscription screen loads with pricing information
-- [x] **SUB-02**: Stripe checkout flow initiates correctly
-
-### Notifications
-
-- [ ] **NOTIF-01**: Permission prompt displays on first relevant action
-- [ ] **NOTIF-02**: Cooking timer completion triggers notification
-
-### Edge Cases
-
-- [x] **EDGE-01**: App shows appropriate loading states on slow network
-- [x] **EDGE-02**: Empty household state is handled gracefully
-- [x] **EDGE-03**: Screens handle missing/null data without crashes
-
-## Traceability
-
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| ONBOARD-01 | Phase 18 | Complete |
-| AUTH-01 | Phase 18 | Complete |
-| AUTH-02 | Phase 18 | Complete |
-| AUTH-03 | Phase 18 | Complete |
-| RLIST-01 | Phase 19 | Complete |
-| RLIST-02 | Phase 19 | Complete |
-| RLIST-03 | Phase 19 | Complete |
-| RLIST-04 | Phase 19 | Complete |
-| RDETAIL-01 | Phase 19 | Complete |
-| RDETAIL-02 | Phase 19 | Complete |
-| RDETAIL-03 | Phase 19 | Complete |
-| RDETAIL-04 | Phase 19 | Complete |
-| RDETAIL-05 | Phase 19 | Complete |
-| RDETAIL-06 | Phase 19 | Complete |
-| RDETAIL-07 | Phase 19 | Complete |
-| RMGMT-01 | Phase 20 | Complete |
-| RMGMT-02 | Phase 20 | Complete |
-| RMGMT-03 | Phase 20 | Complete |
-| RMGMT-04 | Phase 20 | Complete |
-| COOK-01 | Phase 20 | Complete |
-| COOK-02 | Phase 20 | Complete |
-| COOK-03 | Phase 20 | Complete |
-| COOK-04 | Phase 20 | Complete |
-| COOK-05 | Phase 20 | Complete |
-| PLAN-01 | Phase 21 | Complete |
-| PLAN-02 | Phase 21 | Complete |
-| PLAN-03 | Phase 21 | Complete |
-| GROC-01 | Phase 21 | Complete |
-| GROC-02 | Phase 21 | Complete |
-| GROC-03 | Phase 21 | Complete |
-| BUDG-01 | Phase 21 | Complete |
-| BUDG-02 | Phase 21 | Complete |
-| LEFT-01 | Phase 21 | Complete |
-| HOUSE-01 | Phase 18 | Complete |
-| HOUSE-02 | Phase 18 | Complete |
-| HOUSE-03 | Phase 18 | Complete |
-| PROF-01 | Phase 18 | Complete |
-| PROF-02 | Phase 18 | Complete |
-| PRES-01 | Phase 22 | Pending |
-| SUB-01 | Phase 22 | Pending |
-| SUB-02 | Phase 22 | Complete |
-| NOTIF-01 | Phase 22 | Pending |
-| NOTIF-02 | Phase 22 | Pending |
-| EDGE-01 | Phase 22 | Complete |
-| EDGE-02 | Phase 22 | Complete |
-| EDGE-03 | Phase 22 | Complete |
-
-**Coverage:**
-- v2.4 requirements: 46 total
-- Mapped to phases: 46
-- Unmapped: 0
+- **ENHANCE-01**: Gemini multimodal analyzes video frames for on-screen text and ingredient visuals
+- **ENHANCE-02**: User can select specific timestamp range to extract recipe from long videos
+- **ENHANCE-03**: Batch import multiple video URLs at once
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Performance/load testing | Requires specialized tooling and infrastructure |
-| Security penetration testing | Requires dedicated security audit |
-| Android testing | iOS-only app |
-| Accessibility audit (VoiceOver) | Separate milestone if needed |
-| CI/CD pipeline integration | Testing infrastructure, not feature testing |
+| Video download/storage | Unnecessary — transcript extraction handles content without downloading video |
+| Gemini multimodal video analysis | Higher cost, slower — defer to future enhancement if transcript quality insufficient |
+| Android share sheet | iOS-only app |
+| Creator attribution/profiles | Recipe apps link to source URL, not creator profiles |
+| Video playback in-app | Link to original platform instead — avoids ToS and storage issues |
+| Offline video import | Requires network for transcript API + Gemini |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| VURL-01 | — | Pending |
+| VURL-02 | — | Pending |
+| VURL-03 | — | Pending |
+| VURL-04 | — | Pending |
+| TRANS-01 | — | Pending |
+| TRANS-02 | — | Pending |
+| TRANS-03 | — | Pending |
+| PARSE-01 | — | Pending |
+| PARSE-02 | — | Pending |
+| PARSE-03 | — | Pending |
+| IMPORT-01 | — | Pending |
+| IMPORT-02 | — | Pending |
+| IMPORT-03 | — | Pending |
+| IMPORT-04 | — | Pending |
+| SHARE-01 | — | Pending |
+| SHARE-02 | — | Pending |
+| SHARE-03 | — | Pending |
+| RATE-01 | — | Pending |
+| RATE-02 | — | Pending |
+| RATE-03 | — | Pending |
+| RATE-04 | — | Pending |
+
+**Coverage:**
+- v3.0 requirements: 18 total
+- Mapped to phases: 0
+- Unmapped: 18
 
 ---
-*Requirements defined: 2026-03-27*
-*Last updated: 2026-03-27 after roadmap creation (traceability mapped)*
+*Requirements defined: 2026-03-28*
+*Last updated: 2026-03-28 after initial definition*
