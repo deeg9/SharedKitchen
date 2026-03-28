@@ -2,29 +2,35 @@
 gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: UI Polish & Bug Fixes
-status: Milestone complete
-stopped_at: Completed 22-01-PLAN.md
-last_updated: "2026-03-27T23:15:53.877Z"
+status: executing
+stopped_at: Completed 17-01-PLAN.md
+last_updated: "2026-03-26T22:25:32Z"
+last_activity: 2026-03-26 — Completed 17-01 Data Scoping (kitchen-switch data sync)
 progress:
-  total_phases: 10
-  completed_phases: 10
-  total_plans: 18
-  completed_plans: 18
+  total_phases: 3
+  completed_phases: 2
+  total_plans: 6
+  completed_plans: 5
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-27)
+See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Phase 22 — Presence, Subscription, Notifications & Edge Cases QA
+**Current focus:** Phase 17 — Data Scoping
 
 ## Current Position
 
-Phase: 22
-Plan: Not started
+Phase: 17 (Data Scoping)
+Plan: 01 complete
+Status: Executing
+Last activity: 2026-03-26 — Completed 17-01 Data Scoping (kitchen-switch data sync)
+
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
@@ -41,17 +47,16 @@ Plan: Not started
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- [Phase 12]: ErrorBoundary wraps Slot only, PermissionPrompt stays outside for error recovery access
+- [Phase 12]: Used getErrorMessage(error: unknown) utility pattern for all catch blocks
+- [Phase 11]: Left existing if(!customerId) upsert intact, added separate unconditional upsert after subscription creation
+- [Phase 13]: Reduced hero gradient from 160px/0.85 to 80px/0.3 for readability without obscuring food photo
+- [Phase 13]: Used wrapper View stacking context for FilterBar z-index containment instead of modifying FilterBar internals
+- [Phase 14]: Built AppLogo with Views + MaterialCommunityIcons instead of image asset for resolution independence
+- [Phase 15]: Removed entire App Settings section rather than fixing broken toggles
+- [Phase 15]: Used Alert.prompt on iOS for inline household name editing
 - [Phase 17]: Used useRef to skip initial mount in useKitchenDataSync; tabs handle own initial fetch
 - [Phase 17]: Used getState() for imperative store access in sync hook to avoid unnecessary re-renders
-- [v2.4]: QA milestone structured as 5 testing phases grouped by feature affinity (46 requirements)
-- [Phase 18]: Used same Zustand getState() testing pattern as householdStore.test.ts for consistency
-- [Phase 18]: Used getAllByText for elements appearing in multiple UI locations
-- [Phase 18]: Created reusable createQueryBuilder mock helper for Supabase chained queries in store tests
-- [Phase 19]: Error assertions use getErrorMessage fallback since supabase errors are plain objects, not Error instances
-- [Phase 19]: Skipped category dropdown Maestro test due to pre-existing zIndex:-1 layering; filter logic covered by unit tests
-- [Phase 20]: Used single-step recipe fixture to test Done Cooking button without FlatList swipe simulation
-- [Phase 21]: Skipped takeout auto-expense test: planStore.assignRecipe has no mealSource/mealCost params or budgetStore integration
-- [Phase 22]: Used chainable mock pattern (select().eq().maybeSingle()) for subscriptionStore tests
 
 ### Pending Todos
 
@@ -81,19 +86,10 @@ None yet.
 | Phase 15 P01 | 187 | 2 tasks | 2 files |
 | Phase 15 P02 | 169 | 3 tasks | 2 files |
 | Phase 17 P01 | 82s | 2 tasks | 6 files |
-| 260327-iw7 | Add meal source type + grocery cost tracking | 2026-03-27 | 8a49ca4 | [260327-iw7-add-meal-source-type-home-cooked-takeout](./quick/260327-iw7-add-meal-source-type-home-cooked-takeout/) |
-| Phase 18 P01 | 97 | 2 tasks | 2 files |
-| Phase 18 P02 | 216s | 2 tasks | 3 files |
-| Phase 19 P01 | 237s | 2 tasks | 1 files |
-| Phase 19 P02 | 632 | 2 tasks | 2 files |
-| Phase 20 P02 | 41 | 1 tasks | 3 files |
-| Phase 20 P01 | 156 | 2 tasks | 2 files |
-| Phase 21 P01 | 194s | 2 tasks | 2 files |
-| Phase 22 P02 | 32s | 1 tasks | 4 files |
-| Phase 22 P01 | 127 | 2 tasks | 2 files |
+| 260328-iwq | Fix failing ai.test.ts fetch mock and worktree duplicates | 2026-03-28 | 1db6aa5 | [260328-iwq-fix-failing-ai-test-ts-fetch-mock-and-cl](./quick/260328-iwq-fix-failing-ai-test-ts-fetch-mock-and-cl/) |
 
 ## Session Continuity
 
-Last session: 2026-03-27T23:12:14.057Z
-Stopped at: Completed 22-01-PLAN.md
+Last session: 2026-03-28T20:41:15Z
+Stopped at: Completed quick task 260328-iwq
 Resume file: None
