@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { RecipeInsert } from '../types/database';
+import { isVideoUrl } from './videoUrl';
 
 /** Shape of the error context returned by supabase.functions.invoke for non-2xx responses. */
 interface SupabaseFunctionError extends Error {
@@ -197,6 +198,97 @@ export class RateLimitError extends Error {
   }
 }
 
+export class VideoRateLimitError extends Error {
+  limit: number;
+  used: number;
+  remaining: number;
+
+  constructor(message: string, limit: number, used: number) {
+    super(message);
+    this.name = 'VideoRateLimitError';
+    this.limit = limit;
+    this.used = used;
+    this.remaining = Math.max(0, limit - used);
+  }
+}
+
+// ── Video Import Helpers ──────────────────────────────────────────
+
+async function callEdgeFunctionForVideo(
+  url: string
+): Promise<Omit<RecipeInsert, 'household_id' | 'created_by'>> {
+  const session = await supabase.auth.getSession();
+  const token = session.data.session?.access_token;
+  const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+
+  const fnResponse = await fetch(`${supabaseUrl}/functions/v1/parse-recipe-url`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      'apikey': anonKey ?? '',
+    },
+    body: JSON.stringify({ url, type: 'video' }),
+  });
+
+  let data: any;
+  const contentType = fnResponse.headers.get('content-type') ?? '';
+  if (contentType.includes('application/json')) {
+    data = await fnResponse.json();
+  } else {
+    const text = await fnResponse.text();
+    throw new Error(`Server error (${fnResponse.status}). Please try again.`);
+  }
+
+  if (!fnResponse.ok) {
+    if (fnResponse.status === 429 && data?.type === 'video_limit_exceeded') {
+      throw new VideoRateLimitError(
+        data.error ?? 'Monthly video import limit reached',
+        data.limit ?? 3,
+        data.used ?? 0
+      );
+    }
+    throw new Error(data.error ?? `Video import failed (${fnResponse.status})`);
+  }
+
+  // Validate response shape
+  if (!data || typeof data.name !== 'string' || !Array.isArray(data.ingredients)) {
+    throw new Error('Invalid response from video parser. The video may not contain a valid recipe.');
+  }
+
+  return {
+    name: data.name,
+    category: data.category ?? null,
+    prep_time_minutes: data.prep_time_minutes ?? null,
+    cook_time_minutes: data.cook_time_minutes ?? null,
+    servings: data.servings ?? 4,
+    estimated_cost: data.estimated_cost ?? null,
+    ingredients: data.ingredients ?? [],
+    instructions: data.instructions ?? [],
+    tags: data.tags ?? [],
+    source_url: url,
+  };
+}
+
+/**
+ * Returns the current month's video import usage for a user.
+ */
+export async function getVideoImportCount(userId: string): Promise<{ used: number; limit: number }> {
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  monthStart.setHours(0, 0, 0, 0);
+
+  const { count } = await supabase
+    .from('ai_usage_log')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('function_name', 'parse-video-recipe')
+    .gte('created_at', monthStart.toISOString());
+
+  return { used: count ?? 0, limit: 3 };
+}
+
 /**
  * Parses a recipe URL. Tries JSON-LD client-side first (instant, free),
  * falls back to edge function + Gemini if JSON-LD is missing/incomplete.
@@ -204,6 +296,11 @@ export class RateLimitError extends Error {
 export async function parseRecipeUrl(
   url: string
 ): Promise<Omit<RecipeInsert, 'household_id' | 'created_by'>> {
+  // Video URLs skip HTML fetch entirely -- per locked decision
+  if (isVideoUrl(url)) {
+    return callEdgeFunctionForVideo(url);
+  }
+
   // Fetch HTML client-side — mobile browsers aren't blocked by recipe sites
   let html: string;
   try {
