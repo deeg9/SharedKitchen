@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Video Recipe Import
-status: Defining requirements
+status: Ready to plan
 stopped_at: null
-last_updated: "2026-03-28T21:00:00Z"
-last_activity: 2026-03-28 — Milestone v3.0 started
+last_updated: "2026-03-28T21:15:00Z"
+last_activity: 2026-03-28 — v3.0 roadmap created
 progress:
-  total_phases: 0
+  total_phases: 2
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -18,17 +18,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-26)
+See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Milestone v3.0 — Video Recipe Import
+**Current focus:** Phase 23 — Core Video Import Pipeline
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-28 — Milestone v3.0 started
+Phase: 23 of 24 (Core Video Import Pipeline)
+Plan: 0 of TBD in current phase
+Status: Ready to plan
+Last activity: 2026-03-28 — v3.0 roadmap created (2 phases, 21 requirements mapped)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -47,16 +47,11 @@ Progress: [░░░░░░░░░░] 0%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [Phase 12]: ErrorBoundary wraps Slot only, PermissionPrompt stays outside for error recovery access
-- [Phase 12]: Used getErrorMessage(error: unknown) utility pattern for all catch blocks
-- [Phase 11]: Left existing if(!customerId) upsert intact, added separate unconditional upsert after subscription creation
-- [Phase 13]: Reduced hero gradient from 160px/0.85 to 80px/0.3 for readability without obscuring food photo
-- [Phase 13]: Used wrapper View stacking context for FilterBar z-index containment instead of modifying FilterBar internals
-- [Phase 14]: Built AppLogo with Views + MaterialCommunityIcons instead of image asset for resolution independence
-- [Phase 15]: Removed entire App Settings section rather than fixing broken toggles
-- [Phase 15]: Used Alert.prompt on iOS for inline household name editing
-- [Phase 17]: Used useRef to skip initial mount in useKitchenDataSync; tabs handle own initial fetch
-- [Phase 17]: Used getState() for imperative store access in sync hook to avoid unnecessary re-renders
+- [v3.0]: Supadata chosen over SocialKit for transcript extraction (single REST endpoint, all platforms, $17/mo at scale)
+- [v3.0]: Gemini Flash for transcript parsing (already integrated, cheaper for long text)
+- [v3.0]: 2-phase structure: pipeline first via paste-URL (Phase 23), share sheet second requiring native rebuild (Phase 24)
+- [v3.0]: Extend existing parse-recipe-url Edge Function with video branch (same response shape, same auth)
+- [v3.0]: Free tier: 3 video imports/month, unlimited premium -- uses existing ai_usage_log table
 
 ### Pending Todos
 
@@ -64,6 +59,9 @@ None yet.
 
 ### Blockers/Concerns
 
+- SUPADATA_API_KEY env var must be provisioned before Phase 23 execution
+- TikTok mobile short links (vm.tiktok.com) may resolve differently server-side -- test early
+- expo-share-intent requires `expo prebuild --clean` and real-device testing (Phase 24)
 - Apple External Purchase Entitlement must be applied for before Stripe checkout ships
 - Manual recipe creation does not set category field -- filters won't work for manually-added recipes
 
@@ -90,6 +88,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-28T20:41:15Z
-Stopped at: Completed quick task 260328-iwq
+Last session: 2026-03-28
+Stopped at: v3.0 roadmap created, ready to plan Phase 23
 Resume file: None

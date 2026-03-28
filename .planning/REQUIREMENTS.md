@@ -68,33 +68,33 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| VURL-01 | — | Pending |
-| VURL-02 | — | Pending |
-| VURL-03 | — | Pending |
-| VURL-04 | — | Pending |
-| TRANS-01 | — | Pending |
-| TRANS-02 | — | Pending |
-| TRANS-03 | — | Pending |
-| PARSE-01 | — | Pending |
-| PARSE-02 | — | Pending |
-| PARSE-03 | — | Pending |
-| IMPORT-01 | — | Pending |
-| IMPORT-02 | — | Pending |
-| IMPORT-03 | — | Pending |
-| IMPORT-04 | — | Pending |
-| SHARE-01 | — | Pending |
-| SHARE-02 | — | Pending |
-| SHARE-03 | — | Pending |
-| RATE-01 | — | Pending |
-| RATE-02 | — | Pending |
-| RATE-03 | — | Pending |
-| RATE-04 | — | Pending |
+| VURL-01 | Phase 23 | Pending |
+| VURL-02 | Phase 23 | Pending |
+| VURL-03 | Phase 23 | Pending |
+| VURL-04 | Phase 23 | Pending |
+| TRANS-01 | Phase 23 | Pending |
+| TRANS-02 | Phase 23 | Pending |
+| TRANS-03 | Phase 23 | Pending |
+| PARSE-01 | Phase 23 | Pending |
+| PARSE-02 | Phase 23 | Pending |
+| PARSE-03 | Phase 23 | Pending |
+| IMPORT-01 | Phase 23 | Pending |
+| IMPORT-02 | Phase 23 | Pending |
+| IMPORT-03 | Phase 23 | Pending |
+| IMPORT-04 | Phase 23 | Pending |
+| SHARE-01 | Phase 24 | Pending |
+| SHARE-02 | Phase 24 | Pending |
+| SHARE-03 | Phase 24 | Pending |
+| RATE-01 | Phase 23 | Pending |
+| RATE-02 | Phase 23 | Pending |
+| RATE-03 | Phase 23 | Pending |
+| RATE-04 | Phase 23 | Pending |
 
 **Coverage:**
-- v3.0 requirements: 18 total
-- Mapped to phases: 0
-- Unmapped: 18
+- v3.0 requirements: 21 total
+- Mapped to phases: 21
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-28*
-*Last updated: 2026-03-28 after initial definition*
+*Last updated: 2026-03-28 after roadmap creation (traceability added)*
