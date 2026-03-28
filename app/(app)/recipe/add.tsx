@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,14 +8,20 @@ import { Button } from '../../../src/components/ui/Button';
 import { useRecipeStore } from '../../../src/stores/recipeStore';
 import { useHouseholdStore } from '../../../src/stores/householdStore';
 import { supabase } from '../../../src/lib/supabase';
-import { parseRecipeUrl } from '../../../src/lib/ai';
+import { parseRecipeUrl, VideoRateLimitError, getVideoImportCount } from '../../../src/lib/ai';
+import { isVideoUrl } from '../../../src/lib/videoUrl';
 import { RecipeInsert } from '../../../src/types/database';
 import { colors } from '../../../src/theme/colors';
 import { typography } from '../../../src/theme/typography';
 import { spacing, borderRadius } from '../../../src/theme/spacing';
 import { getErrorMessage } from '../../../src/lib/errors';
 
-const PROGRESS_MESSAGES = [
+const VIDEO_PROGRESS_MESSAGES = [
+  'Extracting transcript...',
+  'Parsing recipe...',
+  'Almost done!',
+];
+const WEB_PROGRESS_MESSAGES = [
   'Fetching recipe...',
   'Parsing ingredients...',
   'Extracting instructions...',
@@ -32,15 +38,28 @@ export default function AddRecipeScreen() {
   const [importing, setImporting] = useState(false);
   const [progressMsg, setProgressMsg] = useState('');
   const [importedData, setImportedData] = useState<Omit<RecipeInsert, 'household_id' | 'created_by'> | null>(null);
+  const [videoUsage, setVideoUsage] = useState<{ used: number; limit: number } | null>(null);
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
 
-  const startProgress = () => {
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const usage = await getVideoImportCount(user.id);
+        setVideoUsage(usage);
+      }
+    })();
+  }, []);
+
+  const startProgress = (isVideo: boolean) => {
     let idx = 0;
-    setProgressMsg(PROGRESS_MESSAGES[0]);
+    const messages = isVideo ? VIDEO_PROGRESS_MESSAGES : WEB_PROGRESS_MESSAGES;
+    setProgressMsg(messages[0]);
     progressInterval.current = setInterval(() => {
-      idx = Math.min(idx + 1, PROGRESS_MESSAGES.length - 1);
-      setProgressMsg(PROGRESS_MESSAGES[idx]);
-    }, 2000);
+      idx = Math.min(idx + 1, messages.length - 1);
+      setProgressMsg(messages[idx]);
+    }, isVideo ? 3000 : 2000);
   };
 
   const stopProgress = () => {
@@ -57,13 +76,26 @@ export default function AddRecipeScreen() {
       return;
     }
 
+    const urlIsVideo = isVideoUrl(importUrl.trim());
     setImporting(true);
-    startProgress();
+    startProgress(urlIsVideo);
     try {
       const data = await parseRecipeUrl(importUrl.trim());
       setImportedData(data);
+      // Refresh usage counter after successful video import
+      if (urlIsVideo) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const usage = await getVideoImportCount(user.id);
+          setVideoUsage(usage);
+        }
+      }
     } catch (error: unknown) {
-      Alert.alert('Import Failed', getErrorMessage(error));
+      if (error instanceof VideoRateLimitError) {
+        setShowUpgradePrompt(true);
+      } else {
+        Alert.alert('Import Failed', getErrorMessage(error));
+      }
     } finally {
       setImporting(false);
       stopProgress();
@@ -181,6 +213,28 @@ export default function AddRecipeScreen() {
             <Text style={styles.progressText}>{progressMsg}</Text>
           </View>
         ) : null}
+        {videoUsage && videoUsage.used > 0 && !showUpgradePrompt && (
+          <View style={styles.usageRow}>
+            <MaterialCommunityIcons name="video-outline" size={16} color={colors.onSurfaceVariant} />
+            <Text style={styles.usageText}>
+              {videoUsage.used} of {videoUsage.limit} video imports used this month
+            </Text>
+          </View>
+        )}
+        {showUpgradePrompt && (
+          <View style={styles.upgradeCard}>
+            <MaterialCommunityIcons name="star-circle" size={24} color={colors.primary} />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.upgradeTitle}>Video import limit reached</Text>
+              <Text style={styles.upgradeText}>
+                Free accounts can import 3 video recipes per month. Upgrade to Premium for unlimited video imports.
+              </Text>
+            </View>
+            <Pressable onPress={() => { setShowUpgradePrompt(false); router.push('/(app)/settings/subscription'); }}>
+              <Text style={styles.upgradeButton}>Upgrade</Text>
+            </Pressable>
+          </View>
+        )}
       </View>
 
       <RecipeForm
@@ -260,5 +314,37 @@ const styles = StyleSheet.create({
   progressText: {
     ...typography.bodySm,
     color: colors.onSurfaceVariant,
+  },
+  usageRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginTop: spacing.sm,
+  },
+  usageText: {
+    ...typography.bodySm,
+    color: colors.onSurfaceVariant,
+  },
+  upgradeCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    backgroundColor: colors.primaryContainer,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginTop: spacing.sm,
+  },
+  upgradeTitle: {
+    ...typography.labelMd,
+    color: colors.onPrimaryContainer,
+    marginBottom: 2,
+  },
+  upgradeText: {
+    ...typography.bodySm,
+    color: colors.onPrimaryContainer,
+  },
+  upgradeButton: {
+    ...typography.labelLg,
+    color: colors.primary,
   },
 });
