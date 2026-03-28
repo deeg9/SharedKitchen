@@ -106,7 +106,10 @@ Plans:
   1. SharedKitchen appears as an option in the iOS share sheet when sharing a URL from TikTok, Instagram, or YouTube
   2. Tapping SharedKitchen in the share sheet opens the app and immediately begins the video import flow with the shared URL pre-filled
   3. Share sheet import works correctly whether the app was in the foreground, background, or not running at all
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 24-01-PLAN.md — Install expo-share-intent, configure iOS share extension, wire ShareIntentProvider + auto-import
+- [ ] 24-02-PLAN.md — Native rebuild + real-device human verification of share sheet flow
 **UI hint**: yes
 
 ## Progress
@@ -138,7 +141,7 @@ Plans:
 | 21. Planning, Grocery, Budget & Leftovers QA | v2.4 | 2/2 | Complete | 2026-03-27 |
 | 22. Presence, Subscription, Notifications & Edge Cases QA | v2.4 | 2/2 | Complete | 2026-03-27 |
 | 23. Core Video Import Pipeline | v3.0 | 2/3 | Complete    | 2026-03-28 |
-| 24. Share Sheet Integration | v3.0 | 0/0 | Not started | - |
+| 24. Share Sheet Integration | v3.0 | 0/2 | Not started | - |
 
 ---
-*Last updated: 2026-03-28 after Phase 23 planning*
+*Last updated: 2026-03-28 after Phase 24 planning*
