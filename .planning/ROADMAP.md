@@ -77,7 +77,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 ### v3.0 Video Recipe Import (Phases 23-24)
 
 - [x] **Phase 23: Core Video Import Pipeline** - Edge Function video branch, Supadata transcript extraction, Gemini parsing, paste-URL flow, rate limiting (completed 2026-03-28)
-- [ ] **Phase 24: Share Sheet Integration** - expo-share-intent for iOS share sheet, deep link routing to import flow
+- [x] **Phase 24: Share Sheet Integration** - expo-share-intent for iOS share sheet, deep link routing to import flow (completed 2026-03-28)
 
 ## Phase Details
 
@@ -141,7 +141,7 @@ Plans:
 | 21. Planning, Grocery, Budget & Leftovers QA | v2.4 | 2/2 | Complete | 2026-03-27 |
 | 22. Presence, Subscription, Notifications & Edge Cases QA | v2.4 | 2/2 | Complete | 2026-03-27 |
 | 23. Core Video Import Pipeline | v3.0 | 2/3 | Complete    | 2026-03-28 |
-| 24. Share Sheet Integration | v3.0 | 1/2 | In Progress|  |
+| 24. Share Sheet Integration | v3.0 | 1/2 | Complete    | 2026-03-28 |
 
 ---
 *Last updated: 2026-03-28 after Phase 24 planning*
