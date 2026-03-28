@@ -91,7 +91,11 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
   3. Non-recipe videos (e.g., a dance video or news clip) show a clear error message instead of a hallucinated recipe
   4. Free users see a usage counter ("2 of 3 imports used this month") and are blocked with an upgrade prompt after 3 video imports per month; premium users import unlimited videos
   5. Saved video-imported recipes include a link back to the original source video
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 23-01-PLAN.md — Video URL detection (TDD) + Edge Function video branch (Supadata + Gemini + rate limiting)
+- [ ] 23-02-PLAN.md — Client ai.ts video routing + add-recipe UI (progress, usage counter, upgrade prompt)
+- [ ] 23-03-PLAN.md — Human verification of end-to-end video import flow
 **UI hint**: yes
 
 ### Phase 24: Share Sheet Integration
@@ -133,8 +137,8 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 | 20. Recipe Management & Cooking Mode QA | v2.4 | 2/2 | Complete | 2026-03-27 |
 | 21. Planning, Grocery, Budget & Leftovers QA | v2.4 | 2/2 | Complete | 2026-03-27 |
 | 22. Presence, Subscription, Notifications & Edge Cases QA | v2.4 | 2/2 | Complete | 2026-03-27 |
-| 23. Core Video Import Pipeline | v3.0 | 0/0 | Not started | - |
+| 23. Core Video Import Pipeline | v3.0 | 0/3 | In progress | - |
 | 24. Share Sheet Integration | v3.0 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-03-28 after v3.0 roadmap creation*
+*Last updated: 2026-03-28 after Phase 23 planning*
