@@ -5,7 +5,7 @@ milestone_name: UI Polish & Bug Fixes
 status: executing
 stopped_at: Completed 17-01-PLAN.md
 last_updated: "2026-03-26T22:25:32Z"
-last_activity: 2026-03-26 — Completed 17-01 Data Scoping (kitchen-switch data sync)
+last_activity: 2026-03-28 — Completed quick task 260328-iwq: Fix ai.test.ts fetch mock + worktree cleanup
 progress:
   total_phases: 3
   completed_phases: 2
