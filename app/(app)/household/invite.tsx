@@ -54,7 +54,8 @@ export default function InviteScreen() {
   };
 
   const handleDone = () => {
-    router.back();
+    if (router.canGoBack()) router.back();
+    else router.replace('/(app)/(tabs)/profile');
   };
 
   return (

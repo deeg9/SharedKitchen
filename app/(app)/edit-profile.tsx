@@ -106,7 +106,8 @@ export default function EditProfileScreen() {
         },
       });
 
-      router.back();
+      if (router.canGoBack()) router.back();
+      else router.replace('/(app)/(tabs)/profile');
     } catch (error: unknown) {
       Alert.alert('Error', getErrorMessage(error));
     } finally {

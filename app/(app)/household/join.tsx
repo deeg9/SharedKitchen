@@ -33,7 +33,8 @@ export default function JoinHouseholdScreen() {
     const household = await joinHousehold(code.trim());
 
     if (household) {
-      router.back();
+      if (router.canGoBack()) router.back();
+      else router.replace('/(app)/(tabs)/profile');
     } else {
       const storeError = useHouseholdStore.getState().error;
       setError(storeError ?? 'Failed to join household');

@@ -85,7 +85,8 @@ export default function EditRecipeScreen() {
       };
 
       await updateRecipe(id, updates);
-      router.back();
+      if (router.canGoBack()) router.back();
+      else router.replace(`/(app)/recipe/${id}`);
     } catch (error: unknown) {
       Alert.alert('Error', getErrorMessage(error));
     } finally {

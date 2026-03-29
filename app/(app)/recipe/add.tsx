@@ -178,7 +178,11 @@ export default function AddRecipeScreen() {
       const created = await createRecipe(recipe);
 
       if (created) {
-        router.back();
+        if (router.canGoBack()) {
+          router.back();
+        } else {
+          router.replace('/(app)/(tabs)/recipes');
+        }
       } else {
         Alert.alert('Error', 'Failed to create recipe. Please try again.');
       }
