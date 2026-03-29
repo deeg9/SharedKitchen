@@ -47,7 +47,7 @@ describe('TabBar', () => {
 
     expect(screen.getByText('Plan')).toBeTruthy();
     expect(screen.getByText('Recipes')).toBeTruthy();
-    expect(screen.getByText('Grocery')).toBeTruthy();
+    expect(screen.getByText('Kitchen')).toBeTruthy();
     expect(screen.getByText('Budget')).toBeTruthy();
     expect(screen.getByText('Profile')).toBeTruthy();
   });
@@ -57,7 +57,7 @@ describe('TabBar', () => {
 
     expect(screen.getByTestId('icon-calendar-week')).toBeTruthy();
     expect(screen.getByTestId('icon-book-open-variant')).toBeTruthy();
-    expect(screen.getByTestId('icon-cart')).toBeTruthy();
+    expect(screen.getByTestId('icon-fridge-outline')).toBeTruthy();
     expect(screen.getByTestId('icon-chart-pie')).toBeTruthy();
     expect(screen.getByTestId('icon-account')).toBeTruthy();
   });
