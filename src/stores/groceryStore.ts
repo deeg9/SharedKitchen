@@ -10,6 +10,7 @@ import {
 } from '../types/database';
 import { aggregateIngredients, computeSummary, groupBySection } from '../lib/grocery-utils';
 import { getErrorMessage } from '../lib/errors';
+import { useHouseholdStore } from './householdStore';
 
 interface RecipeWithIngredients {
   id: string;
@@ -222,6 +223,26 @@ export const useGroceryStore = create<GroceryState>((set, get) => ({
         ),
         error: error.message,
       });
+    }
+
+    // Auto-copy to pantry when checking off (not unchecking)
+    if (checked && !error) {
+      const householdId = useHouseholdStore.getState().activeHouseholdId;
+      if (householdId && original) {
+        import('./pantryStore').then((m) => {
+          m.usePantryStore.getState().addFromGrocery(
+            householdId,
+            {
+              name: original.name,
+              quantity: original.quantity,
+              section: original.section,
+            },
+            itemId
+          );
+        }).catch(() => {
+          // Silently ignore pantry copy failures -- grocery check-off is the primary action
+        });
+      }
     }
   },
 
