@@ -126,7 +126,7 @@ Plans:
   6. Checking off a grocery item in Shopping List automatically adds it to On Hand
 **Plans**: 2 plans
 Plans:
-- [ ] 25-01-PLAN.md — Supabase pantry_items migration, TypeScript types, pantryStore, usePantrySync
+- [x] 25-01-PLAN.md — Supabase pantry_items migration, TypeScript types, pantryStore, usePantrySync
 - [ ] 25-02-PLAN.md — Rename tab to Kitchen, segmented control UI, On Hand list, add pantry sheet, grocery auto-copy
 **UI hint**: yes
 
@@ -160,7 +160,7 @@ Plans:
 | 22. Presence, Subscription, Notifications & Edge Cases QA | v2.4 | 2/2 | Complete | 2026-03-27 |
 | 23. Core Video Import Pipeline | v3.0 | 2/3 | Complete    | 2026-03-28 |
 | 24. Share Sheet Integration | v3.0 | 1/2 | Complete    | 2026-03-28 |
-| 25. Kitchen Tab | v3.0 | 0/2 | Not started | - |
+| 25. Kitchen Tab | v3.0 | 1/2 | In Progress|  |
 
 ---
 *Last updated: 2026-03-29 after Phase 25 planning*
