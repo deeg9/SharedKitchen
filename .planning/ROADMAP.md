@@ -74,10 +74,11 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 </details>
 
-### v3.0 Video Recipe Import (Phases 23-24)
+### v3.0 Video Recipe Import & Kitchen Tab (Phases 23-25)
 
 - [x] **Phase 23: Core Video Import Pipeline** - Edge Function video branch, Supadata transcript extraction, Gemini parsing, paste-URL flow, rate limiting (completed 2026-03-28)
 - [x] **Phase 24: Share Sheet Integration** - expo-share-intent for iOS share sheet, deep link routing to import flow (completed 2026-03-28)
+- [ ] **Phase 25: Kitchen Tab** - Rename Grocery tab to Kitchen with segmented control (On Hand | Shopping List), pantry/fridge tracking, auto-move from grocery
 
 ## Phase Details
 
@@ -114,7 +115,7 @@ Plans:
 
 ## Progress
 
-**Execution Order:** Phases execute in numeric order: 23 -> 24
+**Execution Order:** Phases execute in numeric order: 23 -> 24 -> 25
 
 | Phase | Milestone | Plans | Status | Completed |
 |-------|-----------|-------|--------|-----------|
@@ -142,6 +143,28 @@ Plans:
 | 22. Presence, Subscription, Notifications & Edge Cases QA | v2.4 | 2/2 | Complete | 2026-03-27 |
 | 23. Core Video Import Pipeline | v3.0 | 2/3 | Complete    | 2026-03-28 |
 | 24. Share Sheet Integration | v3.0 | 1/2 | Complete    | 2026-03-28 |
+| 25. Kitchen Tab | v3.0 | 0/0 | Not started | - |
+
+### Phase 25: Kitchen Tab
+**Goal**: Rename the middle Grocery tab to Kitchen with a segmented control (On Hand | Shopping List). On Hand tracks fridge/pantry items with manual add and auto-move from checked grocery items. Shopping List is the existing grocery checklist.
+**Depends on**: Phase 24
+**Success Criteria** (what must be TRUE):
+  1. Bottom tab bar shows "Kitchen" instead of "Grocery" with a fridge/kitchen icon
+  2. Kitchen screen has a segmented control at top with "On Hand" and "Shopping List" tabs
+  3. Shopping List tab shows the existing grocery checklist (unchanged functionality)
+  4. On Hand tab shows pantry/fridge items with name, quantity, and optional expiry
+  5. User can manually add items to On Hand
+  6. Checking off a grocery item in Shopping List automatically adds it to On Hand
+**Plans**: TBD
+**UI hint**: yes
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 24
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 25 to break down)
 
 ---
 *Last updated: 2026-03-28 after Phase 24 planning*
