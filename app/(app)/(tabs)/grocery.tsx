@@ -12,11 +12,14 @@ import { GrocerySection } from '../../../src/components/grocery/GrocerySection';
 import { GrocerySummary } from '../../../src/components/grocery/GrocerySummary';
 import { AddItemSheet } from '../../../src/components/grocery/AddItemSheet';
 import { EditCategoriesSheet } from '../../../src/components/grocery/EditCategoriesSheet';
+import { OnHandList } from '../../../src/components/pantry/OnHandList';
 import { useGroceryCategoryStore } from '../../../src/stores/groceryCategoryStore';
 import { useGroceryStore } from '../../../src/stores/groceryStore';
 import { useHouseholdStore } from '../../../src/stores/householdStore';
 import { usePlanStore } from '../../../src/stores/planStore';
+import { usePantryStore } from '../../../src/stores/pantryStore';
 import { useGrocerySync } from '../../../src/hooks/useGrocerySync';
+import { usePantrySync } from '../../../src/hooks/usePantrySync';
 import { getWeekDays, toDateString } from '../../../src/lib/dates';
 import { TAB_BAR_HEIGHT } from '../../../src/lib/constants';
 import { usePresence, PresenceMember } from '../../../src/hooks/usePresence';
@@ -34,6 +37,7 @@ export default function GroceryScreen() {
   const [addSheetOpen, setAddSheetOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<GroceryItemType | null>(null);
   const [catSheetOpen, setCatSheetOpen] = useState(false);
+  const [activeSegment, setActiveSegment] = useState<'shopping' | 'onhand'>('shopping');
   const initCategories = useGroceryCategoryStore((s) => s.initialize);
 
   const user = useAuthStore((s) => s.user);
@@ -41,6 +45,16 @@ export default function GroceryScreen() {
   const activeHouseholdId = useHouseholdStore((s) => s.activeHouseholdId);
   const members = useHouseholdStore((s) => s.members);
   const mealPlan = usePlanStore((s) => s.mealPlan);
+
+  // Pantry sync -- always active regardless of segment
+  usePantrySync(activeHouseholdId);
+  const fetchPantryItems = usePantryStore((s) => s.fetchPantryItems);
+
+  useEffect(() => {
+    if (activeHouseholdId) {
+      fetchPantryItems(activeHouseholdId);
+    }
+  }, [activeHouseholdId]);
 
   // AppState tracking for presence accuracy (RT-04)
   const [appActive, setAppActive] = useState(true);
@@ -132,10 +146,49 @@ export default function GroceryScreen() {
   const summaryData = summary();
   const { sections, completed } = groupedItems();
 
+  // --- Segmented Control ---
+  const segmentedControl = (
+    <View style={styles.segmentRow}>
+      <Pressable
+        onPress={() => setActiveSegment('onhand')}
+        style={[styles.segmentBtn, activeSegment === 'onhand' && styles.segmentBtnActive]}
+      >
+        <Text style={[styles.segmentText, activeSegment === 'onhand' && styles.segmentTextActive]}>On Hand</Text>
+      </Pressable>
+      <Pressable
+        onPress={() => setActiveSegment('shopping')}
+        style={[styles.segmentBtn, activeSegment === 'shopping' && styles.segmentBtnActive]}
+      >
+        <Text style={[styles.segmentText, activeSegment === 'shopping' && styles.segmentTextActive]}>Shopping List</Text>
+      </Pressable>
+    </View>
+  );
+
+  // --- On Hand segment ---
+  if (activeSegment === 'onhand') {
+    return (
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <View style={styles.titleRow}>
+          <View style={styles.titleSpacer} />
+          <Text style={styles.screenTitle}>Kitchen</Text>
+          <View style={styles.titleSpacer} />
+        </View>
+        {segmentedControl}
+        <OnHandList />
+      </View>
+    );
+  }
+
+  // --- Shopping List segment ---
   if (loading && items.length === 0) {
     return (
       <View style={[styles.container, { paddingTop: insets.top }]}>
-        <Text style={styles.screenTitle}>Grocery List</Text>
+        <View style={styles.titleRow}>
+          <View style={styles.titleSpacer} />
+          <Text style={styles.screenTitle}>Kitchen</Text>
+          <View style={styles.titleSpacer} />
+        </View>
+        {segmentedControl}
         <View style={styles.skeletonContainer}>
           <Skeleton width="100%" height={80} />
           <Skeleton width="60%" height={20} style={{ marginTop: spacing.md }} />
@@ -151,7 +204,12 @@ export default function GroceryScreen() {
   if (!activeListId && items.length === 0) {
     return (
       <View style={[styles.container, { paddingTop: insets.top }]}>
-        <Text style={styles.screenTitle}>Grocery List</Text>
+        <View style={styles.titleRow}>
+          <View style={styles.titleSpacer} />
+          <Text style={styles.screenTitle}>Kitchen</Text>
+          <View style={styles.titleSpacer} />
+        </View>
+        {segmentedControl}
         <EmptyState
           icon="cart-outline"
           title="No grocery list yet"
@@ -168,11 +226,13 @@ export default function GroceryScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.titleRow}>
         <PresenceAvatarStack members={presenceMembers} />
-        <Text style={styles.screenTitle}>Grocery List</Text>
+        <Text style={styles.screenTitle}>Kitchen</Text>
         <Pressable onPress={() => setCatSheetOpen(true)} style={styles.editCatBtn}>
           <MaterialCommunityIcons name="tag-edit-outline" size={20} color={colors.onSurfaceVariant} />
         </Pressable>
       </View>
+
+      {segmentedControl}
 
       <GrocerySummary summary={summaryData} />
 
@@ -181,7 +241,7 @@ export default function GroceryScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Unchecked sections in defined order — all collapsible */}
+        {/* Unchecked sections in defined order -- all collapsible */}
         {SECTION_ORDER.map((sectionName) => {
           const sectionItems = sections[sectionName];
           if (!sectionItems || sectionItems.length === 0) return null;
@@ -274,6 +334,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm + 4,
   },
+  titleSpacer: {
+    width: 36,
+  },
   editCatBtn: {
     width: 36,
     height: 36,
@@ -286,6 +349,33 @@ const styles = StyleSheet.create({
     color: colors.onSurface,
     textAlign: 'center',
     flex: 1,
+  },
+  segmentRow: {
+    flexDirection: 'row',
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: borderRadius.full,
+    padding: 3,
+  },
+  segmentBtn: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 36,
+    borderRadius: borderRadius.full,
+  },
+  segmentBtnActive: {
+    backgroundColor: colors.primary,
+  },
+  segmentText: {
+    ...typography.labelSm,
+    color: colors.onSurfaceVariant,
+    fontWeight: '600',
+    textTransform: 'none',
+  },
+  segmentTextActive: {
+    color: colors.onPrimary,
   },
   scrollView: {
     flex: 1,
