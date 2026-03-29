@@ -1,0 +1,43 @@
+appId: com.sharedkitchen.app
+---
+# Video Recipe Import from TikTok
+# User must be signed in already.
+
+- launchApp
+
+# Wait for main app
+- extendedWaitUntil:
+    visible:
+      id: "recipes-tab"
+    timeout: 15000
+
+# Go to Recipes tab
+- tapOn:
+    id: "recipes-tab"
+
+# Navigate to Add Recipe
+- openLink: "sharedkitchen://recipe/add"
+
+# Wait for import field
+- extendedWaitUntil:
+    visible:
+      id: "recipe-import-url-input"
+    timeout: 10000
+
+# Type TikTok URL
+- tapOn:
+    id: "recipe-import-url-input"
+- inputText: "https://www.tiktok.com/@cooking.con.claudia/video/7472515748410232107"
+
+# Tap Import
+- tapOn:
+    id: "recipe-import-button"
+
+# Wait for video import (~15-30s for Supadata + Gemini)
+- extendedWaitUntil:
+    visible:
+      id: "recipe-form-name-input"
+    timeout: 60000
+
+# Screenshot result
+- takeScreenshot: video-import-result

@@ -67,6 +67,7 @@ export default function RecipesScreen() {
                 setShowMenu(false);
                 router.push('/recipe/add');
               }}
+              testID="recipe-add-menu-item"
             >
               <MaterialCommunityIcons name="pencil-plus" size={22} color={colors.primary} />
               <Text style={styles.menuText}>Add Recipe</Text>
