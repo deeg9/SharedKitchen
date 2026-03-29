@@ -1,8 +1,8 @@
-# Requirements: SharedKitchen v3.0 — Video Recipe Import
+# Requirements: SharedKitchen v3.0 — Video Recipe Import & Kitchen Tab
 
 **Defined:** 2026-03-28
 **Core Value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Goal:** Users can import recipes from TikTok, Instagram, YouTube, and any video URL — via share sheet or paste — with transcript-based AI extraction
+**Goal:** Users can import recipes from TikTok, Instagram, YouTube, and any video URL — via share sheet or paste — with transcript-based AI extraction. Kitchen tab unifies grocery shopping and pantry tracking.
 
 ## v3.0 Requirements
 
@@ -22,7 +22,7 @@
 ### Recipe Parsing
 
 - [x] **PARSE-01**: Gemini Flash converts video transcript into structured recipe (title, ingredients, steps, metadata)
-- [x] **PARSE-02**: Gemini uses best-guess for ambiguous measurements ("a splash" → "1 tbsp")
+- [x] **PARSE-02**: Gemini uses best-guess for ambiguous measurements ("a splash" -> "1 tbsp")
 - [x] **PARSE-03**: Non-recipe videos are detected and user sees a clear error instead of a hallucinated recipe
 
 ### Client Import Flow
@@ -45,6 +45,15 @@
 - [x] **RATE-03**: Import flow shows usage counter ("2 of 3 imports used this month")
 - [x] **RATE-04**: User hitting the free limit sees an upgrade prompt
 
+### Kitchen Tab
+
+- [ ] **KITCHEN-01**: Bottom tab bar shows "Kitchen" instead of "Grocery" with a fridge/kitchen icon
+- [ ] **KITCHEN-02**: Kitchen screen has a segmented control at top with "On Hand" and "Shopping List" tabs
+- [ ] **KITCHEN-03**: Shopping List tab shows the existing grocery checklist (unchanged functionality)
+- [ ] **KITCHEN-04**: On Hand tab shows pantry/fridge items with name, quantity, and optional expiry
+- [ ] **KITCHEN-05**: User can manually add items to On Hand
+- [ ] **KITCHEN-06**: Checking off a grocery item in Shopping List automatically adds it to On Hand
+
 ## Future Requirements
 
 ### Enhanced Video Processing
@@ -63,6 +72,9 @@
 | Creator attribution/profiles | Recipe apps link to source URL, not creator profiles |
 | Video playback in-app | Link to original platform instead — avoids ToS and storage issues |
 | Offline video import | Requires network for transcript API + Gemini |
+| Recipe ingredient check-off populating pantry | Deferred — use what you have |
+| Smart grocery suggestions from pantry | Deferred — based on low-stock pantry items |
+| Barcode scanning for pantry | Deferred — hardware integration complexity |
 
 ## Traceability
 
@@ -89,12 +101,18 @@
 | RATE-02 | Phase 23 | Complete |
 | RATE-03 | Phase 23 | Complete |
 | RATE-04 | Phase 23 | Complete |
+| KITCHEN-01 | Phase 25 | Planned |
+| KITCHEN-02 | Phase 25 | Planned |
+| KITCHEN-03 | Phase 25 | Planned |
+| KITCHEN-04 | Phase 25 | Planned |
+| KITCHEN-05 | Phase 25 | Planned |
+| KITCHEN-06 | Phase 25 | Planned |
 
 **Coverage:**
-- v3.0 requirements: 21 total
-- Mapped to phases: 21
+- v3.0 requirements: 27 total
+- Mapped to phases: 27
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-28*
-*Last updated: 2026-03-28 after roadmap creation (traceability added)*
+*Last updated: 2026-03-29 after Phase 25 Kitchen Tab requirements added*

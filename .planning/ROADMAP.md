@@ -2,7 +2,7 @@
 
 ## Overview
 
-SharedKitchen delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP. v2.0 (Phases 5-9) added Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and E2E testing. v2.1 (Phases 10-12) added recipe discovery filters, Stripe test mode E2E, and code quality polish. v2.2 (Phases 13-15) fixes layout bugs, polishes the sign-in screen, repairs the meal generator edge function, and cleans up profile/settings. v2.3 (Phases 16-17) adds multi-kitchen switching so users can belong to multiple kitchens and have all app data scoped to the active one. v2.4 (Phases 18-22) systematically tests and validates every feature area to ensure production readiness. v3.0 (Phases 23-24) adds video recipe import from TikTok, Instagram, YouTube, and any video URL via paste or share sheet, with transcript-based AI extraction and freemium rate limiting.
+SharedKitchen delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP. v2.0 (Phases 5-9) added Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and E2E testing. v2.1 (Phases 10-12) added recipe discovery filters, Stripe test mode E2E, and code quality polish. v2.2 (Phases 13-15) fixes layout bugs, polishes the sign-in screen, repairs the meal generator edge function, and cleans up profile/settings. v2.3 (Phases 16-17) adds multi-kitchen switching so users can belong to multiple kitchens and have all app data scoped to the active one. v2.4 (Phases 18-22) systematically tests and validates every feature area to ensure production readiness. v3.0 (Phases 23-25) adds video recipe import from TikTok, Instagram, YouTube, and any video URL via paste or share sheet, with transcript-based AI extraction, freemium rate limiting, and a unified Kitchen tab with pantry tracking.
 
 ## Milestones
 
@@ -12,7 +12,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - ✅ **v2.2 UI Polish & Bug Fixes** — Phases 13-15 (shipped 2026-03-27)
 - ✅ **v2.3 Kitchen Switching** — Phases 16-17 (shipped 2026-03-27)
 - ✅ **v2.4 Comprehensive QA Testing** — Phases 18-22 (shipped 2026-03-27)
-- 🚧 **v3.0 Video Recipe Import** — Phases 23-24
+- 🚧 **v3.0 Video Recipe Import & Kitchen Tab** — Phases 23-25
 
 ## Phases
 
@@ -113,6 +113,23 @@ Plans:
 - [ ] 24-02-PLAN.md — Native rebuild + real-device human verification of share sheet flow
 **UI hint**: yes
 
+### Phase 25: Kitchen Tab
+**Goal**: Rename the middle Grocery tab to Kitchen with a segmented control (On Hand | Shopping List). On Hand tracks fridge/pantry items with manual add and auto-move from checked grocery items. Shopping List is the existing grocery checklist.
+**Depends on**: Phase 24
+**Requirements**: KITCHEN-01, KITCHEN-02, KITCHEN-03, KITCHEN-04, KITCHEN-05, KITCHEN-06
+**Success Criteria** (what must be TRUE):
+  1. Bottom tab bar shows "Kitchen" instead of "Grocery" with a fridge/kitchen icon
+  2. Kitchen screen has a segmented control at top with "On Hand" and "Shopping List" tabs
+  3. Shopping List tab shows the existing grocery checklist (unchanged functionality)
+  4. On Hand tab shows pantry/fridge items with name, quantity, and optional expiry
+  5. User can manually add items to On Hand
+  6. Checking off a grocery item in Shopping List automatically adds it to On Hand
+**Plans**: 2 plans
+Plans:
+- [ ] 25-01-PLAN.md — Supabase pantry_items migration, TypeScript types, pantryStore, usePantrySync
+- [ ] 25-02-PLAN.md — Rename tab to Kitchen, segmented control UI, On Hand list, add pantry sheet, grocery auto-copy
+**UI hint**: yes
+
 ## Progress
 
 **Execution Order:** Phases execute in numeric order: 23 -> 24 -> 25
@@ -143,28 +160,7 @@ Plans:
 | 22. Presence, Subscription, Notifications & Edge Cases QA | v2.4 | 2/2 | Complete | 2026-03-27 |
 | 23. Core Video Import Pipeline | v3.0 | 2/3 | Complete    | 2026-03-28 |
 | 24. Share Sheet Integration | v3.0 | 1/2 | Complete    | 2026-03-28 |
-| 25. Kitchen Tab | v3.0 | 0/0 | Not started | - |
-
-### Phase 25: Kitchen Tab
-**Goal**: Rename the middle Grocery tab to Kitchen with a segmented control (On Hand | Shopping List). On Hand tracks fridge/pantry items with manual add and auto-move from checked grocery items. Shopping List is the existing grocery checklist.
-**Depends on**: Phase 24
-**Success Criteria** (what must be TRUE):
-  1. Bottom tab bar shows "Kitchen" instead of "Grocery" with a fridge/kitchen icon
-  2. Kitchen screen has a segmented control at top with "On Hand" and "Shopping List" tabs
-  3. Shopping List tab shows the existing grocery checklist (unchanged functionality)
-  4. On Hand tab shows pantry/fridge items with name, quantity, and optional expiry
-  5. User can manually add items to On Hand
-  6. Checking off a grocery item in Shopping List automatically adds it to On Hand
-**Plans**: TBD
-**UI hint**: yes
-
-**Goal:** [To be planned]
-**Requirements**: TBD
-**Depends on:** Phase 24
-**Plans:** 0 plans
-
-Plans:
-- [ ] TBD (run /gsd:plan-phase 25 to break down)
+| 25. Kitchen Tab | v3.0 | 0/2 | Not started | - |
 
 ---
-*Last updated: 2026-03-28 after Phase 24 planning*
+*Last updated: 2026-03-29 after Phase 25 planning*
