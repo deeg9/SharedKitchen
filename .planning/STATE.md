@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
 milestone: v3.0
-milestone_name: Video Recipe Import
+milestone_name: Video Recipe Import & Kitchen Tab
 status: In progress
-stopped_at: Completed 25-01-PLAN.md
-last_updated: "2026-03-29T23:08:14Z"
+stopped_at: Completed 25-02-PLAN.md
+last_updated: "2026-03-29T23:14:17.446Z"
 progress:
   total_phases: 3
-  completed_phases: 0
-  total_plans: 6
-  completed_plans: 4
+  completed_phases: 1
+  total_plans: 7
+  completed_plans: 5
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 Phase: 25
-Plan: 01 complete
+Plan: 02 complete (phase complete)
 
 ## Performance Metrics
 
@@ -50,6 +50,8 @@ Recent decisions affecting current work:
 - [Phase 23]: VideoRateLimitError as separate class from RateLimitError for distinct UI handling
 - [Phase 24]: ShareIntentProvider placed inside GestureHandlerRootView but outside StripeProvider
 - [Phase 24]: handleImportUrl extracted as shared code path for manual paste and share sheet import
+- [Phase 25]: Default segment is Shopping List per CONTEXT.md decision
+- [Phase 25]: Dynamic import for pantryStore in groceryStore to avoid circular deps; fire-and-forget pattern for grocery-to-pantry copy
 
 ### Pending Todos
 
@@ -87,9 +89,10 @@ None yet.
 | Phase 23 P02 | 142 | 2 tasks | 2 files |
 | Phase 24 P01 | 119 | 2 tasks | 5 files |
 | Phase 25 P01 | 158s | 2 tasks | 4 files |
+| Phase 25 P02 | 193 | 2 tasks | 6 files |
 
 ## Session Continuity
 
-Last session: 2026-03-29T23:08:14Z
-Stopped at: Completed 25-01-PLAN.md
+Last session: 2026-03-29T23:14:17.443Z
+Stopped at: Completed 25-02-PLAN.md
 Resume file: None

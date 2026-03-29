@@ -48,8 +48,8 @@
 ### Kitchen Tab
 
 - [x] **KITCHEN-01**: Bottom tab bar shows "Kitchen" instead of "Grocery" with a fridge/kitchen icon
-- [ ] **KITCHEN-02**: Kitchen screen has a segmented control at top with "On Hand" and "Shopping List" tabs
-- [ ] **KITCHEN-03**: Shopping List tab shows the existing grocery checklist (unchanged functionality)
+- [x] **KITCHEN-02**: Kitchen screen has a segmented control at top with "On Hand" and "Shopping List" tabs
+- [x] **KITCHEN-03**: Shopping List tab shows the existing grocery checklist (unchanged functionality)
 - [x] **KITCHEN-04**: On Hand tab shows pantry/fridge items with name, quantity, and optional expiry
 - [x] **KITCHEN-05**: User can manually add items to On Hand
 - [x] **KITCHEN-06**: Checking off a grocery item in Shopping List automatically adds it to On Hand

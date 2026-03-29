@@ -78,7 +78,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 - [x] **Phase 23: Core Video Import Pipeline** - Edge Function video branch, Supadata transcript extraction, Gemini parsing, paste-URL flow, rate limiting (completed 2026-03-28)
 - [x] **Phase 24: Share Sheet Integration** - expo-share-intent for iOS share sheet, deep link routing to import flow (completed 2026-03-28)
-- [ ] **Phase 25: Kitchen Tab** - Rename Grocery tab to Kitchen with segmented control (On Hand | Shopping List), pantry/fridge tracking, auto-move from grocery
+- [x] **Phase 25: Kitchen Tab** - Rename Grocery tab to Kitchen with segmented control (On Hand | Shopping List), pantry/fridge tracking, auto-move from grocery (completed 2026-03-29)
 
 ## Phase Details
 
@@ -127,7 +127,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 25-01-PLAN.md — Supabase pantry_items migration, TypeScript types, pantryStore, usePantrySync
-- [ ] 25-02-PLAN.md — Rename tab to Kitchen, segmented control UI, On Hand list, add pantry sheet, grocery auto-copy
+- [x] 25-02-PLAN.md — Rename tab to Kitchen, segmented control UI, On Hand list, add pantry sheet, grocery auto-copy
 **UI hint**: yes
 
 ## Progress
@@ -160,7 +160,7 @@ Plans:
 | 22. Presence, Subscription, Notifications & Edge Cases QA | v2.4 | 2/2 | Complete | 2026-03-27 |
 | 23. Core Video Import Pipeline | v3.0 | 2/3 | Complete    | 2026-03-28 |
 | 24. Share Sheet Integration | v3.0 | 1/2 | Complete    | 2026-03-28 |
-| 25. Kitchen Tab | v3.0 | 1/2 | In Progress|  |
+| 25. Kitchen Tab | v3.0 | 2/2 | Complete   | 2026-03-29 |
 
 ---
 *Last updated: 2026-03-29 after Phase 25 planning*
