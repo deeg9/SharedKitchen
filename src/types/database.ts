@@ -437,6 +437,44 @@ export interface Database {
           updated_at?: string;
         };
       };
+      pantry_items: {
+        Row: {
+          id: string;
+          household_id: string;
+          name: string;
+          quantity: string | null;
+          unit: string | null;
+          category: string | null;
+          added_at: string;
+          expires_at: string | null;
+          created_by: string | null;
+          source_grocery_item_id: string | null;
+        };
+        Insert: {
+          id?: string;
+          household_id: string;
+          name: string;
+          quantity?: string | null;
+          unit?: string | null;
+          category?: string | null;
+          added_at?: string;
+          expires_at?: string | null;
+          created_by?: string | null;
+          source_grocery_item_id?: string | null;
+        };
+        Update: {
+          id?: string;
+          household_id?: string;
+          name?: string;
+          quantity?: string | null;
+          unit?: string | null;
+          category?: string | null;
+          added_at?: string;
+          expires_at?: string | null;
+          created_by?: string | null;
+          source_grocery_item_id?: string | null;
+        };
+      };
     };
     Views: {
       [_ in never]: never;
@@ -477,6 +515,10 @@ export type BudgetSettings = Database['public']['Tables']['budget_settings']['Ro
 export type Leftover = Database['public']['Tables']['leftovers']['Row'];
 export type LeftoverInsert = Database['public']['Tables']['leftovers']['Insert'];
 export type LeftoverUpdate = Database['public']['Tables']['leftovers']['Update'];
+
+export type PantryItem = Database['public']['Tables']['pantry_items']['Row'];
+export type PantryItemInsert = Database['public']['Tables']['pantry_items']['Insert'];
+export type PantryItemUpdate = Database['public']['Tables']['pantry_items']['Update'];
 
 /** A frequently-added grocery item derived from past lists */
 export interface FrequentItem {
