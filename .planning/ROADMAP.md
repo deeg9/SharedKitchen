@@ -148,7 +148,10 @@ Plans:
   1. After dish identification, user sees both "Find Recipes" and "Log as Meal" options -- choosing either path from a single photo
   2. User can select a specific day and meal slot (breakfast/lunch/dinner) to log the identified dish
   3. Logged meal appears on the weekly meal plan calendar and is visible to all household members
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 29-01-PLAN.md — MealSlotPickerSheet component, dual action buttons on DishIdentifiedSheet
+- [ ] 29-02-PLAN.md — Wire meal logging flow in Kitchen tab, Plan tab display fix
 **UI hint**: yes
 
 ## Progress
@@ -185,7 +188,7 @@ Plans:
 | 26. Vision Foundation | v4.0 | 3/3 | Complete    | 2026-03-30 |
 | 27. Fridge/Pantry Photo Scan | v4.0 | 1/2 | Complete    | 2026-03-30 |
 | 28. Food Photo to Recipe Discovery | v4.0 | 2/2 | Complete    | 2026-03-30 |
-| 29. Food Photo to Meal Logging | v4.0 | 0/0 | Not started | - |
+| 29. Food Photo to Meal Logging | v4.0 | 0/2 | Not started | - |
 
 ---
-*Last updated: 2026-03-30 after Phase 28 planning*
+*Last updated: 2026-03-30 after Phase 29 planning*
