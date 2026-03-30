@@ -80,27 +80,22 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 
 ### Active
 
-**v3.0: Video Recipe Import & Kitchen Tab** ✅
-- [x] Share sheet receives video URLs from TikTok, Instagram, YouTube
-- [x] Paste URL field accepts video URLs in existing import flow
-- [x] Edge Function detects video URLs and routes to transcript extraction
-- [x] Transcript extracted from video via Supadata API
-- [x] Gemini Flash parses transcript into structured recipe format
-- [x] Video import count tracked per user (3/month free, unlimited premium)
-- [x] Kitchen tab with On Hand / Shopping List segmented control
-- [x] Pantry inventory with auto-copy from checked grocery items
+**v4.0: AI Vision — Scan, Snap & Add**
+- [ ] User can photograph fridge/pantry and have items identified with brand-level detail
+- [ ] Identified items are categorized and bulk-added to On Hand inventory
+- [ ] User can photograph food/screenshot and have the dish identified by AI
+- [ ] AI presents 2-3 recipe options from web search for identified dish
+- [ ] User can import a selected recipe into their recipe book
+- [ ] User can add a photographed meal directly to a day's meal plan
 
-## Current Milestone: v3.0 Video Recipe Import & Kitchen Tab (SHIPPED)
+## Current Milestone: v4.0 AI Vision — Scan, Snap & Add
 
-**Shipped:** 2026-03-29
+**Goal:** Let users photograph their kitchen and meals to instantly populate inventory and discover recipes — camera as the primary input method.
 
-**Delivered features:**
-- Video recipe import from TikTok, Instagram, YouTube via paste URL or iOS share sheet
-- Supadata transcript extraction → Gemini Flash recipe parsing pipeline
-- Freemium rate limiting (3/month free, unlimited premium)
-- Kitchen tab with segmented control (On Hand / Shopping List)
-- Pantry/fridge inventory tracking with auto-copy from checked grocery items
-- Real-time pantry sync across household members
+**Target features:**
+- Fridge/pantry photo scan with brand-level item identification and bulk add to On Hand
+- Food photo → recipe discovery with 2-3 web search results to choose from
+- Food photo → meal plan logging for quick day-of meal tracking
 
 ### Out of Scope
 
@@ -155,4 +150,4 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-03-29 after milestone v3.0 shipped*
+*Last updated: 2026-03-30 after milestone v4.0 started*
