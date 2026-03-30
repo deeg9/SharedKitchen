@@ -13,7 +13,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - **v2.3 Kitchen Switching** — Phases 16-17 (shipped 2026-03-27)
 - **v2.4 Comprehensive QA Testing** — Phases 18-22 (shipped 2026-03-27)
 - **v3.0 Video Recipe Import & Kitchen Tab** — Phases 23-25 (shipped 2026-03-29) — [Archive](milestones/v3.0-ROADMAP.md)
-- **v4.0 AI Vision — Scan, Snap & Add** — Phases 26-29
+- ✅ **v4.0 AI Vision — Scan, Snap & Add** — Phases 26-29 (shipped 2026-03-30) — [Archive](milestones/v4.0-ROADMAP.md)
 
 ## Phases
 
@@ -84,75 +84,15 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 </details>
 
-### v4.0 AI Vision — Scan, Snap & Add (Phases 26-29)
+<details>
+<summary>✅ v4.0 AI Vision — Scan, Snap & Add (Phases 26-29) — SHIPPED 2026-03-30</summary>
 
-- [x] **Phase 26: Vision Foundation** - Shared camera capture, image compression, Edge Function with Gemini vision, rate limiting, and error handling (completed 2026-03-30)
-- [x] **Phase 27: Fridge/Pantry Photo Scan** - Photograph shelves, review AI-identified items, bulk-add to On Hand inventory (completed 2026-03-30)
-- [x] **Phase 28: Food Photo to Recipe Discovery** - Photograph food, identify dish, search web for recipes, import into recipe book (completed 2026-03-30)
-- [x] **Phase 29: Food Photo to Meal Logging** - After dish identification, log meal directly to weekly plan with day/slot selection (completed 2026-03-30)
+- [x] Phase 26: Vision Foundation (3/3 plans) — Camera capture, image compression, Edge Function with Gemini vision, rate limiting
+- [x] Phase 27: Fridge/Pantry Photo Scan (2/2 plans) — Photo scan, review screen, bulk-add, dedup, multi-photo
+- [x] Phase 28: Food Photo to Recipe Discovery (2/2 plans) — Dish identification, Serper web search, recipe import
+- [x] Phase 29: Food Photo to Meal Logging (2/2 plans) — Dual-action UX, day/slot picker, Plan tab display
 
-## Phase Details
-
-### Phase 26: Vision Foundation
-**Goal**: Users can capture photos within the app and have them processed by AI vision, with shared infrastructure that all vision features build on
-**Depends on**: Phase 25
-**Requirements**: VIS-01, VIS-02, VIS-03, VIS-04, VIS-05
-**Success Criteria** (what must be TRUE):
-  1. User can open a camera sheet from within the app, take a photo or select from gallery, and see the captured image
-  2. Camera permission is requested with a friendly explanation before the system prompt appears, and denied permission shows a helpful recovery state
-  3. Captured images are compressed on-device so that large iPhone photos do not cause upload failures or excessive latency
-  4. Edge Function accepts images and returns structured AI analysis results, with vision calls tracked and rate-limited per user (free-tier caps enforced server-side)
-**Plans:** 3/3 plans complete
-Plans:
-- [x] 26-01-PLAN.md — Client vision lib, camera components, permission hook, image compression
-- [x] 26-02-PLAN.md — analyze-food-photo Edge Function with Gemini vision and rate limiting
-- [x] 26-03-PLAN.md — Kitchen tab camera FAB integration and end-to-end wiring
-**UI hint**: yes
-
-### Phase 27: Fridge/Pantry Photo Scan
-**Goal**: Users can photograph their fridge or pantry shelves and bulk-add identified items to their On Hand inventory
-**Depends on**: Phase 26
-**Requirements**: SCAN-01, SCAN-02, SCAN-03, SCAN-04, SCAN-05
-**Success Criteria** (what must be TRUE):
-  1. User can photograph fridge/pantry shelves and see a list of AI-identified items with brand-level detail, quantities, and categories
-  2. User can review the identified items on a confirmation screen -- editing names, removing incorrect items, and adding missed items before saving
-  3. Confirmed items are bulk-added to On Hand inventory with correct categories, and appear immediately via real-time sync for all household members
-  4. Items that already exist in On Hand are flagged as duplicates on the review screen rather than silently creating double entries
-  5. User can take multiple photos (different shelves/areas) and merge all results into a single review screen before saving
-**Plans:** 2/2 plans complete
-Plans:
-- [x] 27-01-PLAN.md — Scan types, duplicate detection, bulkAddPantryItems store method
-- [ ] 27-02-PLAN.md — ScanReviewScreen UI, Kitchen tab wiring, multi-photo support
-**UI hint**: yes
-
-### Phase 28: Food Photo to Recipe Discovery
-**Goal**: Users can photograph food or a screenshot and discover recipes for the identified dish
-**Depends on**: Phase 26
-**Requirements**: RCPE-01, RCPE-02, RCPE-03, RCPE-04
-**Success Criteria** (what must be TRUE):
-  1. User can photograph food or a screenshot and see the AI-identified dish name with a confidence indicator
-  2. User can correct the dish name if the AI identification is wrong before searching for recipes
-  3. App presents 2-3 recipe options from web search with title, source, and thumbnail for the identified dish
-  4. User can select a recipe option and import it into their recipe book via the existing import pipeline
-**Plans:** 2/2 plans complete
-Plans:
-- [x] 28-01-PLAN.md — search-recipes Edge Function (Serper.dev), client searchRecipes helper, types
-- [x] 28-02-PLAN.md — DishIdentifiedSheet, RecipeResultsSheet UI, Kitchen tab identify intent wiring
-**UI hint**: yes
-
-### Phase 29: Food Photo to Meal Logging
-**Goal**: Users can log a photographed meal directly to their weekly plan without needing a full recipe
-**Depends on**: Phase 26, Phase 28
-**Requirements**: MEAL-01, MEAL-02, MEAL-03
-**Success Criteria** (what must be TRUE):
-  1. After dish identification, user sees both "Find Recipes" and "Log as Meal" options -- choosing either path from a single photo
-  2. User can select a specific day and meal slot (breakfast/lunch/dinner) to log the identified dish
-  3. Logged meal appears on the weekly meal plan calendar and is visible to all household members
-**Plans:** 2/2 plans complete
-Plans:
-- [x] 29-01-PLAN.md — MealSlotPickerSheet component, dual action buttons on DishIdentifiedSheet
-- [x] 29-02-PLAN.md — Wire meal logging flow in Kitchen tab, Plan tab display fix
-**UI hint**: yes
+</details>
 
 ## Progress
 

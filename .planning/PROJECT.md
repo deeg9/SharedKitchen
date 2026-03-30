@@ -2,7 +2,7 @@
 
 ## What This Is
 
-SharedKitchen is a collaborative dinner planning mobile app for couples, roommates, and families. It combines a shared weekly meal calendar, AI-powered recipe library with web extraction and meal generation, auto-generated grocery lists with real-time sync and live presence, push notifications, Stripe-powered premium subscriptions, fullscreen cooking mode with step-by-step timers, and budget tracking — all in one warm, inviting interface. Built with React Native + Expo for iOS, backed by Supabase.
+SharedKitchen is a collaborative dinner planning mobile app for couples, roommates, and families. It combines a shared weekly meal calendar, AI-powered recipe library with web/video extraction and meal generation, auto-generated grocery lists with real-time sync and live presence, AI vision features (fridge scanning, food photo recipe discovery, photo meal logging), push notifications, Stripe-powered premium subscriptions, fullscreen cooking mode with step-by-step timers, and budget tracking — all in one warm, inviting interface. Built with React Native + Expo for iOS, backed by Supabase.
 
 ## Core Value
 
@@ -10,9 +10,9 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 
 ## Current State
 
-**Shipped:** v3.0 Video Recipe Import & Kitchen Tab (2026-03-29)
-**Codebase:** ~27,500 LOC across 206 source files (TypeScript, SQL, YAML)
-**Tech stack:** React Native + Expo (iOS), Supabase (Postgres, Auth, Realtime, Storage, Edge Functions), Gemini Flash, Supadata, Stripe, expo-share-intent, expo-notifications, Maestro E2E
+**Shipped:** v4.0 AI Vision — Scan, Snap & Add (2026-03-30)
+**Codebase:** ~29,800 LOC across 220+ source files (TypeScript, SQL, YAML)
+**Tech stack:** React Native + Expo (iOS), Supabase (Postgres, Auth, Realtime, Storage, Edge Functions), Gemini 2.5 Flash (vision + text), Supadata, Serper.dev, Stripe, expo-share-intent, expo-image-manipulator, expo-notifications, Maestro E2E
 
 ## Requirements
 
@@ -78,24 +78,33 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 - ✓ Pantry/fridge inventory with auto-copy from checked grocery items — v3.0
 - ✓ Real-time pantry sync via Supabase Realtime — v3.0
 
+- ✓ Camera photo capture with permission pre-prompt and compression — v4.0
+- ✓ analyze-food-photo Edge Function with Gemini 2.5 Flash vision (scan/identify intents) — v4.0
+- ✓ Vision-specific rate limiting (5/month free, unlimited premium) — v4.0
+- ✓ Fridge/pantry photo scan with brand-level item identification — v4.0
+- ✓ Editable scan review screen with bulk-add to On Hand inventory — v4.0
+- ✓ Duplicate detection via normalized name matching against existing pantry — v4.0
+- ✓ Multi-photo scan (scan multiple shelves, merge before saving) — v4.0
+- ✓ Food photo dish identification with confidence levels — v4.0
+- ✓ Recipe web search via Serper.dev (2-3 results) — v4.0
+- ✓ Recipe import from search results via existing parseRecipeUrl pipeline — v4.0
+- ✓ Dual-action after dish ID: Find Recipes or Log as Meal — v4.0
+- ✓ Photo meal logging to weekly plan (day + slot picker) — v4.0
+- ✓ Recipe-less meals displayed on Plan tab via notes fallback — v4.0
+
 ### Active
 
-**v4.0: AI Vision — Scan, Snap & Add**
-- [ ] User can photograph fridge/pantry and have items identified with brand-level detail
-- [ ] Identified items are categorized and bulk-added to On Hand inventory
-- [ ] User can photograph food/screenshot and have the dish identified by AI
-- [ ] AI presents 2-3 recipe options from web search for identified dish
-- [ ] User can import a selected recipe into their recipe book
-- [ ] User can add a photographed meal directly to a day's meal plan
+(None — planning next milestone)
 
-## Current Milestone: v4.0 AI Vision — Scan, Snap & Add
+## Current Milestone: v4.0 AI Vision — Scan, Snap & Add (SHIPPED)
 
-**Goal:** Let users photograph their kitchen and meals to instantly populate inventory and discover recipes — camera as the primary input method.
+**Shipped:** 2026-03-30
 
-**Target features:**
-- Fridge/pantry photo scan with brand-level item identification and bulk add to On Hand
-- Food photo → recipe discovery with 2-3 web search results to choose from
-- Food photo → meal plan logging for quick day-of meal tracking
+**Delivered features:**
+- Camera-based vision infrastructure with Gemini 2.5 Flash (scan + identify intents)
+- Fridge/pantry photo scan with brand-level identification, editable review, dedup, multi-photo, bulk-add
+- Food photo → recipe discovery with Serper.dev web search and existing import pipeline
+- Food photo → meal logging with day/slot picker and Plan tab display
 
 ### Out of Scope
 
@@ -144,10 +153,15 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 | Local notifications for Phase 6 | No server push needed for cooking/leftover/budget | ✓ Good — simpler architecture |
 | Supabase Presence for avatars | Separate from postgres_changes channels | ✓ Good — clean separation of concerns |
 | Maestro over Detox for E2E | YAML-based, no project deps, EAS Workflows support | ✓ Good — 18 flows written quickly |
+| Gemini 2.5 Flash for vision over GPT-5 | Already integrated, 8x cheaper for image analysis | ✓ Good — single API key for text + vision |
+| Single analyze-food-photo Edge Function with intent param | 90% shared code (auth, rate limit, Gemini) | ✓ Good — clean extension for scan vs identify |
+| Serper.dev for recipe web search | 2,500 free queries, structured results, $0.001/query | ✓ Good — cheaper and simpler than Spoonacular |
+| expo-image-manipulator for client compression | Part of Expo SDK, no native rebuild needed | ✓ Good — 1024px JPEG 0.6 keeps payloads small |
+| Base64 in JSON body (not Storage) | Images are transient, not persisted | ✓ Good — simpler architecture, no cleanup |
 
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-03-30 after milestone v4.0 started*
+*Last updated: 2026-03-30 after v4.0 milestone shipped*

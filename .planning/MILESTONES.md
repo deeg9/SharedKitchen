@@ -1,5 +1,21 @@
 # Milestones
 
+## v4.0 AI Vision — Scan, Snap & Add (Shipped: 2026-03-30)
+
+**Phases completed:** 4 phases, 9 plans, 13 tasks
+
+**Key accomplishments:**
+
+- Image compression utility, analyzePhoto Edge Function client, camera permission hook, and 4 reusable camera UI components for vision feature foundation
+- analyze-food-photo Edge Function with Gemini 2.5 Flash vision, intent-based prompt routing (scan/identify), and 5/month free rate limiting via ai_usage_log
+- ScannedItem types, duplicate detection via normalized substring matching, and bulkAddPantryItems with optimistic batch insert
+- Serper.dev recipe search Edge Function with 20/month free rate limiting and typed client helper
+- Dish identification and recipe results bottom sheets with Kitchen tab camera routing for scan vs identify intents
+- Day + meal slot picker bottom sheet with dual-path UX (Find Recipes / Log as Meal) on dish identification
+- End-to-end photo-to-meal-plan flow wiring: DishIdentifiedSheet -> MealSlotPickerSheet -> planStore.assignRecipe with notes-based Plan tab display
+
+---
+
 ## v2.0 AI, Payments & Polish (Shipped: 2026-03-26)
 
 **Phases completed:** 5 phases, 13 plans, 27 tasks
