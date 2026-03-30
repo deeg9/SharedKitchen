@@ -48,7 +48,14 @@
           "icon": "./assets/icon.png",
           "color": "#334537"
         }
-      ]
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "SharedKitchen uses your camera to scan food and identify dishes."
+        }
+      ],
+      "expo-image-manipulator"
     ],
     "extra": {
       "router": {},
