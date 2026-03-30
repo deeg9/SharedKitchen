@@ -32,8 +32,8 @@ Requirements for AI Vision — Scan, Snap & Add. Each maps to roadmap phases.
 
 ### Food Photo → Meal Logging
 
-- [ ] **MEAL-01**: After dish identification, user can choose between "Find Recipes" or "Log as Meal"
-- [ ] **MEAL-02**: User can select a day and meal slot (breakfast/lunch/dinner) to log the identified dish
+- [x] **MEAL-01**: After dish identification, user can choose between "Find Recipes" or "Log as Meal"
+- [x] **MEAL-02**: User can select a day and meal slot (breakfast/lunch/dinner) to log the identified dish
 - [ ] **MEAL-03**: Logged meal appears on the weekly meal plan calendar
 
 ## Future Requirements
@@ -73,8 +73,8 @@ Requirements for AI Vision — Scan, Snap & Add. Each maps to roadmap phases.
 | RCPE-02 | Phase 28 | Complete |
 | RCPE-03 | Phase 28 | Complete |
 | RCPE-04 | Phase 28 | Complete |
-| MEAL-01 | Phase 29 | Pending |
-| MEAL-02 | Phase 29 | Pending |
+| MEAL-01 | Phase 29 | Complete |
+| MEAL-02 | Phase 29 | Complete |
 | MEAL-03 | Phase 29 | Pending |
 
 **Coverage:**
