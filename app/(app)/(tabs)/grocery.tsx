@@ -35,6 +35,9 @@ import { CameraPermissionCard } from '../../../src/components/camera/CameraPermi
 import { VisionLoadingOverlay } from '../../../src/components/camera/VisionLoadingOverlay';
 import { analyzePhoto, VisionRateLimitError } from '../../../src/lib/vision';
 import { ScanReviewScreen } from '../../../src/components/scan/ScanReviewScreen';
+import { DishIdentifiedSheet } from '../../../src/components/recipe-discovery/DishIdentifiedSheet';
+import { RecipeResultsSheet } from '../../../src/components/recipe-discovery/RecipeResultsSheet';
+import { DishIdentification, RecipeSearchResult } from '../../../src/types/recipeSearch';
 
 const SECTION_ORDER = ['Proteins', 'Produce', 'Dairy & Eggs', 'Pantry', 'Other'];
 
@@ -49,6 +52,10 @@ export default function GroceryScreen() {
   const [cameraSheetOpen, setCameraSheetOpen] = useState(false);
   const [visionLoading, setVisionLoading] = useState(false);
   const [scanResults, setScanResults] = useState<Array<{ name: string; category?: string; quantity?: string; brand?: string }> | null>(null);
+  const [dishResult, setDishResult] = useState<DishIdentification | null>(null);
+  const [recipeResults, setRecipeResults] = useState<RecipeSearchResult[] | null>(null);
+  const [dishSheetOpen, setDishSheetOpen] = useState(false);
+  const [recipeSheetOpen, setRecipeSheetOpen] = useState(false);
   const { showPrePrompt, permissionDenied, checkAndPrompt, requestAfterPrePrompt, dismissPrePrompt } = useCameraPermission();
   const initCategories = useGroceryCategoryStore((s) => s.initialize);
 
@@ -165,13 +172,24 @@ export default function GroceryScreen() {
   const handleImageCaptured = useCallback(async (uri: string) => {
     setCameraSheetOpen(false);
     setVisionLoading(true);
+    const intent = activeSegment === 'onhand' ? 'scan' : 'identify';
     try {
-      const result = await analyzePhoto(uri, 'scan');
+      const result = await analyzePhoto(uri, intent);
       setVisionLoading(false);
-      if (result.items && result.items.length > 0) {
-        setScanResults(result.items);
+      if (intent === 'scan') {
+        if (result.items && result.items.length > 0) {
+          setScanResults(result.items);
+        } else {
+          Alert.alert('No items found', 'We couldn\'t identify any food items in that photo. Try taking a clearer photo of your fridge or pantry shelves.');
+        }
       } else {
-        Alert.alert('No items found', 'We couldn\'t identify any food items in that photo. Try taking a clearer photo of your fridge or pantry shelves.');
+        // identify intent
+        if (result.dish) {
+          setDishResult({ name: result.dish.name, confidence: result.dish.confidence, description: result.dish.description });
+          setDishSheetOpen(true);
+        } else {
+          Alert.alert('Could not identify dish', 'Try taking a clearer photo of the food.');
+        }
       }
     } catch (err: unknown) {
       setVisionLoading(false);
@@ -181,7 +199,7 @@ export default function GroceryScreen() {
         Alert.alert('Something went wrong', 'We couldn\'t analyze that photo. Please try again with a clearer image.');
       }
     }
-  }, []);
+  }, [activeSegment]);
 
   const handleScanClose = useCallback(() => {
     setScanResults(null);
@@ -199,6 +217,29 @@ export default function GroceryScreen() {
       setCameraSheetOpen(true);
     }
   }, [requestAfterPrePrompt]);
+
+  const handleSearchResults = useCallback((results: RecipeSearchResult[]) => {
+    setRecipeResults(results);
+    setDishSheetOpen(false);
+    setRecipeSheetOpen(true);
+  }, []);
+
+  const handleDishSheetClose = useCallback(() => {
+    setDishSheetOpen(false);
+    setDishResult(null);
+  }, []);
+
+  const handleRecipeSheetClose = useCallback(() => {
+    setRecipeSheetOpen(false);
+    setRecipeResults(null);
+    setDishSheetOpen(true);
+  }, []);
+
+  const handleImportComplete = useCallback(() => {
+    setRecipeSheetOpen(false);
+    setRecipeResults(null);
+    setDishResult(null);
+  }, []);
 
   const summaryData = summary();
   const { sections, completed } = groupedItems();
@@ -248,6 +289,19 @@ export default function GroceryScreen() {
         onImageCaptured={handleImageCaptured}
       />
       <VisionLoadingOverlay visible={visionLoading} />
+      <DishIdentifiedSheet
+        isOpen={dishSheetOpen}
+        dish={dishResult}
+        onClose={handleDishSheetClose}
+        onSearchResults={handleSearchResults}
+      />
+      <RecipeResultsSheet
+        isOpen={recipeSheetOpen}
+        results={recipeResults ?? []}
+        dishName={dishResult?.name ?? ''}
+        onClose={handleRecipeSheetClose}
+        onImportComplete={handleImportComplete}
+      />
     </>
   );
 
