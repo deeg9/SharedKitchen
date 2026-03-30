@@ -59,29 +59,29 @@ Requirements for AI Vision — Scan, Snap & Add. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| VIS-01 | — | Pending |
-| VIS-02 | — | Pending |
-| VIS-03 | — | Pending |
-| VIS-04 | — | Pending |
-| VIS-05 | — | Pending |
-| SCAN-01 | — | Pending |
-| SCAN-02 | — | Pending |
-| SCAN-03 | — | Pending |
-| SCAN-04 | — | Pending |
-| SCAN-05 | — | Pending |
-| RCPE-01 | — | Pending |
-| RCPE-02 | — | Pending |
-| RCPE-03 | — | Pending |
-| RCPE-04 | — | Pending |
-| MEAL-01 | — | Pending |
-| MEAL-02 | — | Pending |
-| MEAL-03 | — | Pending |
+| VIS-01 | Phase 26 | Pending |
+| VIS-02 | Phase 26 | Pending |
+| VIS-03 | Phase 26 | Pending |
+| VIS-04 | Phase 26 | Pending |
+| VIS-05 | Phase 26 | Pending |
+| SCAN-01 | Phase 27 | Pending |
+| SCAN-02 | Phase 27 | Pending |
+| SCAN-03 | Phase 27 | Pending |
+| SCAN-04 | Phase 27 | Pending |
+| SCAN-05 | Phase 27 | Pending |
+| RCPE-01 | Phase 28 | Pending |
+| RCPE-02 | Phase 28 | Pending |
+| RCPE-03 | Phase 28 | Pending |
+| RCPE-04 | Phase 28 | Pending |
+| MEAL-01 | Phase 29 | Pending |
+| MEAL-02 | Phase 29 | Pending |
+| MEAL-03 | Phase 29 | Pending |
 
 **Coverage:**
 - v4.0 requirements: 17 total
-- Mapped to phases: 0
-- Unmapped: 17 (pending roadmap creation)
+- Mapped to phases: 17
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-30*
-*Last updated: 2026-03-30 after initial definition*
+*Last updated: 2026-03-30 after roadmap creation*

@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: AI Vision — Scan, Snap & Add
 status: In progress
-stopped_at: Defining requirements
+stopped_at: Roadmap created, ready to plan Phase 26
 last_updated: "2026-03-30T00:00:00.000Z"
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -19,14 +19,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-30)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Defining requirements for v4.0
+**Current focus:** Phase 26: Vision Foundation (v4.0)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-30 — Milestone v4.0 started
+Phase: 26 of 29 (Vision Foundation) — first of 4 phases in v4.0
+Plan: 0 of 0 in current phase (not yet planned)
+Status: Ready to plan
+Last activity: 2026-03-30 — v4.0 roadmap created with 4 phases covering 17 requirements
+
+Progress: [██████████████████████████░░░░] 86% (25/29 phases complete)
 
 ## Performance Metrics
 
@@ -43,13 +45,11 @@ Last activity: 2026-03-30 — Milestone v4.0 started
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [v3.0]: Supadata chosen over SocialKit for transcript extraction (single REST endpoint, all platforms, $17/mo at scale)
-- [v3.0]: Gemini Flash for transcript parsing (already integrated, cheaper for long text)
-- [v3.0]: 2-phase structure: pipeline first via paste-URL (Phase 23), share sheet second requiring native rebuild (Phase 24)
-- [v3.0]: Extend existing parse-recipe-url Edge Function with video branch (same response shape, same auth)
-- [v3.0]: Free tier: 3 video imports/month, unlimited premium -- uses existing ai_usage_log table
-- [Phase 25]: Default segment is Shopping List per CONTEXT.md decision
-- [Phase 25]: Dynamic import for pantryStore in groceryStore to avoid circular deps; fire-and-forget pattern for grocery-to-pantry copy
+- [v4.0]: Gemini 2.5 Flash for vision over OpenAI (already integrated, 8x cheaper)
+- [v4.0]: Single Edge Function with intent parameter over separate functions (90% shared code)
+- [v4.0]: Serper.dev for recipe web search in Phase 28 ($0.001/query, 2,500 free)
+- [v4.0]: Mandatory user review screen before any auto-add (60-75% scan accuracy)
+- [v4.0]: expo-image-manipulator for on-device compression (already in Expo SDK)
 
 ### Pending Todos
 
@@ -57,6 +57,8 @@ None yet.
 
 ### Blockers/Concerns
 
+- Phase 28 (Recipe Discovery): Validate Serper.dev search quality with 10-20 dish names before planning
+- Phase 27 (Fridge Scan): Validate Gemini pantry scan prompts against real fridge photos in AI Studio before coding
 - Apple External Purchase Entitlement must be applied for before Stripe checkout ships
 - Manual recipe creation does not set category field -- filters won't work for manually-added recipes
 
@@ -73,5 +75,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-30T00:00:00.000Z
-Stopped at: Defining requirements
+Stopped at: Roadmap created, ready to plan Phase 26
 Resume file: None

@@ -2,7 +2,7 @@
 
 ## Overview
 
-SharedKitchen delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP. v2.0 (Phases 5-9) added Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and E2E testing. v2.1 (Phases 10-12) added recipe discovery filters, Stripe test mode E2E, and code quality polish. v2.2 (Phases 13-15) fixes layout bugs, polishes the sign-in screen, repairs the meal generator edge function, and cleans up profile/settings. v2.3 (Phases 16-17) adds multi-kitchen switching so users can belong to multiple kitchens and have all app data scoped to the active one. v2.4 (Phases 18-22) systematically tests and validates every feature area to ensure production readiness. v3.0 (Phases 23-25) adds video recipe import from TikTok, Instagram, YouTube, and any video URL via paste or share sheet, with transcript-based AI extraction, freemium rate limiting, and a unified Kitchen tab with pantry tracking.
+SharedKitchen delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP. v2.0 (Phases 5-9) added Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and E2E testing. v2.1 (Phases 10-12) added recipe discovery filters, Stripe test mode E2E, and code quality polish. v2.2 (Phases 13-15) fixes layout bugs, polishes the sign-in screen, repairs the meal generator edge function, and cleans up profile/settings. v2.3 (Phases 16-17) adds multi-kitchen switching so users can belong to multiple kitchens and have all app data scoped to the active one. v2.4 (Phases 18-22) systematically tests and validates every feature area to ensure production readiness. v3.0 (Phases 23-25) adds video recipe import from TikTok, Instagram, YouTube, and any video URL via paste or share sheet, with transcript-based AI extraction, freemium rate limiting, and a unified Kitchen tab with pantry tracking. v4.0 (Phases 26-29) adds AI vision features: camera-based fridge/pantry scanning to bulk-add inventory, food photo identification for recipe discovery, and meal plan logging from photos.
 
 ## Milestones
 
@@ -13,11 +13,12 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - ✅ **v2.3 Kitchen Switching** — Phases 16-17 (shipped 2026-03-27)
 - ✅ **v2.4 Comprehensive QA Testing** — Phases 18-22 (shipped 2026-03-27)
 - ✅ **v3.0 Video Recipe Import & Kitchen Tab** — Phases 23-25 (shipped 2026-03-29) — [Archive](milestones/v3.0-ROADMAP.md)
+- **v4.0 AI Vision — Scan, Snap & Add** — Phases 26-29
 
 ## Phases
 
 <details>
-<summary>✅ v1.0 MVP (Phases 1-4) — SHIPPED 2026-03-23</summary>
+<summary>v1.0 MVP (Phases 1-4) — SHIPPED 2026-03-23</summary>
 
 - [x] Phase 1: Foundation (3/3 plans) — Auth, households, design system, navigation
 - [x] Phase 2: Core Features (3/3 plans) — Recipes, meal planning, grocery lists, real-time sync
@@ -27,7 +28,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 </details>
 
 <details>
-<summary>✅ v2.0 AI, Payments & Polish (Phases 5-9) — SHIPPED 2026-03-26</summary>
+<summary>v2.0 AI, Payments & Polish (Phases 5-9) — SHIPPED 2026-03-26</summary>
 
 - [x] Phase 5: AI Fix & Payment Foundation (3/3 plans) — gpt-5-mini, Stripe subscriptions, server-authoritative gating
 - [x] Phase 6: Push Notifications (2/2 plans) — Cooking reminders, leftover alerts, budget warnings
@@ -38,7 +39,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 </details>
 
 <details>
-<summary>✅ v2.1 Discovery, Checkout & Polish (Phases 10-12) — SHIPPED 2026-03-26</summary>
+<summary>v2.1 Discovery, Checkout & Polish (Phases 10-12) — SHIPPED 2026-03-26</summary>
 
 - [x] Phase 10: Recipe Discovery (2/2 plans) — Unify categories, FilterBar, verify filtering end-to-end
 - [x] Phase 11: Stripe Test Mode E2E (2/2 plans) — Package install, webhook fix, env docs, checkout flow
@@ -47,7 +48,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 </details>
 
 <details>
-<summary>✅ v2.2 UI Polish & Bug Fixes (Phases 13-15) — SHIPPED 2026-03-27</summary>
+<summary>v2.2 UI Polish & Bug Fixes (Phases 13-15) — SHIPPED 2026-03-27</summary>
 
 - [x] Phase 13: Layout & Safe Areas (2/2 plans) — Fix safe area violations, recipe detail layout, and filter bar z-index
 - [x] Phase 14: Edge Function & Auth Polish (2/2 plans) — Repair generate-meal endpoint and redesign sign-in screen
@@ -56,7 +57,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 </details>
 
 <details>
-<summary>✅ v2.3 Kitchen Switching (Phases 16-17) — SHIPPED 2026-03-27</summary>
+<summary>v2.3 Kitchen Switching (Phases 16-17) — SHIPPED 2026-03-27</summary>
 
 - [x] Phase 16: Kitchen Switcher & Management (1/1 plans) — Kitchen store, switcher dropdown on profile, create/join flows
 - [x] Phase 17: Data Scoping (1/1 plans) — Wire all Zustand stores to filter by active household_id, re-fetch on switch
@@ -64,7 +65,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 </details>
 
 <details>
-<summary>✅ v2.4 Comprehensive QA Testing (Phases 18-22) — SHIPPED 2026-03-27</summary>
+<summary>v2.4 Comprehensive QA Testing (Phases 18-22) — SHIPPED 2026-03-27</summary>
 
 - [x] Phase 18: Auth, Onboarding & Household QA (2/2 plans) — Test auth flows, onboarding, profile management, and household create/invite/join
 - [x] Phase 19: Recipe Browsing & Detail QA (2/2 plans) — Test recipe list, search, filters, detail display, ratings, favorites, notes, scaling
@@ -74,65 +75,75 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 </details>
 
-### v3.0 Video Recipe Import & Kitchen Tab (Phases 23-25)
+<details>
+<summary>v3.0 Video Recipe Import & Kitchen Tab (Phases 23-25) — SHIPPED 2026-03-29</summary>
 
-- [x] **Phase 23: Core Video Import Pipeline** - Edge Function video branch, Supadata transcript extraction, Gemini parsing, paste-URL flow, rate limiting (completed 2026-03-28)
-- [x] **Phase 24: Share Sheet Integration** - expo-share-intent for iOS share sheet, deep link routing to import flow (completed 2026-03-28)
-- [x] **Phase 25: Kitchen Tab** - Rename Grocery tab to Kitchen with segmented control (On Hand | Shopping List), pantry/fridge tracking, auto-move from grocery (completed 2026-03-29)
+- [x] Phase 23: Core Video Import Pipeline (3/3 plans) — Edge Function video branch, Supadata transcript extraction, Gemini parsing, paste-URL flow, rate limiting
+- [x] Phase 24: Share Sheet Integration (2/2 plans) — expo-share-intent for iOS share sheet, deep link routing to import flow
+- [x] Phase 25: Kitchen Tab (2/2 plans) — Rename Grocery to Kitchen, segmented control, On Hand pantry tracking, grocery auto-copy
+
+</details>
+
+### v4.0 AI Vision — Scan, Snap & Add (Phases 26-29)
+
+- [ ] **Phase 26: Vision Foundation** - Shared camera capture, image compression, Edge Function with Gemini vision, rate limiting, and error handling
+- [ ] **Phase 27: Fridge/Pantry Photo Scan** - Photograph shelves, review AI-identified items, bulk-add to On Hand inventory
+- [ ] **Phase 28: Food Photo to Recipe Discovery** - Photograph food, identify dish, search web for recipes, import into recipe book
+- [ ] **Phase 29: Food Photo to Meal Logging** - After dish identification, log meal directly to weekly plan with day/slot selection
 
 ## Phase Details
 
-### Phase 23: Core Video Import Pipeline
-**Goal**: Users can paste a video URL from TikTok, Instagram, YouTube, or any video source and get a complete recipe extracted from the video's transcript
-**Depends on**: Phase 22 (last phase of v2.4)
-**Requirements**: VURL-01, VURL-02, VURL-03, VURL-04, TRANS-01, TRANS-02, TRANS-03, PARSE-01, PARSE-02, PARSE-03, IMPORT-01, IMPORT-02, IMPORT-03, IMPORT-04, RATE-01, RATE-02, RATE-03, RATE-04
+### Phase 26: Vision Foundation
+**Goal**: Users can capture photos within the app and have them processed by AI vision, with shared infrastructure that all vision features build on
+**Depends on**: Phase 25
+**Requirements**: VIS-01, VIS-02, VIS-03, VIS-04, VIS-05
 **Success Criteria** (what must be TRUE):
-  1. User can paste a TikTok, Instagram Reel, YouTube, or generic video URL into the existing recipe import field and the app routes it to the video import pipeline instead of HTML extraction
-  2. After pasting a video URL, the user sees a loading state, then a preview of the extracted recipe with title, ingredients, steps, and metadata -- with an option to edit before saving
-  3. Non-recipe videos (e.g., a dance video or news clip) show a clear error message instead of a hallucinated recipe
-  4. Free users see a usage counter ("2 of 3 imports used this month") and are blocked with an upgrade prompt after 3 video imports per month; premium users import unlimited videos
-  5. Saved video-imported recipes include a link back to the original source video
-**Plans**: 3 plans
-Plans:
-- [x] 23-01-PLAN.md — Video URL detection (TDD) + Edge Function video branch (Supadata + Gemini + rate limiting)
-- [x] 23-02-PLAN.md — Client ai.ts video routing + add-recipe UI (progress, usage counter, upgrade prompt)
-- [ ] 23-03-PLAN.md — Human verification of end-to-end video import flow
+  1. User can open a camera sheet from within the app, take a photo or select from gallery, and see the captured image
+  2. Camera permission is requested with a friendly explanation before the system prompt appears, and denied permission shows a helpful recovery state
+  3. Captured images are compressed on-device so that large iPhone photos do not cause upload failures or excessive latency
+  4. Edge Function accepts images and returns structured AI analysis results, with vision calls tracked and rate-limited per user (free-tier caps enforced server-side)
+**Plans**: TBD
 **UI hint**: yes
 
-### Phase 24: Share Sheet Integration
-**Goal**: Users can share a video URL from TikTok, Instagram, or YouTube directly to SharedKitchen via the iOS share sheet, triggering video import automatically
-**Depends on**: Phase 23
-**Requirements**: SHARE-01, SHARE-02, SHARE-03
+### Phase 27: Fridge/Pantry Photo Scan
+**Goal**: Users can photograph their fridge or pantry shelves and bulk-add identified items to their On Hand inventory
+**Depends on**: Phase 26
+**Requirements**: SCAN-01, SCAN-02, SCAN-03, SCAN-04, SCAN-05
 **Success Criteria** (what must be TRUE):
-  1. SharedKitchen appears as an option in the iOS share sheet when sharing a URL from TikTok, Instagram, or YouTube
-  2. Tapping SharedKitchen in the share sheet opens the app and immediately begins the video import flow with the shared URL pre-filled
-  3. Share sheet import works correctly whether the app was in the foreground, background, or not running at all
-**Plans**: 2 plans
-Plans:
-- [x] 24-01-PLAN.md — Install expo-share-intent, configure iOS share extension, wire ShareIntentProvider + auto-import
-- [ ] 24-02-PLAN.md — Native rebuild + real-device human verification of share sheet flow
+  1. User can photograph fridge/pantry shelves and see a list of AI-identified items with brand-level detail, quantities, and categories
+  2. User can review the identified items on a confirmation screen -- editing names, removing incorrect items, and adding missed items before saving
+  3. Confirmed items are bulk-added to On Hand inventory with correct categories, and appear immediately via real-time sync for all household members
+  4. Items that already exist in On Hand are flagged as duplicates on the review screen rather than silently creating double entries
+  5. User can take multiple photos (different shelves/areas) and merge all results into a single review screen before saving
+**Plans**: TBD
 **UI hint**: yes
 
-### Phase 25: Kitchen Tab
-**Goal**: Rename the middle Grocery tab to Kitchen with a segmented control (On Hand | Shopping List). On Hand tracks fridge/pantry items with manual add and auto-move from checked grocery items. Shopping List is the existing grocery checklist.
-**Depends on**: Phase 24
-**Requirements**: KITCHEN-01, KITCHEN-02, KITCHEN-03, KITCHEN-04, KITCHEN-05, KITCHEN-06
+### Phase 28: Food Photo to Recipe Discovery
+**Goal**: Users can photograph food or a screenshot and discover recipes for the identified dish
+**Depends on**: Phase 26
+**Requirements**: RCPE-01, RCPE-02, RCPE-03, RCPE-04
 **Success Criteria** (what must be TRUE):
-  1. Bottom tab bar shows "Kitchen" instead of "Grocery" with a fridge/kitchen icon
-  2. Kitchen screen has a segmented control at top with "On Hand" and "Shopping List" tabs
-  3. Shopping List tab shows the existing grocery checklist (unchanged functionality)
-  4. On Hand tab shows pantry/fridge items with name, quantity, and optional expiry
-  5. User can manually add items to On Hand
-  6. Checking off a grocery item in Shopping List automatically adds it to On Hand
-**Plans**: 2 plans
-Plans:
-- [x] 25-01-PLAN.md — Supabase pantry_items migration, TypeScript types, pantryStore, usePantrySync
-- [x] 25-02-PLAN.md — Rename tab to Kitchen, segmented control UI, On Hand list, add pantry sheet, grocery auto-copy
+  1. User can photograph food or a screenshot and see the AI-identified dish name with a confidence indicator
+  2. User can correct the dish name if the AI identification is wrong before searching for recipes
+  3. App presents 2-3 recipe options from web search with title, source, and thumbnail for the identified dish
+  4. User can select a recipe option and import it into their recipe book via the existing import pipeline
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 29: Food Photo to Meal Logging
+**Goal**: Users can log a photographed meal directly to their weekly plan without needing a full recipe
+**Depends on**: Phase 26, Phase 28
+**Requirements**: MEAL-01, MEAL-02, MEAL-03
+**Success Criteria** (what must be TRUE):
+  1. After dish identification, user sees both "Find Recipes" and "Log as Meal" options -- choosing either path from a single photo
+  2. User can select a specific day and meal slot (breakfast/lunch/dinner) to log the identified dish
+  3. Logged meal appears on the weekly meal plan calendar and is visible to all household members
+**Plans**: TBD
 **UI hint**: yes
 
 ## Progress
 
-**Execution Order:** Phases execute in numeric order: 23 -> 24 -> 25
+**Execution Order:** Phases execute in numeric order: 26 -> 27 -> 28 -> 29
 
 | Phase | Milestone | Plans | Status | Completed |
 |-------|-----------|-------|--------|-----------|
@@ -158,9 +169,13 @@ Plans:
 | 20. Recipe Management & Cooking Mode QA | v2.4 | 2/2 | Complete | 2026-03-27 |
 | 21. Planning, Grocery, Budget & Leftovers QA | v2.4 | 2/2 | Complete | 2026-03-27 |
 | 22. Presence, Subscription, Notifications & Edge Cases QA | v2.4 | 2/2 | Complete | 2026-03-27 |
-| 23. Core Video Import Pipeline | v3.0 | 2/3 | Complete    | 2026-03-28 |
-| 24. Share Sheet Integration | v3.0 | 1/2 | Complete    | 2026-03-28 |
-| 25. Kitchen Tab | v3.0 | 2/2 | Complete   | 2026-03-29 |
+| 23. Core Video Import Pipeline | v3.0 | 3/3 | Complete | 2026-03-28 |
+| 24. Share Sheet Integration | v3.0 | 2/2 | Complete | 2026-03-28 |
+| 25. Kitchen Tab | v3.0 | 2/2 | Complete | 2026-03-29 |
+| 26. Vision Foundation | v4.0 | 0/0 | Not started | - |
+| 27. Fridge/Pantry Photo Scan | v4.0 | 0/0 | Not started | - |
+| 28. Food Photo to Recipe Discovery | v4.0 | 0/0 | Not started | - |
+| 29. Food Photo to Meal Logging | v4.0 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-03-29 after Phase 25 planning*
+*Last updated: 2026-03-30 after v4.0 roadmap creation*
