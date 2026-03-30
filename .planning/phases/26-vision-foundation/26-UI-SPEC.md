@@ -115,7 +115,7 @@ New components this phase must create:
 - **Layout:** Horizontal card
   - Left: MaterialCommunityIcons "camera-off-outline", size 32, color onSurfaceVariant
   - Center: "Camera access needed" (titleMd) + "Open Settings to allow SharedKitchen to use your camera" (bodyMd, onSurfaceVariant)
-  - Right: Button variant="secondary", size="sm", label "Settings"
+  - Right: Button variant="secondary", size="sm", label "Open Settings"
 - **Container:** `backgroundColor: surfaceContainerLow`, `borderRadius: borderRadius.lg`, `padding: spacing.md`, `marginHorizontal: spacing.md`
 
 ### 3. CameraPermissionPrompt (pre-prompt bottom sheet)
@@ -128,8 +128,8 @@ New components this phase must create:
     - "camera-outline": "Photograph your fridge or pantry to add items instantly"
     - "food-variant": "Snap a photo of food to find matching recipes"
     - "calendar-check-outline": "Log meals to your plan with a quick photo"
-  - CTA: "Allow Camera" button (full-width, primary background, borderRadius 14, paddingVertical 16)
-  - Dismiss: "Not Now" text button (onSurfaceVariant, Inter_500Medium 15px)
+  - CTA: "Allow Camera" button (full-width, primary background, borderRadius.lg, paddingVertical 16)
+  - Dismiss: "Not Now" text button (bodyMd, onSurfaceVariant)
 
 ### 4. VisionLoadingOverlay (processing state)
 - **Location:** `src/components/camera/VisionLoadingOverlay.tsx`
@@ -200,7 +200,7 @@ New components this phase must create:
 | Permission dismiss | "Not Now" |
 | Permission denied card title | "Camera access needed" |
 | Permission denied card body | "Open Settings to allow SharedKitchen to use your camera" |
-| Permission denied card action | "Settings" |
+| Permission denied card action | "Open Settings" |
 | Loading overlay title | "Analyzing photo..." |
 | Loading overlay body | "This usually takes a few seconds" |
 | Error: generic vision failure | "Something went wrong" / "We couldn't analyze that photo. Please try again with a clearer image." |
@@ -240,7 +240,7 @@ No third-party component registries. All components are built with React Native 
 | Take Photo option | accessibilityLabel="Take a photo with camera", accessibilityRole="button" |
 | Gallery option | accessibilityLabel="Choose photo from gallery", accessibilityRole="button" |
 | Permission prompt CTA | accessibilityLabel="Allow camera access", accessibilityRole="button" |
-| Settings button (denied) | accessibilityLabel="Open device settings", accessibilityRole="button" |
+| Open Settings button (denied) | accessibilityLabel="Open device settings", accessibilityRole="button" |
 | Loading overlay | accessibilityLabel="Analyzing photo", accessibilityLiveRegion="polite" |
 
 ---
