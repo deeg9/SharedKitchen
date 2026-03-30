@@ -6,13 +6,13 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 ## Milestones
 
-- ✅ **v1.0 MVP** — Phases 1-4 (shipped 2026-03-23) — [Archive](milestones/v1.0-ROADMAP.md)
-- ✅ **v2.0 AI, Payments & Polish** — Phases 5-9 (shipped 2026-03-26) — [Archive](milestones/v2.0-ROADMAP.md)
-- ✅ **v2.1 Discovery, Checkout & Polish** — Phases 10-12 (shipped 2026-03-26)
-- ✅ **v2.2 UI Polish & Bug Fixes** — Phases 13-15 (shipped 2026-03-27)
-- ✅ **v2.3 Kitchen Switching** — Phases 16-17 (shipped 2026-03-27)
-- ✅ **v2.4 Comprehensive QA Testing** — Phases 18-22 (shipped 2026-03-27)
-- ✅ **v3.0 Video Recipe Import & Kitchen Tab** — Phases 23-25 (shipped 2026-03-29) — [Archive](milestones/v3.0-ROADMAP.md)
+- **v1.0 MVP** — Phases 1-4 (shipped 2026-03-23) — [Archive](milestones/v1.0-ROADMAP.md)
+- **v2.0 AI, Payments & Polish** — Phases 5-9 (shipped 2026-03-26) — [Archive](milestones/v2.0-ROADMAP.md)
+- **v2.1 Discovery, Checkout & Polish** — Phases 10-12 (shipped 2026-03-26)
+- **v2.2 UI Polish & Bug Fixes** — Phases 13-15 (shipped 2026-03-27)
+- **v2.3 Kitchen Switching** — Phases 16-17 (shipped 2026-03-27)
+- **v2.4 Comprehensive QA Testing** — Phases 18-22 (shipped 2026-03-27)
+- **v3.0 Video Recipe Import & Kitchen Tab** — Phases 23-25 (shipped 2026-03-29) — [Archive](milestones/v3.0-ROADMAP.md)
 - **v4.0 AI Vision — Scan, Snap & Add** — Phases 26-29
 
 ## Phases
@@ -106,7 +106,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 Plans:
 - [x] 26-01-PLAN.md — Client vision lib, camera components, permission hook, image compression
 - [x] 26-02-PLAN.md — analyze-food-photo Edge Function with Gemini vision and rate limiting
-- [ ] 26-03-PLAN.md — Kitchen tab camera FAB integration and end-to-end wiring
+- [x] 26-03-PLAN.md — Kitchen tab camera FAB integration and end-to-end wiring
 **UI hint**: yes
 
 ### Phase 27: Fridge/Pantry Photo Scan
@@ -119,7 +119,10 @@ Plans:
   3. Confirmed items are bulk-added to On Hand inventory with correct categories, and appear immediately via real-time sync for all household members
   4. Items that already exist in On Hand are flagged as duplicates on the review screen rather than silently creating double entries
   5. User can take multiple photos (different shelves/areas) and merge all results into a single review screen before saving
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 27-01-PLAN.md — Scan types, duplicate detection, bulkAddPantryItems store method
+- [ ] 27-02-PLAN.md — ScanReviewScreen UI, Kitchen tab wiring, multi-photo support
 **UI hint**: yes
 
 ### Phase 28: Food Photo to Recipe Discovery
@@ -176,10 +179,10 @@ Plans:
 | 23. Core Video Import Pipeline | v3.0 | 3/3 | Complete | 2026-03-28 |
 | 24. Share Sheet Integration | v3.0 | 2/2 | Complete | 2026-03-28 |
 | 25. Kitchen Tab | v3.0 | 2/2 | Complete | 2026-03-29 |
-| 26. Vision Foundation | v4.0 | 2/3 | Complete    | 2026-03-30 |
-| 27. Fridge/Pantry Photo Scan | v4.0 | 0/0 | Not started | - |
+| 26. Vision Foundation | v4.0 | 3/3 | Complete    | 2026-03-30 |
+| 27. Fridge/Pantry Photo Scan | v4.0 | 0/2 | Planning complete | - |
 | 28. Food Photo to Recipe Discovery | v4.0 | 0/0 | Not started | - |
 | 29. Food Photo to Meal Logging | v4.0 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-03-30 after Phase 26 planning*
+*Last updated: 2026-03-30 after Phase 27 planning*
