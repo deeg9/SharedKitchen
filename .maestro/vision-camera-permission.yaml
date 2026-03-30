@@ -9,7 +9,7 @@ appId: com.sharedkitchen.app
 
 # Navigate to Kitchen tab
 - tapOn:
-    id: "kitchen-tab"
+    id: "grocery-tab"
 
 # Verify camera FAB is visible
 - assertVisible:

@@ -12,7 +12,7 @@ appId: com.sharedkitchen.app
 
 # Navigate to Kitchen tab
 - tapOn:
-    id: "kitchen-tab"
+    id: "grocery-tab"
 
 # Switch to On Hand segment (scan mode)
 - tapOn:
