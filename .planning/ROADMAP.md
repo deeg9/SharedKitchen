@@ -12,7 +12,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - ✅ **v2.2 UI Polish & Bug Fixes** — Phases 13-15 (shipped 2026-03-27)
 - ✅ **v2.3 Kitchen Switching** — Phases 16-17 (shipped 2026-03-27)
 - ✅ **v2.4 Comprehensive QA Testing** — Phases 18-22 (shipped 2026-03-27)
-- 🚧 **v3.0 Video Recipe Import & Kitchen Tab** — Phases 23-25
+- ✅ **v3.0 Video Recipe Import & Kitchen Tab** — Phases 23-25 (shipped 2026-03-29) — [Archive](milestones/v3.0-ROADMAP.md)
 
 ## Phases
 

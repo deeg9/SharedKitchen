@@ -10,9 +10,9 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 
 ## Current State
 
-**Shipped:** v2.0 AI, Payments & Polish (2026-03-26)
-**Codebase:** ~21,700 LOC across 152 source files (TypeScript, SQL, YAML)
-**Tech stack:** React Native + Expo (iOS), Supabase (Postgres, Auth, Realtime, Storage, Edge Functions), OpenAI gpt-5-mini, Stripe, expo-notifications, Maestro E2E
+**Shipped:** v3.0 Video Recipe Import & Kitchen Tab (2026-03-29)
+**Codebase:** ~27,500 LOC across 206 source files (TypeScript, SQL, YAML)
+**Tech stack:** React Native + Expo (iOS), Supabase (Postgres, Auth, Realtime, Storage, Edge Functions), Gemini Flash, Supadata, Stripe, expo-share-intent, expo-notifications, Maestro E2E
 
 ## Requirements
 
@@ -70,31 +70,37 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 - ✓ getErrorMessage utility, zero console.error in stores, zero `as any` casts — v2.1
 - ✓ ErrorBoundary wrapping root layout with fallback UI — v2.1
 - ✓ Reusable EmptyState component on grocery screen — v2.1
+- ✓ Video recipe import from TikTok/Instagram/YouTube via paste URL — v3.0
+- ✓ iOS share sheet integration (expo-share-intent) — v3.0
+- ✓ Supadata transcript extraction + Gemini Flash recipe parsing — v3.0
+- ✓ Freemium video import rate limiting (3/month free, unlimited premium) — v3.0
+- ✓ Kitchen tab with segmented control (On Hand / Shopping List) — v3.0
+- ✓ Pantry/fridge inventory with auto-copy from checked grocery items — v3.0
+- ✓ Real-time pantry sync via Supabase Realtime — v3.0
 
 ### Active
 
-**v3.0: Video Recipe Import**
-- [ ] Share sheet receives video URLs from TikTok, Instagram, YouTube
-- [ ] Paste URL field accepts video URLs in existing import flow
-- [ ] Edge Function detects video URLs and routes to transcript extraction
-- [ ] Transcript extracted from video via third-party API
-- [ ] Gemini Flash parses transcript into structured recipe format
-- [ ] Video import count tracked per user (3/month free, unlimited premium)
-- [ ] Import results in complete recipe entry with ingredients, steps, metadata
+**v3.0: Video Recipe Import & Kitchen Tab** ✅
+- [x] Share sheet receives video URLs from TikTok, Instagram, YouTube
+- [x] Paste URL field accepts video URLs in existing import flow
+- [x] Edge Function detects video URLs and routes to transcript extraction
+- [x] Transcript extracted from video via Supadata API
+- [x] Gemini Flash parses transcript into structured recipe format
+- [x] Video import count tracked per user (3/month free, unlimited premium)
+- [x] Kitchen tab with On Hand / Shopping List segmented control
+- [x] Pantry inventory with auto-copy from checked grocery items
 
-## Current Milestone: v3.0 Video Recipe Import
+## Current Milestone: v3.0 Video Recipe Import & Kitchen Tab (SHIPPED)
 
-**Goal:** Users can import recipes from TikTok, Instagram, YouTube, and any video URL — via share sheet or paste — with transcript-based AI extraction
+**Shipped:** 2026-03-29
 
-**Target features:**
-- Share sheet integration (expo-share-intent) — receive URLs from other apps
-- Paste URL fallback in existing import flow
-- Video URL detection in parse-recipe-url Edge Function
-- Transcript extraction via third-party API (Supadata or similar)
-- Gemini Flash transcript → structured recipe parsing
-- Support for TikTok, Instagram Reels, YouTube, and generic video URLs
-- Free tier: 3 video imports/month, unlimited for premium subscribers
-- LLM best-guess for ambiguous measurements
+**Delivered features:**
+- Video recipe import from TikTok, Instagram, YouTube via paste URL or iOS share sheet
+- Supadata transcript extraction → Gemini Flash recipe parsing pipeline
+- Freemium rate limiting (3/month free, unlimited premium)
+- Kitchen tab with segmented control (On Hand / Shopping List)
+- Pantry/fridge inventory tracking with auto-copy from checked grocery items
+- Real-time pantry sync across household members
 
 ### Out of Scope
 
@@ -149,4 +155,4 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-03-28 after milestone v3.0 started*
+*Last updated: 2026-03-29 after milestone v3.0 shipped*
