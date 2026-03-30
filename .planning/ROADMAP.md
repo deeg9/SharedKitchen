@@ -102,7 +102,11 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
   2. Camera permission is requested with a friendly explanation before the system prompt appears, and denied permission shows a helpful recovery state
   3. Captured images are compressed on-device so that large iPhone photos do not cause upload failures or excessive latency
   4. Edge Function accepts images and returns structured AI analysis results, with vision calls tracked and rate-limited per user (free-tier caps enforced server-side)
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 26-01-PLAN.md — Client vision lib, camera components, permission hook, image compression
+- [ ] 26-02-PLAN.md — analyze-food-photo Edge Function with Gemini vision and rate limiting
+- [ ] 26-03-PLAN.md — Kitchen tab camera FAB integration and end-to-end wiring
 **UI hint**: yes
 
 ### Phase 27: Fridge/Pantry Photo Scan
@@ -172,10 +176,10 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 | 23. Core Video Import Pipeline | v3.0 | 3/3 | Complete | 2026-03-28 |
 | 24. Share Sheet Integration | v3.0 | 2/2 | Complete | 2026-03-28 |
 | 25. Kitchen Tab | v3.0 | 2/2 | Complete | 2026-03-29 |
-| 26. Vision Foundation | v4.0 | 0/0 | Not started | - |
+| 26. Vision Foundation | v4.0 | 0/3 | In progress | - |
 | 27. Fridge/Pantry Photo Scan | v4.0 | 0/0 | Not started | - |
 | 28. Food Photo to Recipe Discovery | v4.0 | 0/0 | Not started | - |
 | 29. Food Photo to Meal Logging | v4.0 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-03-30 after v4.0 roadmap creation*
+*Last updated: 2026-03-30 after Phase 26 planning*
