@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, ScrollView, StyleSheet, Pressable, AppState, AppStateStatus } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Pressable, AppState, AppStateStatus, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as Linking from 'expo-linking';
 import { colors } from '../../../src/theme/colors';
 import { typography } from '../../../src/theme/typography';
 import { spacing, borderRadius } from '../../../src/theme/spacing';
@@ -27,6 +28,12 @@ import { useActivityToast } from '../../../src/hooks/useActivityToast';
 import { PresenceAvatarStack } from '../../../src/components/presence/PresenceAvatarStack';
 import { ActivityToast } from '../../../src/components/presence/ActivityToast';
 import { useAuthStore } from '../../../src/stores/authStore';
+import { useCameraPermission } from '../../../src/hooks/useCameraPermission';
+import { CameraSheet } from '../../../src/components/camera/CameraSheet';
+import { CameraPermissionPrompt } from '../../../src/components/camera/CameraPermissionPrompt';
+import { CameraPermissionCard } from '../../../src/components/camera/CameraPermissionCard';
+import { VisionLoadingOverlay } from '../../../src/components/camera/VisionLoadingOverlay';
+import { analyzePhoto, VisionRateLimitError } from '../../../src/lib/vision';
 
 const SECTION_ORDER = ['Proteins', 'Produce', 'Dairy & Eggs', 'Pantry', 'Other'];
 
@@ -38,6 +45,9 @@ export default function GroceryScreen() {
   const [editingItem, setEditingItem] = useState<GroceryItemType | null>(null);
   const [catSheetOpen, setCatSheetOpen] = useState(false);
   const [activeSegment, setActiveSegment] = useState<'shopping' | 'onhand'>('shopping');
+  const [cameraSheetOpen, setCameraSheetOpen] = useState(false);
+  const [visionLoading, setVisionLoading] = useState(false);
+  const { showPrePrompt, permissionDenied, checkAndPrompt, requestAfterPrePrompt, dismissPrePrompt } = useCameraPermission();
   const initCategories = useGroceryCategoryStore((s) => s.initialize);
 
   const user = useAuthStore((s) => s.user);
@@ -143,6 +153,40 @@ export default function GroceryScreen() {
     await generateGroceryList(activeHouseholdId, weekStart, recipes);
   }, [activeHouseholdId, mealPlan, generateGroceryList]);
 
+  const handleCameraFab = useCallback(async () => {
+    const granted = await checkAndPrompt();
+    if (granted) {
+      setCameraSheetOpen(true);
+    }
+  }, [checkAndPrompt]);
+
+  const handleImageCaptured = useCallback(async (uri: string) => {
+    setCameraSheetOpen(false);
+    setVisionLoading(true);
+    try {
+      const result = await analyzePhoto(uri, 'scan');
+      setVisionLoading(false);
+      // Phase 26 foundation: log result, show success alert
+      // Phases 27-29 will replace with proper result handling screens
+      console.log('[Vision] Analysis result:', JSON.stringify(result, null, 2));
+      Alert.alert('Analysis Complete', `Found ${result.items?.length ?? 0} items. Full result handling comes in Phase 27.`);
+    } catch (err: any) {
+      setVisionLoading(false);
+      if (err instanceof VisionRateLimitError) {
+        Alert.alert('Monthly scan limit reached', `You've used all ${err.limit} free scans this month. Upgrade to Premium for unlimited scans.`);
+      } else {
+        Alert.alert('Something went wrong', 'We couldn\'t analyze that photo. Please try again with a clearer image.');
+      }
+    }
+  }, []);
+
+  const handlePermissionAllow = useCallback(async () => {
+    const granted = await requestAfterPrePrompt();
+    if (granted) {
+      setCameraSheetOpen(true);
+    }
+  }, [requestAfterPrePrompt]);
+
   const summaryData = summary();
   const { sections, completed } = groupedItems();
 
@@ -165,6 +209,26 @@ export default function GroceryScreen() {
   );
 
   // --- On Hand segment ---
+  // --- Camera components shared across all return paths ---
+  const cameraComponents = (
+    <>
+      {permissionDenied && (
+        <CameraPermissionCard onOpenSettings={() => Linking.openSettings()} />
+      )}
+      <CameraPermissionPrompt
+        isOpen={showPrePrompt}
+        onAllow={handlePermissionAllow}
+        onDismiss={dismissPrePrompt}
+      />
+      <CameraSheet
+        isOpen={cameraSheetOpen}
+        onClose={() => setCameraSheetOpen(false)}
+        onImageCaptured={handleImageCaptured}
+      />
+      <VisionLoadingOverlay visible={visionLoading} />
+    </>
+  );
+
   if (activeSegment === 'onhand') {
     return (
       <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -175,6 +239,20 @@ export default function GroceryScreen() {
         </View>
         {segmentedControl}
         <OnHandList />
+
+        {/* Camera FAB */}
+        <Pressable
+          style={[styles.cameraFab, { bottom: TAB_BAR_HEIGHT + spacing.md }]}
+          onPress={handleCameraFab}
+          disabled={visionLoading}
+          accessibilityLabel="Open camera"
+          accessibilityRole="button"
+          testID="camera-fab"
+        >
+          <MaterialCommunityIcons name="camera" size={28} color={colors.onPrimary} />
+        </Pressable>
+
+        {cameraComponents}
       </View>
     );
   }
@@ -196,6 +274,20 @@ export default function GroceryScreen() {
           <Skeleton width="100%" height={44} style={{ marginTop: spacing.sm }} />
           <Skeleton width="100%" height={44} style={{ marginTop: spacing.sm }} />
         </View>
+
+        {/* Camera FAB */}
+        <Pressable
+          style={[styles.cameraFab, { bottom: TAB_BAR_HEIGHT + spacing.md }]}
+          onPress={handleCameraFab}
+          disabled={visionLoading}
+          accessibilityLabel="Open camera"
+          accessibilityRole="button"
+          testID="camera-fab"
+        >
+          <MaterialCommunityIcons name="camera" size={28} color={colors.onPrimary} />
+        </Pressable>
+
+        {cameraComponents}
       </View>
     );
   }
@@ -218,6 +310,20 @@ export default function GroceryScreen() {
           onAction={handleGenerate}
           loading={loading}
         />
+
+        {/* Camera FAB */}
+        <Pressable
+          style={[styles.cameraFab, { bottom: TAB_BAR_HEIGHT + spacing.md }]}
+          onPress={handleCameraFab}
+          disabled={visionLoading}
+          accessibilityLabel="Open camera"
+          accessibilityRole="button"
+          testID="camera-fab"
+        >
+          <MaterialCommunityIcons name="camera" size={28} color={colors.onPrimary} />
+        </Pressable>
+
+        {cameraComponents}
       </View>
     );
   }
@@ -282,6 +388,18 @@ export default function GroceryScreen() {
         )}
       </ScrollView>
 
+      {/* Camera FAB — positioned above the add-item FAB */}
+      <Pressable
+        style={[styles.cameraFab, { bottom: TAB_BAR_HEIGHT + spacing.md + 56 + spacing.sm }]}
+        onPress={handleCameraFab}
+        disabled={visionLoading}
+        accessibilityLabel="Open camera"
+        accessibilityRole="button"
+        testID="camera-fab"
+      >
+        <MaterialCommunityIcons name="camera" size={28} color={colors.onPrimary} />
+      </Pressable>
+
       {/* FAB for manual add */}
       {activeListId && (
         <Pressable
@@ -318,6 +436,8 @@ export default function GroceryScreen() {
           onDismiss={dismissToast}
         />
       )}
+
+      {cameraComponents}
     </View>
   );
 }
@@ -387,6 +507,17 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   fab: {
+    position: 'absolute',
+    right: spacing.md,
+    width: 56,
+    height: 56,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...shadows.float,
+  },
+  cameraFab: {
     position: 'absolute',
     right: spacing.md,
     width: 56,
