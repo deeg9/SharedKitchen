@@ -21,7 +21,7 @@ import { usePlanStore } from '../../../src/stores/planStore';
 import { usePantryStore } from '../../../src/stores/pantryStore';
 import { useGrocerySync } from '../../../src/hooks/useGrocerySync';
 import { usePantrySync } from '../../../src/hooks/usePantrySync';
-import { getWeekDays, toDateString } from '../../../src/lib/dates';
+import { getWeekDays, toDateString, formatDayLabel } from '../../../src/lib/dates';
 import { TAB_BAR_HEIGHT } from '../../../src/lib/constants';
 import { usePresence, PresenceMember } from '../../../src/hooks/usePresence';
 import { useActivityToast } from '../../../src/hooks/useActivityToast';
@@ -37,7 +37,9 @@ import { analyzePhoto, VisionRateLimitError } from '../../../src/lib/vision';
 import { ScanReviewScreen } from '../../../src/components/scan/ScanReviewScreen';
 import { DishIdentifiedSheet } from '../../../src/components/recipe-discovery/DishIdentifiedSheet';
 import { RecipeResultsSheet } from '../../../src/components/recipe-discovery/RecipeResultsSheet';
+import { MealSlotPickerSheet } from '../../../src/components/meal-logging/MealSlotPickerSheet';
 import { DishIdentification, RecipeSearchResult } from '../../../src/types/recipeSearch';
+import { MealType, MEAL_TYPE_CONFIG } from '../../../src/types/database';
 
 const SECTION_ORDER = ['Proteins', 'Produce', 'Dairy & Eggs', 'Pantry', 'Other'];
 
@@ -56,6 +58,7 @@ export default function GroceryScreen() {
   const [recipeResults, setRecipeResults] = useState<RecipeSearchResult[] | null>(null);
   const [dishSheetOpen, setDishSheetOpen] = useState(false);
   const [recipeSheetOpen, setRecipeSheetOpen] = useState(false);
+  const [mealSlotPickerOpen, setMealSlotPickerOpen] = useState(false);
   const { showPrePrompt, permissionDenied, checkAndPrompt, requestAfterPrePrompt, dismissPrePrompt } = useCameraPermission();
   const initCategories = useGroceryCategoryStore((s) => s.initialize);
 
@@ -241,6 +244,37 @@ export default function GroceryScreen() {
     setDishResult(null);
   }, []);
 
+  const handleLogMeal = useCallback(() => {
+    setDishSheetOpen(false);
+    setMealSlotPickerOpen(true);
+  }, []);
+
+  const handleMealSlotSelected = useCallback(async (date: string, mealType: MealType) => {
+    if (!activeHouseholdId || !dishResult) return;
+    setMealSlotPickerOpen(false);
+    try {
+      await usePlanStore.getState().assignRecipe(
+        activeHouseholdId,
+        date,
+        mealType,
+        null,            // no recipe_id — recipe-less meal
+        undefined,       // no cook
+        dishResult.name, // store dish name in notes field
+        'home-cooked',   // default source
+        undefined        // no cost
+      );
+      // Format day label for toast
+      const dayDate = new Date(date + 'T12:00:00'); // avoid timezone issues
+      const dayLabel = formatDayLabel(dayDate).weekday; // e.g. "Mon"
+      const slotLabel = MEAL_TYPE_CONFIG[mealType].label; // e.g. "Dinner"
+      Alert.alert('Meal Logged', `Added ${dishResult.name} to ${dayLabel} ${slotLabel}`);
+      // Clean up all state
+      setDishResult(null);
+    } catch {
+      Alert.alert('Error', 'Could not log meal. Please try again.');
+    }
+  }, [activeHouseholdId, dishResult]);
+
   const summaryData = summary();
   const { sections, completed } = groupedItems();
 
@@ -294,6 +328,7 @@ export default function GroceryScreen() {
         dish={dishResult}
         onClose={handleDishSheetClose}
         onSearchResults={handleSearchResults}
+        onLogMeal={handleLogMeal}
       />
       <RecipeResultsSheet
         isOpen={recipeSheetOpen}
@@ -301,6 +336,15 @@ export default function GroceryScreen() {
         dishName={dishResult?.name ?? ''}
         onClose={handleRecipeSheetClose}
         onImportComplete={handleImportComplete}
+      />
+      <MealSlotPickerSheet
+        isOpen={mealSlotPickerOpen}
+        dishName={dishResult?.name ?? ''}
+        onClose={() => {
+          setMealSlotPickerOpen(false);
+          setDishSheetOpen(true); // go back to dish sheet
+        }}
+        onSelect={handleMealSlotSelected}
       />
     </>
   );
