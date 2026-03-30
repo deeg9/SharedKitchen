@@ -34,6 +34,7 @@ import { CameraPermissionPrompt } from '../../../src/components/camera/CameraPer
 import { CameraPermissionCard } from '../../../src/components/camera/CameraPermissionCard';
 import { VisionLoadingOverlay } from '../../../src/components/camera/VisionLoadingOverlay';
 import { analyzePhoto, VisionRateLimitError } from '../../../src/lib/vision';
+import { ScanReviewScreen } from '../../../src/components/scan/ScanReviewScreen';
 
 const SECTION_ORDER = ['Proteins', 'Produce', 'Dairy & Eggs', 'Pantry', 'Other'];
 
@@ -47,6 +48,7 @@ export default function GroceryScreen() {
   const [activeSegment, setActiveSegment] = useState<'shopping' | 'onhand'>('shopping');
   const [cameraSheetOpen, setCameraSheetOpen] = useState(false);
   const [visionLoading, setVisionLoading] = useState(false);
+  const [scanResults, setScanResults] = useState<Array<{ name: string; category?: string; quantity?: string; brand?: string }> | null>(null);
   const { showPrePrompt, permissionDenied, checkAndPrompt, requestAfterPrePrompt, dismissPrePrompt } = useCameraPermission();
   const initCategories = useGroceryCategoryStore((s) => s.initialize);
 
@@ -166,11 +168,12 @@ export default function GroceryScreen() {
     try {
       const result = await analyzePhoto(uri, 'scan');
       setVisionLoading(false);
-      // Phase 26 foundation: log result, show success alert
-      // Phases 27-29 will replace with proper result handling screens
-      console.log('[Vision] Analysis result:', JSON.stringify(result, null, 2));
-      Alert.alert('Analysis Complete', `Found ${result.items?.length ?? 0} items. Full result handling comes in Phase 27.`);
-    } catch (err: any) {
+      if (result.items && result.items.length > 0) {
+        setScanResults(result.items);
+      } else {
+        Alert.alert('No items found', 'We couldn\'t identify any food items in that photo. Try taking a clearer photo of your fridge or pantry shelves.');
+      }
+    } catch (err: unknown) {
       setVisionLoading(false);
       if (err instanceof VisionRateLimitError) {
         Alert.alert('Monthly scan limit reached', `You've used all ${err.limit} free scans this month. Upgrade to Premium for unlimited scans.`);
@@ -178,6 +181,16 @@ export default function GroceryScreen() {
         Alert.alert('Something went wrong', 'We couldn\'t analyze that photo. Please try again with a clearer image.');
       }
     }
+  }, []);
+
+  const handleScanClose = useCallback(() => {
+    setScanResults(null);
+  }, []);
+
+  const handleScanSaved = useCallback((count: number) => {
+    setScanResults(null);
+    setActiveSegment('onhand');
+    Alert.alert('Added to Pantry', `Added ${count} items to On Hand`);
   }, []);
 
   const handlePermissionAllow = useCallback(async () => {
@@ -209,6 +222,15 @@ export default function GroceryScreen() {
   );
 
   // --- On Hand segment ---
+  // --- Scan review overlay (shown when scan results available) ---
+  const scanReview = scanResults ? (
+    <ScanReviewScreen
+      initialItems={scanResults}
+      onClose={handleScanClose}
+      onSaved={handleScanSaved}
+    />
+  ) : null;
+
   // --- Camera components shared across all return paths ---
   const cameraComponents = (
     <>
@@ -253,6 +275,7 @@ export default function GroceryScreen() {
         </Pressable>
 
         {cameraComponents}
+        {scanReview}
       </View>
     );
   }
@@ -288,6 +311,7 @@ export default function GroceryScreen() {
         </Pressable>
 
         {cameraComponents}
+        {scanReview}
       </View>
     );
   }
@@ -324,6 +348,7 @@ export default function GroceryScreen() {
         </Pressable>
 
         {cameraComponents}
+        {scanReview}
       </View>
     );
   }
