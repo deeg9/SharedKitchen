@@ -114,7 +114,7 @@ export function DishIdentifiedSheet({ isOpen, dish, onClose, onSearchResults, on
               )}
             </View>
           </View>
-        ) : !isHighConfidence ? (
+        ) : (
           <View style={styles.buttonRow}>
             <Pressable style={styles.searchButton} onPress={handleSearch}>
               <Text style={styles.searchButtonText}>Find Recipes</Text>
@@ -126,7 +126,7 @@ export function DishIdentifiedSheet({ isOpen, dish, onClose, onSearchResults, on
               </Pressable>
             )}
           </View>
-        ) : null}
+        )}
 
         <Pressable onPress={onClose} style={styles.notFoodLink}>
           <Text style={styles.notFoodText}>Not a food photo?</Text>

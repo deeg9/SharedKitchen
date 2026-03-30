@@ -561,6 +561,7 @@ export default function GroceryScreen() {
       )}
 
       {cameraComponents}
+      {scanReview}
     </View>
   );
 }
