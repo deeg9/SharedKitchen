@@ -1,14 +1,16 @@
 appId: com.sharedkitchen.app
 ---
 # Vision Scan Pantry Flow
-# Tests: Camera FAB on On Hand segment triggers scan intent,
-# ScanReviewScreen renders with items, user can interact with review.
-# Requires: Camera permission already granted, Edge Function deployed,
-# GEMINI_API_KEY provisioned. Uses gallery picker with a food photo.
-# Note: Stops at camera picker since Maestro can't select gallery photos.
-# For full E2E: manually pick a fridge photo, then this verifies the review screen.
+# Tests: On Hand segment camera flow triggers scan intent.
+# Verifies FAB, segment switching, and camera sheet on On Hand.
 
 - launchApp
+
+# Wait for app to fully load (JS bundle download on relaunch)
+- extendedWaitUntil:
+    visible:
+      id: "grocery-tab"
+    timeout: 15000
 
 # Navigate to Kitchen tab
 - tapOn:
@@ -18,7 +20,7 @@ appId: com.sharedkitchen.app
 - tapOn:
     text: "On Hand"
 
-# Verify camera FAB is visible on On Hand
+# Verify camera FAB is visible on On Hand segment
 - assertVisible:
     id: "camera-fab"
 
@@ -26,19 +28,17 @@ appId: com.sharedkitchen.app
 - tapOn:
     id: "camera-fab"
 
-# If permission already granted, CameraSheet opens directly
+# CameraSheet should open (permission already granted from prior flow)
 - extendedWaitUntil:
     visible:
-      text: "Add a Photo"
-    timeout: 5000
+      text: "Take a photo with camera"
+    timeout: 8000
 
-# Tap "Choose from Gallery" (easier for testing than camera)
-- tapOn:
-    id: "camera-sheet-choose-gallery"
+- assertVisible:
+    text: "Take a photo with camera"
 
-# -- MANUAL STEP: Select a photo of fridge/pantry from gallery --
-# Maestro cannot interact with the native photo picker.
-# The flow pauses here. For automated E2E, you would need to:
-# 1. Pre-seed a test photo in the simulator gallery
-# 2. Use Maestro's `tapOn` with coordinates to select it
-# OR test from the scan review screen directly by mocking the camera result.
+- assertVisible:
+    text: "Choose photo from gallery"
+
+# Test passes: FAB → CameraSheet works on On Hand segment.
+# Do NOT tap gallery — opens native picker that Maestro can't control.

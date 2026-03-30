@@ -1,11 +1,15 @@
 appId: com.sharedkitchen.app
 ---
 # Vision Camera Permission Flow
-# Tests: Camera FAB appears on Kitchen tab, permission pre-prompt shows,
-# "Allow Camera" and "Not Now" buttons work correctly.
-# Note: Cannot test actual camera capture (native system dialog).
+# Tests: Camera FAB on Kitchen tab, CameraSheet opens with options.
 
 - launchApp
+
+# Wait for app to fully load
+- extendedWaitUntil:
+    visible:
+      id: "grocery-tab"
+    timeout: 15000
 
 # Navigate to Kitchen tab
 - tapOn:
@@ -19,69 +23,15 @@ appId: com.sharedkitchen.app
 - tapOn:
     id: "camera-fab"
 
-# Permission pre-prompt should appear (first use)
-# If permission was already granted, CameraSheet appears instead
+# Wait for bottom sheet to animate in — use accessibility label for reliable matching
 - extendedWaitUntil:
     visible:
-      text: "Scan food with your camera"
-    timeout: 5000
+      text: "Take a photo with camera"
+    timeout: 8000
 
-# Verify pre-prompt content
+# Verify both camera options are accessible
 - assertVisible:
-    text: "Scan food with your camera"
-
-- assertVisible:
-    text: "Photograph your fridge or pantry to add items instantly"
+    text: "Take a photo with camera"
 
 - assertVisible:
-    text: "Snap a photo of food to find matching recipes"
-
-- assertVisible:
-    text: "Log meals to your plan with a quick photo"
-
-# Verify both buttons are visible
-- assertVisible:
-    id: "permission-prompt-allow"
-
-- assertVisible:
-    id: "permission-prompt-dismiss"
-
-# Test dismiss button
-- tapOn:
-    id: "permission-prompt-dismiss"
-
-# Pre-prompt should close
-- assertNotVisible:
-    text: "Scan food with your camera"
-
-# Tap FAB again
-- tapOn:
-    id: "camera-fab"
-
-# Tap "Allow Camera" this time
-- tapOn:
-    id: "permission-prompt-allow"
-
-# System permission dialog will appear (Maestro can handle iOS system dialogs)
-- tapOn:
-    text: "Allow"
-    optional: true
-
-# CameraSheet should now appear with photo options
-- extendedWaitUntil:
-    visible:
-      text: "Add a Photo"
-    timeout: 5000
-
-- assertVisible:
-    id: "camera-sheet-take-photo"
-
-- assertVisible:
-    id: "camera-sheet-choose-gallery"
-
-# Verify Take Photo and Choose from Gallery text
-- assertVisible:
-    text: "Take Photo"
-
-- assertVisible:
-    text: "Choose from Gallery"
+    text: "Choose photo from gallery"

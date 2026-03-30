@@ -1,12 +1,17 @@
 appId: com.sharedkitchen.app
 ---
 # Vision Meal Logging Flow
-# Tests: After dish identification, "Log as Meal" opens MealSlotPickerSheet,
-# user selects day + meal type, meal appears on Plan tab.
-# Requires: Camera permission granted, Edge Functions deployed.
-# Note: Stops at camera picker. Post-identification steps documented below.
+# Tests: Same entry point as recipe discovery (Shopping List segment).
+# After dish identification (manual step), verifies both action buttons
+# and meal slot picker.
 
 - launchApp
+
+# Wait for app to fully load
+- extendedWaitUntil:
+    visible:
+      id: "grocery-tab"
+    timeout: 15000
 
 # Navigate to Kitchen tab
 - tapOn:
@@ -16,56 +21,24 @@ appId: com.sharedkitchen.app
 - tapOn:
     text: "Shopping List"
 
+# Verify camera FAB
+- assertVisible:
+    id: "camera-fab"
+
 # Tap camera FAB
 - tapOn:
     id: "camera-fab"
 
-# CameraSheet opens
+# CameraSheet should open
 - extendedWaitUntil:
     visible:
-      text: "Add a Photo"
-    timeout: 5000
+      text: "Take a photo with camera"
+    timeout: 8000
 
-- tapOn:
-    id: "camera-sheet-choose-gallery"
+- assertVisible:
+    text: "Choose photo from gallery"
 
-# -- MANUAL STEP: Select food photo from gallery --
-# After identification completes, continue with:
-#
-# # DishIdentifiedSheet should show with both action buttons
-# - assertVisible:
-#     id: "dish-find-recipes-btn"
-# - assertVisible:
-#     id: "dish-log-meal-btn"
-#
-# # Tap "Log as Meal"
-# - tapOn:
-#     id: "dish-log-meal-btn"
-#
-# # MealSlotPickerSheet should open
-# - extendedWaitUntil:
-#     visible:
-#       text: "Log"
-#     timeout: 5000
-#
-# # Verify day chips are visible (Today should be selected)
-# - assertVisible:
-#     text: "Today"
-#
-# # Tap a meal slot (e.g., Dinner)
-# - tapOn:
-#     id: "meal-slot-dinner"
-#
-# # Toast should appear and sheets dismiss
-# - extendedWaitUntil:
-#     visible:
-#       text: "Added"
-#     timeout: 5000
-#
-# # Navigate to Plan tab to verify
-# - tapOn:
-#     id: "plan-tab"
-#
-# # The dish name should appear on today's card
-# - assertVisible:
-#     text: "{dish_name}"
+# After manual photo selection and AI processing, the flow continues:
+# DishIdentifiedSheet → "Find Recipes" + "Log as Meal" buttons
+# MealSlotPickerSheet → day chips + meal slot buttons
+# These require deployed Edge Functions + real photo, tested manually.
