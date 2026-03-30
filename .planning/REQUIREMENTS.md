@@ -25,10 +25,10 @@ Requirements for AI Vision — Scan, Snap & Add. Each maps to roadmap phases.
 
 ### Food Photo → Recipe Discovery
 
-- [ ] **RCPE-01**: User can photograph food or a screenshot and have the dish identified by AI
-- [ ] **RCPE-02**: AI shows confidence level and allows user to correct the dish name before searching
+- [x] **RCPE-01**: User can photograph food or a screenshot and have the dish identified by AI
+- [x] **RCPE-02**: AI shows confidence level and allows user to correct the dish name before searching
 - [x] **RCPE-03**: App searches the web and presents 2-3 recipe options for the identified dish
-- [ ] **RCPE-04**: User can select a recipe and import it into their recipe book via existing import pipeline
+- [x] **RCPE-04**: User can select a recipe and import it into their recipe book via existing import pipeline
 
 ### Food Photo → Meal Logging
 
@@ -69,10 +69,10 @@ Requirements for AI Vision — Scan, Snap & Add. Each maps to roadmap phases.
 | SCAN-03 | Phase 27 | Complete |
 | SCAN-04 | Phase 27 | Complete |
 | SCAN-05 | Phase 27 | Pending |
-| RCPE-01 | Phase 28 | Pending |
-| RCPE-02 | Phase 28 | Pending |
+| RCPE-01 | Phase 28 | Complete |
+| RCPE-02 | Phase 28 | Complete |
 | RCPE-03 | Phase 28 | Complete |
-| RCPE-04 | Phase 28 | Pending |
+| RCPE-04 | Phase 28 | Complete |
 | MEAL-01 | Phase 29 | Pending |
 | MEAL-02 | Phase 29 | Pending |
 | MEAL-03 | Phase 29 | Pending |
