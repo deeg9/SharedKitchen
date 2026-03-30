@@ -134,7 +134,10 @@ Plans:
   2. User can correct the dish name if the AI identification is wrong before searching for recipes
   3. App presents 2-3 recipe options from web search with title, source, and thumbnail for the identified dish
   4. User can select a recipe option and import it into their recipe book via the existing import pipeline
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 28-01-PLAN.md — search-recipes Edge Function (Serper.dev), client searchRecipes helper, types
+- [ ] 28-02-PLAN.md — DishIdentifiedSheet, RecipeResultsSheet UI, Kitchen tab identify intent wiring
 **UI hint**: yes
 
 ### Phase 29: Food Photo to Meal Logging
@@ -181,8 +184,8 @@ Plans:
 | 25. Kitchen Tab | v3.0 | 2/2 | Complete | 2026-03-29 |
 | 26. Vision Foundation | v4.0 | 3/3 | Complete    | 2026-03-30 |
 | 27. Fridge/Pantry Photo Scan | v4.0 | 1/2 | Complete    | 2026-03-30 |
-| 28. Food Photo to Recipe Discovery | v4.0 | 0/0 | Not started | - |
+| 28. Food Photo to Recipe Discovery | v4.0 | 0/2 | Not started | - |
 | 29. Food Photo to Meal Logging | v4.0 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-03-30 after Phase 27 planning*
+*Last updated: 2026-03-30 after Phase 28 planning*
