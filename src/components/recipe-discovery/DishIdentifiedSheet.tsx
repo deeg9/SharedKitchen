@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TextInput, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheet } from '../ui/BottomSheet';
 import { DishIdentification, RecipeSearchResult } from '../../types/recipeSearch';
 import { searchRecipes } from '../../lib/recipeSearch';
@@ -12,6 +13,7 @@ interface DishIdentifiedSheetProps {
   dish: DishIdentification | null;
   onClose: () => void;
   onSearchResults: (results: RecipeSearchResult[]) => void;
+  onLogMeal?: () => void;
 }
 
 function getConfidenceLevel(confidence: number): { label: string; color: string } {
@@ -20,7 +22,7 @@ function getConfidenceLevel(confidence: number): { label: string; color: string 
   return { label: 'Low confidence', color: colors.error };
 }
 
-export function DishIdentifiedSheet({ isOpen, dish, onClose, onSearchResults }: DishIdentifiedSheetProps) {
+export function DishIdentifiedSheet({ isOpen, dish, onClose, onSearchResults, onLogMeal }: DishIdentifiedSheetProps) {
   const [editedName, setEditedName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -66,7 +68,7 @@ export function DishIdentifiedSheet({ isOpen, dish, onClose, onSearchResults }: 
   const isHighConfidence = dish.confidence >= 0.8;
 
   return (
-    <BottomSheet isOpen={isOpen} onClose={onClose} snapPoints={['45%']}>
+    <BottomSheet isOpen={isOpen} onClose={onClose} snapPoints={['50%']}>
       <View style={styles.container}>
         <Text style={styles.title}>Dish Identified</Text>
 
@@ -100,14 +102,30 @@ export function DishIdentifiedSheet({ isOpen, dish, onClose, onSearchResults }: 
           <View style={styles.errorContainer}>
             <Text style={styles.errorText}>{error}</Text>
             <Text style={styles.hintText}>Try a different name</Text>
-            <Pressable style={styles.searchButton} onPress={handleSearch}>
-              <Text style={styles.searchButtonText}>Search Recipes</Text>
-            </Pressable>
+            <View style={styles.buttonRow}>
+              <Pressable style={styles.searchButton} onPress={handleSearch}>
+                <Text style={styles.searchButtonText}>Find Recipes</Text>
+              </Pressable>
+              {onLogMeal && (
+                <Pressable style={styles.logMealButton} onPress={onLogMeal}>
+                  <MaterialCommunityIcons name="calendar-plus" size={18} color={colors.onSecondaryContainer} />
+                  <Text style={styles.logMealButtonText}>Log as Meal</Text>
+                </Pressable>
+              )}
+            </View>
           </View>
         ) : !isHighConfidence ? (
-          <Pressable style={styles.searchButton} onPress={handleSearch}>
-            <Text style={styles.searchButtonText}>Search Recipes</Text>
-          </Pressable>
+          <View style={styles.buttonRow}>
+            <Pressable style={styles.searchButton} onPress={handleSearch}>
+              <Text style={styles.searchButtonText}>Find Recipes</Text>
+            </Pressable>
+            {onLogMeal && (
+              <Pressable style={styles.logMealButton} onPress={onLogMeal}>
+                <MaterialCommunityIcons name="calendar-plus" size={18} color={colors.onSecondaryContainer} />
+                <Text style={styles.logMealButtonText}>Log as Meal</Text>
+              </Pressable>
+            )}
+          </View>
         ) : null}
 
         <Pressable onPress={onClose} style={styles.notFoodLink}>
@@ -183,7 +201,12 @@ const styles = StyleSheet.create({
     color: colors.onSurfaceVariant,
     marginBottom: spacing.md,
   },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
   searchButton: {
+    flex: 1,
     backgroundColor: colors.primary,
     borderRadius: borderRadius.md,
     paddingVertical: spacing.sm + 4,
@@ -193,6 +216,21 @@ const styles = StyleSheet.create({
   searchButtonText: {
     ...typography.labelLg,
     color: colors.onPrimary,
+  },
+  logMealButton: {
+    flex: 1,
+    backgroundColor: colors.secondaryContainer,
+    borderRadius: borderRadius.md,
+    paddingVertical: spacing.sm + 4,
+    paddingHorizontal: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+  },
+  logMealButtonText: {
+    ...typography.labelLg,
+    color: colors.onSecondaryContainer,
   },
   notFoodLink: {
     alignItems: 'center',
