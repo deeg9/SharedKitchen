@@ -1,5 +1,3 @@
-import * as ImageManipulator from 'expo-image-manipulator';
-import { SaveFormat } from 'expo-image-manipulator';
 import { supabase } from './supabase';
 
 export interface VisionResult {
@@ -25,10 +23,12 @@ export class VisionRateLimitError extends Error {
 export async function compressForVision(
   uri: string
 ): Promise<{ base64: string; width: number; height: number }> {
+  // Lazy import — expo-image-manipulator requires a dev build (not Expo Go)
+  const ImageManipulator = await import('expo-image-manipulator');
   const result = await ImageManipulator.manipulateAsync(
     uri,
     [{ resize: { width: 1024 } }],
-    { format: SaveFormat.JPEG, compress: 0.6, base64: true }
+    { format: ImageManipulator.SaveFormat.JPEG, compress: 0.6, base64: true }
   );
   return { base64: result.base64!, width: result.width, height: result.height };
 }
