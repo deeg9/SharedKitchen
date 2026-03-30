@@ -74,6 +74,7 @@ None yet.
 | 3 | Investigate RLS 403s and text node warnings | 2026-03-24 | 1f3ebc6 | [3-fix-rls-403s-on-grocery-items-and-expens](./quick/3-fix-rls-403s-on-grocery-items-and-expens/) |
 | 4 | Redesign add recipe form to match HTML mockup | 2026-03-24 | f71f1f6 | [4-redesign-add-recipe-form-to-match-html-m](./quick/4-redesign-add-recipe-form-to-match-html-m/) |
 | 5 | Grocery: edit items, collapsible sections | 2026-03-24 | 99e28e8 | [5-grocery-list-edit-items-collapsible-sect](./quick/5-grocery-list-edit-items-collapsible-sect/) |
+| 260330-liw | Jest unit tests for v4.0 AI Vision features | 2026-03-30 | 351add3 | [260330-liw-write-jest-unit-tests-for-v4-0-ai-vision](./quick/260330-liw-write-jest-unit-tests-for-v4-0-ai-vision/) |
 | Phase 26 P02 | 72s | 1 tasks | 1 files |
 | Phase 26 P01 | 123s | 2 tasks | 8 files |
 | Phase 27 P01 | 95s | 2 tasks | 3 files |
