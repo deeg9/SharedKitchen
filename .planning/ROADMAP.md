@@ -89,7 +89,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - [x] **Phase 26: Vision Foundation** - Shared camera capture, image compression, Edge Function with Gemini vision, rate limiting, and error handling (completed 2026-03-30)
 - [x] **Phase 27: Fridge/Pantry Photo Scan** - Photograph shelves, review AI-identified items, bulk-add to On Hand inventory (completed 2026-03-30)
 - [x] **Phase 28: Food Photo to Recipe Discovery** - Photograph food, identify dish, search web for recipes, import into recipe book (completed 2026-03-30)
-- [ ] **Phase 29: Food Photo to Meal Logging** - After dish identification, log meal directly to weekly plan with day/slot selection
+- [x] **Phase 29: Food Photo to Meal Logging** - After dish identification, log meal directly to weekly plan with day/slot selection (completed 2026-03-30)
 
 ## Phase Details
 
@@ -148,10 +148,10 @@ Plans:
   1. After dish identification, user sees both "Find Recipes" and "Log as Meal" options -- choosing either path from a single photo
   2. User can select a specific day and meal slot (breakfast/lunch/dinner) to log the identified dish
   3. Logged meal appears on the weekly meal plan calendar and is visible to all household members
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 29-01-PLAN.md — MealSlotPickerSheet component, dual action buttons on DishIdentifiedSheet
-- [ ] 29-02-PLAN.md — Wire meal logging flow in Kitchen tab, Plan tab display fix
+- [x] 29-02-PLAN.md — Wire meal logging flow in Kitchen tab, Plan tab display fix
 **UI hint**: yes
 
 ## Progress
@@ -188,7 +188,7 @@ Plans:
 | 26. Vision Foundation | v4.0 | 3/3 | Complete    | 2026-03-30 |
 | 27. Fridge/Pantry Photo Scan | v4.0 | 1/2 | Complete    | 2026-03-30 |
 | 28. Food Photo to Recipe Discovery | v4.0 | 2/2 | Complete    | 2026-03-30 |
-| 29. Food Photo to Meal Logging | v4.0 | 1/2 | In Progress|  |
+| 29. Food Photo to Meal Logging | v4.0 | 2/2 | Complete   | 2026-03-30 |
 
 ---
 *Last updated: 2026-03-30 after Phase 29 planning*
