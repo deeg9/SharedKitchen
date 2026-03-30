@@ -1,138 +1,260 @@
-# Feature Landscape: Video Recipe Import
+# Feature Landscape: AI Vision -- Scan, Snap & Add
 
-**Domain:** Video recipe import for collaborative dinner planning app
-**Researched:** 2026-03-28
-**Confidence:** MEDIUM-HIGH (competitive landscape well-documented; API capabilities verified via official docs)
+**Domain:** AI-powered food/kitchen photo scanning for collaborative dinner planning app
+**Researched:** 2026-03-30
+**Confidence:** MEDIUM-HIGH (competitive landscape well-documented; vision API capabilities verified; UX patterns consistent across competitors)
 
-## Table Stakes
+---
 
-Features users expect from video recipe import. Missing = feature feels incomplete or broken compared to CookingGuru, RecipeBro, Flavorish, and REX.
+## Feature 1: Fridge/Pantry Photo Scan -> Bulk Add to On Hand
+
+### Table Stakes
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| Paste URL import for video URLs | Every competitor supports this; users' primary interaction model | Low | Extend existing URL paste field to accept video URLs. Detect TikTok/Instagram/YouTube URL patterns in `parse-recipe-url` Edge Function. |
-| Share sheet integration (receive URLs) | Flavorish, RecipeBro, REX all support "share to app" from TikTok/Instagram/YouTube | Medium | Use `expo-share-intent` library. iOS Share Extension receives URLs, redirects to main app. This is how most users actually trigger import (not manual paste). |
-| TikTok URL support | TikTok is the #1 source of viral recipe content. CookingGuru, RecipeBro, Flavorish, REX all support it. | Medium | Supadata API handles TikTok transcript extraction. Only public videos accessible. |
-| Instagram Reels URL support | Second most common video recipe source. All competitors support it. | Medium | Supadata API handles Instagram transcript extraction. Only public posts accessible. |
-| YouTube URL support (Shorts + full videos) | Third major source. All competitors support it. YouTube has best transcript availability (native captions). | Low-Medium | Supadata API handles YouTube. Native captions usually available, reducing AI transcript cost. |
-| Structured recipe output (ingredients + steps) | Core value prop -- users want a usable recipe, not a transcript. Every competitor produces structured recipes. | Medium | Gemini Flash parses transcript into structured recipe format. Reuse existing recipe schema (ingredients, instructions, timers, nutrition). |
-| Progress/loading feedback during import | Video import takes 5-15 seconds (transcript extraction + LLM parsing). Users need feedback that something is happening. | Low | Loading spinner with status text ("Extracting transcript...", "Parsing recipe..."). |
-| Free tier with limited imports | Flavorish: 5 free, RecipeBro: 10 free, Honeydew: 10 free/month. Users expect to try before paying. | Low | PROJECT.md specifies 3/month free, unlimited premium. Track via `ai_usage_log` with new function name. |
-| Editable results before saving | RecipeBro and others let users fix extraction errors before committing. Transcript-based extraction is inherently imperfect. | Low | Already built -- existing recipe creation form can be pre-populated with imported data and edited before save. |
-| Source URL preserved on recipe | RecipeBro keeps video link. Users want to rewatch the original video for visual reference. | Low | Already supported -- `source_url` field exists on recipes table. Store original video URL there. |
+| Single photo capture of fridge/pantry shelf | Every competitor (Fridge Vision AI, Scan2Meal, Portions Master) starts with "snap a photo." Users expect to open camera, take one photo, see results. | Low | `expo-camera` or `expo-image-picker` for capture. Send base64 to Edge Function for Gemini vision analysis. |
+| Item list returned with names | Core value -- user photographs shelf, gets back a list of recognized items. Fridge Vision AI, Scan2Meal, Portions Master all do this. | Medium | Gemini Flash vision with structured output. Prompt requests JSON array of `{ name, category, quantity? }`. |
+| Editable results before saving | Users need to fix AI mistakes before committing to inventory. Fridge Vision AI shows editable ingredient list. Portions Master allows corrections. | Low | Show checklist UI with item name, category, optional quantity. Users can deselect, edit names, or add missed items before bulk save. |
+| Bulk add to On Hand inventory | One-tap to add all confirmed items. This is the payoff -- no manual entry per item. All competitors support batch add. | Low | Loop through confirmed items calling `pantryStore.addPantryItem()` for each, or batch insert via single Supabase `.insert([...])`. |
+| Category auto-assignment | Items should land in correct On Hand categories (Produce, Dairy & Eggs, Proteins, Pantry, Other). Fridge Vision AI and Portions Master auto-categorize. | Low | Gemini prompt includes category classification. Map to existing `pantryStore` categories: Proteins, Produce, Dairy & Eggs, Pantry, Other. |
+| Camera permission handling | iOS requires explicit permission. Users expect a clean prompt explaining why. | Low | `expo-camera` handles permission request. Add contextual pre-prompt matching existing notification permission pattern. |
+| Loading/progress feedback | Vision API call takes 3-8 seconds. Users need visual feedback. Every competitor shows a processing state. | Low | Spinner + status text ("Analyzing your fridge..."). Same pattern as video recipe import. |
+| Error state for poor/unusable photos | Dark, blurry, or non-food photos should get a helpful error, not garbage results. | Low | If Gemini returns 0 items or low confidence, show "Couldn't identify items. Try a brighter, closer photo." |
 
-## Differentiators
-
-Features that set SharedKitchen apart. Not expected by all users, but valued and not universally offered.
+### Differentiators
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| LLM best-guess for ambiguous measurements | Video creators say "a handful of cheese" or "some oil" -- LLM should produce reasonable numeric amounts (e.g., 1 cup, 2 tbsp) rather than leaving blanks. Competitors often leave these vague. | Low | Handled in Gemini Flash prompt engineering. Add instruction: "When measurements are vague or missing, provide reasonable cooking estimates." Already specified in PROJECT.md. |
-| Timer extraction from transcript | SharedKitchen already has embedded countdown timers in cooking mode. Extract "simmer for 20 minutes" from transcripts into timer metadata. No competitor integrates video import with cooking timers. | Low | Already built for web URL import. Gemini prompt already extracts timers. Transcript parsing inherits this. |
-| Nutrition info estimation | CookingGuru provides this; most others don't. SharedKitchen already has nutrition_info field. | Low | Gemini Flash can estimate nutrition from ingredients list. Already in the prompt for web import. |
-| Generic video URL support (any public video) | Supadata supports arbitrary public file URLs (MP4, WEBM, etc.). Most competitors only support TikTok/Instagram/YouTube. | Low | Supadata API accepts any public video URL. Fall through to generic handling if URL doesn't match known platforms. |
-| Household-shared video imports | Imported recipe automatically available to all household members. Competitors are individual-only apps. | None (free) | Already built -- recipes belong to households via `household_id` FK. No additional work needed. |
+| Brand-level identification | PROJECT.md specifies "brand-level detail" -- e.g., "Tillamook Sharp Cheddar" not just "cheese." No competitor consistently does this well. Fridge Vision AI identifies generic ingredients only. | Medium | Gemini vision can read package labels/logos. Prompt instructs: "For packaged items, identify the brand name and specific product. For loose produce, use common names." Accuracy varies -- packaged items with visible labels ~80%, loose produce ~90%, items behind other items ~50%. |
+| Multi-photo scan session | Fridge Vision AI allows up to 5 photos per session (different shelves, door, crisper). Most competitors limit to 1. Comprehensive coverage requires multiple angles. | Medium | Allow users to take 2-5 photos before processing. Aggregate results across photos, deduplicate. Each photo is a separate Gemini call; merge results client-side. |
+| Household-shared inventory update | Added items instantly visible to all household members via Supabase Realtime. No competitor in the fridge-scan space has multi-user households. | None (free) | Already built -- `pantryStore` uses Realtime sync via `usePantrySync`. Items added by one user appear for all household members. |
+| Quantity estimation | "About half a gallon of milk" or "3 apples" rather than just item names. Portions Master claims this; most competitors skip it. | Low | Gemini prompt can estimate visible quantities. Accuracy is approximate but better than nothing. Map to `pantryStore.addPantryItem({ quantity })`. |
+| Smart deduplication against existing On Hand | If user already has "Milk" in On Hand, scanning a milk carton should offer to update quantity rather than create a duplicate. | Medium | Before bulk add, check existing `pantryStore.items` for name matches (fuzzy). Show "Already in On Hand" badge with option to update or skip. |
 
-## Anti-Features
-
-Features to explicitly NOT build. Tempting but wrong for SharedKitchen's scope or technical reality.
+### Anti-Features
 
 | Anti-Feature | Why Avoid | What to Do Instead |
 |--------------|-----------|-------------------|
-| Video content embedded in recipe | PROJECT.md explicitly excludes this ("text + photos only"). Video hosting is expensive, copyright-fraught, and unnecessary when `source_url` links back. | Store `source_url` pointing to original video. Users tap to watch in native app. |
-| Visual/frame analysis of video content | CookingGuru claims "visual analysis" but transcript-based extraction is more reliable, cheaper, and faster. Computer vision for cooking videos is research-grade, not production-ready. | Use transcript-only extraction via Supadata. Gemini Flash parses text, not video frames. |
-| In-app video playback | Building a video player adds complexity (codec support, streaming, caching) for marginal value. Users already have TikTok/Instagram/YouTube installed. | Deep-link or open `source_url` in system browser/native app. |
-| Private/login-walled video access | TikTok and Instagram block automated access to private content. Attempting this creates legal risk, reliability problems, and user confusion. | Only support publicly accessible videos. Show clear error: "This video appears to be private. Please make sure the video is publicly accessible." |
-| OCR/on-screen text extraction | Some recipes show ingredients as on-screen text overlays without saying them aloud. OCR adds a separate AI pipeline, increases cost, and is unreliable with stylized fonts. | Rely on audio transcript. If transcript is empty or too short, show user-friendly error suggesting they try a different video or enter manually. |
-| Batch/bulk video import | Importing multiple videos at once adds queue management complexity and multiplies API costs. No competitor offers this as a primary feature. | Single URL import per action. Users can import multiple recipes sequentially. |
-| Caption/description-only extraction (no transcript) | RecipeBro claims to extract from "captions and descriptions" -- this works poorly for most video recipes where ingredients are spoken, not typed. | Always extract transcript. If available, combine transcript + caption for better results. Captions alone are insufficient. |
+| Barcode scanning for individual items | Requires a barcode database (UPC -> product name), adds a completely different scanning paradigm, and is slower than photo-based bulk scanning. NoWaste and CozZo focus on barcodes but it is one-item-at-a-time. | Photo-based bulk identification. Users wanting single-item precision can edit the results list or manually add items. |
+| Expiration date detection from photos | Extremely unreliable -- dates are printed small, in varying formats, often obscured. Samsung's AI fridge only manages this for pre-registered items. | Let users manually set expiration dates on items they care about (field already exists in `pantry_items.expires_at`). |
+| Automatic re-scanning on schedule | Push notification saying "Time to scan your fridge!" feels invasive and adds notification fatigue on top of existing cooking reminders and budget alerts. | On-demand scanning only. The camera button is always available on the Kitchen tab. |
+| Receipt OCR scanning | Different feature entirely (ConsumeSmart, CozZo). Requires OCR pipeline, store-specific formatting handling, and a text-to-product mapping layer. Out of scope for camera vision milestone. | Photo-based scanning of actual food items. Receipt scanning could be a separate future milestone. |
+| Real-time camera overlay with item labels | AR-style bounding boxes over items in live camera feed. Requires frame processing, adds massive complexity, drains battery. No food app does this well. | Static photo analysis. Take photo, process server-side, return results. |
 
-## Feature Dependencies
+### Dependencies on Existing Features
 
-```
-Share Sheet Integration (expo-share-intent)
-  --> URL Detection (is this a video URL?)
-    --> Transcript Extraction (Supadata API call)
-      --> LLM Recipe Parsing (Gemini Flash)
-        --> Recipe Preview/Edit Form (existing)
-          --> Recipe Save (existing recipeStore.addRecipe)
-
-Paste URL Field (existing)
-  --> URL Detection (is this a video URL?)
-    --> [same pipeline as above]
-
-Video Import Rate Limiting
-  --> Premium Status Check (existing subscriptions table)
-  --> Usage Tracking (existing ai_usage_log table)
-```
-
-### Integration Points with Existing Infrastructure
-
-| Existing Component | How Video Import Uses It | Changes Needed |
+| Existing Component | How This Feature Uses It | Changes Needed |
 |-------------------|-------------------------|----------------|
-| `parse-recipe-url` Edge Function | Add video URL detection branch. If video URL detected, call Supadata for transcript, then Gemini for recipe parsing. | Add URL pattern matching, Supadata API call, new Gemini prompt for transcripts. |
-| `parseRecipeUrl()` in `src/lib/ai.ts` | Client-side entry point. Detect video URL before fetching HTML (video pages don't have JSON-LD recipe data). Route to edge function directly. | Add video URL regex check, skip HTML fetch for video URLs, pass URL to edge function. |
-| `ai_usage_log` table | Track video imports separately (`function_name: 'parse-video-recipe'`) for rate limiting (3/month free vs 10/day for web URLs). | New function_name constant. Rate limit query filters by this name. |
-| `subscriptions` table | Check premium status for unlimited video imports. | No changes -- already queried in Edge Function. |
-| Recipe creation form | Pre-populate with parsed video recipe data for user review/edit before save. | No changes -- already accepts `RecipeInsert` shape. |
-| `source_url` field | Store original video URL. | No changes -- field already exists. |
-| `expo-share-intent` (NEW) | Receive shared URLs from iOS share sheet. | New dependency. Config plugin in app.json, `+native-intent.ts` handler, route to import flow. |
+| `pantryStore.addPantryItem()` | Bulk add identified items to On Hand | None -- call in loop or refactor to accept array |
+| `pantry_items` table | Store scanned items | None -- schema already has name, quantity, unit, category, expires_at |
+| Kitchen tab (On Hand segment) | Entry point for scan -- camera button on On Hand view | Add camera FAB or header button |
+| `usePantrySync` Realtime hook | Scanned items sync to household members | None -- already working |
+| `ai_usage_log` table | Rate limit scans (premium feature) | Add `function_name: 'scan-pantry'` |
+| `subscriptions` table | Gate unlimited scans for premium users | None -- already queried in Edge Functions |
+
+---
+
+## Feature 2: Food Photo -> Recipe Discovery
+
+### Table Stakes
+
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Take/upload photo of a dish | Core interaction. DishDetect, Recipe Lens, Food Scanner, NomNomBear all start here. Camera or photo library picker. | Low | `expo-image-picker` for camera + gallery. Same capture flow as Feature 1. |
+| AI dish identification with name | "This looks like Pad Thai" or "Chicken Parmesan." Every competitor does this. DishDetect claims 95%+ accuracy. | Medium | Gemini Flash vision identifies the dish. Prompt: "Identify this dish. Return the dish name, cuisine, and a brief description." GPT-4o achieves ~59-74% accuracy on food ID; Gemini Flash should be comparable. |
+| 2-3 recipe options presented | PROJECT.md specifies "2-3 recipe options from web search." Users need choice because AI identification may be approximate ("is it Pad Thai or Drunken Noodles?"). | Medium | After dish identification, search for recipes using the identified dish name. Present 2-3 results with title, source, and thumbnail. |
+| Recipe import from selected option | User picks one recipe, it imports into their recipe book. This is the payoff -- photo to saved recipe. | Low | Reuse existing `parseRecipeUrl()` pipeline. User selects a recipe URL, it flows through the existing JSON-LD -> Gemini extraction. |
+| Loading/progress feedback | Two-step process (identify dish + search recipes) takes 5-10 seconds total. Users need feedback at each stage. | Low | "Identifying dish..." then "Finding recipes..." progress states. |
+| Confidence indication | When AI is uncertain between "Chicken Alfredo" and "Chicken Carbonara," user should know. Recipe Lens and NomNomBear show primary guess with alternatives. | Low | Gemini returns top 1-3 dish name guesses. Show primary identification prominently, alternatives as "Did you mean?" chips. |
+| Photo from gallery (not just camera) | Users often want to identify dishes from screenshots, photos taken earlier, or images shared by friends. Recipe Lens supports this. | Low | `expo-image-picker` supports both camera and gallery in one flow with `launchImageLibraryAsync()` and `launchCameraAsync()`. |
+
+### Differentiators
+
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| Direct import into household recipe book | Competitor apps (DishDetect, Recipe Lens) are individual-only. SharedKitchen imports into the shared household recipe book, immediately available to all members. | None (free) | Existing `recipeStore.addRecipe()` already saves to household. |
+| Recipe results with cooking mode compatibility | Imported recipes get timer extraction and step-by-step cooking mode. No photo-to-recipe competitor offers integrated cooking mode. | None (free) | Existing recipe import pipeline already extracts timers. |
+| Meal plan integration | After importing a recipe from a food photo, offer "Add to this week's plan?" one-tap action. No photo-to-recipe competitor has meal planning. | Low | After recipe save, show bottom sheet with day picker using existing `planStore.assignRecipe()`. |
+| Web search powered recipe discovery | Rather than generating a recipe from AI (unreliable, no source), find real recipes from real food blogs. More trustworthy and users can reference the original source. | Medium | Use Google Custom Search API or SerpApi to search "[dish name] recipe" and return top results with URLs. Each URL can then flow through existing recipe import. |
+
+### Anti-Features
+
+| Anti-Feature | Why Avoid | What to Do Instead |
+|--------------|-----------|-------------------|
+| AI-generated recipes (no source URL) | PROJECT.md already excludes "AI-generated recipe images" and the app philosophy is extracting from real sources. AI-generated recipes have no provenance, may have errors, and cannot be verified. | Search for real recipes from real URLs. Import via existing pipeline. |
+| Nutrition estimation from photo | Calorie tracking from food photos is a separate product (SnapCalorie, Cal AI). Accuracy is poor (10-20% error range per research). SharedKitchen is a meal planning app, not a calorie tracker. | Import the recipe, which already includes nutrition info extracted from the source page. |
+| Ingredient-level identification from cooked dish | "What ingredients are in this?" from a photo of a finished dish is extremely unreliable. Hidden ingredients (spices, sauces) are undetectable. | Identify the dish name, then import a recipe that lists ingredients. The recipe is the source of truth for ingredients. |
+| Reverse image search for recipes | Google Lens-style "find this exact image online" is technically complex, requires a different API, and returns visual matches rather than recipe matches. | Text-based recipe search using the AI-identified dish name. More reliable and cheaper. |
+
+### Dependencies on Existing Features
+
+| Existing Component | How This Feature Uses It | Changes Needed |
+|-------------------|-------------------------|----------------|
+| `parseRecipeUrl()` in `src/lib/ai.ts` | Import selected recipe URL through existing pipeline | None -- already handles URL -> structured recipe |
+| `recipeStore.addRecipe()` | Save imported recipe to household | None |
+| Recipe creation/edit form | Pre-populate with imported data for review | None -- already accepts `RecipeInsert` shape |
+| `planStore.assignRecipe()` | Optional: add imported recipe to meal plan | None -- existing API |
+| `ai_usage_log` table | Rate limit photo identification | Add `function_name: 'identify-dish'` |
+| `parse-recipe-url` Edge Function | Could extend to handle dish identification, or create new `identify-dish` Edge Function | New code path or new function |
+
+---
+
+## Feature 3: Food Photo -> Meal Plan Logging
+
+### Table Stakes
+
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Take photo of meal | Same capture mechanism as Feature 2. Users photograph what they are eating right now. | Low | Reuse the same `expo-image-picker` flow. |
+| AI dish identification | Same as Feature 2 -- identify what the dish is. | Low (shared) | Same Gemini Flash vision call as Feature 2. Shared code path. |
+| Day/slot selection | User picks which day and meal slot (breakfast/lunch/dinner) to log the meal to. | Low | Show bottom sheet with day picker (today pre-selected) and meal type selector. Reuse existing `MealType` enum: breakfast, lunch, dinner. |
+| One-tap logging | After confirming dish name and selecting day/slot, single tap to add to plan. Minimal friction -- this is for quick "I just ate this" logging. | Low | Call `planStore.assignRecipe()` with `recipeId: null` (no recipe) or create a lightweight meal entry. Existing meal plan supports `notes` field for meal name. |
+| Editable dish name before saving | AI might get the name wrong. User should be able to correct "Spaghetti Bolognese" to "Mom's Meat Sauce" before it hits the plan. | Low | Text input pre-filled with AI guess. User can accept or edit. |
+| Meal source selection | Existing meal plan has `MealSource`: home-cooked, takeout, eating-out. Photographing a restaurant dish should default to "eating-out." | Low | Show meal source picker (already built in plan edit UI). Default based on context or let user choose. |
+
+### Differentiators
+
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| Dual-action after photo | After identifying a dish, offer BOTH "Log as meal" AND "Find recipe" as options. One photo, two paths. No competitor offers both in one flow. | Low | After dish identification, show two action buttons: "Add to Plan" (Feature 3 flow) and "Find Recipes" (Feature 2 flow). |
+| Photo stored as meal thumbnail | The photo the user took becomes the visual for that meal on the weekly plan. Adds visual richness to the calendar view. | Medium | Upload photo to Supabase Storage. Store URL on `meal_plans` row. Display as thumbnail on plan day cards. Requires new `image_url` column on `meal_plans`. |
+| Household activity feed integration | "Alex logged Pad Thai for Wednesday dinner" shows as activity toast for household members. | None (free) | Existing Supabase Realtime activity toasts already fire for meal plan changes. |
+| Quick-log from Kitchen tab | Camera button accessible from On Hand tab -- same entry point for both pantry scanning and meal logging, with a choice after photo capture. | Low | Single camera FAB on Kitchen tab. After photo, ask: "Is this your fridge/pantry or a meal?" Route to Feature 1 or Feature 3 accordingly. |
+
+### Anti-Features
+
+| Anti-Feature | Why Avoid | What to Do Instead |
+|--------------|-----------|-------------------|
+| Automatic calorie/macro logging | SharedKitchen is a meal planning app, not a nutrition tracker. Adding calorie tracking from photos creates scope creep into a different product category (competing with MyFitnessPal, SnapCalorie). | Log the meal name and source to the plan. If users want nutrition info, they can find and import the recipe (Feature 2). |
+| Meal cost estimation from photo | Guessing cost from a photo is inaccurate. The existing budget feature requires explicit cost entry. | Keep existing manual cost entry via `meal_cost` field on meal plan edit. |
+| Auto-detect meal type from time of day | "It's 7pm so this must be dinner" is wrong often enough to annoy users (late lunch, early dinner, breakfast for dinner). | Default to dinner (most common for SharedKitchen's use case) but let user change. |
+| Photo required for meal logging | Some meals do not need a photo (quick "we had leftovers" entry). Do not make the camera the only way to log meals. | Camera is an additional input method. Existing manual meal assignment (recipe picker, text notes) remains primary. |
+
+### Dependencies on Existing Features
+
+| Existing Component | How This Feature Uses It | Changes Needed |
+|-------------------|-------------------------|----------------|
+| `planStore.assignRecipe()` | Log identified meal to a day/slot | May need to support `notes` field for dish name when no recipe is linked |
+| `MealType` / `MealSource` enums | Day/slot and source selection | None |
+| Meal plan day cards (Plan tab) | Display logged meal | May need to show photo thumbnail if stored |
+| `meal_plans` table | Store the logged meal | Possibly add `image_url` column for meal photo |
+| Supabase Storage | Store meal photos | New bucket: `meal-photos` |
+| `ai_usage_log` table | Rate limit (shared with Feature 2) | Same `function_name: 'identify-dish'` |
+
+---
+
+## Cross-Feature Dependencies
+
+```
+expo-camera / expo-image-picker (shared)
+  |
+  +--> Photo capture
+        |
+        +--> "What is this?" intent router
+              |
+              +-- Fridge/Pantry scan (Feature 1)
+              |     --> Gemini vision: identify items
+              |     --> Review/edit item list
+              |     --> Bulk add to pantryStore
+              |
+              +-- Food/Meal photo (Features 2 + 3)
+                    --> Gemini vision: identify dish
+                    --> Dual action:
+                          |
+                          +-- "Find Recipes" (Feature 2)
+                          |     --> Web search by dish name
+                          |     --> Recipe URL selection
+                          |     --> Existing parseRecipeUrl() pipeline
+                          |     --> recipeStore.addRecipe()
+                          |
+                          +-- "Log as Meal" (Feature 3)
+                                --> Day/slot picker
+                                --> planStore.assignRecipe()
+```
+
+### Shared Infrastructure
+
+| Component | Used By | Notes |
+|-----------|---------|-------|
+| Camera/image picker | All 3 features | Single shared capture component |
+| Gemini Flash vision API | All 3 features | Different prompts: item identification vs dish identification |
+| Edge Function (new or extended) | All 3 features | Receives base64 image, routes to appropriate Gemini prompt |
+| `ai_usage_log` rate limiting | All 3 features | Two function names: `scan-pantry` and `identify-dish` |
+| Premium gating | All 3 features | Free tier gets limited scans/identifications per month |
+
+---
+
+## Feature Dependencies (Build Order)
+
+```
+Phase 1: Camera infrastructure + Gemini vision pipeline (shared)
+  |
+  +--> Phase 2a: Fridge/pantry scan (Feature 1)
+  |      Depends on: camera, Gemini vision, pantryStore
+  |
+  +--> Phase 2b: Dish identification (shared by Features 2 + 3)
+  |      Depends on: camera, Gemini vision
+  |
+  +--> Phase 3a: Recipe discovery (Feature 2)
+  |      Depends on: dish identification, web search, parseRecipeUrl
+  |
+  +--> Phase 3b: Meal logging (Feature 3)
+         Depends on: dish identification, planStore
+```
+
+Features 2 and 3 share the dish identification step, so they should be built together after the shared vision pipeline is established.
+
+---
 
 ## MVP Recommendation
 
-### Must Have (Phase 1 -- Core Pipeline)
+### Must Have (ship or feature feels broken)
 
-1. **Video URL detection** in Edge Function -- regex patterns for TikTok, Instagram, YouTube URLs
-2. **Supadata transcript extraction** -- API integration in Edge Function
-3. **Transcript-to-recipe Gemini prompt** -- new prompt optimized for conversational/spoken recipe content
-4. **Video-specific rate limiting** -- 3/month free, unlimited premium, tracked in `ai_usage_log`
-5. **Paste URL support** -- extend existing paste field to accept video URLs (minimal client changes)
-
-### Must Have (Phase 2 -- Share Sheet)
-
-6. **Share sheet integration** via `expo-share-intent` -- receive URLs from TikTok/Instagram/YouTube apps
-7. **Deep link routing** -- shared URL routes to import flow with URL pre-filled
+1. **Camera capture component** -- shared by all features, build first
+2. **Gemini vision Edge Function** -- receives image, returns structured identification
+3. **Fridge/pantry scan with bulk add** (Feature 1) -- highest standalone value, populates On Hand inventory from photo
+4. **Dish identification** (shared) -- identifies food photos, used by Features 2 and 3
+5. **Recipe discovery with 2-3 options** (Feature 2) -- photo to recipe import pipeline
+6. **Meal plan logging** (Feature 3) -- simplest of the three, quick-log identified dish
 
 ### Should Have (included in MVP but lower priority)
 
-8. **Progress feedback** -- multi-step loading states during import
-9. **Error handling for private videos** -- clear user-facing message
-10. **Generic video URL support** -- any public video URL, not just TikTok/Instagram/YouTube
+7. **Multi-photo scan sessions** -- 2-5 photos for comprehensive fridge coverage
+8. **Smart deduplication** -- check existing On Hand before adding duplicates
+9. **Dual-action after dish identification** -- "Find Recipes" + "Log as Meal" in one flow
+10. **Meal photo thumbnail on plan** -- visual richness but requires Storage + schema change
 
 ### Defer
 
-- **Video thumbnail as recipe image**: Extract thumbnail from video metadata via Supadata or platform oEmbed endpoint. Nice-to-have but not critical for v3.0 launch.
-- **Caption + transcript combining**: Merge video caption/description text with transcript for richer context. Marginal improvement, add complexity.
+- **Brand-level identification refinement** -- Gemini will try, but accuracy on packaged goods varies. Do not over-promise; ship with best-effort brand detection and iterate.
+- **Quantity estimation refinement** -- approximate quantities are fine for v4.0. Precision can improve with user feedback data.
+- **Receipt OCR** -- entirely different feature, different milestone.
 
-## Competitive Landscape Summary
+---
 
-| App | Video Sources | Extraction Method | Free Tier | Paid Price | Differentiator |
-|-----|--------------|-------------------|-----------|------------|----------------|
-| **CookingGuru** | TikTok, Instagram, YouTube Shorts | Visual analysis + AI (claims) | Free with limits | Freemium (unspecified) | Claims to work on silent videos |
-| **RecipeBro** | TikTok, Instagram, YouTube, Pinterest, any website | Captions + descriptions + AI | 10 free imports | Subscription (unspecified) | 700+ food blog sites, manual support for failures |
-| **Flavorish** | TikTok, Instagram, YouTube, Facebook | Share-to-app AI extraction | 5 free social imports | $4.99/month | Nutrition breakdown, meal planning |
-| **REX** | YouTube, other platforms | AI extraction | Unknown | Unknown | Shopping list generator (coming soon) |
-| **Recify** | TikTok, Instagram, Pinterest | AI from video/caption | Unknown | Unknown | Standardizes casual formats |
-| **Honeydew** | TikTok, Instagram, Pinterest, YouTube | AI extraction | 10 AI imports/month | Subscription | Recipe organization + collections |
-| **SharedKitchen** (planned) | TikTok, Instagram, YouTube, any video URL | Transcript (Supadata) + Gemini Flash | 3 video/month | $9.99/month (existing plan) | Household sharing, cooking mode timers, integrated meal planning |
+## Complexity Summary
 
-### SharedKitchen's Position
+| Feature | Overall Complexity | Biggest Risk |
+|---------|-------------------|--------------|
+| Fridge/pantry scan (Feature 1) | Medium | AI accuracy on cluttered fridges, items behind items, poor lighting. Mitigation: multi-photo support, editable results. |
+| Recipe discovery (Feature 2) | Medium | Web search quality and recipe URL extraction reliability. Mitigation: reuse proven parseRecipeUrl pipeline, show multiple options. |
+| Meal logging (Feature 3) | Low | Dish identification accuracy. Mitigation: editable dish name, low-friction correction. |
+| Shared camera/vision infrastructure | Medium | First-time camera integration in the app, image upload to Edge Function, Gemini vision prompt engineering. |
 
-SharedKitchen is entering a crowded space for video import but has unique advantages:
-- **Household collaboration** -- no competitor shares imported recipes with household members automatically
-- **Cooking mode integration** -- timer extraction from transcripts feeds directly into step-by-step cooking mode with countdown timers
-- **Meal planning integration** -- imported recipes slot directly into weekly dinner calendar
-- **Existing premium base** -- video import adds value to existing $9.99/month subscription rather than being the sole paid feature
+**Total estimated effort:** Medium overall. The heaviest lift is the shared Gemini vision infrastructure (prompt engineering for food/item identification, image handling in Edge Functions). Individual features layer on top with relatively low marginal complexity because they integrate into existing stores and UI patterns.
 
-The 3/month free tier is aggressive (lower than competitors' 5-10) but acceptable given SharedKitchen's broader feature set and higher subscription price point.
+---
 
 ## Sources
 
-- [CookingGuru](https://cooking.guru/) -- Competitor analysis (fetched 2026-03-28)
-- [Flavorish](https://www.flavorish.ai/) -- Competitor analysis (fetched 2026-03-28)
-- [RecipeBro Import](https://recipebro.com/import) -- Competitor analysis (fetched 2026-03-28)
-- [RecipeBro TikTok Import](https://recipebro.com/import-recipes/tiktok) -- Competitor analysis (fetched 2026-03-28)
-- [Supadata Transcript API](https://docs.supadata.ai/get-transcript) -- Official API docs (fetched 2026-03-28)
-- [expo-share-intent GitHub](https://github.com/achorein/expo-share-intent) -- Share sheet library (WebSearch 2026-03-28)
-- [Honeydew Blog - Recipe Apps for Social Media Imports](https://honeydewcook.com/blog/recipe-apps-social-media-imports) -- Market overview (WebSearch 2026-03-28)
-- [Recipe Notes - TikTok Import Guide](https://recipenotes.app/how-to-import-recipes-from-tiktok) -- Competitor analysis (WebSearch 2026-03-28)
+- [Fridge Vision AI](https://fridgevisionai.com/) -- Competitor analysis, UX flow, 95% accuracy claim, 5-photo sessions
+- [Scan2Meal](https://scan2meal.app/) -- Competitor analysis, receipt + photo scanning
+- [Recipe Lens](https://www.recipelens.com/) -- Photo-to-recipe identification flow
+- [DishDetect](https://www.dishdetect.app/) -- 95%+ dish identification accuracy claim
+- [Portions Master](https://portionsmaster.com/blog/best-pantry-inventory-app-and-fridge-management-tool/) -- Fridge scan, categorization, meal recommendations
+- [DEV Community: Building Meal Tracker with GPT-4o Vision](https://dev.to/wellallytech/from-pixels-to-calories-building-a-high-precision-meal-tracker-with-gpt-4o-vision-5018) -- Architecture pattern, prompt strategy, cost analysis
+- [Gemini API Image Understanding](https://ai.google.dev/gemini-api/docs/image-understanding) -- Official Gemini vision capabilities, structured output, object detection
+- [SerpApi Google Recipes API](https://serpapi.com/recipes-results) -- Programmatic recipe search by dish name
+- [Welling.ai: AI Food Tracker Accuracy 2026](https://www.welling.ai/articles/ai-food-tracker-photo-recognition-calories-2026) -- Industry accuracy benchmarks
+- [Samsung Bespoke Fridge with Gemini](https://www.techlicious.com/blog/samsung-bespoke-fridge-vision-ai-with-google-gemini/) -- Gemini food recognition: 37 items, limitation on door bins/freezer
+- [ScienceDirect: Diabot-GPT-4o Food Recognition](https://www.sciencedirect.com/science/article/abs/pii/S0002916525006173) -- GPT-4o: 59-74% food identification accuracy, 10-20% error on portions
