@@ -9,25 +9,25 @@ Requirements for AI Vision — Scan, Snap & Add. Each maps to roadmap phases.
 
 ### Vision Foundation
 
-- [ ] **VIS-01**: User can capture a photo from camera within the app via a reusable camera sheet
-- [ ] **VIS-02**: Captured images are compressed client-side to ~200KB before upload
-- [ ] **VIS-03**: Camera permission is requested with contextual pre-prompt before first use
-- [ ] **VIS-04**: Edge Function accepts base64 images and routes to Gemini 2.5 Flash vision by intent (scan/identify)
-- [ ] **VIS-05**: Vision API calls are rate-limited per intent with free-tier caps tracked in ai_usage_log
+- [x] **VIS-01**: User can capture a photo from camera within the app via a reusable camera sheet
+- [x] **VIS-02**: Captured images are compressed client-side to ~200KB before upload
+- [x] **VIS-03**: Camera permission is requested with contextual pre-prompt before first use
+- [x] **VIS-04**: Edge Function accepts base64 images and routes to Gemini 2.5 Flash vision by intent (scan/identify)
+- [x] **VIS-05**: Vision API calls are rate-limited per intent with free-tier caps tracked in ai_usage_log
 
 ### Fridge/Pantry Scan
 
 - [ ] **SCAN-01**: User can photograph fridge or pantry shelves and receive a list of identified items with brand-level detail
 - [ ] **SCAN-02**: User can review, edit, add, or remove items on a confirmation screen before saving
-- [ ] **SCAN-03**: Confirmed items are bulk-added to On Hand inventory with auto-assigned categories
-- [ ] **SCAN-04**: Duplicate items are detected via normalized name matching and merged or flagged
+- [x] **SCAN-03**: Confirmed items are bulk-added to On Hand inventory with auto-assigned categories
+- [x] **SCAN-04**: Duplicate items are detected via normalized name matching and merged or flagged
 - [ ] **SCAN-05**: User can scan multiple shelves/areas and merge results into a single review before saving
 
 ### Food Photo → Recipe Discovery
 
 - [ ] **RCPE-01**: User can photograph food or a screenshot and have the dish identified by AI
 - [ ] **RCPE-02**: AI shows confidence level and allows user to correct the dish name before searching
-- [ ] **RCPE-03**: App searches the web and presents 2-3 recipe options for the identified dish
+- [x] **RCPE-03**: App searches the web and presents 2-3 recipe options for the identified dish
 - [ ] **RCPE-04**: User can select a recipe and import it into their recipe book via existing import pipeline
 
 ### Food Photo → Meal Logging
@@ -59,19 +59,19 @@ Requirements for AI Vision — Scan, Snap & Add. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| VIS-01 | Phase 26 | Pending |
-| VIS-02 | Phase 26 | Pending |
-| VIS-03 | Phase 26 | Pending |
-| VIS-04 | Phase 26 | Pending |
-| VIS-05 | Phase 26 | Pending |
+| VIS-01 | Phase 26 | Complete |
+| VIS-02 | Phase 26 | Complete |
+| VIS-03 | Phase 26 | Complete |
+| VIS-04 | Phase 26 | Complete |
+| VIS-05 | Phase 26 | Complete |
 | SCAN-01 | Phase 27 | Pending |
 | SCAN-02 | Phase 27 | Pending |
-| SCAN-03 | Phase 27 | Pending |
-| SCAN-04 | Phase 27 | Pending |
+| SCAN-03 | Phase 27 | Complete |
+| SCAN-04 | Phase 27 | Complete |
 | SCAN-05 | Phase 27 | Pending |
 | RCPE-01 | Phase 28 | Pending |
 | RCPE-02 | Phase 28 | Pending |
-| RCPE-03 | Phase 28 | Pending |
+| RCPE-03 | Phase 28 | Complete |
 | RCPE-04 | Phase 28 | Pending |
 | MEAL-01 | Phase 29 | Pending |
 | MEAL-02 | Phase 29 | Pending |
