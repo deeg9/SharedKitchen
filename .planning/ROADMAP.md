@@ -87,7 +87,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 ### v4.0 AI Vision — Scan, Snap & Add (Phases 26-29)
 
 - [x] **Phase 26: Vision Foundation** - Shared camera capture, image compression, Edge Function with Gemini vision, rate limiting, and error handling (completed 2026-03-30)
-- [ ] **Phase 27: Fridge/Pantry Photo Scan** - Photograph shelves, review AI-identified items, bulk-add to On Hand inventory
+- [x] **Phase 27: Fridge/Pantry Photo Scan** - Photograph shelves, review AI-identified items, bulk-add to On Hand inventory (completed 2026-03-30)
 - [ ] **Phase 28: Food Photo to Recipe Discovery** - Photograph food, identify dish, search web for recipes, import into recipe book
 - [ ] **Phase 29: Food Photo to Meal Logging** - After dish identification, log meal directly to weekly plan with day/slot selection
 
@@ -119,9 +119,9 @@ Plans:
   3. Confirmed items are bulk-added to On Hand inventory with correct categories, and appear immediately via real-time sync for all household members
   4. Items that already exist in On Hand are flagged as duplicates on the review screen rather than silently creating double entries
   5. User can take multiple photos (different shelves/areas) and merge all results into a single review screen before saving
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
-- [ ] 27-01-PLAN.md — Scan types, duplicate detection, bulkAddPantryItems store method
+- [x] 27-01-PLAN.md — Scan types, duplicate detection, bulkAddPantryItems store method
 - [ ] 27-02-PLAN.md — ScanReviewScreen UI, Kitchen tab wiring, multi-photo support
 **UI hint**: yes
 
@@ -180,7 +180,7 @@ Plans:
 | 24. Share Sheet Integration | v3.0 | 2/2 | Complete | 2026-03-28 |
 | 25. Kitchen Tab | v3.0 | 2/2 | Complete | 2026-03-29 |
 | 26. Vision Foundation | v4.0 | 3/3 | Complete    | 2026-03-30 |
-| 27. Fridge/Pantry Photo Scan | v4.0 | 0/2 | Planning complete | - |
+| 27. Fridge/Pantry Photo Scan | v4.0 | 1/2 | Complete    | 2026-03-30 |
 | 28. Food Photo to Recipe Discovery | v4.0 | 0/0 | Not started | - |
 | 29. Food Photo to Meal Logging | v4.0 | 0/0 | Not started | - |
 

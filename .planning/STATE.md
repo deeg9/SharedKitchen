@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: AI Vision — Scan, Snap & Add
 status: Ready to plan
-stopped_at: Completed 26-01-PLAN.md
-last_updated: "2026-03-30T18:58:50.436Z"
+stopped_at: Completed 27-01-PLAN.md
+last_updated: "2026-03-30T19:36:11.311Z"
 progress:
   total_phases: 4
-  completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
+  completed_phases: 2
+  total_plans: 5
+  completed_plans: 5
 ---
 
 # Project State
@@ -19,11 +19,11 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-30)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Phase 26 — Vision Foundation
+**Current focus:** Phase 27 — Fridge/Pantry Photo Scan
 
 ## Current Position
 
-Phase: 27
+Phase: 28
 Plan: Not started
 
 ## Performance Metrics
@@ -48,6 +48,8 @@ Recent decisions affecting current work:
 - [v4.0]: expo-image-manipulator for on-device compression (already in Expo SDK)
 - [Phase 26]: Used inline_data with raw base64 for Gemini vision; 30s timeout; no caching for vision calls
 - [Phase 26]: Used surface color for VisionLoadingOverlay card for better contrast on dark overlay
+- [Phase 27]: Substring matching for dedup instead of Levenshtein - simpler and sufficient for food names
+- [Phase 27]: Single batch Supabase insert with optimistic temp IDs following existing addPantryItem pattern
 
 ### Pending Todos
 
@@ -71,9 +73,10 @@ None yet.
 | 5 | Grocery: edit items, collapsible sections | 2026-03-24 | 99e28e8 | [5-grocery-list-edit-items-collapsible-sect](./quick/5-grocery-list-edit-items-collapsible-sect/) |
 | Phase 26 P02 | 72s | 1 tasks | 1 files |
 | Phase 26 P01 | 123s | 2 tasks | 8 files |
+| Phase 27 P01 | 95s | 2 tasks | 3 files |
 
 ## Session Continuity
 
-Last session: 2026-03-30T18:50:27.221Z
-Stopped at: Completed 26-01-PLAN.md
+Last session: 2026-03-30T19:24:42.384Z
+Stopped at: Completed 27-01-PLAN.md
 Resume file: None
