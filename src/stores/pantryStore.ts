@@ -27,6 +27,14 @@ interface PantryState {
     groceryItem: { name: string; quantity: string | null; section: string | null },
     groceryItemId: string
   ) => Promise<void>;
+  bulkAddPantryItems: (
+    householdId: string,
+    items: Array<{
+      name: string;
+      quantity?: string;
+      category?: string;
+    }>
+  ) => Promise<{ addedCount: number }>;
 
   // Realtime helpers (called by usePantrySync)
   _addItem: (item: PantryItem) => void;
@@ -188,6 +196,60 @@ export const usePantryStore = create<PantryState>((set, get) => ({
       }));
     } catch (error: unknown) {
       set({ error: getErrorMessage(error) });
+    }
+  },
+
+  bulkAddPantryItems: async (householdId, items) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      const inserts = items.map((item) => ({
+        household_id: householdId,
+        name: item.name,
+        quantity: item.quantity ?? null,
+        unit: null,
+        category: item.category ?? 'Other',
+        created_by: user?.id ?? null,
+      }));
+
+      // Optimistic: create temp items
+      const tempItems: PantryItem[] = inserts.map((ins, idx) => ({
+        id: `temp-bulk-${Date.now()}-${idx}`,
+        ...ins,
+        added_at: new Date().toISOString(),
+        expires_at: null,
+        source_grocery_item_id: null,
+      }));
+      set((state) => ({ items: [...tempItems, ...state.items] }));
+
+      // Single batch insert
+      const { data, error } = await supabase
+        .from('pantry_items')
+        .insert(inserts)
+        .select();
+
+      if (error) {
+        // Revert all temp items
+        const tempIds = new Set(tempItems.map(t => t.id));
+        set((state) => ({
+          items: state.items.filter((i) => !tempIds.has(i.id)),
+          error: error.message,
+        }));
+        return { addedCount: 0 };
+      }
+
+      // Replace temp items with real ones
+      const tempIds = new Set(tempItems.map(t => t.id));
+      set((state) => ({
+        items: [
+          ...(data as PantryItem[]),
+          ...state.items.filter((i) => !tempIds.has(i.id)),
+        ],
+      }));
+      return { addedCount: data.length };
+    } catch (error: unknown) {
+      set({ error: getErrorMessage(error) });
+      return { addedCount: 0 };
     }
   },
 
