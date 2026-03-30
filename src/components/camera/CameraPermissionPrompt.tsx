@@ -51,6 +51,7 @@ export function CameraPermissionPrompt({ isOpen, onAllow, onDismiss }: CameraPer
           onPress={onAllow}
           accessibilityLabel="Allow camera access"
           accessibilityRole="button"
+          testID="permission-prompt-allow"
         >
           <Text style={styles.allowButtonText}>Allow Camera</Text>
         </Pressable>
@@ -59,6 +60,7 @@ export function CameraPermissionPrompt({ isOpen, onAllow, onDismiss }: CameraPer
           onPress={onDismiss}
           accessibilityLabel="Dismiss camera permission"
           accessibilityRole="button"
+          testID="permission-prompt-dismiss"
         >
           <Text style={styles.dismissText}>Not Now</Text>
         </Pressable>

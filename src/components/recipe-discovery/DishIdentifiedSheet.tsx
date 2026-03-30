@@ -87,6 +87,7 @@ export function DishIdentifiedSheet({ isOpen, dish, onClose, onSearchResults, on
           placeholder="Dish name"
           placeholderTextColor={colors.outlineVariant}
           editable={!loading}
+          testID="dish-name-input"
         />
 
         {dish.description && (
@@ -107,7 +108,7 @@ export function DishIdentifiedSheet({ isOpen, dish, onClose, onSearchResults, on
                 <Text style={styles.searchButtonText}>Find Recipes</Text>
               </Pressable>
               {onLogMeal && (
-                <Pressable style={styles.logMealButton} onPress={onLogMeal}>
+                <Pressable style={styles.logMealButton} onPress={onLogMeal} testID="dish-log-meal-btn">
                   <MaterialCommunityIcons name="calendar-plus" size={18} color={colors.onSecondaryContainer} />
                   <Text style={styles.logMealButtonText}>Log as Meal</Text>
                 </Pressable>
@@ -116,11 +117,11 @@ export function DishIdentifiedSheet({ isOpen, dish, onClose, onSearchResults, on
           </View>
         ) : (
           <View style={styles.buttonRow}>
-            <Pressable style={styles.searchButton} onPress={handleSearch}>
+            <Pressable style={styles.searchButton} onPress={handleSearch} testID="dish-find-recipes-btn">
               <Text style={styles.searchButtonText}>Find Recipes</Text>
             </Pressable>
             {onLogMeal && (
-              <Pressable style={styles.logMealButton} onPress={onLogMeal}>
+              <Pressable style={styles.logMealButton} onPress={onLogMeal} testID="dish-log-meal-btn">
                 <MaterialCommunityIcons name="calendar-plus" size={18} color={colors.onSecondaryContainer} />
                 <Text style={styles.logMealButtonText}>Log as Meal</Text>
               </Pressable>

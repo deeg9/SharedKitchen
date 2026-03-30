@@ -48,6 +48,7 @@ export function CameraSheet({ isOpen, onClose, onImageCaptured }: CameraSheetPro
           onPress={handleTakePhoto}
           accessibilityLabel="Take a photo with camera"
           accessibilityRole="button"
+          testID="camera-sheet-take-photo"
         >
           <MaterialCommunityIcons name="camera" size={24} color={colors.primary} />
           <View style={styles.rowText}>
@@ -61,6 +62,7 @@ export function CameraSheet({ isOpen, onClose, onImageCaptured }: CameraSheetPro
           onPress={handleChooseFromGallery}
           accessibilityLabel="Choose photo from gallery"
           accessibilityRole="button"
+          testID="camera-sheet-choose-gallery"
         >
           <MaterialCommunityIcons name="image-multiple" size={24} color={colors.primary} />
           <View style={styles.rowText}>

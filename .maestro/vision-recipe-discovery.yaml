@@ -1,0 +1,43 @@
+appId: com.sharedkitchen.app
+---
+# Vision Recipe Discovery Flow
+# Tests: Camera FAB on Shopping List segment triggers identify intent.
+# Requires: Camera permission already granted, Edge Functions deployed,
+# GEMINI_API_KEY and SERPER_API_KEY provisioned.
+# Note: Stops at camera picker. For full E2E, manually select a food photo.
+
+- launchApp
+
+# Navigate to Kitchen tab
+- tapOn:
+    id: "kitchen-tab"
+
+# Ensure we are on Shopping List segment (identify mode)
+- tapOn:
+    text: "Shopping List"
+
+# Verify camera FAB is visible
+- assertVisible:
+    id: "camera-fab"
+
+# Tap camera FAB
+- tapOn:
+    id: "camera-fab"
+
+# CameraSheet should open (assuming permission already granted)
+- extendedWaitUntil:
+    visible:
+      text: "Add a Photo"
+    timeout: 5000
+
+# Tap gallery for testing
+- tapOn:
+    id: "camera-sheet-choose-gallery"
+
+# -- MANUAL STEP: Select a photo of food from gallery --
+# After photo selected, the flow would continue:
+# 1. VisionLoadingOverlay appears ("Analyzing photo...")
+# 2. DishIdentifiedSheet opens with dish name + confidence badge
+# 3. User can edit name, tap "Find Recipes" or "Log as Meal"
+# 4. RecipeResultsSheet shows 2-3 recipe cards
+# 5. Tap card to import via parseRecipeUrl

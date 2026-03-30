@@ -80,6 +80,7 @@ export function MealSlotPickerSheet({
                 key={dateStr}
                 style={[styles.dayChip, selected && styles.dayChipSelected]}
                 onPress={() => setSelectedDay(day)}
+                testID={`meal-day-${dateStr}`}
               >
                 <Text
                   style={[
@@ -110,6 +111,7 @@ export function MealSlotPickerSheet({
                 key={mealType}
                 style={styles.mealSlotButton}
                 onPress={() => handleMealSelect(mealType)}
+                testID={`meal-slot-${mealType}`}
               >
                 <MaterialCommunityIcons
                   name={config.icon}

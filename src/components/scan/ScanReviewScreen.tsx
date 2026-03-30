@@ -310,7 +310,7 @@ export function ScanReviewScreen({ initialItems, onClose, onSaved }: ScanReviewS
     }
 
     return (
-      <Pressable style={addStyles.trigger} onPress={() => setAddingItem(true)}>
+      <Pressable style={addStyles.trigger} onPress={() => setAddingItem(true)} testID="scan-add-missed-btn">
         <MaterialCommunityIcons name="plus-circle-outline" size={20} color={colors.primary} />
         <Text style={addStyles.triggerText}>Add missed item</Text>
       </Pressable>
@@ -367,7 +367,7 @@ export function ScanReviewScreen({ initialItems, onClose, onSaved }: ScanReviewS
             <Text style={styles.countBadgeText}>{items.length} items</Text>
           </View>
         </View>
-        <Pressable onPress={handleScanAnother} style={styles.scanAnotherBtn} disabled={scanning}>
+        <Pressable onPress={handleScanAnother} style={styles.scanAnotherBtn} disabled={scanning} testID="scan-another-btn">
           <MaterialCommunityIcons name="camera-plus" size={22} color={colors.primary} />
         </Pressable>
       </View>
@@ -396,6 +396,7 @@ export function ScanReviewScreen({ initialItems, onClose, onSaved }: ScanReviewS
           style={[styles.saveBtn, saving && styles.saveBtnDisabled]}
           onPress={handleSave}
           disabled={saving || items.length === 0}
+          testID="scan-save-btn"
         >
           {saving ? (
             <ActivityIndicator size="small" color={colors.onPrimary} />

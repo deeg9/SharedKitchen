@@ -59,6 +59,7 @@ export function RecipeResultsSheet({ isOpen, results, dishName, onClose, onImpor
             style={styles.card}
             onPress={() => handleImport(result, index)}
             disabled={importingIndex !== null}
+            testID={`recipe-result-${index}`}
           >
             {importingIndex === index && (
               <View style={styles.importingOverlay}>
