@@ -21,8 +21,10 @@ interface MealSlotProps {
 function MealSlot({ mealType, plan, onPress }: MealSlotProps) {
   const config = MEAL_TYPE_CONFIG[mealType];
   const hasRecipe = plan?.recipes != null;
+  const hasNotes = plan != null && !hasRecipe && plan.notes;
 
-  if (!hasRecipe) {
+  // No plan at all — show empty "Add" slot
+  if (!plan || (!hasRecipe && !hasNotes)) {
     return (
       <Pressable onPress={onPress}>
         <View style={slotStyles.empty}>
@@ -31,6 +33,27 @@ function MealSlot({ mealType, plan, onPress }: MealSlotProps) {
           </View>
           <Text style={slotStyles.emptyText}>Add {config.label}</Text>
         </View>
+      </Pressable>
+    );
+  }
+
+  // Recipe-less meal logged via photo (dish name stored in notes)
+  if (hasNotes && !hasRecipe) {
+    return (
+      <Pressable onPress={onPress}>
+        <Card variant="elevated" style={slotStyles.filled}>
+          <View style={slotStyles.filledRow}>
+            <View style={[slotStyles.thumbnail, slotStyles.notesPlaceholder]}>
+              <MaterialCommunityIcons name="food" size={20} color={colors.onSurfaceVariant} />
+            </View>
+            <View style={slotStyles.info}>
+              <Text style={slotStyles.mealLabel}>{config.label}</Text>
+              <Text style={slotStyles.recipeName} numberOfLines={1}>
+                {plan.notes}
+              </Text>
+            </View>
+          </View>
+        </Card>
       </Pressable>
     );
   }
@@ -116,6 +139,12 @@ const slotStyles = StyleSheet.create({
     backgroundColor: colors.surfaceContainer,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  notesPlaceholder: {
+    backgroundColor: colors.surfaceContainer,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
   },
   info: {
     flex: 1,
