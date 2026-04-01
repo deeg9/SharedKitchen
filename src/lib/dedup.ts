@@ -17,6 +17,7 @@ export function findDuplicates(
     id: item.id,
     name: item.name,
     normalized: normalizeName(item.name),
+    quantityStr: [item.quantity, item.unit].filter(Boolean).join(' ') || null,
   }));
 
   return scannedItems.map(scanned => {
@@ -27,7 +28,12 @@ export function findDuplicates(
       scannedNorm.includes(existing.normalized)
     );
     if (match) {
-      return { ...scanned, duplicateOfId: match.id, duplicateOfName: match.name };
+      return {
+        ...scanned,
+        duplicateOfId: match.id,
+        duplicateOfName: match.name,
+        duplicateQuantity: match.quantityStr,
+      };
     }
     return scanned;
   });

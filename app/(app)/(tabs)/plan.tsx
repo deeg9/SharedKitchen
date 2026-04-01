@@ -20,6 +20,7 @@ import { colors } from '../../../src/theme/colors';
 import { typography } from '../../../src/theme/typography';
 import { spacing, borderRadius } from '../../../src/theme/spacing';
 import { shadows } from '../../../src/theme/shadows';
+import { TAB_BAR_HEIGHT } from '../../../src/lib/constants';
 
 export default function PlanScreen() {
   const insets = useSafeAreaInsets();
@@ -221,12 +222,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.surface,
+    paddingBottom: TAB_BAR_HEIGHT,
   },
   scroll: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: spacing.xxl + 60, // Space for FAB
+    paddingBottom: TAB_BAR_HEIGHT + 80, // Space for tab bar + FAB
   },
   skeletonCard: {
     flexDirection: 'row',
@@ -279,7 +281,7 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    bottom: spacing.xl,
+    bottom: TAB_BAR_HEIGHT + spacing.md,
     right: spacing.md,
     flexDirection: 'row',
     alignItems: 'center',

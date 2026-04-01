@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 
 export interface VisionResult {
-  intent: 'scan' | 'identify';
+  intent: 'scan' | 'identify' | 'extract';
   items?: Array<{ name: string; category?: string; quantity?: string; brand?: string }>;
   dish?: { name: string; confidence: number; description?: string };
   raw?: any;
@@ -35,41 +35,42 @@ export async function compressForVision(
 
 export async function analyzePhoto(
   imageUri: string,
-  intent: 'scan' | 'identify'
+  intent: 'scan' | 'identify' | 'extract'
 ): Promise<VisionResult> {
   const { base64 } = await compressForVision(imageUri);
-  const session = await supabase.auth.getSession();
-  const token = session.data.session?.access_token;
-  const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
-  const response = await fetch(`${supabaseUrl}/functions/v1/analyze-food-photo`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-      'apikey': anonKey ?? '',
-    },
-    body: JSON.stringify({ image: base64, intent }),
+  console.log('[Vision] Calling edge function via supabase.functions.invoke...', { intent });
+
+  const { data, error } = await supabase.functions.invoke('analyze-food-photo', {
+    body: { image: base64, intent },
   });
 
-  let data: any;
-  const contentType = response.headers.get('content-type') ?? '';
-  if (contentType.includes('application/json')) {
-    data = await response.json();
-  } else {
-    throw new Error(`Server error (${response.status}). Please try again.`);
+  console.log('[Vision] Response:', { error: error?.message, dataKeys: data ? Object.keys(data) : null });
+
+  if (error) {
+    // Try to read the response body for the actual error message
+    try {
+      const ctx = (error as any).context;
+      if (ctx && !ctx.bodyUsed) {
+        const body = await ctx.json();
+        console.error('[Vision] Server error body:', JSON.stringify(body));
+        throw new Error(body?.error ?? error.message ?? 'Vision analysis failed');
+      }
+    } catch (readErr: any) {
+      if (readErr.message && readErr.message !== error.message) {
+        throw readErr; // re-throw if we got a better error from the body
+      }
+    }
+    console.error('[Vision] Error details:', error);
+    throw new Error(error.message ?? 'Vision analysis failed');
   }
 
-  if (!response.ok) {
-    if (response.status === 429 && data?.type === 'vision_limit_exceeded') {
-      throw new VisionRateLimitError(
-        data.error ?? 'Monthly vision limit reached',
-        data.limit ?? 5,
-        data.used ?? 0
-      );
-    }
-    throw new Error(data.error ?? `Vision analysis failed (${response.status})`);
+  if (data?.type === 'vision_limit_exceeded') {
+    throw new VisionRateLimitError(
+      data.error ?? 'Monthly vision limit reached',
+      data.limit ?? 5,
+      data.used ?? 0,
+    );
   }
 
   return data as VisionResult;

@@ -4,13 +4,10 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
 import { typography, fontFamily } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
-import { shadows } from '../../theme/shadows';
 import { Skeleton } from '../ui/Skeleton';
 import { EmptyState } from '../ui/EmptyState';
 import { usePantryStore } from '../../stores/pantryStore';
 import { PantryItem } from '../../types/database';
-import { TAB_BAR_HEIGHT } from '../../lib/constants';
-import { AddPantryItemSheet } from './AddPantryItemSheet';
 
 const SECTION_ORDER = ['Proteins', 'Produce', 'Dairy & Eggs', 'Pantry', 'Other'];
 
@@ -35,7 +32,6 @@ export function OnHandList() {
   const items = usePantryStore((s) => s.items);
   const loading = usePantryStore((s) => s.loading);
   const removePantryItem = usePantryStore((s) => s.removePantryItem);
-  const [addSheetOpen, setAddSheetOpen] = useState(false);
 
   // Group items by category
   const grouped: Record<string, PantryItem[]> = {};
@@ -63,17 +59,6 @@ export function OnHandList() {
           title="Nothing on hand"
           subtitle="Add items or check off groceries to stock up"
         />
-        <Pressable
-          style={[styles.fab, { bottom: TAB_BAR_HEIGHT + spacing.md }]}
-          onPress={() => setAddSheetOpen(true)}
-          testID="add-pantry-fab"
-        >
-          <MaterialCommunityIcons name="plus" size={28} color={colors.onPrimary} />
-        </Pressable>
-        <AddPantryItemSheet
-          isOpen={addSheetOpen}
-          onClose={() => setAddSheetOpen(false)}
-        />
       </View>
     );
   }
@@ -98,19 +83,6 @@ export function OnHandList() {
           );
         })}
       </ScrollView>
-
-      <Pressable
-        style={[styles.fab, { bottom: TAB_BAR_HEIGHT + spacing.md }]}
-        onPress={() => setAddSheetOpen(true)}
-        testID="add-pantry-fab"
-      >
-        <MaterialCommunityIcons name="plus" size={28} color={colors.onPrimary} />
-      </Pressable>
-
-      <AddPantryItemSheet
-        isOpen={addSheetOpen}
-        onClose={() => setAddSheetOpen(false)}
-      />
     </View>
   );
 }
@@ -205,17 +177,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 100,
-  },
-  fab: {
-    position: 'absolute',
-    right: spacing.md,
-    width: 56,
-    height: 56,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...shadows.float,
   },
 });
 

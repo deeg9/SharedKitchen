@@ -7,6 +7,7 @@ import GorhomBottomSheet, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../../theme/colors';
 import { borderRadius } from '../../theme/spacing';
+import { TAB_BAR_HEIGHT } from '../../lib/constants';
 
 interface BottomSheetProps {
   isOpen: boolean;
@@ -92,5 +93,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    paddingBottom: TAB_BAR_HEIGHT,
   },
 });

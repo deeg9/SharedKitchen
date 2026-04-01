@@ -14,6 +14,8 @@ import { GrocerySummary } from '../../../src/components/grocery/GrocerySummary';
 import { AddItemSheet } from '../../../src/components/grocery/AddItemSheet';
 import { EditCategoriesSheet } from '../../../src/components/grocery/EditCategoriesSheet';
 import { OnHandList } from '../../../src/components/pantry/OnHandList';
+import { AddPantryItemSheet } from '../../../src/components/pantry/AddPantryItemSheet';
+import { AddActionSheet } from '../../../src/components/kitchen/AddActionSheet';
 import { useGroceryCategoryStore } from '../../../src/stores/groceryCategoryStore';
 import { useGroceryStore } from '../../../src/stores/groceryStore';
 import { useHouseholdStore } from '../../../src/stores/householdStore';
@@ -21,7 +23,7 @@ import { usePlanStore } from '../../../src/stores/planStore';
 import { usePantryStore } from '../../../src/stores/pantryStore';
 import { useGrocerySync } from '../../../src/hooks/useGrocerySync';
 import { usePantrySync } from '../../../src/hooks/usePantrySync';
-import { getWeekDays, toDateString, formatDayLabel } from '../../../src/lib/dates';
+import { getWeekDays, toDateString } from '../../../src/lib/dates';
 import { TAB_BAR_HEIGHT } from '../../../src/lib/constants';
 import { usePresence, PresenceMember } from '../../../src/hooks/usePresence';
 import { useActivityToast } from '../../../src/hooks/useActivityToast';
@@ -35,11 +37,7 @@ import { CameraPermissionCard } from '../../../src/components/camera/CameraPermi
 import { VisionLoadingOverlay } from '../../../src/components/camera/VisionLoadingOverlay';
 import { analyzePhoto, VisionRateLimitError } from '../../../src/lib/vision';
 import { ScanReviewScreen } from '../../../src/components/scan/ScanReviewScreen';
-import { DishIdentifiedSheet } from '../../../src/components/recipe-discovery/DishIdentifiedSheet';
-import { RecipeResultsSheet } from '../../../src/components/recipe-discovery/RecipeResultsSheet';
-import { MealSlotPickerSheet } from '../../../src/components/meal-logging/MealSlotPickerSheet';
-import { DishIdentification, RecipeSearchResult } from '../../../src/types/recipeSearch';
-import { MealType, MEAL_TYPE_CONFIG } from '../../../src/types/database';
+import { ListExtractReviewScreen } from '../../../src/components/scan/ListExtractReviewScreen';
 
 const SECTION_ORDER = ['Proteins', 'Produce', 'Dairy & Eggs', 'Pantry', 'Other'];
 
@@ -51,14 +49,12 @@ export default function GroceryScreen() {
   const [editingItem, setEditingItem] = useState<GroceryItemType | null>(null);
   const [catSheetOpen, setCatSheetOpen] = useState(false);
   const [activeSegment, setActiveSegment] = useState<'shopping' | 'onhand'>('shopping');
+  const [actionSheetOpen, setActionSheetOpen] = useState(false);
+  const [pantryAddSheetOpen, setPantryAddSheetOpen] = useState(false);
   const [cameraSheetOpen, setCameraSheetOpen] = useState(false);
   const [visionLoading, setVisionLoading] = useState(false);
   const [scanResults, setScanResults] = useState<Array<{ name: string; category?: string; quantity?: string; brand?: string }> | null>(null);
-  const [dishResult, setDishResult] = useState<DishIdentification | null>(null);
-  const [recipeResults, setRecipeResults] = useState<RecipeSearchResult[] | null>(null);
-  const [dishSheetOpen, setDishSheetOpen] = useState(false);
-  const [recipeSheetOpen, setRecipeSheetOpen] = useState(false);
-  const [mealSlotPickerOpen, setMealSlotPickerOpen] = useState(false);
+  const [extractResults, setExtractResults] = useState<Array<{ name: string; category?: string; quantity?: string }> | null>(null);
   const { showPrePrompt, permissionDenied, checkAndPrompt, requestAfterPrePrompt, dismissPrePrompt } = useCameraPermission();
   const initCategories = useGroceryCategoryStore((s) => s.initialize);
 
@@ -165,34 +161,24 @@ export default function GroceryScreen() {
     await generateGroceryList(activeHouseholdId, weekStart, recipes);
   }, [activeHouseholdId, mealPlan, generateGroceryList]);
 
-  const handleCameraFab = useCallback(async () => {
-    const granted = await checkAndPrompt();
-    if (granted) {
-      setCameraSheetOpen(true);
-    }
-  }, [checkAndPrompt]);
-
   const handleImageCaptured = useCallback(async (uri: string) => {
     setCameraSheetOpen(false);
     setVisionLoading(true);
-    const intent = activeSegment === 'onhand' ? 'scan' : 'identify';
+    const intent = activeSegment === 'onhand' ? 'scan' : 'extract';
     try {
       const result = await analyzePhoto(uri, intent);
       setVisionLoading(false);
-      if (intent === 'scan') {
-        if (result.items && result.items.length > 0) {
+      if (result.items && result.items.length > 0) {
+        if (intent === 'scan') {
           setScanResults(result.items);
         } else {
-          Alert.alert('No items found', 'We couldn\'t identify any food items in that photo. Try taking a clearer photo of your fridge or pantry shelves.');
+          setExtractResults(result.items);
         }
       } else {
-        // identify intent
-        if (result.dish) {
-          setDishResult({ name: result.dish.name, confidence: result.dish.confidence, description: result.dish.description });
-          setDishSheetOpen(true);
-        } else {
-          Alert.alert('Could not identify dish', 'Try taking a clearer photo of the food.');
-        }
+        const message = intent === 'scan'
+          ? 'We couldn\'t identify any food items in that photo. Try taking a clearer photo of your fridge or pantry shelves.'
+          : 'We couldn\'t extract any items from that photo. Try a clearer photo of your list or recipe.';
+        Alert.alert('No items found', message);
       }
     } catch (err: unknown) {
       setVisionLoading(false);
@@ -214,6 +200,15 @@ export default function GroceryScreen() {
     Alert.alert('Added to Pantry', `Added ${count} items to On Hand`);
   }, []);
 
+  const handleExtractClose = useCallback(() => {
+    setExtractResults(null);
+  }, []);
+
+  const handleExtractSaved = useCallback((count: number) => {
+    setExtractResults(null);
+    Alert.alert('Added to Shopping List', `Added ${count} items to your list`);
+  }, []);
+
   const handlePermissionAllow = useCallback(async () => {
     const granted = await requestAfterPrePrompt();
     if (granted) {
@@ -221,59 +216,21 @@ export default function GroceryScreen() {
     }
   }, [requestAfterPrePrompt]);
 
-  const handleSearchResults = useCallback((results: RecipeSearchResult[]) => {
-    setRecipeResults(results);
-    setDishSheetOpen(false);
-    setRecipeSheetOpen(true);
-  }, []);
-
-  const handleDishSheetClose = useCallback(() => {
-    setDishSheetOpen(false);
-    setDishResult(null);
-  }, []);
-
-  const handleRecipeSheetClose = useCallback(() => {
-    setRecipeSheetOpen(false);
-    setRecipeResults(null);
-    setDishSheetOpen(true);
-  }, []);
-
-  const handleImportComplete = useCallback(() => {
-    setRecipeSheetOpen(false);
-    setRecipeResults(null);
-    setDishResult(null);
-  }, []);
-
-  const handleLogMeal = useCallback(() => {
-    setDishSheetOpen(false);
-    setMealSlotPickerOpen(true);
-  }, []);
-
-  const handleMealSlotSelected = useCallback(async (date: string, mealType: MealType) => {
-    if (!activeHouseholdId || !dishResult) return;
-    setMealSlotPickerOpen(false);
-    try {
-      await usePlanStore.getState().assignRecipe(
-        activeHouseholdId,
-        date,
-        mealType,
-        null,            // no recipe_id — recipe-less meal
-        undefined,       // no cook
-        dishResult.name, // store dish name in notes field
-        'home-cooked',   // default source
-        undefined        // no cost
-      );
-      // Format day label for toast
-      const dayDate = new Date(date + 'T12:00:00'); // avoid timezone issues
-      const dayLabel = formatDayLabel(dayDate).weekday; // e.g. "Mon"
-      const slotLabel = MEAL_TYPE_CONFIG[mealType].label; // e.g. "Dinner"
-      Alert.alert('Meal Logged', `Added ${dishResult.name} to ${dayLabel} ${slotLabel}`);
-      // Clean up all state
-      setDishResult(null);
-    } catch {
-      Alert.alert('Error', 'Could not log meal. Please try again.');
+  const handleActionManualEntry = useCallback(() => {
+    if (activeSegment === 'onhand') {
+      setPantryAddSheetOpen(true);
+    } else {
+      setEditingItem(null);
+      setAddSheetOpen(true);
     }
-  }, [activeHouseholdId, dishResult]);
+  }, [activeSegment]);
+
+  const handleActionUseCamera = useCallback(async () => {
+    const granted = await checkAndPrompt();
+    if (granted) {
+      setCameraSheetOpen(true);
+    }
+  }, [checkAndPrompt]);
 
   const summaryData = summary();
   const { sections, completed } = groupedItems();
@@ -306,9 +263,42 @@ export default function GroceryScreen() {
     />
   ) : null;
 
-  // --- Camera components shared across all return paths ---
-  const cameraComponents = (
+  // --- Extract review overlay (shown when extract results available) ---
+  const extractReview = extractResults && activeListId ? (
+    <ListExtractReviewScreen
+      initialItems={extractResults}
+      listId={activeListId}
+      onClose={handleExtractClose}
+      onSaved={handleExtractSaved}
+    />
+  ) : null;
+
+  // --- Unified FAB (shared across all return paths) ---
+  const unifiedFab = (
+    <Pressable
+      style={[styles.fab, { bottom: TAB_BAR_HEIGHT + spacing.md }]}
+      onPress={() => setActionSheetOpen(true)}
+      accessibilityLabel="Add items"
+      accessibilityRole="button"
+      testID="add-fab"
+    >
+      <MaterialCommunityIcons name="plus" size={28} color={colors.onPrimary} />
+    </Pressable>
+  );
+
+  // --- Shared sheets and overlays across all return paths ---
+  const sharedComponents = (
     <>
+      <AddActionSheet
+        isOpen={actionSheetOpen}
+        onClose={() => setActionSheetOpen(false)}
+        onManualEntry={handleActionManualEntry}
+        onUseCamera={handleActionUseCamera}
+      />
+      <AddPantryItemSheet
+        isOpen={pantryAddSheetOpen}
+        onClose={() => setPantryAddSheetOpen(false)}
+      />
       {permissionDenied && (
         <CameraPermissionCard onOpenSettings={() => Linking.openSettings()} />
       )}
@@ -323,29 +313,6 @@ export default function GroceryScreen() {
         onImageCaptured={handleImageCaptured}
       />
       <VisionLoadingOverlay visible={visionLoading} />
-      <DishIdentifiedSheet
-        isOpen={dishSheetOpen}
-        dish={dishResult}
-        onClose={handleDishSheetClose}
-        onSearchResults={handleSearchResults}
-        onLogMeal={handleLogMeal}
-      />
-      <RecipeResultsSheet
-        isOpen={recipeSheetOpen}
-        results={recipeResults ?? []}
-        dishName={dishResult?.name ?? ''}
-        onClose={handleRecipeSheetClose}
-        onImportComplete={handleImportComplete}
-      />
-      <MealSlotPickerSheet
-        isOpen={mealSlotPickerOpen}
-        dishName={dishResult?.name ?? ''}
-        onClose={() => {
-          setMealSlotPickerOpen(false);
-          setDishSheetOpen(true); // go back to dish sheet
-        }}
-        onSelect={handleMealSlotSelected}
-      />
     </>
   );
 
@@ -360,20 +327,10 @@ export default function GroceryScreen() {
         {segmentedControl}
         <OnHandList />
 
-        {/* Camera FAB */}
-        <Pressable
-          style={[styles.cameraFab, { bottom: TAB_BAR_HEIGHT + spacing.md }]}
-          onPress={handleCameraFab}
-          disabled={visionLoading}
-          accessibilityLabel="Open camera"
-          accessibilityRole="button"
-          testID="camera-fab"
-        >
-          <MaterialCommunityIcons name="camera" size={28} color={colors.onPrimary} />
-        </Pressable>
-
-        {cameraComponents}
+        {unifiedFab}
+        {sharedComponents}
         {scanReview}
+        {extractReview}
       </View>
     );
   }
@@ -396,20 +353,10 @@ export default function GroceryScreen() {
           <Skeleton width="100%" height={44} style={{ marginTop: spacing.sm }} />
         </View>
 
-        {/* Camera FAB */}
-        <Pressable
-          style={[styles.cameraFab, { bottom: TAB_BAR_HEIGHT + spacing.md }]}
-          onPress={handleCameraFab}
-          disabled={visionLoading}
-          accessibilityLabel="Open camera"
-          accessibilityRole="button"
-          testID="camera-fab"
-        >
-          <MaterialCommunityIcons name="camera" size={28} color={colors.onPrimary} />
-        </Pressable>
-
-        {cameraComponents}
+        {unifiedFab}
+        {sharedComponents}
         {scanReview}
+        {extractReview}
       </View>
     );
   }
@@ -433,20 +380,10 @@ export default function GroceryScreen() {
           loading={loading}
         />
 
-        {/* Camera FAB */}
-        <Pressable
-          style={[styles.cameraFab, { bottom: TAB_BAR_HEIGHT + spacing.md }]}
-          onPress={handleCameraFab}
-          disabled={visionLoading}
-          accessibilityLabel="Open camera"
-          accessibilityRole="button"
-          testID="camera-fab"
-        >
-          <MaterialCommunityIcons name="camera" size={28} color={colors.onPrimary} />
-        </Pressable>
-
-        {cameraComponents}
+        {unifiedFab}
+        {sharedComponents}
         {scanReview}
+        {extractReview}
       </View>
     );
   }
@@ -511,28 +448,7 @@ export default function GroceryScreen() {
         )}
       </ScrollView>
 
-      {/* Camera FAB — positioned above the add-item FAB */}
-      <Pressable
-        style={[styles.cameraFab, { bottom: TAB_BAR_HEIGHT + spacing.md + 56 + spacing.sm }]}
-        onPress={handleCameraFab}
-        disabled={visionLoading}
-        accessibilityLabel="Open camera"
-        accessibilityRole="button"
-        testID="camera-fab"
-      >
-        <MaterialCommunityIcons name="camera" size={28} color={colors.onPrimary} />
-      </Pressable>
-
-      {/* FAB for manual add */}
-      {activeListId && (
-        <Pressable
-          style={[styles.fab, { bottom: TAB_BAR_HEIGHT + spacing.md }]}
-          onPress={() => { setEditingItem(null); setAddSheetOpen(true); }}
-          testID="add-item-fab"
-        >
-          <MaterialCommunityIcons name="plus" size={28} color={colors.onPrimary} />
-        </Pressable>
-      )}
+      {unifiedFab}
 
       {activeListId && (
         <AddItemSheet
@@ -560,8 +476,9 @@ export default function GroceryScreen() {
         />
       )}
 
-      {cameraComponents}
+      {sharedComponents}
       {scanReview}
+      {extractReview}
     </View>
   );
 }
@@ -570,6 +487,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.surface,
+    paddingBottom: TAB_BAR_HEIGHT,
   },
   titleRow: {
     flexDirection: 'row',
@@ -631,17 +549,6 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   fab: {
-    position: 'absolute',
-    right: spacing.md,
-    width: 56,
-    height: 56,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...shadows.float,
-  },
-  cameraFab: {
     position: 'absolute',
     right: spacing.md,
     width: 56,

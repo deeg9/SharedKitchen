@@ -9,6 +9,8 @@ export interface ScannedItem {
   duplicateOfId: string | null;
   /** Name of existing pantry item if duplicate */
   duplicateOfName: string | null;
+  /** Quantity string of existing pantry item if duplicate (e.g. "2 lbs") */
+  duplicateQuantity: string | null;
 }
 
 export interface ScanReviewState {

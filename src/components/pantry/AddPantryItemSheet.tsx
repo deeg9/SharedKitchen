@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: spacing.md,
-    paddingBottom: TAB_BAR_HEIGHT + spacing.xl,
+    paddingBottom: spacing.xl,
   },
   section: {
     marginBottom: spacing.lg,

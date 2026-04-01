@@ -29,7 +29,7 @@ const benefits = [
 
 export function CameraPermissionPrompt({ isOpen, onAllow, onDismiss }: CameraPermissionPromptProps) {
   return (
-    <BottomSheet isOpen={isOpen} onClose={onDismiss} snapPoints={['55%']}>
+    <BottomSheet isOpen={isOpen} onClose={onDismiss} snapPoints={['70%']}>
       <View style={styles.container}>
         <View style={styles.iconCircle}>
           <MaterialCommunityIcons name="camera-outline" size={48} color={colors.primary} />
@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
+    paddingBottom: spacing.xxl,
   },
   iconCircle: {
     width: 80,

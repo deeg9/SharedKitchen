@@ -47,6 +47,10 @@ interface GroceryState {
     estimatedPrice?: number
   ) => Promise<void>;
   fetchFrequentItems: (householdId: string, excludeListId?: string | null) => Promise<void>;
+  bulkAddGroceryItems: (
+    listId: string,
+    items: Array<{ name: string; quantity?: string; category?: string }>
+  ) => Promise<{ addedCount: number }>;
   removeItem: (itemId: string) => Promise<void>;
   updateItem: (
     itemId: string,
@@ -268,6 +272,57 @@ export const useGroceryStore = create<GroceryState>((set, get) => ({
       }));
     } catch (error: unknown) {
       set({ error: getErrorMessage(error) });
+    }
+  },
+
+  bulkAddGroceryItems: async (listId, items) => {
+    try {
+      const inserts = items.map((item) => ({
+        grocery_list_id: listId,
+        name: item.name,
+        quantity: item.quantity || null,
+        section: (item.category as GroceryItem['section']) || 'Other',
+        estimated_price: null,
+        is_manual: true,
+      }));
+
+      // Optimistic: create temp items
+      const tempItems: GroceryItem[] = inserts.map((ins, idx) => ({
+        id: `temp-bulk-${Date.now()}-${idx}`,
+        ...ins,
+        is_checked: false,
+        checked_by: null,
+        created_at: new Date().toISOString(),
+      })) as unknown as GroceryItem[];
+      set((state) => ({ items: [...state.items, ...tempItems] }));
+
+      // Single batch insert
+      const { data, error } = await supabase
+        .from('grocery_items')
+        .insert(inserts)
+        .select();
+
+      if (error) {
+        const tempIds = new Set(tempItems.map((t) => t.id));
+        set((state) => ({
+          items: state.items.filter((i) => !tempIds.has(i.id)),
+          error: error.message,
+        }));
+        return { addedCount: 0 };
+      }
+
+      // Replace temp items with real ones
+      const tempIds = new Set(tempItems.map((t) => t.id));
+      set((state) => ({
+        items: [
+          ...state.items.filter((i) => !tempIds.has(i.id)),
+          ...(data as GroceryItem[]),
+        ],
+      }));
+      return { addedCount: data.length };
+    } catch (error: unknown) {
+      set({ error: getErrorMessage(error) });
+      return { addedCount: 0 };
     }
   },
 

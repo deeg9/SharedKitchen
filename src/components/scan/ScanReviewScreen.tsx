@@ -17,6 +17,7 @@ import { colors } from '../../theme/colors';
 import { typography, fontFamily } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
 import { shadows } from '../../theme/shadows';
+import { TAB_BAR_HEIGHT } from '../../lib/constants';
 import { ScannedItem } from '../../types/scan';
 import { findDuplicates } from '../../lib/dedup';
 import { analyzePhoto, VisionRateLimitError } from '../../lib/vision';
@@ -70,6 +71,7 @@ export function ScanReviewScreen({ initialItems, onClose, onSaved }: ScanReviewS
       brand: item.brand ?? null,
       duplicateOfId: null,
       duplicateOfName: null,
+      duplicateQuantity: null,
     }));
     const withDuplicates = findDuplicates(converted, pantryItems);
     setItems(withDuplicates);
@@ -98,6 +100,7 @@ export function ScanReviewScreen({ initialItems, onClose, onSaved }: ScanReviewS
       brand: null,
       duplicateOfId: null,
       duplicateOfName: null,
+      duplicateQuantity: null,
     };
     // Check for duplicates against pantry
     const [checked] = findDuplicates([newItem], pantryItems);
@@ -130,6 +133,7 @@ export function ScanReviewScreen({ initialItems, onClose, onSaved }: ScanReviewS
           brand: item.brand ?? null,
           duplicateOfId: null,
           duplicateOfName: null,
+      duplicateQuantity: null,
         }));
         const withDuplicates = findDuplicates(newScanned, pantryItems);
         setItems((prev) => [...prev, ...withDuplicates]);
@@ -320,7 +324,7 @@ export function ScanReviewScreen({ initialItems, onClose, onSaved }: ScanReviewS
   // --- Empty state ---
   if (items.length === 0 && !scanning) {
     return (
-      <View style={[styles.overlay, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+      <View style={[styles.overlay, { paddingTop: insets.top, paddingBottom: insets.bottom + TAB_BAR_HEIGHT }]}>
         <View style={styles.header}>
           <Pressable onPress={onClose} style={styles.closeBtn}>
             <MaterialCommunityIcons name="close" size={24} color={colors.onSurface} />
@@ -353,7 +357,7 @@ export function ScanReviewScreen({ initialItems, onClose, onSaved }: ScanReviewS
 
   return (
     <KeyboardAvoidingView
-      style={[styles.overlay, { paddingTop: insets.top, paddingBottom: insets.bottom }]}
+      style={[styles.overlay, { paddingTop: insets.top, paddingBottom: insets.bottom + TAB_BAR_HEIGHT }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       {/* Header */}
@@ -381,6 +385,7 @@ export function ScanReviewScreen({ initialItems, onClose, onSaved }: ScanReviewS
 
       {/* Item list */}
       <FlatList
+        style={styles.list}
         data={items}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
@@ -403,7 +408,7 @@ export function ScanReviewScreen({ initialItems, onClose, onSaved }: ScanReviewS
           ) : (
             <>
               <MaterialCommunityIcons name="check" size={20} color={colors.onPrimary} />
-              <Text style={styles.saveBtnText}>Save {items.length} items</Text>
+              <Text style={styles.saveBtnText}>Done</Text>
             </>
           )}
         </Pressable>
@@ -493,6 +498,9 @@ const styles = StyleSheet.create({
   photoCountText: {
     ...typography.bodySm,
     color: colors.onSurfaceVariant,
+  },
+  list: {
+    flex: 1,
   },
   listContent: {
     paddingHorizontal: spacing.md,
