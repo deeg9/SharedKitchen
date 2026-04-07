@@ -147,11 +147,10 @@ Plans:
   3. Each feed card displays the kitchen avatar, kitchen name, meal name, day/slot context, recipe photo, and timestamp
   4. User can attach meal photos to feed posts using the existing camera infrastructure
   5. Feed loads more items seamlessly as user scrolls (cursor-based infinite scroll)
-**Plans**: 3 plans
+**Plans**: 2 plans
 Plans:
-- [x] 30-01-PLAN.md — Social database migration (all tables, RLS, triggers) + TypeScript types
-- [ ] 30-02-PLAN.md — socialStore + kitchen profile modal screen
-- [ ] 30-03-PLAN.md — Kitchen search on Plan tab + invite link sharing
+- [ ] 32-01-PLAN.md — Auto-post mechanism, meal photo upload, feed store methods
+- [ ] 32-02-PLAN.md — Feed UI on Plan tab with segmented control, feed cards, infinite scroll
 **UI hint**: yes
 
 ### Phase 33: Social Interactions & Moderation
@@ -223,7 +222,7 @@ Plans:
 | 29. Food Photo to Meal Logging | v4.0 | 2/2 | Complete | 2026-03-30 |
 | 30. Social Database & Kitchen Profiles | v5.0 | 3/3 | Complete   | 2026-04-07 |
 | 31. Follow System | v5.0 | 2/2 | Complete   | 2026-04-07 |
-| 32. Feed & Auto-Post | v5.0 | 0/0 | Not started | - |
+| 32. Feed & Auto-Post | v5.0 | 0/2 | Not started | - |
 | 33. Social Interactions & Moderation | v5.0 | 0/0 | Not started | - |
 | 34. Social Push Notifications | v5.0 | 0/0 | Not started | - |
 
