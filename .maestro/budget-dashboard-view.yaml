@@ -1,0 +1,32 @@
+appId: com.sharedkitchen.app
+name: "Budget Dashboard View"
+---
+# Budget Dashboard View
+# Opens budget tab and verifies categories and weekly breakdown are visible.
+# Assumes user is logged in.
+
+- launchApp
+
+# Navigate to Budget tab
+- tapOn:
+    id: "budget-tab"
+
+# Wait for budget dashboard to load
+- extendedWaitUntil:
+    visible:
+      text: "Groceries"
+    timeout: 5000
+
+# Verify expense category cards are visible
+- assertVisible:
+    text: "Groceries"
+
+- assertVisible:
+    text: "Dining Out"
+
+- assertVisible:
+    text: "Takeout"
+
+# Verify the FAB is present
+- assertVisible:
+    id: "budget-add-expense-button"

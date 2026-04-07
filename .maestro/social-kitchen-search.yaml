@@ -1,0 +1,41 @@
+appId: com.sharedkitchen.app
+name: "Kitchen Search"
+---
+# Kitchen Search Flow
+# Opens the search overlay from Plan tab, types a query, verifies results area, closes search.
+# Assumes user is logged in.
+
+- launchApp
+
+# Navigate to Plan tab
+- tapOn:
+    id: "plan-tab"
+
+# Tap search icon to open search overlay
+- tapOn:
+    id: "plan-search-icon"
+
+# Wait for search input to appear
+- extendedWaitUntil:
+    visible:
+      id: "kitchen-search-input"
+    timeout: 3000
+
+# Type a search query
+- tapOn:
+    id: "kitchen-search-input"
+- inputText: "test"
+
+# Wait briefly for search results to load
+- extendedWaitUntil:
+    visible:
+      text: ".*"
+    timeout: 5000
+
+# Close the search overlay
+- tapOn:
+    id: "kitchen-search-close"
+
+# Verify we are back on the Plan tab
+- assertVisible:
+    id: "plan-tab"

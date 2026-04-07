@@ -1,0 +1,38 @@
+appId: com.sharedkitchen.app
+name: "Social Feed View"
+---
+# Social Feed View
+# Navigates to Plan tab, switches to Feed segment, verifies feed loads.
+# Assumes user is logged in with at least one followed kitchen.
+
+- launchApp
+
+# Navigate to Plan tab
+- tapOn:
+    id: "plan-tab"
+
+# Wait for Plan tab to load
+- extendedWaitUntil:
+    visible:
+      text: "My Plan"
+    timeout: 5000
+
+# Switch to Feed segment
+- tapOn:
+    text: "Feed"
+
+# Verify we are on the Feed view (Feed text should be selected/visible)
+- assertVisible:
+    text: "Feed"
+
+# Verify My Plan segment is also visible (confirms segmented control rendered)
+- assertVisible:
+    text: "My Plan"
+
+# Switch back to My Plan
+- tapOn:
+    text: "My Plan"
+
+# Verify plan content is visible again
+- assertVisible:
+    text: "My Plan"

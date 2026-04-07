@@ -1,0 +1,51 @@
+appId: com.sharedkitchen.app
+name: "Budget Add Expense"
+---
+# Budget Add Expense Flow
+# Opens budget tab, taps FAB to add expense, fills form, submits.
+# Assumes user is logged in.
+
+- launchApp
+
+# Navigate to Budget tab
+- tapOn:
+    id: "budget-tab"
+
+# Wait for budget dashboard to load
+- extendedWaitUntil:
+    visible:
+      id: "budget-add-expense-button"
+    timeout: 5000
+
+# Tap FAB to open add expense sheet
+- tapOn:
+    id: "budget-add-expense-button"
+
+# Wait for expense form to appear
+- extendedWaitUntil:
+    visible:
+      text: "Add Expense"
+    timeout: 3000
+
+# Select a category chip
+- tapOn:
+    text: "Groceries"
+
+# Tap into the amount field and enter a value
+- tapOn:
+    text: "0.00"
+- inputText: "25.50"
+
+# Submit the expense
+- tapOn:
+    id: "budget-expense-submit"
+
+# Wait for sheet to dismiss and verify budget tab is still visible
+- extendedWaitUntil:
+    visible:
+      id: "budget-add-expense-button"
+    timeout: 5000
+
+# Verify we are back on the budget dashboard
+- assertVisible:
+    id: "budget-add-expense-button"
