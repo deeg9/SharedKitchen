@@ -94,23 +94,34 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 
 ### Active
 
-(None — planning next milestone)
+- [ ] Follow/unfollow other kitchens
+- [ ] Social feed on Plan tab showing meals from followed kitchens
+- [ ] Auto-post meals from plan with manual share toggle
+- [ ] Feed cards with kitchen name, meal, recipe, photos
+- [ ] Like/react to meals
+- [ ] Comment on meals
+- [ ] Save recipes from feed to own library
+- [ ] Kitchen profile (public view for followers)
 
-## Current Milestone: v4.0 AI Vision — Scan, Snap & Add (SHIPPED)
+## Current Milestone: v5.0 Social Feed
 
-**Shipped:** 2026-03-30
+**Goal:** Let users follow other kitchens and see what they're eating in a Venmo-style social feed with full interactions.
 
-**Delivered features:**
-- Camera-based vision infrastructure with Gemini 2.5 Flash (scan + identify intents)
-- Fridge/pantry photo scan with brand-level identification, editable review, dedup, multi-photo, bulk-add
-- Food photo → recipe discovery with Serper.dev web search and existing import pipeline
-- Food photo → meal logging with day/slot picker and Plan tab display
+**Target features:**
+- Follow/unfollow other kitchens (friend model)
+- Social feed on Plan tab showing meals from followed kitchens
+- Auto-post meals from plan + manual share toggle
+- Feed cards with kitchen name, meal, recipe, photos
+- Like/react to meals
+- Comment on meals
+- Save recipes from feed to your own library
+- Kitchen profile (public view for followers)
 
 ### Out of Scope
 
 - Android build — iOS-first; Expo cross-platform foundation ready
 - Web version — mobile-first product
-- Social features beyond household — no public profiles or recipe sharing
+- Social features beyond follow-based feed — no public profiles, DMs, or recipe marketplace
 - Meal prep / batch cooking — per-day planning kept simple
 - Grocery delivery integration (Instacart, etc.)
 - Real-time chat — activity feed provides lightweight awareness
@@ -164,4 +175,4 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-03-30 after v4.0 milestone shipped*
+*Last updated: 2026-04-07 after v5.0 milestone started*
