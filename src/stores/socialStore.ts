@@ -18,6 +18,10 @@ interface SocialState {
   // Follow state
   isFollowing: boolean;
   followLoading: boolean;
+  // Follower/following lists
+  followers: KitchenProfile[];
+  following: KitchenProfile[];
+  followListLoading: boolean;
   // General
   loading: boolean;
   error: string | null;
@@ -37,6 +41,9 @@ interface SocialState {
   checkIsFollowing: (myKitchenId: string, targetKitchenId: string) => Promise<void>;
   followKitchen: (myKitchenId: string, targetKitchenId: string) => Promise<void>;
   unfollowKitchen: (myKitchenId: string, targetKitchenId: string) => Promise<void>;
+  fetchFollowers: (kitchenId: string) => Promise<void>;
+  fetchFollowing: (kitchenId: string) => Promise<void>;
+  clearFollowLists: () => void;
   clearFollowState: () => void;
   clearSearch: () => void;
   clearViewedProfile: () => void;
@@ -49,6 +56,9 @@ export const useSocialStore = create<SocialState>((set, get) => ({
   searchLoading: false,
   isFollowing: false,
   followLoading: false,
+  followers: [],
+  following: [],
+  followListLoading: false,
   loading: false,
   error: null,
 
@@ -276,11 +286,77 @@ export const useSocialStore = create<SocialState>((set, get) => ({
     }
   },
 
+  fetchFollowers: async (kitchenId: string) => {
+    set({ followListLoading: true });
+    try {
+      // Two-step approach: get follower IDs, then fetch profiles
+      const { data: followRows, error: followError } = await supabase
+        .from('follows')
+        .select('follower_kitchen_id')
+        .eq('following_kitchen_id', kitchenId);
+
+      if (followError) throw followError;
+
+      const followerIds = (followRows ?? []).map((r: { follower_kitchen_id: string }) => r.follower_kitchen_id);
+
+      if (followerIds.length === 0) {
+        set({ followers: [], followListLoading: false });
+        return;
+      }
+
+      const { data: profiles, error: profileError } = await supabase
+        .from('kitchen_profiles')
+        .select('id, display_name, bio, avatar_url, follower_count, following_count, household_id')
+        .in('id', followerIds);
+
+      if (profileError) throw profileError;
+
+      set({ followers: (profiles ?? []) as KitchenProfile[], followListLoading: false });
+    } catch (error: unknown) {
+      set({ followListLoading: false, error: getErrorMessage(error) });
+    }
+  },
+
+  fetchFollowing: async (kitchenId: string) => {
+    set({ followListLoading: true });
+    try {
+      // Two-step approach: get following IDs, then fetch profiles
+      const { data: followRows, error: followError } = await supabase
+        .from('follows')
+        .select('following_kitchen_id')
+        .eq('follower_kitchen_id', kitchenId);
+
+      if (followError) throw followError;
+
+      const followingIds = (followRows ?? []).map((r: { following_kitchen_id: string }) => r.following_kitchen_id);
+
+      if (followingIds.length === 0) {
+        set({ following: [], followListLoading: false });
+        return;
+      }
+
+      const { data: profiles, error: profileError } = await supabase
+        .from('kitchen_profiles')
+        .select('id, display_name, bio, avatar_url, follower_count, following_count, household_id')
+        .in('id', followingIds);
+
+      if (profileError) throw profileError;
+
+      set({ following: (profiles ?? []) as KitchenProfile[], followListLoading: false });
+    } catch (error: unknown) {
+      set({ followListLoading: false, error: getErrorMessage(error) });
+    }
+  },
+
+  clearFollowLists: () => {
+    set({ followers: [], following: [], followListLoading: false });
+  },
+
   clearFollowState: () => {
     set({ isFollowing: false, followLoading: false });
   },
 
   clearViewedProfile: () => {
-    set({ viewedProfile: null, isFollowing: false, followLoading: false });
+    set({ viewedProfile: null, isFollowing: false, followLoading: false, followers: [], following: [], followListLoading: false });
   },
 }));
