@@ -187,10 +187,10 @@ export default function KitchenProfileScreen() {
           followLoading={followLoading}
           onFollowToggle={handleFollowToggle}
           onFollowersPress={() => {
-            // Follower list navigation wired in Plan 02
+            router.push(`/kitchen/followers?kitchenId=${viewedProfile.id}&tab=followers` as any);
           }}
           onFollowingPress={() => {
-            // Following list navigation wired in Plan 02
+            router.push(`/kitchen/followers?kitchenId=${viewedProfile.id}&tab=following` as any);
           }}
         />
 
