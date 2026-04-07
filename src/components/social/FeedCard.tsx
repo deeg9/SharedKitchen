@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import React, { useRef, useCallback } from 'react';
+import { View, Text, Pressable, Animated, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FeedPost } from '../../types/database';
@@ -12,8 +12,13 @@ interface FeedCardProps {
   post: FeedPost;
   kitchenProfile?: { display_name: string; avatar_url: string | null };
   isOwnPost: boolean;
+  isLiked: boolean;
   onKitchenPress: () => void;
   onRecipePress: () => void;
+  onLikePress: () => void;
+  onCommentPress: () => void;
+  onSavePress: () => void;
+  onLongPress?: () => void;
   onPhotoAttach?: () => void;
 }
 
@@ -55,8 +60,13 @@ export function FeedCard({
   post,
   kitchenProfile,
   isOwnPost,
+  isLiked,
   onKitchenPress,
   onRecipePress,
+  onLikePress,
+  onCommentPress,
+  onSavePress,
+  onLongPress,
   onPhotoAttach,
 }: FeedCardProps) {
   const displayName = kitchenProfile?.display_name ?? 'Kitchen';
@@ -64,100 +74,138 @@ export function FeedCard({
   const photoUrl = post.photo_url ?? post.recipe_image_url;
   const daySlot = `${getDayName(post.meal_date)} ${capitalizeFirst(post.meal_type)}`;
 
+  // Like animation
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handleLikePress = useCallback(() => {
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 1.3,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1.0,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+    onLikePress();
+  }, [scaleAnim, onLikePress]);
+
   return (
-    <View style={s.card}>
-      {/* Header: avatar + name + timestamp */}
-      <View style={s.header}>
-        <Pressable onPress={onKitchenPress} style={s.headerLeft}>
-          {avatarUrl ? (
-            <Image
-              source={{ uri: avatarUrl }}
-              style={s.avatar}
-              contentFit="cover"
-              transition={200}
-            />
-          ) : (
-            <View style={[s.avatar, s.avatarPlaceholder]}>
-              <Text style={s.avatarInitials}>{getInitials(displayName)}</Text>
-            </View>
-          )}
-          <Text style={s.kitchenName} numberOfLines={1}>
-            {displayName}
-          </Text>
-        </Pressable>
-        <Text style={s.timestamp}>{getRelativeTime(post.created_at)}</Text>
-      </View>
-
-      {/* Content: meal context + recipe name */}
-      <Pressable onPress={onRecipePress}>
-        <Text style={s.mealContext}>{daySlot}</Text>
-        <Text style={s.recipeName} numberOfLines={2}>
-          {post.recipe_name}
-        </Text>
-      </Pressable>
-
-      {/* Photo or placeholder */}
-      <Pressable onPress={onRecipePress}>
-        {photoUrl ? (
-          <Image
-            source={{ uri: photoUrl }}
-            style={s.photo}
-            contentFit="cover"
-            transition={300}
-          />
-        ) : (
-          <View style={[s.photo, s.photoPlaceholder]}>
-            <MaterialCommunityIcons
-              name="silverware-fork-knife"
-              size={40}
-              color={colors.outlineVariant}
-            />
-          </View>
-        )}
-      </Pressable>
-
-      {/* Action bar */}
-      <View style={s.actionBar}>
-        <View style={s.actionGroup}>
-          <View style={s.actionItem}>
-            <MaterialCommunityIcons
-              name="heart-outline"
-              size={22}
-              color={colors.onSurfaceVariant}
-            />
-            {post.like_count > 0 && (
-              <Text style={s.actionCount}>{post.like_count}</Text>
+    <Pressable onLongPress={onLongPress} disabled={!onLongPress}>
+      <View style={s.card}>
+        {/* Header: avatar + name + timestamp */}
+        <View style={s.header}>
+          <Pressable onPress={onKitchenPress} style={s.headerLeft}>
+            {avatarUrl ? (
+              <Image
+                source={{ uri: avatarUrl }}
+                style={s.avatar}
+                contentFit="cover"
+                transition={200}
+              />
+            ) : (
+              <View style={[s.avatar, s.avatarPlaceholder]}>
+                <Text style={s.avatarInitials}>{getInitials(displayName)}</Text>
+              </View>
             )}
-          </View>
-          <View style={s.actionItem}>
-            <MaterialCommunityIcons
-              name="comment-outline"
-              size={22}
-              color={colors.onSurfaceVariant}
-            />
-            {post.comment_count > 0 && (
-              <Text style={s.actionCount}>{post.comment_count}</Text>
-            )}
-          </View>
-          <MaterialCommunityIcons
-            name="bookmark-outline"
-            size={22}
-            color={colors.onSurfaceVariant}
-          />
+            <Text style={s.kitchenName} numberOfLines={1}>
+              {displayName}
+            </Text>
+          </Pressable>
+          <Text style={s.timestamp}>{getRelativeTime(post.created_at)}</Text>
         </View>
 
-        {/* Camera button for own posts without photo */}
-        {isOwnPost && !post.photo_url && onPhotoAttach && (
-          <Pressable onPress={onPhotoAttach} hitSlop={8}>
-            <MaterialCommunityIcons
-              name="camera-plus-outline"
-              size={22}
-              color={colors.primary}
+        {/* Content: meal context + recipe name */}
+        <Pressable onPress={onRecipePress}>
+          <Text style={s.mealContext}>{daySlot}</Text>
+          <Text style={s.recipeName} numberOfLines={2}>
+            {post.recipe_name}
+          </Text>
+        </Pressable>
+
+        {/* Photo or placeholder */}
+        <Pressable onPress={onRecipePress}>
+          {photoUrl ? (
+            <Image
+              source={{ uri: photoUrl }}
+              style={s.photo}
+              contentFit="cover"
+              transition={300}
             />
+          ) : (
+            <View style={[s.photo, s.photoPlaceholder]}>
+              <MaterialCommunityIcons
+                name="silverware-fork-knife"
+                size={40}
+                color={colors.outlineVariant}
+              />
+            </View>
+          )}
+        </Pressable>
+
+        {/* Comment preview link */}
+        {post.comment_count > 0 && (
+          <Pressable onPress={onCommentPress}>
+            <Text style={s.commentPreview}>
+              View all {post.comment_count} comment{post.comment_count !== 1 ? 's' : ''}
+            </Text>
           </Pressable>
         )}
+
+        {/* Action bar */}
+        <View style={s.actionBar}>
+          <View style={s.actionGroup}>
+            <Pressable onPress={handleLikePress} hitSlop={8}>
+              <View style={s.actionItem}>
+                <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+                  <MaterialCommunityIcons
+                    name={isLiked ? 'heart' : 'heart-outline'}
+                    size={22}
+                    color={isLiked ? colors.error : colors.onSurfaceVariant}
+                  />
+                </Animated.View>
+                {post.like_count > 0 && (
+                  <Text style={s.actionCount}>{post.like_count}</Text>
+                )}
+              </View>
+            </Pressable>
+            <Pressable onPress={onCommentPress} hitSlop={8}>
+              <View style={s.actionItem}>
+                <MaterialCommunityIcons
+                  name="comment-outline"
+                  size={22}
+                  color={colors.onSurfaceVariant}
+                />
+                {post.comment_count > 0 && (
+                  <Text style={s.actionCount}>{post.comment_count}</Text>
+                )}
+              </View>
+            </Pressable>
+            <Pressable onPress={onSavePress} hitSlop={8}>
+              <MaterialCommunityIcons
+                name="bookmark-outline"
+                size={22}
+                color={colors.onSurfaceVariant}
+              />
+            </Pressable>
+          </View>
+
+          {/* Camera button for own posts without photo */}
+          {isOwnPost && !post.photo_url && onPhotoAttach && (
+            <Pressable onPress={onPhotoAttach} hitSlop={8}>
+              <MaterialCommunityIcons
+                name="camera-plus-outline"
+                size={22}
+                color={colors.primary}
+              />
+            </Pressable>
+          )}
+        </View>
       </View>
-    </View>
+    </Pressable>
   );
 }
 
@@ -227,6 +275,11 @@ const s = StyleSheet.create({
     backgroundColor: colors.surfaceVariant,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  commentPreview: {
+    ...typography.bodySm,
+    color: colors.onSurfaceVariant,
+    marginBottom: spacing.xs,
   },
   actionBar: {
     flexDirection: 'row',
