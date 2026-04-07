@@ -1,184 +1,185 @@
 # Pitfalls Research
 
-**Domain:** AI Vision features for React Native food/kitchen app (SharedKitchen v4.0)
-**Researched:** 2026-03-30
-**Confidence:** HIGH (based on existing codebase analysis, official docs, and ecosystem research)
+**Domain:** Adding social feed features (follow, feed, likes, comments) to a private household dinner planning app
+**Researched:** 2026-04-06
+**Confidence:** HIGH
 
 ## Critical Pitfalls
 
-### Pitfall 1: Sending Full-Resolution Camera Images to Vision API
+### Pitfall 1: Household Data Leakage Through Social Feed
 
 **What goes wrong:**
-iPhone cameras capture 12-48MP images (8-15MB each). Sending these as base64 to a Supabase Edge Function via JSON body means: (a) the base64 string is ~33% larger than the binary (~12-20MB), (b) the Edge Function must hold the entire image in its 256MB memory alongside the Gemini API request, (c) Gemini's inline image limit is 20MB total request size (prompt + image), and (d) the user waits 5-15 seconds just for upload over cellular. A single fridge photo at full resolution will regularly hit or exceed these limits.
+The entire existing data model is household-scoped behind strict RLS (`is_household_member` checks on every table). Adding a social feed means meal plans, recipes, and user profiles must become partially visible to followers who are NOT household members. Developers open up RLS too broadly (e.g., making recipes globally readable) and accidentally expose private household data -- grocery lists, budget info, pantry contents, leftovers, meal notes, assigned cooks, and household member names.
 
 **Why it happens:**
-expo-image-picker returns full-resolution images by default. Developers grab the URI, convert to base64, and ship it without resizing. It works in development on fast WiFi with small test images, then breaks in production.
+The current RLS policies use a single `is_household_member()` gate on all tables. There is no concept of "public" vs "private" data. When adding feed visibility, it is tempting to add a permissive SELECT policy like `true` or `follower_id = auth.uid()` to recipes/meal_plans, which inadvertently exposes all columns and related data that should remain private.
 
 **How to avoid:**
-Compress and resize on-device BEFORE base64 encoding. Use expo-image-manipulator to resize to max 1024x1024 (or 1536 longest edge) at quality 0.7-0.8. This produces ~100-300KB images that are perfectly adequate for food/item recognition. The existing codebase already uses expo-image-picker (in edit-profile.tsx and RecipeForm.tsx) -- add a shared `compressForVision()` utility that all vision flows call.
-
-```typescript
-// Target: ~200KB base64 payload per image
-ImageManipulator.manipulateAsync(uri, [
-  { resize: { width: 1024 } }  // maintain aspect ratio
-], { compress: 0.75, format: SaveFormat.JPEG, base64: true });
-```
+- Create a separate `feed_posts` table that contains only the data intended for public consumption (meal name, recipe name, photo URL, kitchen display name). Never expose raw `meal_plans`, `recipes`, or `households` rows to non-members.
+- The feed post is a materialized snapshot, not a live join to household data. When a meal is shared, copy the shareable fields into `feed_posts`. This decouples the social layer from the private household layer entirely.
+- Keep ALL existing RLS policies on `households`, `meal_plans`, `recipes`, `grocery_items`, `expenses`, `pantry_items`, and `leftovers` completely untouched. New social tables get their own independent policies.
+- Audit rule: any migration that ALTERs an existing RLS policy on a household-scoped table is a red flag.
 
 **Warning signs:**
-- Edge Function timeouts (504) on cellular connections
-- "Request too large" errors from Gemini API
-- Memory warnings or OOM crashes on older iPhones (iPhone 11/SE)
+- Any migration that modifies existing RLS policies on household-scoped tables
+- Queries that JOIN `recipes` or `meal_plans` directly to `follows` without going through `feed_posts`
+- Followers able to see recipe ingredients, instructions, grocery lists, or budget data
+- The word "household_id" appearing in any follower-facing query
 
 **Phase to address:**
-Phase 1 (Foundation) -- image capture and compression utility must exist before any vision feature is built.
+Phase 1 (Data Model) -- the feed_posts table and its RLS policies must be designed before any UI work. This is the architectural firewall between private and public data.
 
 ---
 
-### Pitfall 2: Treating Vision API as Deterministic/Reliable for Inventory
+### Pitfall 2: Exposing User Identity Across Household Boundaries
 
 **What goes wrong:**
-AI vision identifies "milk" but the user has oat milk. It sees a bottle and guesses "soy sauce" when it is balsamic vinegar. It misses items behind other items. It hallucinates items not in the photo. A fridge photo with 15-20 items will realistically achieve 60-75% accuracy at the item level, and brand-level accuracy is significantly lower. If items are bulk-added to the pantry without user review, the On Hand inventory becomes unreliable, undermining the entire Kitchen tab experience.
+The current `profiles` table RLS only allows reading your own profile or co-household-members' profiles (via the joined policy in migration 00002). When followers view a kitchen's feed posts, they need to see display names and avatars. Developers add a broad SELECT policy to `profiles` (e.g., `true` for all authenticated users) which exposes ALL user profiles -- including email-derived display names that were never intended to be public.
 
 **Why it happens:**
-General-purpose vision models (Gemini, GPT) are not food-recognition specialists. Research shows Google Cloud Vision achieved only 9% top-1 accuracy for food items in comparative studies. Multi-model APIs are better but still struggle with: overlapping items, poor lighting, reflective packaging, similar-looking bottles, and items partially hidden. Developers demo with a neatly arranged fridge and assume production accuracy matches.
+The existing profile visibility policy joins through `household_members` -- there is no mechanism for "this profile is visible because I follow their kitchen." The easy fix is making profiles globally readable, but this leaks private identity information.
 
 **How to avoid:**
-NEVER auto-add items to pantry without user confirmation. The vision API output should populate an editable review screen where users can:
-1. Remove incorrect items (swipe to delete)
-2. Edit item names (tap to rename)
-3. Add missed items manually
-4. Confirm the batch
-
-This matches how the best competing apps (Portions Master, Scan2Meal) handle it. The AI is an accelerator, not an oracle.
+- Create a `kitchen_profiles` table (or view) that contains only public-facing kitchen information: kitchen display name, kitchen avatar, optional bio, follower count. This is separate from `profiles` (individual user data) and `households` (private household data).
+- Feed posts reference `kitchen_id` and the `kitchen_profiles` table, never individual `user_id` or `profiles`.
+- The social unit is the KITCHEN (household), not the USER. A kitchen has members, but followers see the kitchen identity only. Individual member names/avatars should not appear in the feed.
+- Do NOT modify the existing profiles SELECT policy. Do NOT modify the existing households SELECT policy.
 
 **Warning signs:**
-- Users reporting phantom items in their On Hand list
-- Users losing trust in the feature after 2-3 bad results and abandoning it
-- Support tickets about "wrong items added to my pantry"
+- Any migration modifying the profiles or households SELECT policy
+- Feed UI showing individual user names instead of kitchen names
+- Followers able to enumerate household member lists
+- `profiles.id` appearing as a foreign key in any social table visible to followers
 
 **Phase to address:**
-Phase 2 (Fridge Scan feature) -- the review/edit screen is not optional, it is the core UX of the feature.
+Phase 1 (Data Model) -- kitchen_profiles must be created as part of the follow/kitchen identity schema before any follow or feed UI is built.
 
 ---
 
-### Pitfall 3: Supabase Edge Function Payload and Memory Constraints for Images
+### Pitfall 3: Default-Public Sharing Without Explicit Opt-In
 
 **What goes wrong:**
-The current Edge Functions (parse-recipe-url, generate-meal) send text payloads (HTML, prompts). Vision features need to send image data. Supabase Edge Functions have a 256MB memory limit shared between request parsing, image processing, and the outgoing Gemini API call. A single compressed image (~200KB base64 = ~270KB in JSON body) is fine. But a fridge scan flow that tries to send multiple images or a single high-res panorama will hit memory pressure. Additionally, the Edge Function CPU time limit is 2 seconds per request (excluding async I/O), which constrains any image preprocessing on the server.
+Meals are auto-posted to the social feed without explicit user consent. Users who joined SharedKitchen for private household planning suddenly discover their dinner plans are visible to followers they forgot they had. This violates user expectations and erodes trust, especially for a product whose entire value proposition is private household coordination.
 
 **Why it happens:**
-The existing architecture pipes everything through Edge Functions as JSON. This works for text but is inefficient for binary data. Developers extend the existing pattern without reconsidering the transport mechanism.
+The project spec says "auto-post meals from plan with manual share toggle." If the toggle defaults to ON, every meal plan entry becomes a feed post automatically. Users who set up follows during initial excitement may not realize every dinner is being broadcast.
 
 **How to avoid:**
-Two viable approaches:
-1. **Direct Gemini call from Edge Function with base64 inline** -- For single compressed images (<1MB base64), this works within Gemini's 20MB request limit and Edge Function memory. This is the simplest approach and matches the existing Edge Function pattern.
-2. **Upload to Supabase Storage first, then pass Storage path** -- For multi-image flows or if images need persistence, upload to a `vision-uploads` bucket with short TTL, then pass the Storage URL to the Edge Function. Edge Function fetches from Storage (fast, same-region) and forwards to Gemini.
-
-For v4.0, approach #1 is sufficient since each vision flow processes one photo at a time. Reserve approach #2 only if multi-photo fridge scanning is needed later.
+- Default the share toggle to OFF for the initial release. Users must explicitly opt in per meal or enable auto-sharing at the kitchen level.
+- Add a kitchen-level "auto-share new meals" setting that defaults to OFF. Users must visit settings to enable it.
+- Show a one-time education prompt when a user first enables sharing: "Meals you share will be visible to your followers. Your grocery list, budget, and other household data remain private."
+- Never auto-share meals that were logged via the "notes" fallback (recipe-less photo meals from v4.0) -- these feel more personal and informal.
+- When auto-sharing is enabled, show a visible indicator on the meal plan card so users always know which meals will be shared.
 
 **Warning signs:**
-- Edge Function memory errors or 500s when processing images
-- Timeouts on the POST request from client to Edge Function
-- JSON.parse failures on large payloads
+- No share toggle visible on the meal plan creation/edit flow
+- Feed posts appearing for meals the user never explicitly shared
+- No kitchen-level sharing preference in settings
+- User confusion or complaints about what is "public" vs "private"
 
 **Phase to address:**
-Phase 1 (Foundation) -- decide the transport mechanism and implement it once for all vision flows.
+Phase 1 (Data Model) for the `is_shared` column default (FALSE), Phase 2 (Feed UI) for the toggle and education prompt.
 
 ---
 
-### Pitfall 4: Vision API Cost Explosion Under Freemium Model
+### Pitfall 4: N+1 Queries and Unbounded Feed Loading
 
 **What goes wrong:**
-Each vision API call with an image costs significantly more than text-only calls. Gemini Flash image input costs ~1,120 tokens per image (~$0.00028/image at current pricing), plus output tokens for the structured response. While per-call costs seem tiny, vision features encourage frequent use: users might scan their fridge daily, photograph every meal, snap dishes at restaurants. At 100 active users doing 3 scans/day, that is 9,000 calls/month. At 1,000 users, 90,000 calls/month. Free-tier users generate cost with no revenue.
+The feed query becomes: "For this user, get all kitchens they follow, then for each kitchen get recent shared meals, then for each meal get the recipe details, then get like counts, then get comments." This cascading query pattern creates N+1 problems that degrade linearly with the number of followed kitchens. Combined with unbounded loading (no pagination), the feed screen becomes a performance disaster.
 
 **Why it happens:**
-Text-only AI features (recipe import, meal suggestions) are naturally rate-limited by user behavior -- you only import a recipe when you find one. Vision features are "point and shoot" -- much lower friction means much higher usage frequency. The existing rate limits (10/day for recipe import, 5/day for meal gen, 3/month for video) were calibrated for text costs.
+The existing codebase fetches data in Zustand stores that call Supabase directly (e.g., `recipeStore`, `planStore`). Developers follow the same pattern for the feed, making separate queries per followed kitchen. Supabase's client makes it easy to write `select('*, recipe(*), likes(*), comments(*)')` which generates massive JOIN queries.
 
 **How to avoid:**
-1. **Extend the existing ai_usage_log rate limiting** with new `function_name` values for vision calls (e.g., `vision-fridge-scan`, `vision-dish-identify`). The infrastructure already exists.
-2. **Set aggressive free-tier limits**: 5 vision scans/month for free users, unlimited for premium. Vision is a premium differentiator.
-3. **Cache aggressively**: Hash the image (or a perceptual hash) and cache results in ai_usage_log.cached_response, same pattern as parse-recipe-url. Identical or near-identical photos should return cached results.
-4. **Use Gemini Flash** (not GPT-4o or gpt-5-mini) for vision -- it is 10-50x cheaper for image input and already used in the codebase for video parsing and meal generation.
-5. **Track token usage per call** -- the existing `tokens_used` column in ai_usage_log supports this. Monitor actual costs weekly.
+- Use a single denormalized query: `feed_posts` table contains kitchen name, meal name, recipe name, photo URL, like count, comment count -- no JOINs needed for the feed list view.
+- Implement cursor-based pagination from day one. Use `created_at` + `id` as the cursor, not OFFSET. Fetch 20 posts per page.
+- Like and comment counts should be denormalized counters on `feed_posts`, updated via triggers, not computed via `COUNT(*)` subqueries on every render.
+- Use a single Postgres function or view for the feed query rather than multiple sequential client-side calls.
+- Comments load lazily only when user taps into a post detail view -- never preloaded in the feed list.
 
 **Warning signs:**
-- Gemini API bill exceeding $50/month with <500 users
-- Free-tier users consuming >80% of AI budget
-- Token usage per vision call exceeding 3,000 (indicates images are too large)
+- Feed load time exceeding 500ms
+- Multiple sequential `.from()` calls in the feed store
+- No LIMIT clause on feed queries
+- Like/comment counts computed via subquery per card
 
 **Phase to address:**
-Phase 1 (Foundation) -- rate limiting and cost controls must be in place before any vision feature ships.
+Phase 1 (Data Model) for denormalized schema and pagination design. Phase 2 (Feed UI) for implementing cursor-based infinite scroll.
 
 ---
 
-### Pitfall 5: Item Name Normalization Drift Between Vision Output and Existing Pantry
+### Pitfall 5: RLS Performance Degradation on Follow-Based Queries
 
 **What goes wrong:**
-The vision API returns "2% reduced fat milk" but the pantry has "Milk" (added manually or from a grocery item). Or it returns "Organic Baby Spinach 5oz" but the existing item is "spinach". The user now has duplicate items in their On Hand list. Over time, the pantry fills with near-duplicates: "chicken breast", "Chicken Breasts", "boneless skinless chicken breast", "Tyson Chicken Breast". The category assignments also drift -- the AI might label something "Dairy" while the existing pantry item has category "Other" (the default in pantry_items).
+RLS policies on the `feed_posts` table use subqueries like `EXISTS (SELECT 1 FROM follows WHERE follower_id = auth.uid() AND following_kitchen_id = feed_posts.kitchen_id)`. This subquery executes per row, and without proper indexing and the `(select auth.uid())` wrapper, it becomes catastrophically slow as the feed table grows.
 
 **Why it happens:**
-The pantry_items table stores `name` as freeform `text` with no normalization. There is no uniqueness constraint. Manual additions, grocery-item auto-copies (via source_grocery_item_id), and vision-scan additions all write different name formats. The current grocery-to-pantry auto-copy (v3.0) already has this problem at small scale -- vision scanning will amplify it by an order of magnitude because each scan can add 10-20 items at once.
+The existing `is_household_member()` SECURITY DEFINER function works well because household membership is a tiny set (2-6 members). Follow relationships can be orders of magnitude larger (hundreds or thousands). The same RLS pattern that works for households will not scale for social feeds. Supabase documentation confirms that unwrapped `auth.uid()` calls evaluate per-row, causing up to 10,000x performance degradation.
 
 **How to avoid:**
-1. **Normalize item names in the Edge Function response** -- instruct Gemini to return simplified, generic item names (e.g., "milk" not "Horizon Organic 2% Reduced Fat Milk 64oz"). Strip brand names, standardize pluralization, lowercase.
-2. **Fuzzy match against existing pantry items** -- before inserting, query existing pantry_items by household_id and check for similar names. Present matches to the user in the review screen: "You already have 'Spinach' -- update this item or add new?"
-3. **Consider a `normalized_name` column** on pantry_items for deduplication queries, keeping the display `name` user-friendly. This can be a generated column: `lower(regexp_replace(name, '^\d+\s*(oz|lb|g|kg|ml|l)\s+', '', 'i'))`.
+- Always wrap `auth.uid()` in a subselect: `(select auth.uid())` to cache it per statement, not per row. Supabase docs confirm this yields up to 99.99% improvement.
+- Create a `SECURITY DEFINER` function `get_followed_kitchen_ids(p_user_id UUID)` that returns `UUID[]` and use `kitchen_id = ANY(get_followed_kitchen_ids((select auth.uid())))` in the policy. This avoids per-row subquery evaluation.
+- Add composite indexes: `follows(follower_id, following_kitchen_id)` and `feed_posts(kitchen_id, created_at DESC)`.
+- Always add explicit WHERE filters client-side that match the policy logic -- this helps Postgres construct better query plans even when RLS provides the same implicit filter.
 
 **Warning signs:**
-- Users with >50 pantry items when they realistically have ~20 unique items
-- Multiple items with the same base ingredient at slightly different names
-- Complaints about "messy" or "cluttered" pantry/On Hand view
+- Feed queries slowing as total feed_posts rows grow, even for users with few followed kitchens
+- `EXPLAIN ANALYZE` showing sequential scans on `follows` table
+- Supabase dashboard showing slow queries (>200ms) on feed-related tables
 
 **Phase to address:**
-Phase 2 (Fridge Scan) -- normalization logic is part of the scan-to-pantry pipeline. Consider a migration to add `normalized_name` column early.
+Phase 1 (Data Model) -- must be built into the initial migration and RLS design, not retrofitted.
 
 ---
 
-### Pitfall 6: Camera Permission and Multi-Step Flow Interruption
+### Pitfall 6: No Moderation System Alongside Comments
 
 **What goes wrong:**
-User opens the scan feature, iOS prompts for camera permission, user denies or dismisses. The app shows a blank screen or crashes. Or: user grants permission, takes a photo, switches to another app mid-processing, returns, and the vision API response is lost. Or: user takes a photo but the Edge Function returns a 429 (rate limit) -- the photo is lost and they have to retake it.
+Comments go live with no reporting mechanism, no spam detection, and no ability to remove abusive content. A single bad actor can post offensive comments on meal photos across many kitchens. Since SharedKitchen is a household/family app, exposure to inappropriate content is especially damaging to trust. Without tools to address it, there is no way to remove content, no way to block users, and no recourse for affected users.
 
 **Why it happens:**
-The existing expo-image-picker usage (profile avatar, recipe photos) handles the simple case: pick image, use it locally or upload it. Vision features add a multi-step async flow: capture -> compress -> upload -> API call -> review -> confirm -> save. Any step can fail, and the photo (which took effort to capture) should not be lost.
+For an MVP social feed in a small community, moderation feels like over-engineering. "We only have 200 users, who would spam?" But even one incident with no tools to address it creates a crisis. Content moderation experts consistently identify skipping moderation at launch as a top mistake -- the cost of adding it retroactively during a crisis is 5-10x higher than building basic tools alongside comments.
 
 **How to avoid:**
-1. **Pre-check camera permission** before showing the scan button. Use `ImagePicker.getCameraPermissionsAsync()` and show a contextual pre-prompt (the app already does this pattern for push notifications in v2.0).
-2. **Save the compressed image to a local temp path** before starting the API call. If the API call fails, the user can retry without retaking the photo.
-3. **Handle all Edge Function error codes gracefully**: 429 (rate limit) shows the limit UI with retry option, 504 (timeout) offers retry, 422 (unrecognizable) lets user add items manually, 502 (API down) shows "try again later".
-4. **Use AbortController** on the client side (the Edge Functions already use this pattern internally) so app backgrounding can cancel in-flight requests cleanly.
+- Ship a `content_reports` table and basic report flow in the same phase as comments. It does not need AI moderation -- just a "Report" button that flags content and an admin query to review flags.
+- Add a `blocked_kitchens` table so users can block kitchens whose comments they do not want to see. Client-side filtering is acceptable for MVP.
+- Add an `is_hidden` boolean on comments so content can be soft-deleted without losing evidence for review.
+- Rate-limit comments per user (e.g., max 20 comments per hour) via a simple count check in the Edge Function or RLS policy.
+- Plain text only for comments. Strip all markup. Limit to 500 characters.
 
 **Warning signs:**
-- Crash reports on the camera permission screen
-- Users retaking photos repeatedly (analytics funnel drop-off between capture and confirm)
-- Unhandled promise rejections from backgrounded API calls
+- Comments feature shipping without a "Report" option in the UI
+- No admin tooling for reviewing reported content (even a simple SQL query counts)
+- No ability to hide/remove individual comments without deleting the row
+- No rate limiting on comment creation
 
 **Phase to address:**
-Phase 1 (Foundation) -- permission handling and error recovery are part of the base vision infrastructure.
+Phase 3 (Interactions) -- must ship alongside comments, not as a follow-up.
 
 ---
 
-### Pitfall 7: Food Photo to Recipe -- Unrealistic Identification Expectations
+### Pitfall 7: Notification Spam from Social Activity
 
 **What goes wrong:**
-User photographs a bowl of pasta. The AI identifies it as "pasta with tomato sauce." The app searches for recipes and returns generic "spaghetti marinara" recipes that look nothing like what the user photographed. Or worse: the AI confidently identifies "Thai Green Curry" when it is actually palak paneer. The user expected the AI to identify the exact dish and find the exact recipe -- the feature feels broken even when the AI is working correctly.
+Users who follow 20 kitchens start receiving push notifications for every new meal shared, every like on their posts, and every comment. The notification volume overwhelms the existing notification system (which currently only fires for cooking reminders, leftover expiry, and budget alerts -- all low-volume, high-signal) and users disable notifications entirely, losing the valuable household notifications too.
 
 **Why it happens:**
-Food dish identification from a single photo is genuinely ambiguous. Many dishes look similar (various stir-fries, various curries, various pasta dishes). The gap between user expectation ("find me THIS recipe") and technical capability ("here are recipes for dishes that look similar") is large. Framing the feature as "snap and get the recipe" sets the wrong expectation.
+The app already has push notifications via expo-notifications and Expo Push API. It is tempting to reuse the same channel for social activity. But household notifications are low-volume (3-5 per day maximum). Social notifications can be high-volume (50+ per day with active following). iOS does not let users selectively disable notification categories within a single app -- they either allow or disallow all.
 
 **How to avoid:**
-1. **Frame the UX as "what dish is this?" not "find this exact recipe."** Show the AI's identification with a confidence indicator and let the user edit/correct it before searching.
-2. **Present 2-3 recipe options** (already in the spec) with clear visual differences -- this sets the expectation that these are "recipes like this" not "the recipe for this exact dish."
-3. **Let the user type/edit the dish name** if the AI gets it wrong, then re-search. The AI identification is a shortcut, not the only path.
-4. **Add the identified dish as a meal plan entry even without a full recipe** -- sometimes users just want to log "I had Thai food" without importing a full recipe. This supports the "add as meal to specific day/slot" requirement.
+- Do NOT send push notifications for social activity in the initial release. Use in-app indicators only (badge count on feed tab, dot indicators on new posts).
+- If push notifications are added later, use a separate notification category with its own toggle in app settings.
+- Never send push notifications for likes. Only send for comments on YOUR posts, and batch those ("3 people commented on your meal").
+- Respect the existing notification permission pre-prompt flow -- do not trigger a new permission request for social features.
 
 **Warning signs:**
-- Low conversion from "identify dish" to "import recipe" (<20%)
-- Users repeatedly correcting the AI identification
-- App store reviews mentioning "wrong recipe" or "doesn't recognize my food"
+- Social notifications using the same code path as household notifications
+- No per-category notification settings in the app
+- Users reporting "too many notifications" after social feature launch
+- Notification opt-out rate increasing after social features ship
 
 **Phase to address:**
-Phase 3 (Food Photo features) -- UX framing and expectations management are critical to this feature's perceived quality.
+Phase 3 (Interactions) -- explicitly decide what does and does not trigger notifications before implementing likes/comments.
 
 ---
 
@@ -188,26 +189,27 @@ Shortcuts that seem reasonable but create long-term problems.
 
 | Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
 |----------|-------------------|----------------|-----------------|
-| Calling Gemini directly from client instead of Edge Function | Faster development, no Edge Function needed | API key exposed in app bundle, no rate limiting, no caching, no usage logging | Never -- all AI calls must go through Edge Functions for security and rate limiting |
-| Skipping image compression on client | Simpler code, one fewer dependency (expo-image-manipulator) | 10x larger payloads, timeouts on cellular, memory issues on old devices, higher API costs | Never -- even a simple resize to 1024px is essential |
-| Using the same rate limit bucket for vision and text AI calls | No schema changes needed, fewer function_name values | Vision calls and text calls have different cost profiles, impossible to tune limits independently | Only in initial prototype; split before shipping |
-| Storing vision API responses without name normalization | Ship faster, defer cleanup | Pantry fills with duplicates, user trust erodes, harder to fix retroactively with existing data | MVP only -- add normalization before second iteration |
-| Hardcoding vision prompts in Edge Functions | Works, matches existing pattern for generate-meal and parse-recipe-url | Cannot A/B test prompts, cannot improve without redeployment | Acceptable for v4.0; extract to config if iterating frequently post-launch |
-| Persisting user food photos in Supabase Storage | Enables retry, visual history | Privacy liability, storage costs grow linearly, GDPR exposure | Never persist permanently; use ephemeral temp files with 1-hour auto-delete |
+| JOINing live household tables for feed display instead of snapshotting into feed_posts | No data duplication | Feed queries coupled to private data, RLS complexity explosion, privacy risk | Never -- always snapshot into feed_posts |
+| Storing like/comment counts as computed aggregates (COUNT subqueries) | No denormalization to maintain | O(n) per feed card on every render, degrades linearly | Never at scale -- denormalize counters from day one |
+| Using OFFSET pagination for feed | Simple to implement | Performance degrades linearly, skips/duplicates when new posts arrive | Never for user-facing feed -- use cursor pagination |
+| Single notification channel for household + social | Less code, fewer categories | Users disable all notifications to escape social spam, losing household alerts | Never -- keep channels separate even if social push is deferred |
+| Skipping blocked/muted kitchen support | Faster MVP | First harassment incident has no mitigation path | Only if comments are not shipped yet |
+| Making follow relationships symmetric (auto-follow-back) | Simpler data model | Users cannot curate their feed, forced reciprocity feels invasive for a cooking app | Never -- follows should be unidirectional |
+| Using household_id as the social identifier in feed_posts | No new table needed | Leaks internal household UUID to followers, who could probe other endpoints | Never -- use a public-facing kitchen_profile_id |
 
 ## Integration Gotchas
 
-Common mistakes when connecting vision features to existing SharedKitchen systems.
+Common mistakes when connecting social features to existing SharedKitchen systems.
 
 | Integration | Common Mistake | Correct Approach |
 |-------------|----------------|------------------|
-| Vision scan -> pantry_items | Inserting items without checking for duplicates against existing household inventory | Query existing pantry_items by household_id, fuzzy-match against AI results, present merge options in review screen |
-| Vision identify -> recipe search | Assuming the dish name from AI is a good web search query as-is | Strip qualifiers ("homemade", "mom's", "traditional"), use the core dish name, search with fallback variations |
-| Vision -> meal_plans | Requiring a recipe_id for meal plan entries from photo-identified meals | Support meal plan entries with just a dish name (no recipe). The user may want to log "pad thai" without importing a full recipe |
-| Vision -> ai_usage_log | Using a single function_name for all vision calls | Use distinct function_names: `vision-fridge-scan`, `vision-dish-identify`, `vision-meal-log` for independent rate limiting and cost tracking |
-| Image data -> Edge Function | Sending raw base64 in JSON body without size validation | Compress to <300KB base64 on client, validate base64 length in Edge Function before forwarding to Gemini, return 413 for oversized payloads |
-| Gemini API -> structured JSON for vision | Assuming Gemini always returns valid JSON for vision responses | Vision responses are less structured than text-only prompts. Always validate JSON schema. The codebase already strips markdown fences -- keep this pattern for vision Edge Functions |
-| Vision results -> existing categories | Assuming AI-returned categories match the app's 14-category system | Map AI category output to the canonical category list (from FilterBar/category picker), or default to "Other" |
+| Supabase Realtime for feed | Subscribing to `feed_posts` changes for live feed updates, creating a channel per user with broad filters | Use Realtime only for comment threads on a single open post. Poll or use badge counts for the main feed list. |
+| Supabase Storage for feed photos | Storing shared meal photos in a bucket without proper RLS, making them accessible via URL guessing | Use signed URLs with short expiry, or serve through the existing Storage RLS patterns. Feed photos should be read-only to followers. |
+| Existing recipe save flow | Copying the full recipe object (ingredients, instructions, timers) when user saves from feed | Save a snapshot of the recipe at share time into feed_posts or a published_recipes table. The original household recipe may be edited or deleted later -- the feed snapshot must be independent. |
+| Supabase Auth identity | Using `auth.uid()` as the social identity in feed posts | Social identity is the kitchen (household), not the individual user. Multiple household members share one social identity. Use kitchen_profile_id. |
+| Expo Push Notifications | Sending social push notifications through the same Edge Function as household notifications | Create a separate Edge Function (or at minimum separate logic branch) for social notifications with its own rate limiting and batching. |
+| Plan tab integration | Replacing the existing Plan tab content with a social feed | Keep the Plan tab focused on the user's own meal plan. Add the social feed as a separate section (subtab, swipe, or new tab). Do not displace existing functionality. |
+| Meal plan mutations | Creating feed_posts synchronously inside the meal plan save transaction | Create feed_posts asynchronously (trigger or background) so meal plan saves are not slowed by social layer failures. A failed feed post should never block a meal plan update. |
 
 ## Performance Traps
 
@@ -215,52 +217,55 @@ Patterns that work at small scale but fail as usage grows.
 
 | Trap | Symptoms | Prevention | When It Breaks |
 |------|----------|------------|----------------|
-| Base64 encoding full-res images on React Native JS thread | UI freezes for 1-3 seconds during encoding, app feels unresponsive | Use expo-image-manipulator which processes on native thread and returns base64 from the manipulation call directly | Every time on devices with <4GB RAM |
-| Synchronous pantry duplicate check per item in Edge Function | Each scan adds 200-500ms per item checking for duplicates individually | Batch the duplicate check: one query with `name ILIKE ANY(array[...])` instead of N individual queries | >30 pantry items per household |
-| Logging every vision call with full Gemini raw response in cached_response | ai_usage_log table grows rapidly with large JSONB entries (vision responses can be verbose) | For vision calls, cache only the structured item list, not the full Gemini response. Consider TTL-based cleanup job | >10,000 vision calls total in ai_usage_log |
-| No client-side image cache for retry scenarios | User retakes photo on every retry after API failure -- slow and frustrating | Cache the compressed image URI in local state; clear after successful save or on unmount | Every retry scenario |
-| Scanning full fridge in one API call with one photo | Single photo of full fridge has low per-item accuracy, items at edges are unrecognizable | Guide user to take per-shelf photos; merge results across multiple scans | Fridges with >15 visible items |
+| Fan-out on read (assembling feed at query time by joining follows + meal_plans) | Feed load time grows linearly with followed kitchen count | Use a denormalized feed_posts table. Fan-out on read is acceptable at SharedKitchen's scale (<10K users) but requires cursor pagination and denormalized counts. | >50 followed kitchens per user |
+| COUNT(*) for likes/comments per feed card | Feed list view slows on scroll, especially with popular posts | Denormalize `like_count` and `comment_count` into feed_posts, update via Postgres trigger on insert/delete | >100 likes per post or >50 posts in a single feed load |
+| Loading all comments for all visible feed posts at once | Memory spike, slow initial load, wasted bandwidth for comments user never reads | Lazy-load comments only when user taps into post detail view. Feed cards show comment_count only. | >10 comments per post average |
+| Full recipe data embedded in feed cards | Large payloads per card, slow FlatList rendering | Feed cards show recipe name + photo only. Full recipe data loads on tap into detail. | >20 posts with full recipe payloads in feed |
+| Supabase Realtime subscription per followed kitchen | Connection limit exhaustion (default 200 concurrent connections per project) | Use a single subscription with array-based filter, or avoid Realtime for feed entirely (poll on pull-to-refresh) | >20 followed kitchens per user |
+| Unindexed follower lookups in RLS policies | Every feed query triggers sequential scan on follows table | Add composite index on `follows(follower_id, following_kitchen_id)` and use SECURITY DEFINER helper | >1,000 rows in follows table |
 
 ## Security Mistakes
 
-Domain-specific security issues for vision features.
+Domain-specific security issues for social feed features.
 
 | Mistake | Risk | Prevention |
 |---------|------|------------|
-| Exposing Gemini API key in client bundle for "faster" vision calls | Anyone can extract the key from the IPA and make unlimited API calls at your expense | Route ALL vision calls through Edge Functions (matching existing pattern for parse-recipe-url and generate-meal). Never call Gemini directly from React Native. |
-| Storing user food photos permanently in Supabase Storage | Privacy liability -- food photos reveal dietary habits, health conditions, household composition, and potentially location metadata in EXIF | Do NOT persist photos. Process in memory only. If ephemeral caching is needed, use Supabase Storage with auto-delete lifecycle rules (1 hour TTL). Strip EXIF data on client before sending. |
-| No input validation on image data in Edge Function | Malicious user sends a 50MB payload or non-image data to exhaust Edge Function memory or crash the function | Validate base64 length (<500KB) early in the Edge Function, before any processing. Check for JPEG/PNG header bytes in the decoded data. Reject immediately if invalid. |
-| Rate limiting only on successful API calls | Attacker sends invalid images repeatedly to burn Gemini API quota before rate limit kicks in | Count ALL attempts (success + failure) against the rate limit, matching the existing pattern where ai_usage_log is written regardless of outcome |
-| Logging full image base64 in Edge Function console.error | Images end up in Supabase function logs, accessible to anyone with dashboard access | Never log image data. Log only metadata: image size, dimensions, function_name, user_id, error message |
+| Feed posts containing raw `household_id` visible to followers | Followers can probe other household-scoped endpoints using the leaked UUID | Feed posts reference `kitchen_profile_id` (a public-facing ID), never `household_id`. Ensure no API endpoint accepts household_id from non-members without RLS check. |
+| No rate limiting on follow/unfollow requests | Spam follow bots, follower count manipulation, follow/unfollow harassment loops | Limit to 100 max followed kitchens per user. Rate-limit follow/unfollow to 10 per minute. Prevent self-follow. |
+| Comments allowing HTML, markdown, or link injection | XSS if any WebView rendering is used, phishing links, misleading formatted content | Plain text only for comments. Strip all markup server-side. Limit to 500 characters. No clickable URLs. |
+| Recipe "save from feed" bypassing premium gating | Free users saving unlimited recipes through feed instead of manual creation | Feed recipe saves count toward the same limits as recipe creation if any exist. Check subscription status server-side. |
+| Invite codes discoverable through kitchen profiles | Non-members could join private households by finding invite codes on the public kitchen profile | Kitchen profiles must NEVER expose invite codes. Invite codes and kitchen profiles are completely separate concepts. |
+| No input sanitization on kitchen profile bio/name | Stored XSS, inappropriate content in kitchen names | Sanitize and length-limit all user-provided text in kitchen profiles. No HTML/markdown. |
 
 ## UX Pitfalls
 
-Common user experience mistakes in food vision apps.
+Common user experience mistakes when adding social features to a private app.
 
 | Pitfall | User Impact | Better Approach |
 |---------|-------------|-----------------|
-| Requiring the whole fridge in one photo | Users contort themselves to fit everything in frame, photo quality suffers, items at edges are unrecognizable | Allow multiple photos ("top shelf", "bottom shelf", "door") and merge results. Or frame as "photograph one shelf at a time" with an "Add more" button after each scan. |
-| No loading state during 3-8 second vision processing | User taps scan, nothing happens, taps again, gets duplicate results or confusion | Show an animated "Scanning..." overlay with the captured photo visible underneath. The app already has good loading patterns from recipe import. |
-| Auto-dismissing the review screen or auto-adding items | Items are added before the user can verify, eroding trust in the inventory | Review screen must be user-dismissed with an explicit "Add X items to On Hand" button. All items should be pre-selected but individually toggleable. |
-| Not showing confidence or uncertainty in scan results | User sees a flat list with no indication that "soy sauce" is a guess while "eggs" is obvious | Group or annotate items by confidence: "Clearly identified" vs "Best guess -- please check." Highlight uncertain items for easy correction. |
-| Forcing recipe import as the only outcome of dish identification | User just wants to log what they ate, not find and import a full recipe | Offer two clear paths after dish identification: "Find Recipes" (search and import) and "Log This Meal" (add to meal plan with just the name). |
-| Going too big on initial pantry scan | The thought of scanning every shelf, drawer, and cabinet is overwhelming -- user gives up before starting | Frame as incremental: "Start with what is in front of you." Make it easy to do partial scans. Do not require a complete inventory to see value. |
+| Forcing social features on existing users | Users who want private planning feel the app changed on them -- churn risk | Social feed is opt-in and additive. Existing Plan tab stays unchanged. Feed is a new section or subtab that users discover naturally. |
+| Empty feed state with no guidance | New social users see a blank feed and do not understand how to populate it | Show a clear "Follow kitchens to see what they're cooking" prompt with a discovery/search mechanism or invite link flow. |
+| No way to discover kitchens to follow | Users cannot find interesting kitchens, feed stays permanently empty, feature feels dead | Provide invite-link-based following (share your kitchen link) and optionally a kitchen search/browse. Do not rely on organic discovery alone. |
+| Showing follower counts prominently | Turns a cozy, warm cooking app into a social status competition -- misaligned with the "Culinary Curator" design philosophy | De-emphasize or hide follower counts. Focus on the food, not the numbers. Show "X kitchens you follow" not "X followers this kitchen has." |
+| Share toggle buried in settings | Users cannot easily control what gets shared on a per-meal basis, leading to frustration or accidental shares | Show the share toggle inline on the meal plan card or meal creation bottom sheet, clearly visible during the normal planning flow. |
+| Comments without context | Flat comment lists with no attribution feel anonymous and potentially hostile | Show the commenter's kitchen name and avatar on each comment. Keep comments flat (no threading) for MVP, but provide clear identity context. |
+| Treating "save recipe" as cloning the full recipe | Users expect a lightweight "bookmark" but get a full recipe clone in their library, creating duplicates and confusion | Save creates a reference/bookmark with attribution ("Saved from Kitchen X"). Recipe data is a snapshot, clearly marked as saved from feed. |
 
 ## "Looks Done But Isn't" Checklist
 
 Things that appear complete but are missing critical pieces.
 
-- [ ] **Fridge scan:** Often missing handling for empty/unrecognizable photos -- verify the Edge Function returns a clear "No items found in this photo" message, not an error
-- [ ] **Fridge scan:** Often missing duplicate detection against existing pantry -- verify scan results are cross-referenced with current household pantry_items before presenting review screen
-- [ ] **Fridge scan:** Often missing category assignment -- verify scanned items get categories that match the existing pantry_items.category values, not arbitrary AI-generated ones
-- [ ] **Dish identification:** Often missing fallback when web recipe search returns no results -- verify the user can still add the dish name as a meal plan entry
-- [ ] **Dish identification:** Often missing the "edit dish name" step -- verify the user can correct the AI's identification before searching for recipes
-- [ ] **Image compression:** Often missing validation that compressed image is under size threshold -- verify a >10MB camera image compresses to <300KB before sending
-- [ ] **Rate limiting:** Often missing separate counters for different vision features -- verify `vision-fridge-scan` and `vision-dish-identify` have independent limits in ai_usage_log
-- [ ] **Permission handling:** Often missing the "permission previously denied" state -- verify the app detects this and shows "Enable Camera in Settings" with a deep link to iOS Settings
-- [ ] **Error recovery:** Often missing photo retention on API failure -- verify the compressed photo is cached locally so the user can retry without retaking
-- [ ] **Offline handling:** Often missing graceful degradation when offline -- verify the camera/scan button is disabled or shows an offline message rather than failing silently after photo capture
-- [ ] **Premium gating:** Often missing the subscription check before vision features -- verify free-tier limits are enforced server-side via the existing isPremium pattern in Edge Functions
+- [ ] **Follow system:** Often missing unfollow confirmation, follow request rate limiting, and self-follow prevention -- verify all three exist
+- [ ] **Feed pagination:** Often missing handling of new posts arriving while user scrolls (duplicates/skips with OFFSET) -- verify cursor-based pagination handles concurrent insertions
+- [ ] **Like toggle:** Often missing optimistic UI rollback on network failure -- verify like state reverts if server request fails
+- [ ] **Comment posting:** Often missing empty-string validation, max-length enforcement, and rate limiting -- verify all three are enforced server-side, not just client-side
+- [ ] **Kitchen profile:** Often missing the case where a kitchen has no shared meals yet -- verify empty state exists
+- [ ] **Recipe save from feed:** Often missing handling of original recipe deletion -- verify the saved snapshot is independent and survives the source being removed
+- [ ] **Share toggle:** Often missing the "retroactive" case -- if a user turns sharing OFF, do existing feed posts get removed? Decide and implement consistently.
+- [ ] **Feed post deletion:** Often missing cascade cleanup of likes and comments -- verify ON DELETE CASCADE on foreign keys from likes/comments to feed_posts
+- [ ] **Block/Report:** Often missing immediate effect -- blocked kitchen's posts should hide from feed instantly (client-side filter), not just on next refresh
+- [ ] **Multi-household users:** Often missing which kitchen identity is used when a user belongs to multiple households -- verify the active household context is clear when sharing
+- [ ] **Existing RLS audit:** Often missing a verification that NO existing RLS policies were modified -- run a diff against migration 00001-00017 to confirm zero changes
 
 ## Recovery Strategies
 
@@ -268,12 +273,13 @@ When pitfalls occur despite prevention, how to recover.
 
 | Pitfall | Recovery Cost | Recovery Steps |
 |---------|---------------|----------------|
-| Duplicate pantry items from ungated vision scans | MEDIUM | Add a "merge duplicates" utility that groups by normalized name and lets user pick the canonical entry. Can be a one-time cleanup migration plus a new UI action. |
-| Cost overrun from unmetered vision calls | LOW | Tighten rate limits server-side (Edge Function change only, no app update needed). The existing ai_usage_log provides a complete audit trail for cost analysis. |
-| Users lost trust due to poor scan accuracy | HIGH | Cannot easily recover perception. Must improve prompts, add confidence indicators, add manual correction UX, and re-frame the feature as "AI-assisted" not "automatic." Requires app update. |
-| Large images caused Edge Function OOMs | LOW | Deploy updated Edge Function with size validation (no app update needed for server-side check). Client-side compression fix requires EAS build + app update. |
-| Photos stored in Storage without cleanup | MEDIUM | Run a Supabase Storage lifecycle policy or a pg_cron job to delete old vision uploads. Add TTL auto-delete going forward. |
-| Vision categories do not match app categories | LOW | Update the Gemini prompt to constrain categories to the app's canonical list. Edge Function change only. |
+| Household data leaked via overly permissive RLS | HIGH | Audit all feed-related RLS policies immediately. Drop overly permissive policies. Migrate feed_posts to use snapshots instead of JOINs. Notify affected users if PII was exposed. Review access logs. |
+| N+1 feed queries causing timeouts | MEDIUM | Add denormalized feed_posts table if not present. Backfill from existing data. Swap queries. No client-side change if API contract is stable. |
+| Notification spam causing opt-outs | MEDIUM | Add notification categories retroactively. Reset all social notification preferences to OFF. Consider a one-time apology/explanation in-app message. |
+| No moderation tools after abuse incident | HIGH | Emergency deploy: add is_hidden column to comments, build admin flag review query, manually hide offending content via SQL. Reputational damage to a family-focused app is hard to undo. |
+| User profiles exposed to all authenticated users | HIGH | Revert the RLS policy change immediately. Audit Supabase access logs for data exposure scope. Create kitchen_profiles table as the proper public-facing entity. |
+| Auto-shared meals without user consent | MEDIUM | Set all existing feed_posts to hidden/draft. Add retroactive opt-in prompt. Let users review and explicitly re-share what they want public. |
+| Feed performance degradation | LOW | Add missing indexes, wrap auth.uid() in subselect, add SECURITY DEFINER function. All fixable via migration without app update. |
 
 ## Pitfall-to-Phase Mapping
 
@@ -281,27 +287,28 @@ How roadmap phases should address these pitfalls.
 
 | Pitfall | Prevention Phase | Verification |
 |---------|------------------|--------------|
-| Full-resolution images (#1) | Phase 1: Foundation | Unit test: `compressForVision()` produces <300KB base64 output from a 10MB+ input image |
-| No user review for scan results (#2) | Phase 2: Fridge Scan | Manual test: scan a messy fridge photo, verify editable review screen with toggle/remove/edit per item |
-| Edge Function payload constraints (#3) | Phase 1: Foundation | Integration test: new vision Edge Function handles 300KB base64 image without timeout or memory error |
-| Cost explosion (#4) | Phase 1: Foundation | Verify ai_usage_log entries for vision calls include tokens_used; verify 429 rate limit response at threshold |
-| Item name normalization (#5) | Phase 2: Fridge Scan | Test: scan returns "2% Milk", pantry has "milk" -- verify merge/duplicate prompt appears in review screen |
-| Camera permission flow (#6) | Phase 1: Foundation | Maestro E2E: deny camera permission, verify graceful fallback UI with Settings link |
-| Dish identification expectations (#7) | Phase 3: Food Photo | User test: photograph ambiguous dish, verify editable identification with both "Find Recipes" and "Log Meal" paths |
+| Household data leakage (#1) | Phase 1 (Data Model) | Zero changes to existing RLS policies in migrations 00001-00017. feed_posts contains only snapshot data. Manual RLS audit before merge. |
+| User identity exposure (#2) | Phase 1 (Data Model) | kitchen_profiles table exists. No modifications to profiles or households SELECT policies. Feed shows kitchen names only, never individual user names to followers. |
+| Default-public sharing (#3) | Phase 1 (Data Model) + Phase 2 (UI) | is_shared column defaults to FALSE in migration. Share toggle visible in UI with OFF as default state. |
+| N+1 feed queries (#4) | Phase 1 (Data Model) | Single query returns paginated feed. EXPLAIN ANALYZE shows index scans, not sequential scans. Feed loads in <200ms. |
+| RLS performance (#5) | Phase 1 (Data Model) | Feed query with 50 followed kitchens completes in <100ms. auth.uid() wrapped in subselect. SECURITY DEFINER function for follow lookup. |
+| No moderation system (#6) | Phase 3 (Interactions) | Report button exists on every comment. content_reports table exists. Admin can hide comments. Comment rate limiting active. |
+| Notification spam (#7) | Phase 3 (Interactions) | Social activity produces zero push notifications in v1. In-app badge indicators only. |
+| Forced social on existing users | Phase 2 (Feed UI) | Existing Plan tab layout unchanged. Feed is additive. No existing workflow disrupted. |
+| Empty feed state | Phase 2 (Feed UI) | Empty state component with clear call-to-action for discovering/following kitchens. |
+| Multi-household identity | Phase 1 (Data Model) | Kitchen profile is tied to household, not user. Active household context determines which kitchen identity is used for social actions. |
 
 ## Sources
 
-- [Supabase Edge Functions Limits](https://supabase.com/docs/guides/functions/limits) -- 256MB memory, 2s CPU time, 150s/400s execution duration, 20MB function size
-- [Gemini API Image Understanding](https://ai.google.dev/gemini-api/docs/image-understanding) -- 20MB inline image limit, base64 input method, image token counts
-- [Gemini API Pricing](https://ai.google.dev/gemini-api/docs/pricing) -- ~1,120 tokens per input image for Flash, $0.25/M input tokens
-- [expo-image-picker Documentation](https://docs.expo.dev/versions/latest/sdk/imagepicker/) -- camera API, base64 option, quality settings, permission methods
-- [ImageManipulator - Expo Documentation](https://docs.expo.dev/versions/latest/sdk/imagemanipulator/) -- resize and compress utilities for on-device image processing
-- [Use of Different Food Image Recognition Platforms - PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC7752530/) -- Google Cloud Vision 9% top-1 accuracy for food, comparative analysis of recognition platforms
-- [Portions Master - Ingredient Scanner](https://portionsmaster.com/blog/the-best-ingredient-scanner-app-of-2025-how-portions-master-ai-helps-you-turn-your-cart-pantry-or-fridge-into-goalbased-meals/) -- competitor UX patterns for AI fridge scanning
-- [Fridge Vision AI](https://fridgevisionai.com/) -- competitor reference for food photo to recipe flow
-- [react-native-compressor](https://www.npmjs.com/package/react-native-compressor) -- alternative native image compression (50KB APK overhead)
-- SharedKitchen codebase: `src/lib/ai.ts` (existing AI call patterns, rate limit errors, video import flow), `supabase/functions/parse-recipe-url/index.ts` (Edge Function pattern, caching, rate limiting, Gemini integration), `supabase/functions/generate-meal/index.ts` (Gemini Flash usage, AbortController timeout pattern), `supabase/migrations/00011_create_ai_usage_log.sql` (rate limit schema), `supabase/migrations/00017_create_pantry_items.sql` (pantry schema, no normalization column)
+- SharedKitchen codebase: migrations 00001-00004 (current RLS policies, household/recipe/meal_plan data model, profile visibility rules)
+- [Supabase RLS documentation](https://supabase.com/docs/guides/database/postgres/row-level-security) -- performance best practices: subselect wrapping for auth.uid(), SECURITY DEFINER functions, index optimization, minimize joins in policies
+- [Supabase RLS data leaking patterns](https://dev.to/gifteddev/why-your-supabase-app-might-be-leaking-user-data-and-how-to-fix-it-with-rls-2fbf) -- common mistakes with overly permissive policies
+- [Supabase RLS best practices for multi-tenant apps](https://makerkit.dev/blog/tutorials/supabase-rls-best-practices) -- production patterns for role-based access
+- [Facebook News Feed system design](https://www.hellointerview.com/learn/system-design/problem-breakdowns/fb-news-feed) -- fan-out on read vs write tradeoffs, feed pagination patterns
+- [Content moderation mistakes](https://getstream.io/blog/content-moderation-mistakes/) -- top 6 mistakes when building social features
+- [Content moderation best practices 2025](https://arena.im/uncategorized/content-moderation-best-practices-for-2025/) -- hybrid moderation approaches
+- [The Moderation Stack 2025](https://www.social.plus/blog/the-moderation-stack-what-every-in-app-community-needs-in-2025/) -- what every in-app community needs at launch
 
 ---
-*Pitfalls research for: AI Vision features in SharedKitchen v4.0*
-*Researched: 2026-03-30*
+*Pitfalls research for: Social feed features in SharedKitchen v5.0*
+*Researched: 2026-04-06*

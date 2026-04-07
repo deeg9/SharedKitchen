@@ -1,260 +1,184 @@
-# Feature Landscape: AI Vision -- Scan, Snap & Add
+# Feature Research: Social Meal Feed
 
-**Domain:** AI-powered food/kitchen photo scanning for collaborative dinner planning app
-**Researched:** 2026-03-30
-**Confidence:** MEDIUM-HIGH (competitive landscape well-documented; vision API capabilities verified; UX patterns consistent across competitors)
+**Domain:** Social feed for collaborative cooking/meal planning app
+**Researched:** 2026-04-06
+**Confidence:** HIGH
 
----
+## Feature Landscape
 
-## Feature 1: Fridge/Pantry Photo Scan -> Bulk Add to On Hand
+### Table Stakes (Users Expect These)
 
-### Table Stakes
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Single photo capture of fridge/pantry shelf | Every competitor (Fridge Vision AI, Scan2Meal, Portions Master) starts with "snap a photo." Users expect to open camera, take one photo, see results. | Low | `expo-camera` or `expo-image-picker` for capture. Send base64 to Edge Function for Gemini vision analysis. |
-| Item list returned with names | Core value -- user photographs shelf, gets back a list of recognized items. Fridge Vision AI, Scan2Meal, Portions Master all do this. | Medium | Gemini Flash vision with structured output. Prompt requests JSON array of `{ name, category, quantity? }`. |
-| Editable results before saving | Users need to fix AI mistakes before committing to inventory. Fridge Vision AI shows editable ingredient list. Portions Master allows corrections. | Low | Show checklist UI with item name, category, optional quantity. Users can deselect, edit names, or add missed items before bulk save. |
-| Bulk add to On Hand inventory | One-tap to add all confirmed items. This is the payoff -- no manual entry per item. All competitors support batch add. | Low | Loop through confirmed items calling `pantryStore.addPantryItem()` for each, or batch insert via single Supabase `.insert([...])`. |
-| Category auto-assignment | Items should land in correct On Hand categories (Produce, Dairy & Eggs, Proteins, Pantry, Other). Fridge Vision AI and Portions Master auto-categorize. | Low | Gemini prompt includes category classification. Map to existing `pantryStore` categories: Proteins, Produce, Dairy & Eggs, Pantry, Other. |
-| Camera permission handling | iOS requires explicit permission. Users expect a clean prompt explaining why. | Low | `expo-camera` handles permission request. Add contextual pre-prompt matching existing notification permission pattern. |
-| Loading/progress feedback | Vision API call takes 3-8 seconds. Users need visual feedback. Every competitor shows a processing state. | Low | Spinner + status text ("Analyzing your fridge..."). Same pattern as video recipe import. |
-| Error state for poor/unusable photos | Dark, blurry, or non-food photos should get a helpful error, not garbage results. | Low | If Gemini returns 0 items or low confidence, show "Couldn't identify items. Try a brighter, closer photo." |
-
-### Differentiators
-
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| Brand-level identification | PROJECT.md specifies "brand-level detail" -- e.g., "Tillamook Sharp Cheddar" not just "cheese." No competitor consistently does this well. Fridge Vision AI identifies generic ingredients only. | Medium | Gemini vision can read package labels/logos. Prompt instructs: "For packaged items, identify the brand name and specific product. For loose produce, use common names." Accuracy varies -- packaged items with visible labels ~80%, loose produce ~90%, items behind other items ~50%. |
-| Multi-photo scan session | Fridge Vision AI allows up to 5 photos per session (different shelves, door, crisper). Most competitors limit to 1. Comprehensive coverage requires multiple angles. | Medium | Allow users to take 2-5 photos before processing. Aggregate results across photos, deduplicate. Each photo is a separate Gemini call; merge results client-side. |
-| Household-shared inventory update | Added items instantly visible to all household members via Supabase Realtime. No competitor in the fridge-scan space has multi-user households. | None (free) | Already built -- `pantryStore` uses Realtime sync via `usePantrySync`. Items added by one user appear for all household members. |
-| Quantity estimation | "About half a gallon of milk" or "3 apples" rather than just item names. Portions Master claims this; most competitors skip it. | Low | Gemini prompt can estimate visible quantities. Accuracy is approximate but better than nothing. Map to `pantryStore.addPantryItem({ quantity })`. |
-| Smart deduplication against existing On Hand | If user already has "Milk" in On Hand, scanning a milk carton should offer to update quantity rather than create a duplicate. | Medium | Before bulk add, check existing `pantryStore.items` for name matches (fuzzy). Show "Already in On Hand" badge with option to update or skip. |
-
-### Anti-Features
-
-| Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
-| Barcode scanning for individual items | Requires a barcode database (UPC -> product name), adds a completely different scanning paradigm, and is slower than photo-based bulk scanning. NoWaste and CozZo focus on barcodes but it is one-item-at-a-time. | Photo-based bulk identification. Users wanting single-item precision can edit the results list or manually add items. |
-| Expiration date detection from photos | Extremely unreliable -- dates are printed small, in varying formats, often obscured. Samsung's AI fridge only manages this for pre-registered items. | Let users manually set expiration dates on items they care about (field already exists in `pantry_items.expires_at`). |
-| Automatic re-scanning on schedule | Push notification saying "Time to scan your fridge!" feels invasive and adds notification fatigue on top of existing cooking reminders and budget alerts. | On-demand scanning only. The camera button is always available on the Kitchen tab. |
-| Receipt OCR scanning | Different feature entirely (ConsumeSmart, CozZo). Requires OCR pipeline, store-specific formatting handling, and a text-to-product mapping layer. Out of scope for camera vision milestone. | Photo-based scanning of actual food items. Receipt scanning could be a separate future milestone. |
-| Real-time camera overlay with item labels | AR-style bounding boxes over items in live camera feed. Requires frame processing, adds massive complexity, drains battery. No food app does this well. | Static photo analysis. Take photo, process server-side, return results. |
-
-### Dependencies on Existing Features
-
-| Existing Component | How This Feature Uses It | Changes Needed |
-|-------------------|-------------------------|----------------|
-| `pantryStore.addPantryItem()` | Bulk add identified items to On Hand | None -- call in loop or refactor to accept array |
-| `pantry_items` table | Store scanned items | None -- schema already has name, quantity, unit, category, expires_at |
-| Kitchen tab (On Hand segment) | Entry point for scan -- camera button on On Hand view | Add camera FAB or header button |
-| `usePantrySync` Realtime hook | Scanned items sync to household members | None -- already working |
-| `ai_usage_log` table | Rate limit scans (premium feature) | Add `function_name: 'scan-pantry'` |
-| `subscriptions` table | Gate unlimited scans for premium users | None -- already queried in Edge Functions |
-
----
-
-## Feature 2: Food Photo -> Recipe Discovery
-
-### Table Stakes
+Features users assume exist in any social feed. Missing these = feed feels broken.
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| Take/upload photo of a dish | Core interaction. DishDetect, Recipe Lens, Food Scanner, NomNomBear all start here. Camera or photo library picker. | Low | `expo-image-picker` for camera + gallery. Same capture flow as Feature 1. |
-| AI dish identification with name | "This looks like Pad Thai" or "Chicken Parmesan." Every competitor does this. DishDetect claims 95%+ accuracy. | Medium | Gemini Flash vision identifies the dish. Prompt: "Identify this dish. Return the dish name, cuisine, and a brief description." GPT-4o achieves ~59-74% accuracy on food ID; Gemini Flash should be comparable. |
-| 2-3 recipe options presented | PROJECT.md specifies "2-3 recipe options from web search." Users need choice because AI identification may be approximate ("is it Pad Thai or Drunken Noodles?"). | Medium | After dish identification, search for recipes using the identified dish name. Present 2-3 results with title, source, and thumbnail. |
-| Recipe import from selected option | User picks one recipe, it imports into their recipe book. This is the payoff -- photo to saved recipe. | Low | Reuse existing `parseRecipeUrl()` pipeline. User selects a recipe URL, it flows through the existing JSON-LD -> Gemini extraction. |
-| Loading/progress feedback | Two-step process (identify dish + search recipes) takes 5-10 seconds total. Users need feedback at each stage. | Low | "Identifying dish..." then "Finding recipes..." progress states. |
-| Confidence indication | When AI is uncertain between "Chicken Alfredo" and "Chicken Carbonara," user should know. Recipe Lens and NomNomBear show primary guess with alternatives. | Low | Gemini returns top 1-3 dish name guesses. Show primary identification prominently, alternatives as "Did you mean?" chips. |
-| Photo from gallery (not just camera) | Users often want to identify dishes from screenshots, photos taken earlier, or images shared by friends. Recipe Lens supports this. | Low | `expo-image-picker` supports both camera and gallery in one flow with `launchImageLibraryAsync()` and `launchCameraAsync()`. |
+| Follow/unfollow kitchens | Core social primitive -- without this there is no feed. Cookpad, Whisk, and every social cooking app uses follow-based feeds. | MEDIUM | Needs follow relationship table, discovery UI, follower counts. Use asymmetric follow model (like Instagram/Cookpad) not mutual friend model (like Venmo) -- lower friction for cooking context. |
+| Chronological feed of meals from followed kitchens | The feed itself. Venmo shows friend transactions in a scrollable list; translate to "Kitchen X planned Chicken Tikka for Tuesday dinner." Cookpad's home tab is exactly this pattern. | HIGH | Requires feed query joining follows + meal_plan entries + recipes. Pagination critical. Fan-out-on-read (query at read time) is correct for SharedKitchen's scale (dozens of followed kitchens, not millions). |
+| Feed card with kitchen name, meal name, recipe photo, and timestamp | Every social feed needs a clear content unit. Venmo's unit is the transaction card; Cookpad's is the recipe card with cooksnap photo. SharedKitchen's unit is the meal card. | MEDIUM | Card shows: kitchen avatar + name, meal name, day/slot context ("Tuesday Dinner"), recipe photo (if available), timestamp. Tap to expand for recipe details. |
+| Like/react to meals | Universal social signal. Cookpad, Allrecipes, Pepper, Whisk all have likes. Single-tap heart is table stakes. | LOW | Simple join table (user_id, feed_item_id). Optimistic UI update. Like count displayed on card. |
+| Save recipe from feed to own library | Users see a recipe they want and expect to grab it. Yummly's entire UX was built on the "Yum" save button. Cookpad allows saving others' recipes. This is the key value-exchange of a cooking social feed. | MEDIUM | Deep dependency on existing recipe infrastructure. Must clone recipe data (not reference) so saved recipe persists even if source kitchen changes/deletes it. Mark provenance ("Saved from Kitchen X"). |
+| Share toggle / privacy control | Users need control over what auto-posts. Venmo lets you set transaction privacy (public/friends/private). Cookpad profiles control public visibility. | LOW | Per-meal toggle: "Share to feed" (default ON with easy toggle off). Kitchen-level default setting in kitchen profile. |
+| Kitchen profile (public view) | Followers need to see who they're following. Cookpad profiles show recipe count, follower/following counts, bio. | MEDIUM | Public-facing view of kitchen: name, avatar, member count, bio/description, recipe count, meal streak, follower/following counts. Distinct from existing household settings screen. |
+| Comments on feed items | Expected social primitive alongside likes. Cookpad, Whisk, Pepper, Allrecipes all support comments. Venmo has comments on transactions. | MEDIUM | Flat comment list (no threading). Comment row: user avatar, name, text, timestamp. Push notification to feed item author on new comment. |
+| Push notifications for social events | Users expect to know when someone follows them, likes their meal, or comments. Standard in every social app. | MEDIUM | New notification types: new_follower, feed_like, feed_comment. Leverage existing expo-notifications + Expo Push API infrastructure. |
 
-### Differentiators
+### Differentiators (Competitive Advantage)
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| Direct import into household recipe book | Competitor apps (DishDetect, Recipe Lens) are individual-only. SharedKitchen imports into the shared household recipe book, immediately available to all members. | None (free) | Existing `recipeStore.addRecipe()` already saves to household. |
-| Recipe results with cooking mode compatibility | Imported recipes get timer extraction and step-by-step cooking mode. No photo-to-recipe competitor offers integrated cooking mode. | None (free) | Existing recipe import pipeline already extracts timers. |
-| Meal plan integration | After importing a recipe from a food photo, offer "Add to this week's plan?" one-tap action. No photo-to-recipe competitor has meal planning. | Low | After recipe save, show bottom sheet with day picker using existing `planStore.assignRecipe()`. |
-| Web search powered recipe discovery | Rather than generating a recipe from AI (unreliable, no source), find real recipes from real food blogs. More trustworthy and users can reference the original source. | Medium | Use Google Custom Search API or SerpApi to search "[dish name] recipe" and return top results with URLs. Each URL can then flow through existing recipe import. |
-
-### Anti-Features
-
-| Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
-| AI-generated recipes (no source URL) | PROJECT.md already excludes "AI-generated recipe images" and the app philosophy is extracting from real sources. AI-generated recipes have no provenance, may have errors, and cannot be verified. | Search for real recipes from real URLs. Import via existing pipeline. |
-| Nutrition estimation from photo | Calorie tracking from food photos is a separate product (SnapCalorie, Cal AI). Accuracy is poor (10-20% error range per research). SharedKitchen is a meal planning app, not a calorie tracker. | Import the recipe, which already includes nutrition info extracted from the source page. |
-| Ingredient-level identification from cooked dish | "What ingredients are in this?" from a photo of a finished dish is extremely unreliable. Hidden ingredients (spices, sauces) are undetectable. | Identify the dish name, then import a recipe that lists ingredients. The recipe is the source of truth for ingredients. |
-| Reverse image search for recipes | Google Lens-style "find this exact image online" is technically complex, requires a different API, and returns visual matches rather than recipe matches. | Text-based recipe search using the AI-identified dish name. More reliable and cheaper. |
-
-### Dependencies on Existing Features
-
-| Existing Component | How This Feature Uses It | Changes Needed |
-|-------------------|-------------------------|----------------|
-| `parseRecipeUrl()` in `src/lib/ai.ts` | Import selected recipe URL through existing pipeline | None -- already handles URL -> structured recipe |
-| `recipeStore.addRecipe()` | Save imported recipe to household | None |
-| Recipe creation/edit form | Pre-populate with imported data for review | None -- already accepts `RecipeInsert` shape |
-| `planStore.assignRecipe()` | Optional: add imported recipe to meal plan | None -- existing API |
-| `ai_usage_log` table | Rate limit photo identification | Add `function_name: 'identify-dish'` |
-| `parse-recipe-url` Edge Function | Could extend to handle dish identification, or create new `identify-dish` Edge Function | New code path or new function |
-
----
-
-## Feature 3: Food Photo -> Meal Plan Logging
-
-### Table Stakes
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Take photo of meal | Same capture mechanism as Feature 2. Users photograph what they are eating right now. | Low | Reuse the same `expo-image-picker` flow. |
-| AI dish identification | Same as Feature 2 -- identify what the dish is. | Low (shared) | Same Gemini Flash vision call as Feature 2. Shared code path. |
-| Day/slot selection | User picks which day and meal slot (breakfast/lunch/dinner) to log the meal to. | Low | Show bottom sheet with day picker (today pre-selected) and meal type selector. Reuse existing `MealType` enum: breakfast, lunch, dinner. |
-| One-tap logging | After confirming dish name and selecting day/slot, single tap to add to plan. Minimal friction -- this is for quick "I just ate this" logging. | Low | Call `planStore.assignRecipe()` with `recipeId: null` (no recipe) or create a lightweight meal entry. Existing meal plan supports `notes` field for meal name. |
-| Editable dish name before saving | AI might get the name wrong. User should be able to correct "Spaghetti Bolognese" to "Mom's Meat Sauce" before it hits the plan. | Low | Text input pre-filled with AI guess. User can accept or edit. |
-| Meal source selection | Existing meal plan has `MealSource`: home-cooked, takeout, eating-out. Photographing a restaurant dish should default to "eating-out." | Low | Show meal source picker (already built in plan edit UI). Default based on context or let user choose. |
-
-### Differentiators
+Features that set SharedKitchen apart from Cookpad/Allrecipes-style social cooking apps.
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| Dual-action after photo | After identifying a dish, offer BOTH "Log as meal" AND "Find recipe" as options. One photo, two paths. No competitor offers both in one flow. | Low | After dish identification, show two action buttons: "Add to Plan" (Feature 3 flow) and "Find Recipes" (Feature 2 flow). |
-| Photo stored as meal thumbnail | The photo the user took becomes the visual for that meal on the weekly plan. Adds visual richness to the calendar view. | Medium | Upload photo to Supabase Storage. Store URL on `meal_plans` row. Display as thumbnail on plan day cards. Requires new `image_url` column on `meal_plans`. |
-| Household activity feed integration | "Alex logged Pad Thai for Wednesday dinner" shows as activity toast for household members. | None (free) | Existing Supabase Realtime activity toasts already fire for meal plan changes. |
-| Quick-log from Kitchen tab | Camera button accessible from On Hand tab -- same entry point for both pantry scanning and meal logging, with a choice after photo capture. | Low | Single camera FAB on Kitchen tab. After photo, ask: "Is this your fridge/pantry or a meal?" Route to Feature 1 or Feature 3 accordingly. |
+| Household-level social (kitchens follow kitchens, not users follow users) | No cooking app does social at the household level. Cookpad/Whisk are individual-user social. SharedKitchen's core value is collaborative households -- the social unit should be the kitchen, not the person. "The Smith Kitchen is cooking pad thai tonight." This is the Venmo analogy: Venmo shows friend-level activity, SharedKitchen shows kitchen-level activity. | MEDIUM | Follow relationships are kitchen-to-kitchen. Any household member can post/interact on behalf of the kitchen. Avoids individual social pressure. |
+| Meal context in feed (day + slot, not just recipe) | Cookpad shows recipes. SharedKitchen shows what people are actually eating and when. "Tuesday Dinner: Chicken Tikka Masala" is more relatable than just a recipe post. Adds planning inspiration: "Oh, they're doing taco Tuesday too." | LOW | Already have meal_plan data with day/slot. Feed query just includes this context. |
+| Cooksnap-style meal photos from vision features | Users can photograph their finished meal (already built in v4.0 photo meal logging) and attach it to the feed card. Cookpad's cooksnaps are their highest-engagement feature. SharedKitchen already has the camera + food photo infrastructure. | LOW | Extend existing photo meal logging to optionally attach photo to the shared feed item. Photo stored in Supabase Storage (already used for recipe images). |
+| One-tap "Cook This Too" -- add meal to own plan | Go beyond just saving the recipe. When you see a meal in your feed, tap to add it directly to YOUR meal plan for a specific day. No other cooking social app does plan-to-plan inspiration this seamlessly. | MEDIUM | Combines recipe save + meal plan assignment in one flow. Bottom sheet: pick day + slot, recipe gets cloned to library and meal gets created. |
+| Auto-post from meal plan (zero-effort content creation) | Unlike Instagram/Cookpad where you have to actively create posts, SharedKitchen auto-generates feed items from meal plan. Venmo does this -- every payment auto-appears in the feed. No content creation friction. | LOW | When a meal is added to plan and share toggle is on, create a feed_item row. No separate "post" action needed. |
 
-### Anti-Features
+### Anti-Features (Commonly Requested, Often Problematic)
 
-| Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
-| Automatic calorie/macro logging | SharedKitchen is a meal planning app, not a nutrition tracker. Adding calorie tracking from photos creates scope creep into a different product category (competing with MyFitnessPal, SnapCalorie). | Log the meal name and source to the plan. If users want nutrition info, they can find and import the recipe (Feature 2). |
-| Meal cost estimation from photo | Guessing cost from a photo is inaccurate. The existing budget feature requires explicit cost entry. | Keep existing manual cost entry via `meal_cost` field on meal plan edit. |
-| Auto-detect meal type from time of day | "It's 7pm so this must be dinner" is wrong often enough to annoy users (late lunch, early dinner, breakfast for dinner). | Default to dinner (most common for SharedKitchen's use case) but let user change. |
-| Photo required for meal logging | Some meals do not need a photo (quick "we had leftovers" entry). Do not make the camera the only way to log meals. | Camera is an additional input method. Existing manual meal assignment (recipe picker, text notes) remains primary. |
+| Feature | Why Requested | Why Problematic | Alternative |
+|---------|---------------|-----------------|-------------|
+| Full comment threads with replies and nested threading | "We need rich discussions like Facebook" | Massive complexity (threading, notification management, moderation). Cooking apps are not discussion platforms. Cookpad keeps comments flat and simple. Allrecipes forums are a ghost town. | Flat comments only (no replies/threading). Keep it lightweight like Venmo -- short reactions, not conversations. |
+| Public global feed / explore/discover tab | "Users need to discover new kitchens" | Cold-start problem: empty global feed looks dead. Moderation burden. Content quality varies wildly. Cookpad's global feed works because they have 100M+ users. | Kitchen discovery via invite links, search by name, and "suggested kitchens" based on mutual follows. No public browsing of strangers' meals. |
+| Recipe ratings/reviews on feed items | "People should rate recipes they see" | SharedKitchen already has recipe ratings. Adding ratings to feed items conflates "I like that you're cooking this" (social signal) with "this recipe is 3/5 stars" (quality signal). Confusing UX. | Likes on feed items (social approval). Ratings stay on recipe detail screen (quality assessment). Keep the two signals separate. |
+| Direct messaging between kitchens | "Followers should be able to chat" | Building a messaging system is a massive undertaking (real-time, read receipts, media, notifications, moderation). PROJECT.md explicitly lists this as out of scope. | Comments on feed items serve as lightweight public communication. Deep conversations happen via existing channels (text, iMessage). |
+| Algorithmic / ranked feed | "Show me the best content first" | At SharedKitchen's scale (dozens to hundreds of followed kitchens, not thousands), chronological is fine. Algorithmic feeds require usage data, ML infrastructure, and create filter bubbles. | Chronological reverse-chron feed. Simple, predictable, fair. Add "new since last visit" divider for catch-up. |
+| Emoji reactions (multiple reaction types beyond like) | "Let users react with different emojis like Slack" | Multiple reaction types add UI complexity, database complexity, and decision fatigue. For a cooking feed, a heart/like is sufficient social signal. | Single like (heart). If demand emerges post-launch, consider adding 2-3 cooking-specific reactions (fire, drooling, chef-kiss) as a v5.1 enhancement. |
+| Stories / ephemeral content | "Add stories like Instagram" | Ephemeral content is antithetical to a meal planning app. Meals are planned, persistent, and reference-worthy. Stories add massive complexity (media pipeline, expiry logic, viewer tracking). | Meal photos persist on feed cards permanently. The feed IS the story of what your followed kitchens are eating. |
+| User-level follows (follow individual people) | "I want to follow my friend, not their whole kitchen" | Contradicts SharedKitchen's household-first model. Creates tension when one household member follows someone but the other doesn't. Complicates permissions and feed visibility. | Kitchen-to-kitchen follow. All members of your kitchen see the same feed. Consistent with existing multi-household architecture. |
 
-### Dependencies on Existing Features
-
-| Existing Component | How This Feature Uses It | Changes Needed |
-|-------------------|-------------------------|----------------|
-| `planStore.assignRecipe()` | Log identified meal to a day/slot | May need to support `notes` field for dish name when no recipe is linked |
-| `MealType` / `MealSource` enums | Day/slot and source selection | None |
-| Meal plan day cards (Plan tab) | Display logged meal | May need to show photo thumbnail if stored |
-| `meal_plans` table | Store the logged meal | Possibly add `image_url` column for meal photo |
-| Supabase Storage | Store meal photos | New bucket: `meal-photos` |
-| `ai_usage_log` table | Rate limit (shared with Feature 2) | Same `function_name: 'identify-dish'` |
-
----
-
-## Cross-Feature Dependencies
+## Feature Dependencies
 
 ```
-expo-camera / expo-image-picker (shared)
-  |
-  +--> Photo capture
-        |
-        +--> "What is this?" intent router
-              |
-              +-- Fridge/Pantry scan (Feature 1)
-              |     --> Gemini vision: identify items
-              |     --> Review/edit item list
-              |     --> Bulk add to pantryStore
-              |
-              +-- Food/Meal photo (Features 2 + 3)
-                    --> Gemini vision: identify dish
-                    --> Dual action:
-                          |
-                          +-- "Find Recipes" (Feature 2)
-                          |     --> Web search by dish name
-                          |     --> Recipe URL selection
-                          |     --> Existing parseRecipeUrl() pipeline
-                          |     --> recipeStore.addRecipe()
-                          |
-                          +-- "Log as Meal" (Feature 3)
-                                --> Day/slot picker
-                                --> planStore.assignRecipe()
+[Kitchen Profile (public view)]
+    └──enables──> [Follow System (kitchen-to-kitchen)]
+                       └──enables──> [Kitchen Discovery / Search]
+                       └──enables──> [Feed Display (chronological)]
+                                          └──requires──> [Auto-post / Share Toggle]
+                                          |                    └──requires──> [Feed item data model]
+                                          └──enables──> [Like on feed items]
+                                          └──enables──> [Comments on feed items]
+                                          └──enables──> [Save Recipe from Feed]
+                                          |                    └──enables──> [Cook This Too (add to plan)]
+                                          └──enables──> [Meal Photo on Feed Card]
+                                          └──enables──> [Push Notifications (social)]
 ```
 
-### Shared Infrastructure
+### Dependency Notes
 
-| Component | Used By | Notes |
-|-----------|---------|-------|
-| Camera/image picker | All 3 features | Single shared capture component |
-| Gemini Flash vision API | All 3 features | Different prompts: item identification vs dish identification |
-| Edge Function (new or extended) | All 3 features | Receives base64 image, routes to appropriate Gemini prompt |
-| `ai_usage_log` rate limiting | All 3 features | Two function names: `scan-pantry` and `identify-dish` |
-| Premium gating | All 3 features | Free tier gets limited scans/identifications per month |
+- **Feed Display requires Follow System:** No feed without knowing who to show content from. Follow system must be built and testable before feed rendering.
+- **Follow System requires Kitchen Profile:** Users need to see a kitchen's profile before deciding to follow. Even a minimal profile (name, avatar, recipe count) must exist.
+- **Auto-post / Share Toggle required for Feed Display:** Without content being posted to the feed, there is nothing to display. The auto-post mechanism (creating feed_item rows from meal plan entries) must exist before the feed can render.
+- **Like/Comment require Feed Display:** Interactions attach to feed items -- need the feed first.
+- **Save Recipe requires existing recipe infrastructure:** Recipe cloning must handle all recipe fields (ingredients, steps, nutrition, photos). Existing recipe import pipeline provides a model but save-from-feed is a simpler variant (structured data to structured data, no parsing needed).
+- **Cook This Too requires Save Recipe:** Must save the recipe first, then create the meal plan entry. Two-step atomic operation.
+- **Push Notifications (social) require Feed Display:** Need feed items and interactions to exist before notifications about them make sense.
 
----
+## MVP Definition
 
-## Feature Dependencies (Build Order)
+### Launch With (v5.0)
 
-```
-Phase 1: Camera infrastructure + Gemini vision pipeline (shared)
-  |
-  +--> Phase 2a: Fridge/pantry scan (Feature 1)
-  |      Depends on: camera, Gemini vision, pantryStore
-  |
-  +--> Phase 2b: Dish identification (shared by Features 2 + 3)
-  |      Depends on: camera, Gemini vision
-  |
-  +--> Phase 3a: Recipe discovery (Feature 2)
-  |      Depends on: dish identification, web search, parseRecipeUrl
-  |
-  +--> Phase 3b: Meal logging (Feature 3)
-         Depends on: dish identification, planStore
-```
+Minimum to validate social feed concept with real users.
 
-Features 2 and 3 share the dish identification step, so they should be built together after the shared vision pipeline is established.
+- [ ] Feed item data model (schema for shared meals) -- foundation everything else builds on
+- [ ] Kitchen profile public view (name, avatar, bio, recipe count, follower counts) -- needed for follow decisions
+- [ ] Kitchen-to-kitchen follow/unfollow with kitchen search/discovery -- core social primitive
+- [ ] Auto-post meals from plan to feed with per-meal share toggle -- content creation with zero friction
+- [ ] Chronological feed on Plan tab showing meals from followed kitchens -- the feed itself
+- [ ] Feed cards: kitchen avatar + name, meal name, day/slot, recipe photo, timestamp -- content unit
+- [ ] Like (heart) on feed items with count -- minimum social signal
+- [ ] Flat comments on feed items -- lightweight interaction
+- [ ] Save recipe from feed to own library -- key value exchange
+- [ ] Push notifications for new followers, likes, and comments -- engagement loop
 
----
+### Add After Validation (v5.x)
 
-## MVP Recommendation
+Features to add once core feed is working and users are engaged.
 
-### Must Have (ship or feature feels broken)
+- [ ] "Cook This Too" one-tap add-to-plan from feed -- once save-recipe is validated, extend to plan integration
+- [ ] Meal photos attached to feed cards (leverage v4.0 camera) -- once users are posting, add visual richness
+- [ ] "New since last visit" divider in feed -- once feed has enough content to need catch-up UX
+- [ ] Suggested kitchens (based on mutual follows) -- once follow graph has enough edges
+- [ ] Kitchen-level default share setting (always share / always ask / never share) -- once users express preference patterns
 
-1. **Camera capture component** -- shared by all features, build first
-2. **Gemini vision Edge Function** -- receives image, returns structured identification
-3. **Fridge/pantry scan with bulk add** (Feature 1) -- highest standalone value, populates On Hand inventory from photo
-4. **Dish identification** (shared) -- identifies food photos, used by Features 2 and 3
-5. **Recipe discovery with 2-3 options** (Feature 2) -- photo to recipe import pipeline
-6. **Meal plan logging** (Feature 3) -- simplest of the three, quick-log identified dish
+### Future Consideration (v6+)
 
-### Should Have (included in MVP but lower priority)
+- [ ] 2-3 cooking-specific reactions beyond heart (fire, drooling, chef-kiss) -- defer until like engagement data exists
+- [ ] Weekly "What's everyone eating" digest notification -- defer until feed has consistent content
+- [ ] Kitchen invite from feed ("Invite to your kitchen") -- social feature crossover, complex permissions
 
-7. **Multi-photo scan sessions** -- 2-5 photos for comprehensive fridge coverage
-8. **Smart deduplication** -- check existing On Hand before adding duplicates
-9. **Dual-action after dish identification** -- "Find Recipes" + "Log as Meal" in one flow
-10. **Meal photo thumbnail on plan** -- visual richness but requires Storage + schema change
+## Feature Prioritization Matrix
 
-### Defer
+| Feature | User Value | Implementation Cost | Priority |
+|---------|------------|---------------------|----------|
+| Feed item data model + auto-post | HIGH | MEDIUM | P1 |
+| Follow/unfollow kitchens | HIGH | MEDIUM | P1 |
+| Kitchen profile (public) | HIGH | MEDIUM | P1 |
+| Feed display (chronological) | HIGH | HIGH | P1 |
+| Share toggle per meal | MEDIUM | LOW | P1 |
+| Feed card design | HIGH | MEDIUM | P1 |
+| Like on feed items | HIGH | LOW | P1 |
+| Save recipe from feed | HIGH | MEDIUM | P1 |
+| Flat comments | MEDIUM | MEDIUM | P1 |
+| Push notifications (social) | MEDIUM | MEDIUM | P1 |
+| Kitchen discovery / search | MEDIUM | MEDIUM | P1 |
+| Meal photos on feed | MEDIUM | LOW | P2 |
+| Cook This Too (add to plan) | HIGH | MEDIUM | P2 |
+| Suggested kitchens | LOW | MEDIUM | P3 |
+| Cooking-specific reactions | LOW | LOW | P3 |
 
-- **Brand-level identification refinement** -- Gemini will try, but accuracy on packaged goods varies. Do not over-promise; ship with best-effort brand detection and iterate.
-- **Quantity estimation refinement** -- approximate quantities are fine for v4.0. Precision can improve with user feedback data.
-- **Receipt OCR** -- entirely different feature, different milestone.
+**Priority key:**
+- P1: Must have for v5.0 launch
+- P2: Should have, add in v5.x
+- P3: Nice to have, future consideration
 
----
+## Competitor Feature Analysis
 
-## Complexity Summary
+| Feature | Cookpad | Whisk | Allrecipes | Venmo (model) | SharedKitchen Approach |
+|---------|---------|-------|------------|---------------|----------------------|
+| Social unit | Individual user | Individual user | Individual user | Individual user (friends) | Kitchen (household) -- unique differentiator |
+| Content type | Recipes + cooksnaps | Recipes | Recipes + reviews | Transactions | Meals from plan (recipe + day/slot context) |
+| Follow model | Asymmetric (follow) | Asymmetric | N/A (no follow) | Symmetric (friends) | Asymmetric follow (kitchen-to-kitchen) |
+| Feed type | Home tab recipe feed | Community feed | No feed (search-based) | Friends-only transaction feed | Friends-only meal feed on Plan tab |
+| Content creation | Manual recipe post | Manual recipe share | Manual recipe submit | Auto from payment | Auto from meal plan (zero friction) |
+| Photo sharing | Cooksnaps on recipes | Recipe photos | User photos on reviews | No photos | Meal photos from v4.0 camera infra |
+| Interactions | Like, comment, cooksnap | Like, comment | Rate, review, photo | Like, comment | Like, comment, save recipe |
+| Save/collect | Save to collection | Save to meal plan | Save to recipe box | N/A | Save recipe + "Cook This Too" (add to plan) |
+| Privacy | Public profiles, controlled info | Public | Public | Friends-only (post-2021) | Follow-based only, share toggle per meal |
+| Discovery | Global explore, trending | Communities | Search, categories | Contacts sync | Search by name, invite links, mutual follow suggestions |
 
-| Feature | Overall Complexity | Biggest Risk |
-|---------|-------------------|--------------|
-| Fridge/pantry scan (Feature 1) | Medium | AI accuracy on cluttered fridges, items behind items, poor lighting. Mitigation: multi-photo support, editable results. |
-| Recipe discovery (Feature 2) | Medium | Web search quality and recipe URL extraction reliability. Mitigation: reuse proven parseRecipeUrl pipeline, show multiple options. |
-| Meal logging (Feature 3) | Low | Dish identification accuracy. Mitigation: editable dish name, low-friction correction. |
-| Shared camera/vision infrastructure | Medium | First-time camera integration in the app, image upload to Edge Function, Gemini vision prompt engineering. |
+## Existing Infrastructure Dependencies
 
-**Total estimated effort:** Medium overall. The heaviest lift is the shared Gemini vision infrastructure (prompt engineering for food/item identification, image handling in Edge Functions). Individual features layer on top with relatively low marginal complexity because they integrate into existing stores and UI patterns.
+These existing SharedKitchen features directly support social feed implementation:
 
----
+| Existing Feature | How It Supports Social Feed | Changes Needed |
+|-----------------|---------------------------|----------------|
+| Multi-household / kitchen switching | Kitchen entity already exists as the social unit. Kitchen has name, members, avatar. | Add public profile fields (bio, public flag). |
+| Meal plan data model (day cards, slots) | Feed items are derived from meal_plan rows. No new content type needed. | Add share_to_feed boolean column or separate feed_items table referencing meal_plans. |
+| Recipe library with full data model | Recipe save/clone has a clear data model to copy from. | Add provenance field (saved_from_kitchen_id) on recipes. |
+| Supabase Realtime | Real-time feed updates, like counts, new comments can use existing Realtime infrastructure. | New channel subscriptions for feed updates. |
+| Camera + food photo (v4.0) | Meal photo capture already built. Extend to attach photos to feed items. | Connect photo upload flow to feed item creation. |
+| Push notifications (v2.0) | Notification infrastructure exists. Add new notification types for social events. | New notification type handlers for follow/like/comment. |
+| Supabase RLS | Feed privacy enforcement: only show feed items from kitchens you follow. Server-authoritative. | New RLS policies on feed_items, follows, comments, likes tables. |
+| User profiles with avatar | Existing profile data can populate kitchen profile view. | Kitchen-level profile distinct from user profile. |
+| Activity toasts (v2.0) | In-app activity awareness pattern already established. | Extend to social events (new follower, new like). |
 
 ## Sources
 
-- [Fridge Vision AI](https://fridgevisionai.com/) -- Competitor analysis, UX flow, 95% accuracy claim, 5-photo sessions
-- [Scan2Meal](https://scan2meal.app/) -- Competitor analysis, receipt + photo scanning
-- [Recipe Lens](https://www.recipelens.com/) -- Photo-to-recipe identification flow
-- [DishDetect](https://www.dishdetect.app/) -- 95%+ dish identification accuracy claim
-- [Portions Master](https://portionsmaster.com/blog/best-pantry-inventory-app-and-fridge-management-tool/) -- Fridge scan, categorization, meal recommendations
-- [DEV Community: Building Meal Tracker with GPT-4o Vision](https://dev.to/wellallytech/from-pixels-to-calories-building-a-high-precision-meal-tracker-with-gpt-4o-vision-5018) -- Architecture pattern, prompt strategy, cost analysis
-- [Gemini API Image Understanding](https://ai.google.dev/gemini-api/docs/image-understanding) -- Official Gemini vision capabilities, structured output, object detection
-- [SerpApi Google Recipes API](https://serpapi.com/recipes-results) -- Programmatic recipe search by dish name
-- [Welling.ai: AI Food Tracker Accuracy 2026](https://www.welling.ai/articles/ai-food-tracker-photo-recognition-calories-2026) -- Industry accuracy benchmarks
-- [Samsung Bespoke Fridge with Gemini](https://www.techlicious.com/blog/samsung-bespoke-fridge-vision-ai-with-google-gemini/) -- Gemini food recognition: 37 items, limitation on door bins/freezer
-- [ScienceDirect: Diabot-GPT-4o Food Recognition](https://www.sciencedirect.com/science/article/abs/pii/S0002916525006173) -- GPT-4o: 59-74% food identification accuracy, 10-20% error on portions
+- [Cookpad: Build Your Community (Followers and Following)](https://blog.cookpad.com/uk/build-your-community-on-cookpad-followers-and-following/)
+- [Cookpad: Exciting new features](https://blog.cookpad.com/us/exciting-changes-in-the-cookpad-app/)
+- [Cookpad UX as antidote to Instagram for foodies](https://econsultancy.com/how-ux-makes-cookpad-s-app-the-best-antidote-to-instagram-for-foodies/)
+- [Cookpad: A Cooksnap is worth 1,000 Words](https://blog.cookpad.com/us/a-cooksnap-is-worth-1-000-words/)
+- [Why Venmo has a social graph -- Ben Chamberlain](https://medium.com/@bchamberlain951/why-venmo-has-a-social-graph-ce0091b3fcee)
+- [Venmo removes global public feed -- TechCrunch](https://techcrunch.com/2021/07/20/venmo-removes-its-global-public-feed-in-a-significant-app-redesign/)
+- [Pepper the App: Instagram for Cooking](https://thespoon.tech/pepper-app-aims-to-be-the-instagram-for-cooking/)
+- [Allrecipes: From Community to Data](https://spacestudy.blog/allrecipes-community-to-data/)
+- [Whisk: Recipe Keeper & Planner](https://trywhisk.com/)
+- [BiteShare: a food social media app (Medium)](https://medium.com/@agrdesigner/biteshare-a-food-social-media-app-bd92c7865afa)
+- [Guide to Implementing Social Feeds in Apps](https://www.social.plus/answers/guide-to-implementing-social-feeds-in-apps)
+- [Yummly shutdown and alternatives](https://mealthinker.com/blog/yummly-alternative)
+- [Best Cooking Apps 2026](https://www.bestapp.com/best-recipe-apps/)
+
+---
+*Feature research for: Social meal feed in SharedKitchen*
+*Researched: 2026-04-06*

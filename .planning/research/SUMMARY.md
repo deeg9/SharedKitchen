@@ -1,180 +1,171 @@
 # Project Research Summary
 
-**Project:** SharedKitchen — AI Vision Features (v4.0)
-**Domain:** AI-powered food/kitchen photo scanning in a React Native + Expo collaborative meal planning app
-**Researched:** 2026-03-30
+**Project:** SharedKitchen v5.0 -- Social Feed
+**Domain:** Social feed features for collaborative household dinner planning app
+**Researched:** 2026-04-06
 **Confidence:** HIGH
 
 ## Executive Summary
 
-SharedKitchen v4.0 adds three AI vision features — fridge/pantry photo scanning to bulk-add On Hand inventory, food photo identification to discover recipes, and food photo identification to log meals to the plan. All three features share a single camera-capture-to-Gemini-to-store pipeline that closely mirrors the existing `parse-recipe-url` and `generate-meal` patterns already proven in the codebase. The stack is already in place: Gemini 2.5 Flash (same API key, same `fetch()`-based integration pattern), expo-image-picker (already installed), and Supabase Edge Functions (same auth, rate limiting, and `ai_usage_log` infrastructure). The only genuinely new external dependency is Serper.dev — a Google Search REST API for recipe discovery in Feature 2 ($0.001/query, 2,500 free queries).
+SharedKitchen v5.0 adds a social feed layer to an existing household meal planning app built on React Native (Expo SDK 55) with Supabase as the backend. The key architectural insight across all research is that the social layer must be a clean, decoupled addition -- not a modification of existing household-scoped infrastructure. The existing codebase already provides nearly everything needed: Supabase client, FlashList for performant lists, Realtime subscriptions, push token registration, image capture/compression, and Zustand state management. Only one new npm package is required (`expo-image` for cached feed photo rendering). Everything else is infrastructure configuration (database tables, RLS policies, Storage buckets, one Edge Function).
 
-The recommended approach is a single shared Edge Function (`analyze-food-photo`) with an `intent` parameter (`scan-pantry`, `identify-dish`, `log-meal`) rather than three separate functions — 90% of the code (auth, rate limiting, image handling, Gemini API call, `ai_usage_log` write) is identical across all three features. Client-side, a new transient `visionStore.ts` holds flow state and orchestrates hand-offs to the existing `pantryStore`, `recipeStore`, and `planStore`. The only database migration needed is adding a `metadata JSONB` column to `ai_usage_log` for intent tracking; all other tables (`pantry_items`, `meal_plans`, `recipes`) accommodate vision-sourced data without schema changes.
+The recommended approach is fan-out-on-read with a denormalized `feed_posts` table that snapshots shareable meal data. Kitchens (households) are the social unit, not individual users -- this is SharedKitchen's primary differentiator against Cookpad, Whisk, and Allrecipes, all of which use individual-user social models. Auto-posting from the meal plan with zero content-creation friction (the Venmo model) is the second differentiator. The feed query uses cursor-based pagination over a composite index, likes/comments use denormalized counters maintained by triggers, and Realtime is scoped narrowly to visible post interactions only (not the full feed).
 
-The primary risks are: (1) image size — iPhone cameras produce 8-15MB images that must be compressed to ~200KB before sending to the Edge Function, and this must be solved before any other vision code is written; (2) AI accuracy expectations — fridge scan accuracy is realistically 60-75% at the item level, making a mandatory user review screen the central UX contract of the feature rather than optional polish; and (3) cost controls — vision features are "point and shoot" and will be called far more frequently than text AI features, requiring aggressive free-tier rate limits (5 scans/month free, unlimited premium) enforced server-side from day one.
+The dominant risk is household data leakage. The entire existing data model sits behind strict `is_household_member()` RLS gates. Adding social visibility requires a separate public-facing data layer (`kitchen_profiles`, `feed_posts`) that never JOINs to private household tables. Every pitfall researcher and architecture decision converges on this: the social layer is a snapshot layer, not a live view into household data. Secondary risks include RLS performance degradation on follow-based queries (mitigated by SECURITY DEFINER functions and `(select auth.uid())` wrapping), notification spam from social activity (mitigated by deferring push notifications to in-app indicators only for v5.0), and missing moderation tools alongside comments (mitigated by shipping a basic report/block system in the same phase as comments).
 
 ## Key Findings
 
 ### Recommended Stack
 
-The entire vision feature set can be built without adding any new client-side npm packages. `expo-image-picker` is already installed and handles both camera capture and gallery selection. `expo-image-manipulator` (part of the Expo SDK already in the project) handles on-device compression. All AI calls route through a new Supabase Edge Function using the same `fetch()`-based Gemini REST pattern already in `parse-recipe-url`. One new API credential (Serper.dev) is needed only for recipe web search in Feature 2.
+The existing stack covers nearly all requirements. SharedKitchen already uses Supabase (Postgres, Auth, Realtime, Storage, Edge Functions), FlashList, expo-notifications, expo-image-picker, expo-image-manipulator, Zustand, and Reanimated. The social feed is fundamentally CRUD plus real-time subscriptions plus image display -- no new frameworks needed.
 
-**Core technologies:**
-- **Gemini 2.5 Flash** (`gemini-2.5-flash`): Vision AI for food/item identification and dish recognition — already integrated in the codebase, ~$0.001-0.003 per vision call, proven in production food apps (CalCam, Samsung Bespoke fridge); send image as `inline_data` in the same `fetch()` call pattern as existing Gemini usage
-- **expo-image-picker** (`~55.0.13`) + **expo-image-manipulator**: Camera capture and on-device compression — both already in the project; compress to max 1024px / quality 0.75 before base64 encoding; target <300KB base64 payload per image
-- **Serper.dev** (REST API): Google Search API for recipe discovery by dish name — 2,500 free queries, $50/50K paid, returns structured JSON in 1-2 seconds; needed only for Feature 2 (food photo to recipe)
+**Core additions:**
+- `expo-image` ~55.0.8: Cached image rendering with blurhash placeholders and disk caching (SDWebImage) -- React Native's built-in Image has no caching and will cause visible jank in an image-heavy feed
+- Supabase Storage `meal-photos` bucket: Persisting meal photos as CDN-served URLs instead of transient base64 (which is how v4.0 vision features work)
+- Supabase Database Webhooks + Edge Function: Server-triggered push notifications for social interactions (existing notifications are all local/device-scheduled)
 
-**What not to use:** on-device ML (TFLite/CoreML — prohibitive model size and dev client requirements); OpenAI vision (8x more expensive; Gemini is already configured); barcode scanning (one-item-at-a-time, requires UPC database — different feature entirely); receipt OCR (different pipeline, out of scope).
+**Explicitly avoid:** GetStream ($499+/mo, over-engineering), React Query (codebase uses Zustand exclusively), react-native-fast-image (unmaintained, incompatible with Expo), OneSignal/Knock/Novu (existing Expo Push API is sufficient), video players (out of scope), Algolia (Supabase ilike is sufficient at this scale).
 
 ### Expected Features
 
-Feature research confirmed three distinct user flows with a shared infrastructure layer. The competitive landscape (Fridge Vision AI, Scan2Meal, Portions Master, DishDetect, Recipe Lens) validates all three features as desirable and identifies the mandatory review-before-save pattern as the dividing line between apps users trust and apps users abandon.
-
 **Must have (table stakes):**
-- Camera capture (and gallery fallback) with iOS permission handling and loading state during 3-8 second API call
-- Gemini vision identification returning structured JSON: items with name/brand/quantity/category for pantry scan; dish name with confidence for food photo
-- Editable review screen before any data is committed — all competitors that skip this step lose user trust; not optional
-- Bulk-add to On Hand pantry with category auto-assignment matching existing `pantry_items` categories
-- Dish identification with 2-3 recipe options from web search, imported via existing `parseRecipeUrl()` pipeline
-- One-tap meal plan logging with day/slot picker after dish identification
-- Rate limiting enforced server-side (free tier caps) before shipping — vision is a premium differentiator
+- Kitchen-to-kitchen follow/unfollow with asymmetric model (like Instagram, not mutual friends)
+- Chronological feed of meals from followed kitchens with cursor-based pagination
+- Feed cards: kitchen avatar, meal name, day/slot context, recipe photo, timestamp
+- Like (heart) on feed items with optimistic UI
+- Flat comments (no threading)
+- Save recipe from feed to own library (clone with provenance tracking)
+- Share toggle per meal (controls what auto-posts)
+- Kitchen profile (public view: name, avatar, bio, recipe count, follower counts)
+- Push notifications for social events (followers, likes, comments)
+- Kitchen discovery/search
 
 **Should have (differentiators):**
-- Multi-photo scan sessions (2-5 photos for different shelves) with result deduplication
-- Smart deduplication against existing On Hand before bulk-add (fuzzy match)
-- Dual action after dish identification ("Find Recipes" + "Log as Meal") — no competitor offers both in one flow
-- Brand-level item identification for premium users (Gemini reads labels/logos via OCR)
-- Household-shared inventory update via existing Realtime sync (already built; costs nothing extra)
-- Meal photo thumbnail stored on plan day cards (requires `image_url` column on `meal_plans` + Supabase Storage bucket)
+- Household-level social identity (kitchens follow kitchens, unique in the cooking app space)
+- Meal context in feed (day + slot, not just recipe name)
+- Auto-post from meal plan with zero friction (Venmo model)
+- Cooksnap-style meal photos leveraging v4.0 camera infrastructure
+- "Cook This Too" one-tap add-to-plan from feed
 
-**Defer to v2+:**
-- Brand-level identification accuracy refinement (ship best-effort, iterate based on user feedback data)
-- Quantity estimation precision (approximate values acceptable for v4.0)
-- Receipt OCR (entirely different pipeline — different milestone)
-- Real-time camera overlay with AR item labels (prohibitive complexity; no food app does this well)
+**Defer (v5.x/v6+):**
+- Comment threading/replies
+- Public global feed / explore tab
+- Algorithmic feed ranking
+- Direct messaging between kitchens
+- Emoji reactions beyond heart
+- Stories / ephemeral content
 
 ### Architecture Approach
 
-All three vision features share a single pipeline: Camera Capture -> On-Device Compression -> `analyze-food-photo` Edge Function -> Gemini 2.5 Flash -> Structured JSON Response -> Intent-specific store update. The Edge Function uses an `intent` parameter to route to different Gemini prompts and JSON schemas while running identical auth/rate-limit/API-call/logging infrastructure for all three. Client-side, a new transient `visionStore.ts` holds flow state (captured image, results, selection state, loading/error) and hands off confirmed data to existing stores — none of which require structural changes except adding `bulkAddPantryItems()` to `pantryStore`.
+The architecture adds a clean social layer on top of the existing Supabase + Zustand stack. Five new database tables (`kitchen_profiles`, `follows`, `feed_posts`, `post_likes`, `post_comments`) with independent RLS policies that never touch existing household-scoped tables. Two new Zustand stores (`feedStore` for feed data/pagination/likes, `socialStore` for follows/kitchen profiles). Fan-out-on-read for the feed query (no materialized timeline table -- unnecessary at SharedKitchen's scale). Realtime is used sparingly: pull-to-refresh for new posts, postgres_changes only for likes/comments on currently visible posts.
 
 **Major components:**
-1. `analyze-food-photo` Edge Function (NEW) — auth, rate limiting, Gemini vision API call, intent routing; three intents: `scan-pantry` / `identify-dish` / `log-meal`
-2. `src/lib/vision.ts` (NEW) — client helper: camera capture, `compressForVision()`, Edge Function invocation, typed response parsing; mirrors `src/lib/ai.ts`
-3. `src/stores/visionStore.ts` (NEW) — transient UI state store for active vision flow; orchestrates capture → review → commit lifecycle; does not persist data
-4. `src/components/vision/CameraSheet.tsx` (NEW) — shared bottom sheet for camera/gallery capture; entry point for all three features
-5. Feature-specific review sheets (NEW): `ScanResultsSheet.tsx`, `DishResultSheet.tsx`, `MealLogSheet.tsx` — each follows the existing `BottomSheet` + multi-step pattern
-6. `pantryStore.bulkAddPantryItems()` (MODIFIED) — batch insert action for scan results; replaces N individual `addPantryItem()` calls
-7. UI entry points (MODIFIED): Kitchen tab On Hand segment (camera FAB), Recipes tab header (camera icon), Plan tab PlanEditSheet ("Snap a Meal" option)
-
-**Key patterns to follow:** structured JSON output from Gemini via `responseMimeType: 'application/json'` + `responseSchema` (matches `generate-meal`); typed rate limit errors (`VisionRateLimitError` mirrors `VideoRateLimitError`); premium gating server-side in Edge Function (matches `generate-meal`); bottom sheets for multi-step flows (matches `AddPantryItemSheet`, `MealGeneratorSheet`).
-
-**Anti-patterns to avoid explicitly:** storing photos in Supabase Storage before processing (adds latency and storage cost; images are transient); calling Gemini directly from the React Native client (exposes API key, no rate limiting); separate Edge Functions per intent (90% duplication); persisting scan results in a new database table (over-engineering; visionStore holds transient state).
+1. `feedStore` + `FeedList`/`FeedCard` -- Feed data, cursor pagination, infinite scroll, optimistic likes
+2. `socialStore` + `KitchenProfile` screen -- Follow relationships, kitchen profiles, discovery/search
+3. `useFeedSync` hook -- Scoped Realtime subscriptions for interactions on visible posts only
+4. `send-social-notification` Edge Function -- Server-triggered push via Expo Push API on like/comment/follow inserts
+5. `meal-photos` Storage bucket + `expo-image` -- Photo persistence and cached display with blurhash placeholders
 
 ### Critical Pitfalls
 
-1. **Full-resolution images sent to Edge Function** — iPhone cameras produce 8-15MB images; base64-encoded this exceeds Gemini's 20MB inline limit and causes Edge Function memory errors on older iPhones. Prevent by building `compressForVision()` using `expo-image-manipulator` (resize to 1024px max, quality 0.75, target <300KB base64) as Phase 1 foundational work before any other vision code is written. Unit test that a 10MB+ input compresses to <300KB output.
-
-2. **No user review before auto-adding pantry items** — fridge scan accuracy is realistically 60-75% at the item level; auto-add creates phantom/wrong inventory that erodes user trust and is extremely hard to recover from. The review/edit screen with item toggles, name editing, and explicit "Add X items to On Hand" confirmation button is not optional UI polish — it is the core UX contract of the fridge scan feature.
-
-3. **Vision API cost explosion under freemium** — vision features are low-friction ("point and shoot") vs. text AI features, leading to 5-10x higher usage frequency. At 1,000 users doing 3 scans/day, that is 90,000 calls/month. Set aggressive free-tier limits (5 vision scans/month free, unlimited premium) enforced server-side via `ai_usage_log` before shipping. Use separate `function_name` values per intent (`vision-fridge-scan`, `vision-dish-identify`) for independent rate limiting and cost tracking.
-
-4. **Item name normalization drift** — Gemini returns "Horizon Organic 2% Reduced Fat Milk 64oz" while existing pantry has "Milk"; scanning amplifies the duplicate problem 10-20x per session. Instruct Gemini in the prompt to return simplified generic names, and implement fuzzy-match deduplication against existing `pantry_items` in the scan review screen before Phase 2 ships. Consider a `normalized_name` generated column on `pantry_items` for efficient deduplication queries.
-
-5. **Camera permission and multi-step flow interruption** — vision flows are multi-step async (capture → compress → upload → API → review → save); any step can fail. Pre-check permissions before showing scan entry points, cache the compressed image locally for retry without re-capture, and handle all Edge Function error codes (429, 504, 422, 502) with graceful user-facing recovery actions rather than unhandled promise rejections.
+1. **Household data leakage** -- The biggest risk. Never JOIN live household tables for feed display. `feed_posts` must be a snapshot of shareable data. Zero modifications to existing RLS policies on household-scoped tables. Audit every migration.
+2. **User identity exposure across household boundaries** -- Create `kitchen_profiles` as the public-facing entity. Feed posts reference kitchen_profile_id, never user_id or household_id directly. Do not modify existing profiles/households SELECT policies.
+3. **Default-public sharing without opt-in** -- Default share toggle to OFF. Require explicit opt-in per meal or kitchen-level setting. Show education prompt on first enable.
+4. **RLS performance on follow-based queries** -- Wrap `auth.uid()` in `(select auth.uid())`, use SECURITY DEFINER functions for follow lookups, add composite indexes on follows and feed_posts.
+5. **Notification spam killing household notification value** -- Do NOT send push for social activity in v5.0 initial release. Use in-app indicators only. If added later, use separate notification category with independent toggle.
 
 ## Implications for Roadmap
 
-Based on the combined research, all four researchers converge on a four-phase structure driven by shared infrastructure dependencies:
+Based on research, suggested phase structure:
 
-### Phase 1: Vision Foundation
-**Rationale:** All three vision features share camera capture, image compression, the Edge Function, `visionStore`, auth/rate-limiting, and error handling. Building this shared layer first means each subsequent feature adds only its specific UI and store wiring. The two must-address-first pitfalls (image size and cost explosion) are both Phase 1 work — no feature phase should ship without these safeguards.
-**Delivers:** `analyze-food-photo` Edge Function with all three intents (skeleton), `src/lib/vision.ts` with `compressForVision()`, `visionStore.ts`, `CameraSheet.tsx`, `ai_usage_log` metadata migration, separate rate limiting per intent, camera permission handling and denied-permission state, error recovery with cached compressed image for retry, input size validation (reject >4MB base64 at Edge Function)
-**Addresses:** Shared infrastructure for all three features; pitfalls #1, #3, #5, #6
-**Research flag:** Standard patterns — directly extends existing `parse-recipe-url` / `generate-meal` Edge Function pattern; no novel architecture
+### Phase 1: Database Foundation and Kitchen Identity
 
-### Phase 2: Fridge/Pantry Photo Scan
-**Rationale:** Highest standalone user value; directly populates existing On Hand inventory with no additional search step; exercises the full pipeline end-to-end; natural first consumer of the Phase 1 foundation. Validate Gemini pantry scan prompt quality in Google AI Studio against real fridge photos before coding.
-**Delivers:** `ScanResultsSheet.tsx` with per-item toggle/edit/remove, `pantryStore.bulkAddPantryItems()`, camera FAB on Kitchen > On Hand segment, category mapping to canonical `pantry_items` categories, fuzzy deduplication against existing household pantry items with "Already in On Hand" badge, brand-level detail gated to premium users, multi-photo session support
-**Uses:** `analyze-food-photo` with `scan-pantry` intent, Gemini 2.5 Flash, existing `pantry_items` table + `usePantrySync` Realtime
-**Avoids:** Pitfalls #2 (mandatory review screen), #5 (name normalization + deduplication)
-**Research flag:** Standard patterns; main risk is prompt engineering — validate in Google AI Studio before coding
+**Rationale:** Every other phase depends on the data model. Kitchen profiles must exist before follows. Follows must exist before the feed query. The RLS design is the architectural firewall between private household data and public social data -- getting this wrong is the highest-risk pitfall.
+**Delivers:** All 5 new database tables with RLS policies, triggers for denormalized counters, Storage bucket for meal photos, `kitchen_profiles` CRUD, helper functions (`can_view_kitchen`, `get_followed_kitchen_ids`).
+**Addresses:** Feed item data model, kitchen profile, share toggle data layer (is_shared default FALSE).
+**Avoids:** Pitfall 1 (data leakage), Pitfall 2 (identity exposure), Pitfall 4 (N+1 queries via denormalized schema), Pitfall 5 (RLS performance via proper indexes and SECURITY DEFINER).
 
-### Phase 3: Food Photo to Recipe Discovery
-**Rationale:** Builds on the `identify-dish` path from Phase 1; requires Serper.dev integration (the one genuinely new sub-feature); most complex feature because it chains dish ID + web search + existing `parseRecipeUrl()` pipeline. Natural to build before meal logging since it validates the dish identification UX.
-**Delivers:** `DishResultSheet.tsx` with dish name + recipe option cards (title, source, thumbnail), `search-recipes` sub-flow using Serper.dev, camera icon on Recipes tab header, editable dish name for AI correction before search, confidence display with "Did you mean?" alternatives, connection from selected recipe URL into existing `parseRecipeUrl()` import
-**Uses:** `analyze-food-photo` with `identify-dish` intent, Serper.dev REST API, existing `parseRecipeUrl()` + `recipeStore.createRecipe()`
-**Avoids:** Pitfall #7 (dish identification expectation mismatch — editable name, "recipes like this" framing, 2-3 options presented)
-**Research flag:** Needs a pre-planning spike on Serper.dev recipe search result quality — verify that AI-identified dish names produce useful recipe URLs that successfully feed through `parseRecipeUrl()` extraction
+### Phase 2: Follow System and Kitchen Discovery
 
-### Phase 4: Food Photo to Meal Plan Logging
-**Rationale:** Shares the `identify-dish` pipeline with Phase 3; simplest integration (just calls existing `planStore.assignRecipe()` with `recipe_id: null`); naturally completes the dual-action UX alongside Phase 3. Build last because it has no dependencies beyond Phase 1 infrastructure and benefits from Phase 3's `DishResultSheet` for the dual-action flow.
-**Delivers:** `MealLogSheet.tsx` with day/slot/meal-source picker, "Snap a Meal" option in `PlanEditSheet`, dual-action bottom sheet after dish identification ("Find Recipes" + "Log as Meal"), optional meal photo thumbnail on plan day cards (requires `image_url` on `meal_plans` + `meal-photos` Storage bucket — confirm scope during planning)
-**Uses:** `analyze-food-photo` with `log-meal` intent, existing `planStore.assignRecipe()` (already supports `recipe_id: null` with `notes`), `MealType`/`MealSource` enums
-**Implements:** `MealLogSheet`, `PlanEditSheet` modification
-**Research flag:** Standard patterns — all integration points are existing, well-understood store actions; no novel architecture
+**Rationale:** The follow graph must exist before the feed has any content to show. Follow/unfollow is the core social primitive that everything builds on.
+**Delivers:** `socialStore`, follow/unfollow UI, kitchen search/discovery, kitchen profile screen, follower/following counts.
+**Addresses:** Follow/unfollow kitchens, kitchen discovery/search, kitchen profile public view.
+**Avoids:** Empty feed state (users build their follow graph before seeing the feed).
+
+### Phase 3: Feed Display and Auto-Post
+
+**Rationale:** With kitchen profiles and follows in place, the feed can now query and display content. Auto-post from meal plan creates the content that populates the feed.
+**Delivers:** `feedStore` with cursor pagination, FeedList/FeedCard components, Plan tab segmented control (My Plan | Feed), auto-post from `planStore.assignRecipe()` with share toggle, meal photo upload to Storage, `expo-image` integration for cached display.
+**Addresses:** Chronological feed, feed cards, auto-post with share toggle, meal photos on feed.
+**Uses:** `expo-image` (new), Supabase Storage `meal-photos` bucket, FlashList (existing).
+
+### Phase 4: Social Interactions
+
+**Rationale:** Interactions (likes, comments, save recipe) attach to feed items -- the feed must exist and have content first. Moderation tools (report/block) MUST ship alongside comments.
+**Delivers:** Like/unlike with optimistic UI, comments bottom sheet, `useFeedSync` for real-time interaction updates, save recipe from feed, report/block system, comment rate limiting.
+**Addresses:** Likes, comments, save recipe from feed, basic moderation.
+**Avoids:** Pitfall 6 (no moderation alongside comments), Pitfall 7 (notification spam -- use in-app indicators only, no push).
+
+### Phase 5: Server-Side Push Notifications
+
+**Rationale:** Push notifications are the engagement loop but are the highest risk for spam and user annoyance. Defer to last phase so the social features are validated before adding push. In-app indicators from Phase 4 provide engagement feedback in the interim.
+**Delivers:** `send-social-notification` Edge Function, database webhooks on likes/comments/follows, notification deduplication/batching, separate notification category with independent toggle in settings.
+**Addresses:** Push notifications for social events.
+**Avoids:** Pitfall 7 (notification spam) by shipping as a separate, carefully controlled phase.
 
 ### Phase Ordering Rationale
 
-- **Foundation first** because 90% of code (auth, compression, Edge Function, visionStore, CameraSheet) is shared — building it once in Phase 1 means Phases 2-4 each add only feature-specific UI and store wiring, not infrastructure
-- **Fridge scan second** because it is the highest standalone user value, exercises the full pipeline end-to-end, and validates Gemini vision prompt quality before the dish-identification features depend on it
-- **Recipe discovery third** because it requires Serper.dev (one new external API) and chains more steps than meal logging — validating recipe search integration before adding meal logging is cleaner
-- **Meal logging last** because it is the simplest integration (no new infrastructure beyond Phase 1), pairs with Phase 3's dual-action UX, and depends on dish identification being validated first
-- **Pitfall alignment**: The two must-address-first pitfalls (image compression, cost controls) are both Phase 1 work, ensuring no feature phase ships without those safeguards
+- Dependency chain: Database schema -> kitchen profiles -> follows -> feed content -> feed display -> interactions -> notifications. Each phase produces what the next phase consumes.
+- Risk front-loading: The highest-risk pitfall (data leakage) is addressed in Phase 1 before any UI work begins. RLS design is validated before any social data flows.
+- Privacy-first: Share toggle defaults to OFF, social is opt-in and additive, push notifications are deferred to the final phase.
+- Existing code stability: No existing Plan tab workflows are disrupted until Phase 3, which adds a segmented control rather than replacing content.
 
 ### Research Flags
 
 Phases likely needing deeper research during planning:
-- **Phase 3 (Recipe Discovery):** A small spike should precede planning — validate that Gemini-generated dish names produce useful Serper.dev search results, and that returned recipe URLs reliably feed through the existing `parseRecipeUrl()` pipeline. 30-60 minute manual test with 10-20 real dish names before committing to the architecture.
+- **Phase 1:** RLS policy design for social tables needs careful review -- the interaction between `can_view_kitchen()`, existing `is_household_member()`, and Supabase's per-row RLS evaluation is nuanced. Run EXPLAIN ANALYZE on feed queries with realistic data volumes.
+- **Phase 5:** Notification deduplication/batching strategy needs design. How to avoid spamming when 10 people like a post in quick succession. Expo Push API rate limits and batching patterns need verification.
 
 Phases with standard patterns (skip research-phase):
-- **Phase 1 (Foundation):** Direct extension of existing `parse-recipe-url` and `generate-meal` Edge Function patterns; all libraries are well-documented and already in the project
-- **Phase 2 (Fridge Scan):** Standard Gemini structured output + bottom sheet review pattern; prompt engineering validated in Google AI Studio before coding begins
-- **Phase 4 (Meal Logging):** All integration points are existing store actions with no structural changes required
+- **Phase 2:** Well-documented asymmetric follow pattern. Simple CRUD on follows table.
+- **Phase 3:** Cursor-based pagination with FlashList is a standard pattern. Auto-post is a simple INSERT trigger.
+- **Phase 4:** Optimistic like toggle, flat comment list, bottom sheet -- all well-established React Native patterns.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | Core technologies verified from official docs and confirmed in existing codebase; Gemini pricing verified; expo-image-picker already installed and working in production |
-| Features | MEDIUM-HIGH | Competitive landscape well-documented across 6+ competitor apps; vision API capabilities verified; UX patterns consistent across multiple sources; actual AI accuracy in production will vary from benchmarks |
-| Architecture | HIGH | Direct extension of proven existing patterns; no novel infrastructure required; all integration points confirmed in existing codebase without structural changes to core tables |
-| Pitfalls | HIGH | Based on existing codebase constraint analysis, official API limit documentation, and production failure modes documented in competitor research and academic studies |
+| Stack | HIGH | Only one new npm package needed. All other stack elements already installed and proven in the codebase. Version compatibility verified against Expo SDK 55. |
+| Features | HIGH | Feature landscape well-documented across Cookpad, Venmo, Whisk, and Allrecipes comparables. Clear dependency chain and MVP definition. |
+| Architecture | HIGH | Fan-out-on-read at this scale is well-justified. Schema design follows established Supabase patterns. Existing codebase conventions (Zustand stores, Realtime hooks, RLS functions) provide clear templates. |
+| Pitfalls | HIGH | All pitfalls sourced from Supabase documentation, existing codebase analysis, and documented social feature failure patterns. Prevention strategies are concrete and phase-mapped. |
 
 **Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **Gemini vision prompt quality for pantry scan**: Actual accuracy on cluttered fridge photos with varied lighting depends heavily on prompt engineering. Validate prompts against real fridge photos in Google AI Studio before coding Phase 2. Research flags 60-75% item-level accuracy as a realistic baseline — calibrate user-facing messaging accordingly (frame as "AI-assisted" not "automatic").
-- **Serper.dev recipe search pipeline quality**: Serper.dev returning structured JSON is confirmed; whether AI-identified dish names consistently produce URLs that `parseRecipeUrl()` can extract is unvalidated. A 10-20 dish name test before Phase 3 planning is strongly recommended.
-- **`meal_plans` schema for photo thumbnails**: The meal photo thumbnail differentiator (Phase 4 "Should Have") requires an `image_url` column on `meal_plans` and a `meal-photos` Supabase Storage bucket. Confirm scope during Phase 4 planning — whether to include in v4.0 or defer.
-- **`normalized_name` column on `pantry_items`**: Research recommends a generated column for efficient deduplication queries. Decide during Phase 2 planning whether to add this migration or rely on application-level fuzzy matching only.
+- **Expo Push API batching limits:** The exact rate limits and optimal batching strategy for Expo Push API when sending social notifications to many recipients need verification during Phase 5 planning.
+- **Multi-household feed context:** When a user belongs to multiple households, which kitchen identity is active for social actions? The architecture assumes active household context but the exact UX flow for switching needs design during Phase 2 planning.
+- **Recipe cloning edge cases:** When saving a recipe from feed, how to handle recipes with photos stored in the source household's Storage path. Need to verify whether photo URLs remain accessible or need to be copied during Phase 4 planning.
+- **Supabase Realtime `in` filter support:** The architecture recommends filtering post_likes/post_comments by `post_id=in.(...)` but the exact filter syntax and limitations for array-based filters in postgres_changes need verification during Phase 4 planning.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- [Gemini API Pricing (official)](https://ai.google.dev/gemini-api/docs/pricing) — image token counts, Flash pricing, free tier
-- [Gemini Image Understanding Docs](https://ai.google.dev/gemini-api/docs/image-understanding) — `inline_data` format, base64 input, structured output
-- [Gemini Structured Output](https://firebase.google.com/docs/ai-logic/generate-structured-output) — `responseSchema` with `responseMimeType`
-- [Expo ImagePicker docs](https://docs.expo.dev/versions/latest/sdk/imagepicker/) — camera API, base64 option, permissions
-- [ImageManipulator - Expo Documentation](https://docs.expo.dev/versions/latest/sdk/imagemanipulator/) — on-device resize and compress
-- [Supabase Edge Functions Limits](https://supabase.com/docs/guides/functions/limits) — 256MB memory, payload limits, timeouts
-- [CalCam: Food Tracking with Gemini API (Google Developers Blog)](https://developers.googleblog.com/en/calcam-transforming-food-tracking-with-the-gemini-api/) — real-world Gemini food recognition production case study
-- Existing codebase: `supabase/functions/parse-recipe-url/index.ts`, `supabase/functions/generate-meal/index.ts`, `src/lib/ai.ts`, `supabase/migrations/00011_create_ai_usage_log.sql`, `supabase/migrations/00017_create_pantry_items.sql`
+- Expo SDK 55 Changelog -- expo-image version 55.0.8 compatibility confirmed
+- Supabase Push Notifications Guide -- Edge Function + Database Webhook pattern for Expo Push
+- Supabase Realtime Benchmarks -- postgres_changes single-thread limitation
+- Supabase RLS Documentation -- SECURITY DEFINER pattern, auth.uid() subselect optimization
+- Existing codebase: `useGrocerySync.ts`, `useActivityToast.ts`, `notifications.ts`, `push_tokens` migration, all existing Zustand stores
 
 ### Secondary (MEDIUM confidence)
-- [Serper.dev](https://serper.dev/) — pricing, free tier, structured JSON from Google recipe search results
-- [Samsung Bespoke Fridge with Gemini Vision AI (Techlicious)](https://www.techlicious.com/blog/samsung-bespoke-fridge-vision-ai-with-google-gemini/) — production fridge item identification with Gemini
-- [Roboflow: Gemini 2.5 for Zero-Shot Object Detection](https://blog.roboflow.com/gemini-2-5-object-detection-segmentation/) — Gemini 2.5 structured JSON output for detected objects
-- [Fridge Vision AI](https://fridgevisionai.com/) — competitor UX: multi-photo sessions, editable results, category handling
-- [DishDetect](https://www.dishdetect.app/), [Recipe Lens](https://www.recipelens.com/), [Scan2Meal](https://scan2meal.app/), [Portions Master](https://portionsmaster.com/) — competitor feature baseline and UX patterns
-- [SerpApi Google Recipes API](https://serpapi.com/recipes-results) — recipe search structured results format reference
-- [DEV Community: Building Meal Tracker with GPT-4o Vision](https://dev.to/wellallytech/from-pixels-to-calories-building-a-high-precision-meal-tracker-with-gpt-4o-vision-5018) — architecture pattern, prompt strategy, cost analysis
+- Cookpad blog posts -- feature patterns for cooking social apps (follow, cooksnaps, community)
+- GetStream fan-out documentation -- fan-out-on-read vs write tradeoffs
+- Content moderation best practices (GetStream, Arena.im, Social Plus) -- moderation requirements at launch
 
 ### Tertiary (LOW confidence)
-- [ScienceDirect: Diabot-GPT-4o Food Recognition](https://www.sciencedirect.com/science/article/abs/pii/S0002916525006173) — GPT-4o 59-74% food identification accuracy; used for baseline expectation calibration (Gemini Flash expected to be comparable)
-- [Use of Different Food Image Recognition Platforms (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC7752530/) — Google Cloud Vision 9% top-1 accuracy for food (older model; used for floor baseline only)
-- [GPT-5 Image Mini pricing (third-party aggregator)](https://pricepertoken.com/pricing-page/model/openai-gpt-5-image-mini) — used for cost comparison to validate Gemini Flash as the correct choice
+- Supabase Realtime `in` filter syntax for postgres_changes -- needs runtime verification, documentation is sparse on array filters
 
 ---
-*Research completed: 2026-03-30*
+*Research completed: 2026-04-06*
 *Ready for roadmap: yes*
