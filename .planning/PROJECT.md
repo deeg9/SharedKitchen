@@ -2,7 +2,7 @@
 
 ## What This Is
 
-SharedKitchen is a collaborative dinner planning mobile app for couples, roommates, and families. It combines a shared weekly meal calendar, AI-powered recipe library with web/video extraction and meal generation, auto-generated grocery lists with real-time sync and live presence, AI vision features (fridge scanning, food photo recipe discovery, photo meal logging), push notifications, Stripe-powered premium subscriptions, fullscreen cooking mode with step-by-step timers, and budget tracking — all in one warm, inviting interface. Built with React Native + Expo for iOS, backed by Supabase.
+SharedKitchen is a collaborative dinner planning mobile app for couples, roommates, and families. It combines a shared weekly meal calendar, AI-powered recipe library with web/video extraction and meal generation, auto-generated grocery lists with real-time sync and live presence, AI vision features (fridge scanning, food photo recipe discovery, photo meal logging), a Venmo-style social feed where kitchens follow each other and share what they're eating, push notifications, Stripe-powered premium subscriptions, fullscreen cooking mode with step-by-step timers, and budget tracking — all in one warm, inviting interface. Built with React Native + Expo for iOS, backed by Supabase.
 
 ## Core Value
 
@@ -10,9 +10,9 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 
 ## Current State
 
-**Shipped:** v4.0 AI Vision — Scan, Snap & Add (2026-03-30)
-**Codebase:** ~29,800 LOC across 220+ source files (TypeScript, SQL, YAML)
-**Tech stack:** React Native + Expo (iOS), Supabase (Postgres, Auth, Realtime, Storage, Edge Functions), Gemini 2.5 Flash (vision + text), Supadata, Serper.dev, Stripe, expo-share-intent, expo-image-manipulator, expo-notifications, Maestro E2E
+**Shipped:** v5.0 Social Feed (2026-04-07)
+**Codebase:** ~32,000 LOC across 240+ source files (TypeScript, SQL, YAML)
+**Tech stack:** React Native + Expo (iOS), Supabase (Postgres, Auth, Realtime, Storage, Edge Functions), Gemini 2.5 Flash (vision + text), Supadata, Serper.dev, Stripe, expo-share-intent, expo-image-manipulator, expo-image, expo-notifications, Maestro E2E
 
 ## Requirements
 
@@ -92,30 +92,39 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 - ✓ Photo meal logging to weekly plan (day + slot picker) — v4.0
 - ✓ Recipe-less meals displayed on Plan tab via notes fallback — v4.0
 
+- ✓ Kitchen-to-kitchen follow/unfollow with optimistic UI — v5.0
+- ✓ Kitchen profile (public view with name, avatar, bio, recipe count, follower/following counts) — v5.0
+- ✓ Kitchen search by name with live results — v5.0
+- ✓ Invite-to-follow link sharing — v5.0
+- ✓ Followers/following list with segmented control — v5.0
+- ✓ Social feed on Plan tab with segmented control (My Plan / Feed) — v5.0
+- ✓ Auto-post meals from plan to followers' feed — v5.0
+- ✓ Feed cards with kitchen avatar, name, meal, day/slot, recipe photo, timestamp — v5.0
+- ✓ Meal photo upload to Supabase Storage with camera attach on feed cards — v5.0
+- ✓ Infinite scroll feed with cursor-based pagination — v5.0
+- ✓ Like (heart) on feed items with animated toggle and optimistic UI — v5.0
+- ✓ Flat comments on feed items via CommentSheet bottom sheet — v5.0
+- ✓ Save recipe from feed to own library with "Saved from Kitchen X" provenance — v5.0
+- ✓ Cook This Too: save recipe + add to meal plan in one tap — v5.0
+- ✓ Report feed item/comment for inappropriate content — v5.0
+- ✓ Block kitchen (hides all content from feed) — v5.0
+- ✓ Server-side push notifications for follows, likes, comments via Edge Function — v5.0
+- ✓ Social notifications toggle (separate from household notifications) — v5.0
+
 ### Active
 
-- [ ] Follow/unfollow other kitchens
-- [ ] Social feed on Plan tab showing meals from followed kitchens
-- [ ] Auto-post meals from plan with manual share toggle
-- [ ] Feed cards with kitchen name, meal, recipe, photos
-- [ ] Like/react to meals
-- [ ] Comment on meals
-- [ ] Save recipes from feed to own library
-- [ ] Kitchen profile (public view for followers)
+(None — planning next milestone)
 
-## Current Milestone: v5.0 Social Feed
+## Current Milestone: v5.0 Social Feed (SHIPPED)
 
-**Goal:** Let users follow other kitchens and see what they're eating in a Venmo-style social feed with full interactions.
+**Shipped:** 2026-04-07
 
-**Target features:**
-- Follow/unfollow other kitchens (friend model)
-- Social feed on Plan tab showing meals from followed kitchens
-- Auto-post meals from plan + manual share toggle
-- Feed cards with kitchen name, meal, recipe, photos
-- Like/react to meals
-- Comment on meals
-- Save recipes from feed to your own library
-- Kitchen profile (public view for followers)
+**Delivered features:**
+- Kitchen-to-kitchen social graph with follow/unfollow, profiles, search, and invite links
+- Venmo-style social feed on Plan tab with auto-posted meals, photos, and infinite scroll
+- Full social interactions: likes, comments, recipe saving, Cook This Too
+- Moderation tools: report content and block kitchens
+- Server-side push notifications for social events via Edge Function + database webhooks
 
 ### Out of Scope
 
@@ -134,6 +143,7 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 
 - **v1.0 MVP** shipped with 63 requirements across 4 phases (Foundation, Core Features, Supporting Features, Onboarding & Freemium)
 - **v2.0 AI, Payments & Polish** shipped with 30 requirements across 5 phases (AI Fix & Payment Foundation, Push Notifications, Real-Time Presence, Enhanced AI & Cooking Mode, E2E Testing)
+- **v5.0 Social Feed** shipped with 20 requirements across 5 phases (DB & Kitchen Profiles, Follow System, Feed & Auto-Post, Interactions & Moderation, Push Notifications)
 - Architecture spec: `/Users/deeg/Desktop/mise-stitch-prompt.md`
 - Design language: warm cream/off-white backgrounds, deep olive/sage green primary (#334537), burnt orange accent (#904d00), Material Design 3 color tokens, Plus Jakarta Sans headers, Inter body text
 - Design philosophy: "Tactile Sophistication" — no-line rule, tonal layering, ambient shadows, ghost borders
@@ -169,10 +179,16 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 | Serper.dev for recipe web search | 2,500 free queries, structured results, $0.001/query | ✓ Good — cheaper and simpler than Spoonacular |
 | expo-image-manipulator for client compression | Part of Expo SDK, no native rebuild needed | ✓ Good — 1024px JPEG 0.6 keeps payloads small |
 | Base64 in JSON body (not Storage) | Images are transient, not persisted | ✓ Good — simpler architecture, no cleanup |
+| Kitchen-to-kitchen follow model (not user-to-user) | Maintains household-first identity, avoids individual social pressure | ✓ Good — consistent with multi-household architecture |
+| Separate kitchen_profiles table from households | Isolates social data from private household logic | ✓ Good — zero RLS policy changes to existing tables |
+| Fan-out-on-read for feed queries | Simpler than fan-out-on-write at SharedKitchen's scale (dozens of followed kitchens) | ✓ Good — cursor pagination keeps queries fast |
+| expo-image for cached feed photo rendering | CDN-backed, built-in caching, Expo SDK compatible | ✓ Good — only new npm dependency for v5.0 |
+| Server-side push via Edge Function + pg_net webhooks | Social notifications need server-triggered delivery, not client-side | ✓ Good — decoupled from client, fires on DB inserts |
+| Moderation shipped with comments (report + block) | Research: even one harassment incident in family app causes disproportionate trust damage | ✓ Good — shipped together as designed |
 
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-04-07 after v5.0 milestone started*
+*Last updated: 2026-04-07 after v5.0 milestone shipped*

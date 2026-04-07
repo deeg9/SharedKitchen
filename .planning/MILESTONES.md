@@ -1,5 +1,25 @@
 # Milestones
 
+## v5.0 Social Feed (Shipped: 2026-04-07)
+
+**Phases completed:** 5 phases, 12 plans, 25 tasks
+
+**Key accomplishments:**
+
+- Zustand socialStore with profile CRUD, lazy creation, and search; kitchen profile modal screen with KitchenProfileCard showing avatar, name, bio, recipe count, and follower/following counts
+- Debounced kitchen search overlay on Plan tab with live results and invite code sharing (copy/share) on own kitchen profile screen
+- Follow/unfollow actions in socialStore with optimistic UI rollback, wired to Follow/Following toggle button on kitchen profile screens with counter updates and unfollow toast
+- Followers/following list screen with segmented control, inline follow buttons, two-step Supabase queries, and navigation wiring from kitchen profile stat taps
+- Auto-post hook in planStore creates feed_post rows on meal assignment, with meal photo upload to Supabase Storage and cursor-paginated feed queries in socialStore
+- Venmo-style social feed on Plan tab with segmented control, infinite-scroll FeedCard list, pull-to-refresh, camera photo attach on own posts, and empty state with search CTA
+- Complete data layer for likes, comments, recipe saving, reporting, and blocking with optimistic UI patterns, blocked kitchen feed filtering, and reported_content migration with RLS
+- Interactive FeedCard with animated like toggle, CommentSheet bottom sheet, and recipe save with Alert feedback wired through socialStore methods
+- Cook This Too button with MealSlotPickerSheet for recipe-to-plan flow, plus long-press action sheet for report/block moderation on non-own feed cards
+- Webhook-triggered Edge Function sending Expo push notifications for follows, likes, and comments with kitchen-to-user token resolution and self-notification prevention
+- Database webhook triggers on follows/likes/comments tables firing async HTTP to Edge Function, with social notifications toggle in profile settings
+
+---
+
 ## v4.0 AI Vision — Scan, Snap & Add (Shipped: 2026-03-30)
 
 **Phases completed:** 4 phases, 9 plans, 13 tasks

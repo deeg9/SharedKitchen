@@ -14,7 +14,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - **v2.4 Comprehensive QA Testing** — Phases 18-22 (shipped 2026-03-27)
 - **v3.0 Video Recipe Import & Kitchen Tab** — Phases 23-25 (shipped 2026-03-29) — [Archive](milestones/v3.0-ROADMAP.md)
 - ✅ **v4.0 AI Vision — Scan, Snap & Add** — Phases 26-29 (shipped 2026-03-30) — [Archive](milestones/v4.0-ROADMAP.md)
-- 🚧 **v5.0 Social Feed** — Phases 30-34 (in progress)
+- ✅ **v5.0 Social Feed** — Phases 30-34 (shipped 2026-04-07) — [Archive](milestones/v5.0-ROADMAP.md)
 
 ## Phases
 
@@ -95,94 +95,16 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 </details>
 
-### 🚧 v5.0 Social Feed (In Progress)
+<details>
+<summary>✅ v5.0 Social Feed (Phases 30-34) — SHIPPED 2026-04-07</summary>
 
-**Milestone Goal:** Let users follow other kitchens and see what they're eating in a Venmo-style social feed with full interactions.
+- [x] Phase 30: Social Database & Kitchen Profiles (3/3 plans) — DB foundation, kitchen profiles, search, invite links
+- [x] Phase 31: Follow System (2/2 plans) — Follow/unfollow, follower/following lists
+- [x] Phase 32: Feed & Auto-Post (2/2 plans) — Chronological feed on Plan tab, auto-post, photos, pagination
+- [x] Phase 33: Social Interactions & Moderation (3/3 plans) — Likes, comments, save recipe, Cook This Too, report/block
+- [x] Phase 34: Social Push Notifications (2/2 plans) — Edge Function + webhooks, social notification toggle
 
-- [x] **Phase 30: Social Database & Kitchen Profiles** - Database foundation, Storage bucket, kitchen profile CRUD, search, and invite links (completed 2026-04-07)
-- [x] **Phase 31: Follow System** - Follow/unfollow kitchens, follower/following lists (completed 2026-04-07)
-- [x] **Phase 32: Feed & Auto-Post** - Auto-post meals to followers, chronological feed with cards, photos, and pagination (completed 2026-04-07)
-- [x] **Phase 33: Social Interactions & Moderation** - Likes, comments, recipe saving, Cook This Too, report, and block (completed 2026-04-07)
-- [x] **Phase 34: Social Push Notifications** - Server-triggered push for follows, likes, and comments (completed 2026-04-07)
-
-## Phase Details
-
-### Phase 30: Social Database & Kitchen Profiles
-**Goal**: Users can view, search, and share kitchen profiles as the public-facing social identity
-**Depends on**: Phase 29
-**Requirements**: KITC-01, KITC-02, KITC-03, FOLL-03
-**Success Criteria** (what must be TRUE):
-  1. User can view any kitchen's public profile showing name, avatar, bio, recipe count, and follower/following counts
-  2. User can search for kitchens by name and see matching results
-  3. User can generate and share an invite link that others can use to follow their kitchen
-  4. All social database tables exist with RLS policies that never expose private household data
-**Plans**: 3 plans
-Plans:
-- [x] 30-01-PLAN.md — Social database migration (all tables, RLS, triggers) + TypeScript types
-- [x] 30-02-PLAN.md — socialStore + kitchen profile modal screen
-- [x] 30-03-PLAN.md — Kitchen search on Plan tab + invite link sharing
-**UI hint**: yes
-
-### Phase 31: Follow System
-**Goal**: Users can build their social graph by following and unfollowing kitchens
-**Depends on**: Phase 30
-**Requirements**: FOLL-01, FOLL-02
-**Success Criteria** (what must be TRUE):
-  1. User can follow and unfollow another kitchen from their profile screen
-  2. User can view their own following list and followers list
-  3. Follow/unfollow updates the follower and following counts on both kitchen profiles immediately
-**Plans**: 2 plans
-Plans:
-- [x] 31-01-PLAN.md — Follow/unfollow actions with optimistic UI + Follow button wiring
-- [x] 31-02-PLAN.md — Followers/following list screen with segmented control
-**UI hint**: yes
-
-### Phase 32: Feed & Auto-Post
-**Goal**: Users see a chronological feed of meals from kitchens they follow, populated automatically from meal plans
-**Depends on**: Phase 31
-**Requirements**: FEED-01, FEED-02, FEED-03, FEED-04, FEED-05
-**Success Criteria** (what must be TRUE):
-  1. When a user adds a meal to their plan, it auto-posts to their followers' feed (with share toggle defaulting to off, requiring opt-in)
-  2. User can scroll a chronological feed of meals from followed kitchens on the Plan tab
-  3. Each feed card displays the kitchen avatar, kitchen name, meal name, day/slot context, recipe photo, and timestamp
-  4. User can attach meal photos to feed posts using the existing camera infrastructure
-  5. Feed loads more items seamlessly as user scrolls (cursor-based infinite scroll)
-**Plans**: 2 plans
-Plans:
-- [x] 32-01-PLAN.md — Auto-post mechanism, meal photo upload, feed store methods
-- [x] 32-02-PLAN.md — Feed UI on Plan tab with segmented control, feed cards, infinite scroll
-**UI hint**: yes
-
-### Phase 33: Social Interactions & Moderation
-**Goal**: Users can engage with feed content through likes, comments, and recipe saving, with moderation tools to handle abuse
-**Depends on**: Phase 32
-**Requirements**: INTR-01, INTR-02, INTR-03, INTR-04, MODR-01, MODR-02
-**Success Criteria** (what must be TRUE):
-  1. User can like/unlike a feed item with instant optimistic UI feedback and visible like count
-  2. User can write and read flat comments on any feed item
-  3. User can save a recipe from the feed to their own library with "Saved from Kitchen X" provenance
-  4. User can "Cook This Too" to save a recipe and add it to their own meal plan in one tap via day/slot picker
-  5. User can report a feed item or comment, and can block a kitchen to hide all their content
-**Plans**: 3 plans
-Plans:
-- [x] 33-01-PLAN.md — Migration + socialStore interaction methods (like, comment, save, report, block)
-- [x] 33-02-PLAN.md — CommentSheet + FeedCard wiring (like animation, comment, save handlers)
-- [x] 33-03-PLAN.md — Cook This Too with MealSlotPickerSheet + long-press report/block + checkpoint
-**UI hint**: yes
-
-### Phase 34: Social Push Notifications
-**Goal**: Users receive timely push notifications for social interactions to drive engagement
-**Depends on**: Phase 33
-**Requirements**: NOTF-01, NOTF-02, NOTF-03
-**Success Criteria** (what must be TRUE):
-  1. User receives a push notification when someone follows their kitchen
-  2. User receives a push notification when someone likes their feed item
-  3. User receives a push notification when someone comments on their feed item
-  4. Social notifications have a separate toggle in settings so users can mute them without affecting household notifications
-**Plans**: 2 plans
-Plans:
-- [x] 34-01-PLAN.md — Edge Function for social push notifications + notification settings update
-- [x] 34-02-PLAN.md — Database webhook triggers + social notification toggle UI + checkpoint
+</details>
 
 ## Progress
 
@@ -226,4 +148,4 @@ Plans:
 | 34. Social Push Notifications | v5.0 | 2/2 | Complete   | 2026-04-07 |
 
 ---
-*Last updated: 2026-04-06 after Phase 34 planning*
+*Last updated: 2026-04-07 after v5.0 milestone shipped*
