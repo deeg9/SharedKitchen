@@ -14,6 +14,7 @@ import { Card } from '../../../src/components/ui/Card';
 import { Skeleton } from '../../../src/components/ui/Skeleton';
 
 import { SearchableSelect, DIETARY_OPTIONS } from '../../../src/components/ui/SearchableSelect';
+import SocialNotificationToggle from '../../../src/components/social/SocialNotificationToggle';
 import { supabase } from '../../../src/lib/supabase';
 import { colors } from '../../../src/theme/colors';
 import { typography } from '../../../src/theme/typography';
@@ -423,6 +424,14 @@ export default function ProfileScreen() {
               </Pressable>
             </View>
           </View>
+        </View>
+
+        {/* Notifications */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Notifications</Text>
+          <Card variant="filled">
+            <SocialNotificationToggle />
+          </Card>
         </View>
 
         {/* Sign Out */}
