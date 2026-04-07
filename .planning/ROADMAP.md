@@ -165,9 +165,9 @@ Plans:
   5. User can report a feed item or comment, and can block a kitchen to hide all their content
 **Plans**: 3 plans
 Plans:
-- [ ] 30-01-PLAN.md — Social database migration (all tables, RLS, triggers) + TypeScript types
-- [ ] 30-02-PLAN.md — socialStore + kitchen profile modal screen
-- [ ] 30-03-PLAN.md — Kitchen search on Plan tab + invite link sharing
+- [ ] 33-01-PLAN.md — Migration + socialStore interaction methods (like, comment, save, report, block)
+- [ ] 33-02-PLAN.md — CommentSheet + FeedCard wiring (like animation, comment, save handlers)
+- [ ] 33-03-PLAN.md — Cook This Too with MealSlotPickerSheet + long-press report/block + checkpoint
 **UI hint**: yes
 
 ### Phase 34: Social Push Notifications
@@ -223,8 +223,8 @@ Plans:
 | 30. Social Database & Kitchen Profiles | v5.0 | 3/3 | Complete   | 2026-04-07 |
 | 31. Follow System | v5.0 | 2/2 | Complete   | 2026-04-07 |
 | 32. Feed & Auto-Post | v5.0 | 2/2 | Complete   | 2026-04-07 |
-| 33. Social Interactions & Moderation | v5.0 | 0/0 | Not started | - |
+| 33. Social Interactions & Moderation | v5.0 | 0/3 | Planned | - |
 | 34. Social Push Notifications | v5.0 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-04-06 after v5.0 roadmap creation*
+*Last updated: 2026-04-06 after Phase 33 planning*
