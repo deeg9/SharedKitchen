@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { View, FlatList, RefreshControl, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, FlatList, RefreshControl, ActivityIndicator, Alert, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSocialStore } from '../../stores/socialStore';
+import { useHouseholdStore } from '../../stores/householdStore';
 import { supabase } from '../../lib/supabase';
 import { uploadMealPhoto } from '../../lib/feedHelpers';
 import { FeedCard } from './FeedCard';
+import { CommentSheet } from './CommentSheet';
 import { EmptyState } from '../ui/EmptyState';
 import { CameraSheet } from '../camera/CameraSheet';
 import { FeedPost } from '../../types/database';
@@ -27,18 +29,27 @@ export function FeedList({ myKitchenId }: FeedListProps) {
     feedCursor,
     fetchFeedPosts,
     refreshFeed,
+    toggleLike,
+    saveRecipeFromPost,
+    likedPostIds,
+    fetchBlockedKitchens,
   } = useSocialStore();
+
+  const { activeHouseholdId } = useHouseholdStore();
 
   const [kitchenProfiles, setKitchenProfiles] = useState<KitchenProfileLookup>(new Map());
   const [refreshing, setRefreshing] = useState(false);
   const [cameraSheetOpen, setCameraSheetOpen] = useState(false);
   const [activePostId, setActivePostId] = useState<string | null>(null);
+  const [commentSheetOpen, setCommentSheetOpen] = useState(false);
+  const [activeCommentPostId, setActiveCommentPostId] = useState<string | null>(null);
   const profilesFetched = useRef(false);
 
-  // Load initial feed on mount
+  // Load initial feed and blocked kitchens on mount
   useEffect(() => {
     if (myKitchenId) {
       fetchFeedPosts(myKitchenId);
+      fetchBlockedKitchens(myKitchenId);
     }
   }, [myKitchenId]);
 
@@ -106,21 +117,36 @@ export function FeedList({ myKitchenId }: FeedListProps) {
     [activePostId, myKitchenId, refreshFeed]
   );
 
+  const householdId = activeHouseholdId ?? '';
+
   const renderItem = useCallback(
     ({ item }: { item: FeedPost }) => (
       <FeedCard
         post={item}
         kitchenProfile={kitchenProfiles.get(item.kitchen_id)}
         isOwnPost={item.kitchen_id === myKitchenId}
+        isLiked={likedPostIds.includes(item.id)}
         onKitchenPress={() => router.push(`/kitchen/${item.kitchen_id}` as any)}
         onRecipePress={() => {
-          // TODO: Phase 33 - Navigate to recipe detail once recipe_id is available on feed_posts.
-          // meal_plan_id links to meal_plans, not directly to recipes.
+          // TODO: Recipe detail navigation deferred
+        }}
+        onLikePress={() => toggleLike(item.id, myKitchenId)}
+        onCommentPress={() => {
+          setActiveCommentPostId(item.id);
+          setCommentSheetOpen(true);
+        }}
+        onSavePress={async () => {
+          const result = await saveRecipeFromPost(item, myKitchenId, householdId);
+          if (result) {
+            Alert.alert('Recipe Saved', `"${item.recipe_name}" saved to your library`);
+          } else {
+            Alert.alert('Error', 'Could not save recipe. It may not be available.');
+          }
         }}
         onPhotoAttach={() => handlePhotoAttach(item.id)}
       />
     ),
-    [kitchenProfiles, myKitchenId, router, handlePhotoAttach]
+    [kitchenProfiles, myKitchenId, router, handlePhotoAttach, likedPostIds, toggleLike, saveRecipeFromPost, householdId]
   );
 
   const keyExtractor = useCallback((item: FeedPost) => item.id, []);
@@ -185,6 +211,18 @@ export function FeedList({ myKitchenId }: FeedListProps) {
           setActivePostId(null);
         }}
         onImageCaptured={handleImageCaptured}
+      />
+
+      {/* Comment sheet */}
+      <CommentSheet
+        isOpen={commentSheetOpen}
+        onClose={() => {
+          setCommentSheetOpen(false);
+          setActiveCommentPostId(null);
+        }}
+        postId={activeCommentPostId ?? ''}
+        myKitchenId={myKitchenId}
+        kitchenProfiles={kitchenProfiles}
       />
     </View>
   );
