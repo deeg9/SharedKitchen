@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { KitchenSearchBar } from '../../../src/components/social/KitchenSearchBar';
 import { WeekHeader } from '../../../src/components/plan/WeekHeader';
 import { DaySection } from '../../../src/components/plan/DayCard';
 import { PlanEditSheet } from '../../../src/components/plan/PlanEditSheet';
@@ -43,6 +44,7 @@ export default function PlanScreen() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedMealType, setSelectedMealType] = useState<MealType>('dinner');
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
 
   const days = weekDays();
   const label = weekLabel();
@@ -87,6 +89,17 @@ export default function PlanScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
+      {/* Search Icon */}
+      <View style={styles.headerActions}>
+        <Pressable
+          onPress={() => setShowSearch(true)}
+          hitSlop={12}
+          testID="plan-search-icon"
+        >
+          <MaterialCommunityIcons name="magnify" size={24} color={colors.onSurface} />
+        </Pressable>
+      </View>
+
       {/* Week Navigation */}
       <WeekHeader
         weekLabel={label}
@@ -208,6 +221,11 @@ export default function PlanScreen() {
         />
       )}
 
+      {/* Kitchen Search Overlay */}
+      {showSearch && (
+        <KitchenSearchBar onClose={() => setShowSearch(false)} />
+      )}
+
       {/* Premium Upgrade Prompt */}
       <UpgradePrompt
         visible={showUpgradePrompt}
@@ -223,6 +241,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.surface,
     paddingBottom: TAB_BAR_HEIGHT,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.xs,
   },
   scroll: {
     flex: 1,
