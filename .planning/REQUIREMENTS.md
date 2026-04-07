@@ -36,9 +36,9 @@ Requirements for Social Feed milestone. Each maps to roadmap phases.
 
 ### Notifications
 
-- [ ] **NOTF-01**: User receives push notification when someone follows their kitchen
-- [ ] **NOTF-02**: User receives push notification when someone likes their feed item
-- [ ] **NOTF-03**: User receives push notification when someone comments on their feed item
+- [x] **NOTF-01**: User receives push notification when someone follows their kitchen
+- [x] **NOTF-02**: User receives push notification when someone likes their feed item
+- [x] **NOTF-03**: User receives push notification when someone comments on their feed item
 
 ### Moderation
 
@@ -97,9 +97,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INTR-02 | Phase 33 | Complete |
 | INTR-03 | Phase 33 | Complete |
 | INTR-04 | Phase 33 | Complete |
-| NOTF-01 | Phase 34 | Pending |
-| NOTF-02 | Phase 34 | Pending |
-| NOTF-03 | Phase 34 | Pending |
+| NOTF-01 | Phase 34 | Complete |
+| NOTF-02 | Phase 34 | Complete |
+| NOTF-03 | Phase 34 | Complete |
 | MODR-01 | Phase 33 | Complete |
 | MODR-02 | Phase 33 | Complete |
 

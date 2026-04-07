@@ -181,7 +181,7 @@ Plans:
   4. Social notifications have a separate toggle in settings so users can mute them without affecting household notifications
 **Plans**: 2 plans
 Plans:
-- [ ] 34-01-PLAN.md — Edge Function for social push notifications + notification settings update
+- [x] 34-01-PLAN.md — Edge Function for social push notifications + notification settings update
 - [ ] 34-02-PLAN.md — Database webhook triggers + social notification toggle UI + checkpoint
 
 ## Progress
@@ -223,7 +223,7 @@ Plans:
 | 31. Follow System | v5.0 | 2/2 | Complete   | 2026-04-07 |
 | 32. Feed & Auto-Post | v5.0 | 2/2 | Complete   | 2026-04-07 |
 | 33. Social Interactions & Moderation | v5.0 | 3/3 | Complete   | 2026-04-07 |
-| 34. Social Push Notifications | v5.0 | 0/2 | Not started | - |
+| 34. Social Push Notifications | v5.0 | 1/2 | In Progress|  |
 
 ---
 *Last updated: 2026-04-06 after Phase 34 planning*
