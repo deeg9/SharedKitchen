@@ -116,7 +116,11 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
   2. User can search for kitchens by name and see matching results
   3. User can generate and share an invite link that others can use to follow their kitchen
   4. All social database tables exist with RLS policies that never expose private household data
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 30-01-PLAN.md — Social database migration (all tables, RLS, triggers) + TypeScript types
+- [ ] 30-02-PLAN.md — socialStore + kitchen profile modal screen
+- [ ] 30-03-PLAN.md — Kitchen search on Plan tab + invite link sharing
 **UI hint**: yes
 
 ### Phase 31: Follow System
@@ -127,7 +131,11 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
   1. User can follow and unfollow another kitchen from their profile screen
   2. User can view their own following list and followers list
   3. Follow/unfollow updates the follower and following counts on both kitchen profiles immediately
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 30-01-PLAN.md — Social database migration (all tables, RLS, triggers) + TypeScript types
+- [ ] 30-02-PLAN.md — socialStore + kitchen profile modal screen
+- [ ] 30-03-PLAN.md — Kitchen search on Plan tab + invite link sharing
 **UI hint**: yes
 
 ### Phase 32: Feed & Auto-Post
@@ -140,7 +148,11 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
   3. Each feed card displays the kitchen avatar, kitchen name, meal name, day/slot context, recipe photo, and timestamp
   4. User can attach meal photos to feed posts using the existing camera infrastructure
   5. Feed loads more items seamlessly as user scrolls (cursor-based infinite scroll)
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 30-01-PLAN.md — Social database migration (all tables, RLS, triggers) + TypeScript types
+- [ ] 30-02-PLAN.md — socialStore + kitchen profile modal screen
+- [ ] 30-03-PLAN.md — Kitchen search on Plan tab + invite link sharing
 **UI hint**: yes
 
 ### Phase 33: Social Interactions & Moderation
@@ -153,7 +165,11 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
   3. User can save a recipe from the feed to their own library with "Saved from Kitchen X" provenance
   4. User can "Cook This Too" to save a recipe and add it to their own meal plan in one tap via day/slot picker
   5. User can report a feed item or comment, and can block a kitchen to hide all their content
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 30-01-PLAN.md — Social database migration (all tables, RLS, triggers) + TypeScript types
+- [ ] 30-02-PLAN.md — socialStore + kitchen profile modal screen
+- [ ] 30-03-PLAN.md — Kitchen search on Plan tab + invite link sharing
 **UI hint**: yes
 
 ### Phase 34: Social Push Notifications
@@ -165,7 +181,11 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
   2. User receives a push notification when someone likes their feed item
   3. User receives a push notification when someone comments on their feed item
   4. Social notifications have a separate toggle in settings so users can mute them without affecting household notifications
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 30-01-PLAN.md — Social database migration (all tables, RLS, triggers) + TypeScript types
+- [ ] 30-02-PLAN.md — socialStore + kitchen profile modal screen
+- [ ] 30-03-PLAN.md — Kitchen search on Plan tab + invite link sharing
 
 ## Progress
 
