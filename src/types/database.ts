@@ -544,6 +544,7 @@ export interface Database {
           id: string;
           kitchen_id: string;
           meal_plan_id: string | null;
+          recipe_id: string | null;
           recipe_name: string;
           recipe_image_url: string | null;
           meal_date: string;
@@ -558,6 +559,7 @@ export interface Database {
           id?: string;
           kitchen_id: string;
           meal_plan_id?: string | null;
+          recipe_id?: string | null;
           recipe_name: string;
           recipe_image_url?: string | null;
           meal_date: string;
@@ -572,6 +574,7 @@ export interface Database {
           id?: string;
           kitchen_id?: string;
           meal_plan_id?: string | null;
+          recipe_id?: string | null;
           recipe_name?: string;
           recipe_image_url?: string | null;
           meal_date?: string;
@@ -672,6 +675,35 @@ export interface Database {
           created_at?: string;
         };
       };
+      reported_content: {
+        Row: {
+          id: string;
+          reporter_kitchen_id: string;
+          content_type: 'post' | 'comment';
+          post_id: string | null;
+          comment_id: string | null;
+          reason: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          reporter_kitchen_id: string;
+          content_type: 'post' | 'comment';
+          post_id?: string | null;
+          comment_id?: string | null;
+          reason?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          reporter_kitchen_id?: string;
+          content_type?: 'post' | 'comment';
+          post_id?: string | null;
+          comment_id?: string | null;
+          reason?: string | null;
+          created_at?: string;
+        };
+      };
     };
     Views: {
       [_ in never]: never;
@@ -728,6 +760,7 @@ export type PostComment = Database['public']['Tables']['post_comments']['Row'];
 export type PostCommentInsert = Database['public']['Tables']['post_comments']['Insert'];
 export type SavedRecipe = Database['public']['Tables']['saved_recipes']['Row'];
 export type BlockedKitchen = Database['public']['Tables']['blocked_kitchens']['Row'];
+export type ReportedContent = Database['public']['Tables']['reported_content']['Row'];
 
 export interface KitchenProfileWithRecipeCount extends KitchenProfile {
   recipe_count: number;
