@@ -166,7 +166,7 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [x] 33-01-PLAN.md — Migration + socialStore interaction methods (like, comment, save, report, block)
-- [ ] 33-02-PLAN.md — CommentSheet + FeedCard wiring (like animation, comment, save handlers)
+- [x] 33-02-PLAN.md — CommentSheet + FeedCard wiring (like animation, comment, save handlers)
 - [ ] 33-03-PLAN.md — Cook This Too with MealSlotPickerSheet + long-press report/block + checkpoint
 **UI hint**: yes
 
@@ -223,7 +223,7 @@ Plans:
 | 30. Social Database & Kitchen Profiles | v5.0 | 3/3 | Complete   | 2026-04-07 |
 | 31. Follow System | v5.0 | 2/2 | Complete   | 2026-04-07 |
 | 32. Feed & Auto-Post | v5.0 | 2/2 | Complete   | 2026-04-07 |
-| 33. Social Interactions & Moderation | v5.0 | 1/3 | In Progress|  |
+| 33. Social Interactions & Moderation | v5.0 | 2/3 | In Progress|  |
 | 34. Social Push Notifications | v5.0 | 0/0 | Not started | - |
 
 ---
