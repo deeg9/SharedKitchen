@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: Social Feed
 status: verifying
-stopped_at: Completed 30-03-PLAN.md
-last_updated: "2026-04-07T18:35:32.497Z"
+stopped_at: Completed 31-01-PLAN.md
+last_updated: "2026-04-07T19:04:07.888Z"
 last_activity: 2026-04-07
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
-  percent: 100
+  total_plans: 5
+  completed_plans: 4
+  percent: 80
 ---
 
 # Project State
@@ -47,6 +47,7 @@ Recent decisions affecting current work:
 - [Phase 30]: All social tables in single migration 00018 with trigger-maintained counters and is_kitchen_member helper
 - [Phase 30]: socialStore uses maybeSingle() for graceful profile lookup; Follow button is a disabled placeholder until Phase 31
 - [Phase 30]: Search overlay uses absolute positioning with backdrop; own profile detection via household_id; /kitchen/me triggers lazy creation then fetch
+- [Phase 31]: Used local state toast for unfollow notification instead of subscription-based useActivityToast
 
 ### Pending Todos
 
@@ -66,6 +67,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-07T18:35:32.495Z
-Stopped at: Completed 30-03-PLAN.md
+Last session: 2026-04-07T19:04:07.886Z
+Stopped at: Completed 31-01-PLAN.md
 Resume file: None

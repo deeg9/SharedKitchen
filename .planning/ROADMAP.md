@@ -133,7 +133,7 @@ Plans:
   3. Follow/unfollow updates the follower and following counts on both kitchen profiles immediately
 **Plans**: 2 plans
 Plans:
-- [ ] 31-01-PLAN.md — Follow/unfollow actions with optimistic UI + Follow button wiring
+- [x] 31-01-PLAN.md — Follow/unfollow actions with optimistic UI + Follow button wiring
 - [ ] 31-02-PLAN.md — Followers/following list screen with segmented control
 **UI hint**: yes
 
@@ -222,7 +222,7 @@ Plans:
 | 28. Food Photo to Recipe Discovery | v4.0 | 2/2 | Complete | 2026-03-30 |
 | 29. Food Photo to Meal Logging | v4.0 | 2/2 | Complete | 2026-03-30 |
 | 30. Social Database & Kitchen Profiles | v5.0 | 3/3 | Complete   | 2026-04-07 |
-| 31. Follow System | v5.0 | 0/2 | Planned | - |
+| 31. Follow System | v5.0 | 1/2 | In Progress|  |
 | 32. Feed & Auto-Post | v5.0 | 0/0 | Not started | - |
 | 33. Social Interactions & Moderation | v5.0 | 0/0 | Not started | - |
 | 34. Social Push Notifications | v5.0 | 0/0 | Not started | - |

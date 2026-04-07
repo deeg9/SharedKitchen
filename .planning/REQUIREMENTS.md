@@ -15,7 +15,7 @@ Requirements for Social Feed milestone. Each maps to roadmap phases.
 
 ### Follow System
 
-- [ ] **FOLL-01**: User can follow/unfollow another kitchen (asymmetric, kitchen-to-kitchen)
+- [x] **FOLL-01**: User can follow/unfollow another kitchen (asymmetric, kitchen-to-kitchen)
 - [ ] **FOLL-02**: User can view their following list and followers list
 - [x] **FOLL-03**: Follower/following counts display on kitchen profile
 
@@ -85,7 +85,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | KITC-01 | Phase 30 | Complete |
 | KITC-02 | Phase 30 | Complete |
 | KITC-03 | Phase 30 | Complete |
-| FOLL-01 | Phase 31 | Pending |
+| FOLL-01 | Phase 31 | Complete |
 | FOLL-02 | Phase 31 | Pending |
 | FOLL-03 | Phase 30 | Complete |
 | FEED-01 | Phase 32 | Pending |
