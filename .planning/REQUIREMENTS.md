@@ -82,32 +82,32 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| KITC-01 | — | Pending |
-| KITC-02 | — | Pending |
-| KITC-03 | — | Pending |
-| FOLL-01 | — | Pending |
-| FOLL-02 | — | Pending |
-| FOLL-03 | — | Pending |
-| FEED-01 | — | Pending |
-| FEED-02 | — | Pending |
-| FEED-03 | — | Pending |
-| FEED-04 | — | Pending |
-| FEED-05 | — | Pending |
-| INTR-01 | — | Pending |
-| INTR-02 | — | Pending |
-| INTR-03 | — | Pending |
-| INTR-04 | — | Pending |
-| NOTF-01 | — | Pending |
-| NOTF-02 | — | Pending |
-| NOTF-03 | — | Pending |
-| MODR-01 | — | Pending |
-| MODR-02 | — | Pending |
+| KITC-01 | Phase 30 | Pending |
+| KITC-02 | Phase 30 | Pending |
+| KITC-03 | Phase 30 | Pending |
+| FOLL-01 | Phase 31 | Pending |
+| FOLL-02 | Phase 31 | Pending |
+| FOLL-03 | Phase 30 | Pending |
+| FEED-01 | Phase 32 | Pending |
+| FEED-02 | Phase 32 | Pending |
+| FEED-03 | Phase 32 | Pending |
+| FEED-04 | Phase 32 | Pending |
+| FEED-05 | Phase 32 | Pending |
+| INTR-01 | Phase 33 | Pending |
+| INTR-02 | Phase 33 | Pending |
+| INTR-03 | Phase 33 | Pending |
+| INTR-04 | Phase 33 | Pending |
+| NOTF-01 | Phase 34 | Pending |
+| NOTF-02 | Phase 34 | Pending |
+| NOTF-03 | Phase 34 | Pending |
+| MODR-01 | Phase 33 | Pending |
+| MODR-02 | Phase 33 | Pending |
 
 **Coverage:**
 - v5.0 requirements: 20 total
-- Mapped to phases: 0
-- Unmapped: 20 ⚠️
+- Mapped to phases: 20
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-07*
-*Last updated: 2026-04-07 after initial definition*
+*Last updated: 2026-04-06 after roadmap creation*

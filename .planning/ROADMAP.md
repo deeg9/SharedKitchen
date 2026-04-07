@@ -2,7 +2,7 @@
 
 ## Overview
 
-SharedKitchen delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP. v2.0 (Phases 5-9) added Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and E2E testing. v2.1 (Phases 10-12) added recipe discovery filters, Stripe test mode E2E, and code quality polish. v2.2 (Phases 13-15) fixes layout bugs, polishes the sign-in screen, repairs the meal generator edge function, and cleans up profile/settings. v2.3 (Phases 16-17) adds multi-kitchen switching so users can belong to multiple kitchens and have all app data scoped to the active one. v2.4 (Phases 18-22) systematically tests and validates every feature area to ensure production readiness. v3.0 (Phases 23-25) adds video recipe import from TikTok, Instagram, YouTube, and any video URL via paste or share sheet, with transcript-based AI extraction, freemium rate limiting, and a unified Kitchen tab with pantry tracking. v4.0 (Phases 26-29) adds AI vision features: camera-based fridge/pantry scanning to bulk-add inventory, food photo identification for recipe discovery, and meal plan logging from photos.
+SharedKitchen delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP. v2.0 (Phases 5-9) added Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and E2E testing. v2.1 (Phases 10-12) added recipe discovery filters, Stripe test mode E2E, and code quality polish. v2.2 (Phases 13-15) fixes layout bugs, polishes the sign-in screen, repairs the meal generator edge function, and cleans up profile/settings. v2.3 (Phases 16-17) adds multi-kitchen switching so users can belong to multiple kitchens and have all app data scoped to the active one. v2.4 (Phases 18-22) systematically tests and validates every feature area to ensure production readiness. v3.0 (Phases 23-25) adds video recipe import from TikTok, Instagram, YouTube, and any video URL via paste or share sheet, with transcript-based AI extraction, freemium rate limiting, and a unified Kitchen tab with pantry tracking. v4.0 (Phases 26-29) adds AI vision features: camera-based fridge/pantry scanning to bulk-add inventory, food photo identification for recipe discovery, and meal plan logging from photos. v5.0 (Phases 30-34) adds a Venmo-style social feed layer: kitchen profiles, follow/unfollow, auto-posted meals from the plan, feed with likes, comments, recipe saving, and push notifications for social interactions.
 
 ## Milestones
 
@@ -14,6 +14,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - **v2.4 Comprehensive QA Testing** — Phases 18-22 (shipped 2026-03-27)
 - **v3.0 Video Recipe Import & Kitchen Tab** — Phases 23-25 (shipped 2026-03-29) — [Archive](milestones/v3.0-ROADMAP.md)
 - ✅ **v4.0 AI Vision — Scan, Snap & Add** — Phases 26-29 (shipped 2026-03-30) — [Archive](milestones/v4.0-ROADMAP.md)
+- 🚧 **v5.0 Social Feed** — Phases 30-34 (in progress)
 
 ## Phases
 
@@ -85,7 +86,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 </details>
 
 <details>
-<summary>✅ v4.0 AI Vision — Scan, Snap & Add (Phases 26-29) — SHIPPED 2026-03-30</summary>
+<summary>v4.0 AI Vision — Scan, Snap & Add (Phases 26-29) — SHIPPED 2026-03-30</summary>
 
 - [x] Phase 26: Vision Foundation (3/3 plans) — Camera capture, image compression, Edge Function with Gemini vision, rate limiting
 - [x] Phase 27: Fridge/Pantry Photo Scan (2/2 plans) — Photo scan, review screen, bulk-add, dedup, multi-photo
@@ -94,9 +95,81 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 </details>
 
+### 🚧 v5.0 Social Feed (In Progress)
+
+**Milestone Goal:** Let users follow other kitchens and see what they're eating in a Venmo-style social feed with full interactions.
+
+- [ ] **Phase 30: Social Database & Kitchen Profiles** - Database foundation, Storage bucket, kitchen profile CRUD, search, and invite links
+- [ ] **Phase 31: Follow System** - Follow/unfollow kitchens, follower/following lists
+- [ ] **Phase 32: Feed & Auto-Post** - Auto-post meals to followers, chronological feed with cards, photos, and pagination
+- [ ] **Phase 33: Social Interactions & Moderation** - Likes, comments, recipe saving, Cook This Too, report, and block
+- [ ] **Phase 34: Social Push Notifications** - Server-triggered push for follows, likes, and comments
+
+## Phase Details
+
+### Phase 30: Social Database & Kitchen Profiles
+**Goal**: Users can view, search, and share kitchen profiles as the public-facing social identity
+**Depends on**: Phase 29
+**Requirements**: KITC-01, KITC-02, KITC-03, FOLL-03
+**Success Criteria** (what must be TRUE):
+  1. User can view any kitchen's public profile showing name, avatar, bio, recipe count, and follower/following counts
+  2. User can search for kitchens by name and see matching results
+  3. User can generate and share an invite link that others can use to follow their kitchen
+  4. All social database tables exist with RLS policies that never expose private household data
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 31: Follow System
+**Goal**: Users can build their social graph by following and unfollowing kitchens
+**Depends on**: Phase 30
+**Requirements**: FOLL-01, FOLL-02
+**Success Criteria** (what must be TRUE):
+  1. User can follow and unfollow another kitchen from their profile screen
+  2. User can view their own following list and followers list
+  3. Follow/unfollow updates the follower and following counts on both kitchen profiles immediately
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 32: Feed & Auto-Post
+**Goal**: Users see a chronological feed of meals from kitchens they follow, populated automatically from meal plans
+**Depends on**: Phase 31
+**Requirements**: FEED-01, FEED-02, FEED-03, FEED-04, FEED-05
+**Success Criteria** (what must be TRUE):
+  1. When a user adds a meal to their plan, it auto-posts to their followers' feed (with share toggle defaulting to off, requiring opt-in)
+  2. User can scroll a chronological feed of meals from followed kitchens on the Plan tab
+  3. Each feed card displays the kitchen avatar, kitchen name, meal name, day/slot context, recipe photo, and timestamp
+  4. User can attach meal photos to feed posts using the existing camera infrastructure
+  5. Feed loads more items seamlessly as user scrolls (cursor-based infinite scroll)
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 33: Social Interactions & Moderation
+**Goal**: Users can engage with feed content through likes, comments, and recipe saving, with moderation tools to handle abuse
+**Depends on**: Phase 32
+**Requirements**: INTR-01, INTR-02, INTR-03, INTR-04, MODR-01, MODR-02
+**Success Criteria** (what must be TRUE):
+  1. User can like/unlike a feed item with instant optimistic UI feedback and visible like count
+  2. User can write and read flat comments on any feed item
+  3. User can save a recipe from the feed to their own library with "Saved from Kitchen X" provenance
+  4. User can "Cook This Too" to save a recipe and add it to their own meal plan in one tap via day/slot picker
+  5. User can report a feed item or comment, and can block a kitchen to hide all their content
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 34: Social Push Notifications
+**Goal**: Users receive timely push notifications for social interactions to drive engagement
+**Depends on**: Phase 33
+**Requirements**: NOTF-01, NOTF-02, NOTF-03
+**Success Criteria** (what must be TRUE):
+  1. User receives a push notification when someone follows their kitchen
+  2. User receives a push notification when someone likes their feed item
+  3. User receives a push notification when someone comments on their feed item
+  4. Social notifications have a separate toggle in settings so users can mute them without affecting household notifications
+**Plans**: TBD
+
 ## Progress
 
-**Execution Order:** Phases execute in numeric order: 26 -> 27 -> 28 -> 29
+**Execution Order:** Phases execute in numeric order: 30 -> 31 -> 32 -> 33 -> 34
 
 | Phase | Milestone | Plans | Status | Completed |
 |-------|-----------|-------|--------|-----------|
@@ -125,10 +198,15 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 | 23. Core Video Import Pipeline | v3.0 | 3/3 | Complete | 2026-03-28 |
 | 24. Share Sheet Integration | v3.0 | 2/2 | Complete | 2026-03-28 |
 | 25. Kitchen Tab | v3.0 | 2/2 | Complete | 2026-03-29 |
-| 26. Vision Foundation | v4.0 | 3/3 | Complete    | 2026-03-30 |
-| 27. Fridge/Pantry Photo Scan | v4.0 | 1/2 | Complete    | 2026-03-30 |
-| 28. Food Photo to Recipe Discovery | v4.0 | 2/2 | Complete    | 2026-03-30 |
-| 29. Food Photo to Meal Logging | v4.0 | 2/2 | Complete    | 2026-03-30 |
+| 26. Vision Foundation | v4.0 | 3/3 | Complete | 2026-03-30 |
+| 27. Fridge/Pantry Photo Scan | v4.0 | 1/2 | Complete | 2026-03-30 |
+| 28. Food Photo to Recipe Discovery | v4.0 | 2/2 | Complete | 2026-03-30 |
+| 29. Food Photo to Meal Logging | v4.0 | 2/2 | Complete | 2026-03-30 |
+| 30. Social Database & Kitchen Profiles | v5.0 | 0/0 | Not started | - |
+| 31. Follow System | v5.0 | 0/0 | Not started | - |
+| 32. Feed & Auto-Post | v5.0 | 0/0 | Not started | - |
+| 33. Social Interactions & Moderation | v5.0 | 0/0 | Not started | - |
+| 34. Social Push Notifications | v5.0 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-03-30 after Phase 29 planning*
+*Last updated: 2026-04-06 after v5.0 roadmap creation*
