@@ -10,8 +10,8 @@ Requirements for Social Feed milestone. Each maps to roadmap phases.
 ### Kitchen Identity
 
 - [x] **KITC-01**: User can view a kitchen's public profile (name, avatar, bio, recipe count, follower/following counts)
-- [ ] **KITC-02**: User can search for kitchens by name to discover and follow
-- [ ] **KITC-03**: User can share an invite link that lets someone follow their kitchen
+- [x] **KITC-02**: User can search for kitchens by name to discover and follow
+- [x] **KITC-03**: User can share an invite link that lets someone follow their kitchen
 
 ### Follow System
 
@@ -83,8 +83,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | KITC-01 | Phase 30 | Complete |
-| KITC-02 | Phase 30 | Pending |
-| KITC-03 | Phase 30 | Pending |
+| KITC-02 | Phase 30 | Complete |
+| KITC-03 | Phase 30 | Complete |
 | FOLL-01 | Phase 31 | Pending |
 | FOLL-02 | Phase 31 | Pending |
 | FOLL-03 | Phase 30 | Complete |

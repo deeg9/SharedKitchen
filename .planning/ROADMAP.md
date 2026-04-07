@@ -99,7 +99,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 **Milestone Goal:** Let users follow other kitchens and see what they're eating in a Venmo-style social feed with full interactions.
 
-- [ ] **Phase 30: Social Database & Kitchen Profiles** - Database foundation, Storage bucket, kitchen profile CRUD, search, and invite links
+- [x] **Phase 30: Social Database & Kitchen Profiles** - Database foundation, Storage bucket, kitchen profile CRUD, search, and invite links (completed 2026-04-07)
 - [ ] **Phase 31: Follow System** - Follow/unfollow kitchens, follower/following lists
 - [ ] **Phase 32: Feed & Auto-Post** - Auto-post meals to followers, chronological feed with cards, photos, and pagination
 - [ ] **Phase 33: Social Interactions & Moderation** - Likes, comments, recipe saving, Cook This Too, report, and block
@@ -120,7 +120,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 Plans:
 - [x] 30-01-PLAN.md — Social database migration (all tables, RLS, triggers) + TypeScript types
 - [x] 30-02-PLAN.md — socialStore + kitchen profile modal screen
-- [ ] 30-03-PLAN.md — Kitchen search on Plan tab + invite link sharing
+- [x] 30-03-PLAN.md — Kitchen search on Plan tab + invite link sharing
 **UI hint**: yes
 
 ### Phase 31: Follow System
@@ -134,7 +134,7 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [x] 30-01-PLAN.md — Social database migration (all tables, RLS, triggers) + TypeScript types
-- [ ] 30-02-PLAN.md — socialStore + kitchen profile modal screen
+- [x] 30-02-PLAN.md — socialStore + kitchen profile modal screen
 - [ ] 30-03-PLAN.md — Kitchen search on Plan tab + invite link sharing
 **UI hint**: yes
 
@@ -150,7 +150,7 @@ Plans:
   5. Feed loads more items seamlessly as user scrolls (cursor-based infinite scroll)
 **Plans**: 3 plans
 Plans:
-- [ ] 30-01-PLAN.md — Social database migration (all tables, RLS, triggers) + TypeScript types
+- [x] 30-01-PLAN.md — Social database migration (all tables, RLS, triggers) + TypeScript types
 - [ ] 30-02-PLAN.md — socialStore + kitchen profile modal screen
 - [ ] 30-03-PLAN.md — Kitchen search on Plan tab + invite link sharing
 **UI hint**: yes
@@ -222,7 +222,7 @@ Plans:
 | 27. Fridge/Pantry Photo Scan | v4.0 | 1/2 | Complete | 2026-03-30 |
 | 28. Food Photo to Recipe Discovery | v4.0 | 2/2 | Complete | 2026-03-30 |
 | 29. Food Photo to Meal Logging | v4.0 | 2/2 | Complete | 2026-03-30 |
-| 30. Social Database & Kitchen Profiles | v5.0 | 2/3 | In Progress|  |
+| 30. Social Database & Kitchen Profiles | v5.0 | 3/3 | Complete   | 2026-04-07 |
 | 31. Follow System | v5.0 | 0/0 | Not started | - |
 | 32. Feed & Auto-Post | v5.0 | 0/0 | Not started | - |
 | 33. Social Interactions & Moderation | v5.0 | 0/0 | Not started | - |
