@@ -3,6 +3,8 @@ import { supabase } from '../lib/supabase';
 import { getWeekDays, getWeekLabel, toDateString, makePlanKey } from '../lib/dates';
 import { Recipe, Database, MealType, MealSource, MEAL_SOURCE_CONFIG } from '../types/database';
 import { useBudgetStore } from './budgetStore';
+import { useSocialStore } from './socialStore';
+import { createFeedPost } from '../lib/feedHelpers';
 import { scheduleCookingReminder, cancelNotification } from '../lib/notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getErrorMessage } from '../lib/errors';
@@ -158,6 +160,23 @@ export const usePlanStore = create<PlanState>((set, get) => ({
             await AsyncStorage.setItem(`notif_meal_${data.id}`, notifId);
           }
         } catch {}
+      }
+
+      // Auto-post to feed (fire-and-forget — failure never blocks meal planning)
+      if (data && data.recipes) {
+        const myKitchenProfile = useSocialStore.getState().myKitchenProfile;
+        if (myKitchenProfile) {
+          try {
+            await createFeedPost({
+              kitchenId: myKitchenProfile.id,
+              mealPlanId: data.id,
+              recipeName: data.recipes.name,
+              recipeImageUrl: data.recipes.image_url ?? null,
+              mealDate: date,
+              mealType,
+            });
+          } catch {}
+        }
       }
 
       // Auto-create expense for takeout/eating-out meals

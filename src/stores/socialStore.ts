@@ -4,6 +4,7 @@ import {
   KitchenProfile,
   KitchenProfileUpdate,
   KitchenProfileWithRecipeCount,
+  FeedPost,
 } from '../types/database';
 import { getErrorMessage } from '../lib/errors';
 
@@ -22,6 +23,11 @@ interface SocialState {
   followers: KitchenProfile[];
   following: KitchenProfile[];
   followListLoading: boolean;
+  // Feed
+  feedPosts: FeedPost[];
+  feedLoading: boolean;
+  feedCursor: string | null;
+  feedHasMore: boolean;
   // General
   loading: boolean;
   error: string | null;
@@ -47,6 +53,10 @@ interface SocialState {
   clearFollowState: () => void;
   clearSearch: () => void;
   clearViewedProfile: () => void;
+  // Feed actions
+  fetchFeedPosts: (myKitchenId: string, cursor?: string) => Promise<void>;
+  refreshFeed: (myKitchenId: string) => Promise<void>;
+  clearFeed: () => void;
 }
 
 export const useSocialStore = create<SocialState>((set, get) => ({
@@ -59,6 +69,10 @@ export const useSocialStore = create<SocialState>((set, get) => ({
   followers: [],
   following: [],
   followListLoading: false,
+  feedPosts: [],
+  feedLoading: false,
+  feedCursor: null,
+  feedHasMore: true,
   loading: false,
   error: null,
 
@@ -358,5 +372,76 @@ export const useSocialStore = create<SocialState>((set, get) => ({
 
   clearViewedProfile: () => {
     set({ viewedProfile: null, isFollowing: false, followLoading: false, followers: [], following: [], followListLoading: false });
+  },
+
+  fetchFeedPosts: async (myKitchenId: string, cursor?: string) => {
+    set({ feedLoading: true });
+    try {
+      // Step 1: Get IDs of kitchens I follow
+      const { data: followRows, error: followError } = await supabase
+        .from('follows')
+        .select('following_kitchen_id')
+        .eq('follower_kitchen_id', myKitchenId);
+
+      if (followError) throw followError;
+
+      const followingIds = (followRows ?? []).map(
+        (r: { following_kitchen_id: string }) => r.following_kitchen_id
+      );
+
+      // Also include own kitchen so user sees their own posts
+      followingIds.push(myKitchenId);
+
+      if (followingIds.length === 0) {
+        set({ feedPosts: [], feedLoading: false, feedHasMore: false });
+        return;
+      }
+
+      // Step 2: Query feed_posts from followed kitchens
+      let query = supabase
+        .from('feed_posts')
+        .select('*')
+        .in('kitchen_id', followingIds)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (cursor) {
+        query = query.lt('created_at', cursor);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      const posts = (data ?? []) as FeedPost[];
+
+      if (cursor) {
+        // Append for pagination
+        set((state) => ({
+          feedPosts: [...state.feedPosts, ...posts],
+          feedCursor: posts.length > 0 ? posts[posts.length - 1].created_at : state.feedCursor,
+          feedHasMore: posts.length === 20,
+          feedLoading: false,
+        }));
+      } else {
+        // Replace for initial load / refresh
+        set({
+          feedPosts: posts,
+          feedCursor: posts.length > 0 ? posts[posts.length - 1].created_at : null,
+          feedHasMore: posts.length === 20,
+          feedLoading: false,
+        });
+      }
+    } catch (error: unknown) {
+      set({ feedLoading: false, error: getErrorMessage(error) });
+    }
+  },
+
+  refreshFeed: async (myKitchenId: string) => {
+    await get().fetchFeedPosts(myKitchenId);
+  },
+
+  clearFeed: () => {
+    set({ feedPosts: [], feedCursor: null, feedHasMore: true });
   },
 }));
