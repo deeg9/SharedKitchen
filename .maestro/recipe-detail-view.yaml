@@ -1,4 +1,4 @@
-appId: com.mise.app
+appId: com.sharedkitchen.app
 ---
 # Recipe Detail View Flow
 # Navigates to a recipe detail page and interacts with favorite, cook, and add-to-plan buttons.

@@ -1,4 +1,4 @@
-appId: com.mise.app
+appId: com.sharedkitchen.app
 ---
 - launchApp:
     clearState: true
@@ -11,6 +11,7 @@ appId: com.mise.app
 - inputText: "***REMOVED***"
 - tapOn:
     id: "sign-in-submit-button"
-- assertVisible:
-    text: ".*Plan.*|.*Recipes.*|.*Welcome.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*Plan.*|.*Recipes.*|.*Welcome.*"
     timeout: 10000

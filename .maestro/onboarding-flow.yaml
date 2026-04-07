@@ -1,4 +1,4 @@
-appId: com.mise.app
+appId: com.sharedkitchen.app
 ---
 - launchApp:
     clearState: true
@@ -16,8 +16,9 @@ appId: com.mise.app
 - tapOn:
     id: "sign-up-submit-button"
 # Step 1: Welcome
-- assertVisible:
-    text: ".*Welcome.*SharedKitchen.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*Welcome.*SharedKitchen.*"
     timeout: 10000
 - tapOn:
     id: "onboarding-welcome-continue"
@@ -28,30 +29,35 @@ appId: com.mise.app
 - tapOn:
     id: "onboarding-household-continue"
 # Step 3: Invite Members (skip)
-- assertVisible:
-    text: ".*Invite.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*Invite.*"
     timeout: 5000
 - tapOn:
     id: "onboarding-invite-skip"
 # Step 4: Add Recipes (continue)
-- assertVisible:
-    text: ".*recipe.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*recipe.*"
     timeout: 5000
 - tapOn:
     id: "onboarding-recipes-continue"
 # Step 5: Plan Week (continue)
-- assertVisible:
-    text: ".*Plan.*meals.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*Plan.*meals.*"
     timeout: 5000
 - tapOn:
     id: "onboarding-plan-continue"
 # Step 6: All Set
-- assertVisible:
-    text: ".*all set.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*all set.*"
     timeout: 5000
 - tapOn:
     id: "onboarding-allset-done"
 # Should land on main app
-- assertVisible:
-    text: ".*Plan.*|.*Recipes.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*Plan.*|.*Recipes.*"
     timeout: 5000
