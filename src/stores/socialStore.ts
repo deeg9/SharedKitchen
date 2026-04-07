@@ -5,6 +5,8 @@ import {
   KitchenProfileUpdate,
   KitchenProfileWithRecipeCount,
   FeedPost,
+  PostComment,
+  Recipe,
 } from '../types/database';
 import { getErrorMessage } from '../lib/errors';
 
@@ -28,6 +30,13 @@ interface SocialState {
   feedLoading: boolean;
   feedCursor: string | null;
   feedHasMore: boolean;
+  // Likes
+  likedPostIds: string[];
+  // Comments
+  comments: PostComment[];
+  commentsLoading: boolean;
+  // Blocked
+  blockedKitchenIds: string[];
   // General
   loading: boolean;
   error: string | null;
@@ -57,6 +66,18 @@ interface SocialState {
   fetchFeedPosts: (myKitchenId: string, cursor?: string) => Promise<void>;
   refreshFeed: (myKitchenId: string) => Promise<void>;
   clearFeed: () => void;
+  // Interaction actions
+  checkLikedPosts: (myKitchenId: string, postIds: string[]) => Promise<void>;
+  toggleLike: (postId: string, myKitchenId: string) => Promise<void>;
+  fetchComments: (postId: string) => Promise<void>;
+  addComment: (postId: string, myKitchenId: string, content: string) => Promise<void>;
+  deleteComment: (commentId: string, postId: string) => Promise<void>;
+  clearComments: () => void;
+  saveRecipeFromPost: (post: FeedPost, myKitchenId: string, myHouseholdId: string) => Promise<Recipe | null>;
+  reportContent: (reporterKitchenId: string, contentType: 'post' | 'comment', postId?: string, commentId?: string, reason?: string) => Promise<void>;
+  blockKitchen: (myKitchenId: string, blockedKitchenId: string) => Promise<void>;
+  unblockKitchen: (myKitchenId: string, blockedKitchenId: string) => Promise<void>;
+  fetchBlockedKitchens: (myKitchenId: string) => Promise<void>;
 }
 
 export const useSocialStore = create<SocialState>((set, get) => ({
@@ -73,6 +94,10 @@ export const useSocialStore = create<SocialState>((set, get) => ({
   feedLoading: false,
   feedCursor: null,
   feedHasMore: true,
+  likedPostIds: [],
+  comments: [],
+  commentsLoading: false,
+  blockedKitchenIds: [],
   loading: false,
   error: null,
 
@@ -392,7 +417,11 @@ export const useSocialStore = create<SocialState>((set, get) => ({
       // Also include own kitchen so user sees their own posts
       followingIds.push(myKitchenId);
 
-      if (followingIds.length === 0) {
+      // Filter out blocked kitchens
+      const blockedIds = get().blockedKitchenIds;
+      const filteredIds = followingIds.filter((id: string) => !blockedIds.includes(id));
+
+      if (filteredIds.length === 0) {
         set({ feedPosts: [], feedLoading: false, feedHasMore: false });
         return;
       }
@@ -401,7 +430,7 @@ export const useSocialStore = create<SocialState>((set, get) => ({
       let query = supabase
         .from('feed_posts')
         .select('*')
-        .in('kitchen_id', followingIds)
+        .in('kitchen_id', filteredIds)
         .order('created_at', { ascending: false })
         .limit(20);
 
@@ -413,7 +442,10 @@ export const useSocialStore = create<SocialState>((set, get) => ({
 
       if (error) throw error;
 
-      const posts = (data ?? []) as FeedPost[];
+      // Additionally filter out any posts from blocked kitchens (safety net)
+      const posts = (data ?? []).filter(
+        (p: FeedPost) => !blockedIds.includes(p.kitchen_id)
+      ) as FeedPost[];
 
       if (cursor) {
         // Append for pagination
@@ -432,6 +464,12 @@ export const useSocialStore = create<SocialState>((set, get) => ({
           feedLoading: false,
         });
       }
+
+      // Check which posts current user has liked
+      const postIds = posts.map((p: FeedPost) => p.id);
+      if (postIds.length > 0) {
+        await get().checkLikedPosts(myKitchenId, postIds);
+      }
     } catch (error: unknown) {
       set({ feedLoading: false, error: getErrorMessage(error) });
     }
@@ -443,5 +481,320 @@ export const useSocialStore = create<SocialState>((set, get) => ({
 
   clearFeed: () => {
     set({ feedPosts: [], feedCursor: null, feedHasMore: true });
+  },
+
+  // --- Interaction methods ---
+
+  checkLikedPosts: async (myKitchenId: string, postIds: string[]) => {
+    try {
+      const { data, error } = await supabase
+        .from('post_likes')
+        .select('post_id')
+        .eq('kitchen_id', myKitchenId)
+        .in('post_id', postIds);
+
+      if (error) throw error;
+
+      const likedIds = (data ?? []).map((r: { post_id: string }) => r.post_id);
+      // Merge with existing likedPostIds (for pagination)
+      set((state) => {
+        const existing = new Set(state.likedPostIds);
+        likedIds.forEach((id: string) => existing.add(id));
+        return { likedPostIds: Array.from(existing) };
+      });
+    } catch (error: unknown) {
+      console.warn('[socialStore] checkLikedPosts error:', getErrorMessage(error));
+    }
+  },
+
+  toggleLike: async (postId: string, myKitchenId: string) => {
+    const isLiked = get().likedPostIds.includes(postId);
+    const prevLikedPostIds = [...get().likedPostIds];
+    const prevFeedPosts = [...get().feedPosts];
+
+    if (isLiked) {
+      // Optimistic unlike
+      set((state) => ({
+        likedPostIds: state.likedPostIds.filter((id) => id !== postId),
+        feedPosts: state.feedPosts.map((p) =>
+          p.id === postId ? { ...p, like_count: Math.max(p.like_count - 1, 0) } : p
+        ),
+      }));
+
+      try {
+        const { error } = await supabase
+          .from('post_likes')
+          .delete()
+          .eq('post_id', postId)
+          .eq('kitchen_id', myKitchenId);
+
+        if (error) throw error;
+      } catch (error: unknown) {
+        // Rollback
+        set({ likedPostIds: prevLikedPostIds, feedPosts: prevFeedPosts });
+        console.warn('[socialStore] toggleLike unlike error:', getErrorMessage(error));
+      }
+    } else {
+      // Optimistic like
+      set((state) => ({
+        likedPostIds: [...state.likedPostIds, postId],
+        feedPosts: state.feedPosts.map((p) =>
+          p.id === postId ? { ...p, like_count: p.like_count + 1 } : p
+        ),
+      }));
+
+      try {
+        const { error } = await supabase
+          .from('post_likes')
+          .insert({ post_id: postId, kitchen_id: myKitchenId });
+
+        if (error) throw error;
+      } catch (error: unknown) {
+        // Rollback
+        set({ likedPostIds: prevLikedPostIds, feedPosts: prevFeedPosts });
+        console.warn('[socialStore] toggleLike like error:', getErrorMessage(error));
+      }
+    }
+  },
+
+  fetchComments: async (postId: string) => {
+    set({ commentsLoading: true });
+    try {
+      const { data, error } = await supabase
+        .from('post_comments')
+        .select('*')
+        .eq('post_id', postId)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      set({ comments: (data ?? []) as PostComment[], commentsLoading: false });
+    } catch (error: unknown) {
+      set({ commentsLoading: false, error: getErrorMessage(error) });
+    }
+  },
+
+  addComment: async (postId: string, myKitchenId: string, content: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('post_comments')
+        .insert({ post_id: postId, kitchen_id: myKitchenId, content })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        // Append to comments and optimistically increment comment_count
+        set((state) => ({
+          comments: [...state.comments, data as PostComment],
+          feedPosts: state.feedPosts.map((p) =>
+            p.id === postId ? { ...p, comment_count: p.comment_count + 1 } : p
+          ),
+        }));
+      }
+    } catch (error: unknown) {
+      set({ error: getErrorMessage(error) });
+    }
+  },
+
+  deleteComment: async (commentId: string, postId: string) => {
+    try {
+      const { error } = await supabase
+        .from('post_comments')
+        .delete()
+        .eq('id', commentId);
+
+      if (error) throw error;
+
+      set((state) => ({
+        comments: state.comments.filter((c) => c.id !== commentId),
+        feedPosts: state.feedPosts.map((p) =>
+          p.id === postId ? { ...p, comment_count: Math.max(p.comment_count - 1, 0) } : p
+        ),
+      }));
+    } catch (error: unknown) {
+      set({ error: getErrorMessage(error) });
+    }
+  },
+
+  clearComments: () => {
+    set({ comments: [], commentsLoading: false });
+  },
+
+  saveRecipeFromPost: async (post: FeedPost, myKitchenId: string, myHouseholdId: string) => {
+    try {
+      let recipeData: Recipe | null = null;
+
+      // Step A: Look up the recipe
+      if (post.recipe_id) {
+        const { data, error } = await supabase
+          .from('recipes')
+          .select('*')
+          .eq('id', post.recipe_id)
+          .single();
+
+        if (!error && data) {
+          recipeData = data as Recipe;
+        }
+      }
+
+      // Fallback: look up via meal_plan_id
+      if (!recipeData && post.meal_plan_id) {
+        const { data: mealPlan, error: mpError } = await supabase
+          .from('meal_plans')
+          .select('recipe_id')
+          .eq('id', post.meal_plan_id)
+          .single();
+
+        if (!mpError && mealPlan?.recipe_id) {
+          const { data, error } = await supabase
+            .from('recipes')
+            .select('*')
+            .eq('id', mealPlan.recipe_id)
+            .single();
+
+          if (!error && data) {
+            recipeData = data as Recipe;
+          }
+        }
+      }
+
+      if (!recipeData) {
+        console.warn('[socialStore] saveRecipeFromPost: could not find source recipe');
+        return null;
+      }
+
+      // Step B: Clone the recipe
+      // Get source kitchen display name for badge
+      const { data: sourceKitchen } = await supabase
+        .from('kitchen_profiles')
+        .select('display_name')
+        .eq('id', post.kitchen_id)
+        .single();
+
+      const sourceLabel = sourceKitchen?.display_name ?? 'another kitchen';
+      const savedTag = `Saved from ${sourceLabel}`;
+
+      const { data: newRecipe, error: insertError } = await supabase
+        .from('recipes')
+        .insert({
+          household_id: myHouseholdId,
+          name: recipeData.name,
+          category: recipeData.category,
+          image_url: recipeData.image_url,
+          prep_time_minutes: recipeData.prep_time_minutes,
+          cook_time_minutes: recipeData.cook_time_minutes,
+          servings: recipeData.servings,
+          estimated_cost: recipeData.estimated_cost,
+          ingredients: recipeData.ingredients,
+          instructions: recipeData.instructions,
+          tags: [...(recipeData.tags || []), savedTag],
+          source_url: recipeData.source_url,
+          nutrition_info: recipeData.nutrition_info,
+          source_image_url: recipeData.source_image_url,
+        })
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+
+      if (!newRecipe) return null;
+
+      // Step C: Record in saved_recipes
+      await supabase
+        .from('saved_recipes')
+        .insert({
+          kitchen_id: myKitchenId,
+          source_kitchen_id: post.kitchen_id,
+          recipe_id: (newRecipe as Recipe).id,
+          feed_post_id: post.id,
+        });
+
+      return newRecipe as Recipe;
+    } catch (error: unknown) {
+      console.warn('[socialStore] saveRecipeFromPost error:', getErrorMessage(error));
+      return null;
+    }
+  },
+
+  reportContent: async (
+    reporterKitchenId: string,
+    contentType: 'post' | 'comment',
+    postId?: string,
+    commentId?: string,
+    reason?: string
+  ) => {
+    try {
+      const { error } = await supabase
+        .from('reported_content')
+        .insert({
+          reporter_kitchen_id: reporterKitchenId,
+          content_type: contentType,
+          post_id: postId ?? null,
+          comment_id: commentId ?? null,
+          reason: reason ?? null,
+        });
+
+      if (error) {
+        console.warn('[socialStore] reportContent error:', error.message);
+      }
+    } catch (err) {
+      console.warn('[socialStore] reportContent exception:', err);
+    }
+  },
+
+  blockKitchen: async (myKitchenId: string, blockedKitchenId: string) => {
+    try {
+      const { error } = await supabase
+        .from('blocked_kitchens')
+        .insert({ blocker_kitchen_id: myKitchenId, blocked_kitchen_id: blockedKitchenId });
+
+      if (error) throw error;
+
+      // Add to local blocked list
+      set((state) => ({
+        blockedKitchenIds: [...state.blockedKitchenIds, blockedKitchenId],
+      }));
+
+      // Refresh feed to filter out blocked kitchen's posts
+      await get().refreshFeed(myKitchenId);
+    } catch (error: unknown) {
+      set({ error: getErrorMessage(error) });
+    }
+  },
+
+  unblockKitchen: async (myKitchenId: string, blockedKitchenId: string) => {
+    try {
+      const { error } = await supabase
+        .from('blocked_kitchens')
+        .delete()
+        .eq('blocker_kitchen_id', myKitchenId)
+        .eq('blocked_kitchen_id', blockedKitchenId);
+
+      if (error) throw error;
+
+      set((state) => ({
+        blockedKitchenIds: state.blockedKitchenIds.filter((id) => id !== blockedKitchenId),
+      }));
+    } catch (error: unknown) {
+      set({ error: getErrorMessage(error) });
+    }
+  },
+
+  fetchBlockedKitchens: async (myKitchenId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('blocked_kitchens')
+        .select('blocked_kitchen_id')
+        .eq('blocker_kitchen_id', myKitchenId);
+
+      if (error) throw error;
+
+      const blockedIds = (data ?? []).map((r: { blocked_kitchen_id: string }) => r.blocked_kitchen_id);
+      set({ blockedKitchenIds: blockedIds });
+    } catch (error: unknown) {
+      console.warn('[socialStore] fetchBlockedKitchens error:', getErrorMessage(error));
+    }
   },
 }));

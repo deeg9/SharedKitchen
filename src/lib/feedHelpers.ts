@@ -10,6 +10,7 @@ export async function createFeedPost(params: {
   mealPlanId: string;
   recipeName: string;
   recipeImageUrl: string | null;
+  recipeId: string | null;
   mealDate: string;
   mealType: string;
 }): Promise<FeedPost | null> {
@@ -17,6 +18,7 @@ export async function createFeedPost(params: {
     const insert: FeedPostInsert = {
       kitchen_id: params.kitchenId,
       meal_plan_id: params.mealPlanId,
+      recipe_id: params.recipeId,
       recipe_name: params.recipeName,
       recipe_image_url: params.recipeImageUrl,
       meal_date: params.mealDate,

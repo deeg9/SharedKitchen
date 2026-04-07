@@ -172,6 +172,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
               mealPlanId: data.id,
               recipeName: data.recipes.name,
               recipeImageUrl: data.recipes.image_url ?? null,
+              recipeId: recipeId ?? null,
               mealDate: date,
               mealType,
             });
