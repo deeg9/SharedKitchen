@@ -20,6 +20,7 @@ interface FeedCardProps {
   onSavePress: () => void;
   onLongPress?: () => void;
   onPhotoAttach?: () => void;
+  onCookThisToo?: () => void;
 }
 
 function getInitials(name: string): string {
@@ -68,6 +69,7 @@ export function FeedCard({
   onSavePress,
   onLongPress,
   onPhotoAttach,
+  onCookThisToo,
 }: FeedCardProps) {
   const displayName = kitchenProfile?.display_name ?? 'Kitchen';
   const avatarUrl = kitchenProfile?.avatar_url ?? null;
@@ -193,6 +195,14 @@ export function FeedCard({
             </Pressable>
           </View>
 
+          {/* Cook This Too button for non-own posts */}
+          {!isOwnPost && onCookThisToo && (
+            <Pressable onPress={onCookThisToo} style={s.cookThisTooBtn} hitSlop={8}>
+              <MaterialCommunityIcons name="pot-steam-outline" size={18} color={colors.primary} />
+              <Text style={s.cookThisTooText}>Cook This Too</Text>
+            </Pressable>
+          )}
+
           {/* Camera button for own posts without photo */}
           {isOwnPost && !post.photo_url && onPhotoAttach && (
             <Pressable onPress={onPhotoAttach} hitSlop={8}>
@@ -299,5 +309,14 @@ const s = StyleSheet.create({
   actionCount: {
     ...typography.bodySm,
     color: colors.onSurfaceVariant,
+  },
+  cookThisTooBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  cookThisTooText: {
+    ...typography.labelSm,
+    color: colors.primary,
   },
 });

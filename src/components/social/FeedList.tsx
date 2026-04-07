@@ -1,15 +1,17 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { View, FlatList, RefreshControl, ActivityIndicator, Alert, StyleSheet } from 'react-native';
+import { View, FlatList, RefreshControl, ActivityIndicator, Alert, ActionSheetIOS, Platform, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSocialStore } from '../../stores/socialStore';
 import { useHouseholdStore } from '../../stores/householdStore';
+import { usePlanStore } from '../../stores/planStore';
 import { supabase } from '../../lib/supabase';
 import { uploadMealPhoto } from '../../lib/feedHelpers';
 import { FeedCard } from './FeedCard';
 import { CommentSheet } from './CommentSheet';
+import { MealSlotPickerSheet } from '../meal-logging/MealSlotPickerSheet';
 import { EmptyState } from '../ui/EmptyState';
 import { CameraSheet } from '../camera/CameraSheet';
-import { FeedPost } from '../../types/database';
+import { FeedPost, MealType } from '../../types/database';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
 import { TAB_BAR_HEIGHT } from '../../lib/constants';
@@ -33,6 +35,8 @@ export function FeedList({ myKitchenId }: FeedListProps) {
     saveRecipeFromPost,
     likedPostIds,
     fetchBlockedKitchens,
+    reportContent,
+    blockKitchen,
   } = useSocialStore();
 
   const { activeHouseholdId } = useHouseholdStore();
@@ -43,6 +47,8 @@ export function FeedList({ myKitchenId }: FeedListProps) {
   const [activePostId, setActivePostId] = useState<string | null>(null);
   const [commentSheetOpen, setCommentSheetOpen] = useState(false);
   const [activeCommentPostId, setActiveCommentPostId] = useState<string | null>(null);
+  const [slotPickerOpen, setSlotPickerOpen] = useState(false);
+  const [cookThisPost, setCookThisPost] = useState<FeedPost | null>(null);
   const profilesFetched = useRef(false);
 
   // Load initial feed and blocked kitchens on mount
@@ -119,6 +125,74 @@ export function FeedList({ myKitchenId }: FeedListProps) {
 
   const householdId = activeHouseholdId ?? '';
 
+  // Long-press action sheet for report/block
+  const handleLongPress = useCallback((post: FeedPost) => {
+    if (post.kitchen_id === myKitchenId) return; // Don't report/block own posts
+
+    const options = ['Report Post', 'Block Kitchen', 'Cancel'];
+    const cancelIndex = 2;
+
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        { options, cancelButtonIndex: cancelIndex, destructiveButtonIndex: 1 },
+        (index) => {
+          if (index === 0) {
+            reportContent(myKitchenId, 'post', post.id);
+            Alert.alert('Reported', 'Thank you for reporting. We will review this content.');
+          } else if (index === 1) {
+            Alert.alert(
+              'Block Kitchen',
+              'You will no longer see posts from this kitchen. You can unblock from settings.',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Block',
+                  style: 'destructive',
+                  onPress: () => blockKitchen(myKitchenId, post.kitchen_id),
+                },
+              ]
+            );
+          }
+        }
+      );
+    } else {
+      // Android fallback with Alert
+      Alert.alert('Options', undefined, [
+        { text: 'Report Post', onPress: () => {
+          reportContent(myKitchenId, 'post', post.id);
+          Alert.alert('Reported', 'Thank you for reporting.');
+        }},
+        { text: 'Block Kitchen', style: 'destructive', onPress: () => {
+          blockKitchen(myKitchenId, post.kitchen_id);
+        }},
+        { text: 'Cancel', style: 'cancel' },
+      ]);
+    }
+  }, [myKitchenId, reportContent, blockKitchen]);
+
+  // Cook This Too handlers
+  const handleCookThisToo = useCallback((post: FeedPost) => {
+    setCookThisPost(post);
+    setSlotPickerOpen(true);
+  }, []);
+
+  const handleSlotSelect = useCallback(async (date: string, mealType: MealType) => {
+    setSlotPickerOpen(false);
+    if (!cookThisPost) return;
+
+    // Step 1: Save recipe to library
+    const savedRecipe = await saveRecipeFromPost(cookThisPost, myKitchenId, householdId);
+    if (!savedRecipe) {
+      Alert.alert('Error', 'Could not save recipe.');
+      return;
+    }
+
+    // Step 2: Assign to meal plan
+    await usePlanStore.getState().assignRecipe(householdId, date, mealType, savedRecipe.id);
+    Alert.alert('Added!', `"${cookThisPost.recipe_name}" saved and added to your plan.`);
+    setCookThisPost(null);
+  }, [cookThisPost, myKitchenId, householdId, saveRecipeFromPost]);
+
   const renderItem = useCallback(
     ({ item }: { item: FeedPost }) => (
       <FeedCard
@@ -143,10 +217,12 @@ export function FeedList({ myKitchenId }: FeedListProps) {
             Alert.alert('Error', 'Could not save recipe. It may not be available.');
           }
         }}
+        onLongPress={() => handleLongPress(item)}
+        onCookThisToo={item.kitchen_id !== myKitchenId ? () => handleCookThisToo(item) : undefined}
         onPhotoAttach={() => handlePhotoAttach(item.id)}
       />
     ),
-    [kitchenProfiles, myKitchenId, router, handlePhotoAttach, likedPostIds, toggleLike, saveRecipeFromPost, householdId]
+    [kitchenProfiles, myKitchenId, router, handlePhotoAttach, likedPostIds, toggleLike, saveRecipeFromPost, householdId, handleLongPress, handleCookThisToo]
   );
 
   const keyExtractor = useCallback((item: FeedPost) => item.id, []);
@@ -223,6 +299,17 @@ export function FeedList({ myKitchenId }: FeedListProps) {
         postId={activeCommentPostId ?? ''}
         myKitchenId={myKitchenId}
         kitchenProfiles={kitchenProfiles}
+      />
+
+      {/* Meal slot picker for Cook This Too */}
+      <MealSlotPickerSheet
+        isOpen={slotPickerOpen}
+        dishName={cookThisPost?.recipe_name ?? ''}
+        onClose={() => {
+          setSlotPickerOpen(false);
+          setCookThisPost(null);
+        }}
+        onSelect={handleSlotSelect}
       />
     </View>
   );
