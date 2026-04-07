@@ -475,6 +475,203 @@ export interface Database {
           source_grocery_item_id?: string | null;
         };
       };
+      kitchen_profiles: {
+        Row: {
+          id: string;
+          household_id: string;
+          display_name: string;
+          bio: string | null;
+          avatar_url: string | null;
+          invite_code: string;
+          is_public: boolean;
+          is_searchable: boolean;
+          follower_count: number;
+          following_count: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          household_id: string;
+          display_name: string;
+          bio?: string | null;
+          avatar_url?: string | null;
+          invite_code?: string;
+          is_public?: boolean;
+          is_searchable?: boolean;
+          follower_count?: number;
+          following_count?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          household_id?: string;
+          display_name?: string;
+          bio?: string | null;
+          avatar_url?: string | null;
+          invite_code?: string;
+          is_public?: boolean;
+          is_searchable?: boolean;
+          follower_count?: number;
+          following_count?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      follows: {
+        Row: {
+          id: string;
+          follower_kitchen_id: string;
+          following_kitchen_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          follower_kitchen_id: string;
+          following_kitchen_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          follower_kitchen_id?: string;
+          following_kitchen_id?: string;
+          created_at?: string;
+        };
+      };
+      feed_posts: {
+        Row: {
+          id: string;
+          kitchen_id: string;
+          meal_plan_id: string | null;
+          recipe_name: string;
+          recipe_image_url: string | null;
+          meal_date: string;
+          meal_type: string;
+          caption: string | null;
+          photo_url: string | null;
+          like_count: number;
+          comment_count: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          kitchen_id: string;
+          meal_plan_id?: string | null;
+          recipe_name: string;
+          recipe_image_url?: string | null;
+          meal_date: string;
+          meal_type: string;
+          caption?: string | null;
+          photo_url?: string | null;
+          like_count?: number;
+          comment_count?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          kitchen_id?: string;
+          meal_plan_id?: string | null;
+          recipe_name?: string;
+          recipe_image_url?: string | null;
+          meal_date?: string;
+          meal_type?: string;
+          caption?: string | null;
+          photo_url?: string | null;
+          like_count?: number;
+          comment_count?: number;
+          created_at?: string;
+        };
+      };
+      post_likes: {
+        Row: {
+          id: string;
+          post_id: string;
+          kitchen_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          post_id: string;
+          kitchen_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          post_id?: string;
+          kitchen_id?: string;
+          created_at?: string;
+        };
+      };
+      post_comments: {
+        Row: {
+          id: string;
+          post_id: string;
+          kitchen_id: string;
+          content: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          post_id: string;
+          kitchen_id: string;
+          content: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          post_id?: string;
+          kitchen_id?: string;
+          content?: string;
+          created_at?: string;
+        };
+      };
+      saved_recipes: {
+        Row: {
+          id: string;
+          kitchen_id: string;
+          source_kitchen_id: string | null;
+          recipe_id: string;
+          feed_post_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          kitchen_id: string;
+          source_kitchen_id?: string | null;
+          recipe_id: string;
+          feed_post_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          kitchen_id?: string;
+          source_kitchen_id?: string | null;
+          recipe_id?: string;
+          feed_post_id?: string | null;
+          created_at?: string;
+        };
+      };
+      blocked_kitchens: {
+        Row: {
+          id: string;
+          blocker_kitchen_id: string;
+          blocked_kitchen_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          blocker_kitchen_id: string;
+          blocked_kitchen_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          blocker_kitchen_id?: string;
+          blocked_kitchen_id?: string;
+          created_at?: string;
+        };
+      };
     };
     Views: {
       [_ in never]: never;
@@ -519,6 +716,22 @@ export type LeftoverUpdate = Database['public']['Tables']['leftovers']['Update']
 export type PantryItem = Database['public']['Tables']['pantry_items']['Row'];
 export type PantryItemInsert = Database['public']['Tables']['pantry_items']['Insert'];
 export type PantryItemUpdate = Database['public']['Tables']['pantry_items']['Update'];
+
+export type KitchenProfile = Database['public']['Tables']['kitchen_profiles']['Row'];
+export type KitchenProfileInsert = Database['public']['Tables']['kitchen_profiles']['Insert'];
+export type KitchenProfileUpdate = Database['public']['Tables']['kitchen_profiles']['Update'];
+export type Follow = Database['public']['Tables']['follows']['Row'];
+export type FeedPost = Database['public']['Tables']['feed_posts']['Row'];
+export type FeedPostInsert = Database['public']['Tables']['feed_posts']['Insert'];
+export type PostLike = Database['public']['Tables']['post_likes']['Row'];
+export type PostComment = Database['public']['Tables']['post_comments']['Row'];
+export type PostCommentInsert = Database['public']['Tables']['post_comments']['Insert'];
+export type SavedRecipe = Database['public']['Tables']['saved_recipes']['Row'];
+export type BlockedKitchen = Database['public']['Tables']['blocked_kitchens']['Row'];
+
+export interface KitchenProfileWithRecipeCount extends KitchenProfile {
+  recipe_count: number;
+}
 
 /** A frequently-added grocery item derived from past lists */
 export interface FrequentItem {
