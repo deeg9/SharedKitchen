@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: Social Feed
 status: verifying
-stopped_at: Completed 32-02-PLAN.md
-last_updated: "2026-04-07T19:35:22.530Z"
+stopped_at: Completed 33-01-PLAN.md
+last_updated: "2026-04-07T20:29:43.000Z"
 last_activity: 2026-04-07
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 7
-  completed_plans: 7
-  percent: 100
+  total_plans: 10
+  completed_plans: 8
+  percent: 80
 ---
 
 # Project State
@@ -53,6 +53,8 @@ Recent decisions affecting current work:
 - [Phase 32]: Feed includes own kitchen posts alongside followed kitchens
 - [Phase 32-02]: Kitchen profiles batch-fetched into local Map for feed card rendering
 - [Phase 32-02]: Recipe detail navigation deferred to Phase 33 (meal_plan_id != recipe_id)
+- [Phase 33]: toggleLike uses optimistic UI with rollback matching follow/unfollow pattern
+- [Phase 33]: Blocked kitchen filtering at query level plus post-query safety net
 
 ### Pending Todos
 
@@ -72,6 +74,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-07T19:35:22.527Z
-Stopped at: Completed 32-02-PLAN.md
+Last session: 2026-04-07T20:29:42.998Z
+Stopped at: Completed 33-01-PLAN.md
 Resume file: None

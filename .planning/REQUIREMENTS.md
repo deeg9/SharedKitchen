@@ -29,10 +29,10 @@ Requirements for Social Feed milestone. Each maps to roadmap phases.
 
 ### Interactions
 
-- [ ] **INTR-01**: User can like (heart) a feed item with optimistic UI and like count
-- [ ] **INTR-02**: User can comment on a feed item (flat comments, no threading)
-- [ ] **INTR-03**: User can save a recipe from the feed to their own library (with "Saved from Kitchen X" provenance)
-- [ ] **INTR-04**: User can "Cook This Too" — save recipe + add to own meal plan in one tap via day/slot picker
+- [x] **INTR-01**: User can like (heart) a feed item with optimistic UI and like count
+- [x] **INTR-02**: User can comment on a feed item (flat comments, no threading)
+- [x] **INTR-03**: User can save a recipe from the feed to their own library (with "Saved from Kitchen X" provenance)
+- [x] **INTR-04**: User can "Cook This Too" — save recipe + add to own meal plan in one tap via day/slot picker
 
 ### Notifications
 
@@ -42,8 +42,8 @@ Requirements for Social Feed milestone. Each maps to roadmap phases.
 
 ### Moderation
 
-- [ ] **MODR-01**: User can report a feed item or comment for inappropriate content
-- [ ] **MODR-02**: User can block a kitchen (hides all their content from feed)
+- [x] **MODR-01**: User can report a feed item or comment for inappropriate content
+- [x] **MODR-02**: User can block a kitchen (hides all their content from feed)
 
 ## Future Requirements
 
@@ -93,15 +93,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FEED-03 | Phase 32 | Complete |
 | FEED-04 | Phase 32 | Complete |
 | FEED-05 | Phase 32 | Complete |
-| INTR-01 | Phase 33 | Pending |
-| INTR-02 | Phase 33 | Pending |
-| INTR-03 | Phase 33 | Pending |
-| INTR-04 | Phase 33 | Pending |
+| INTR-01 | Phase 33 | Complete |
+| INTR-02 | Phase 33 | Complete |
+| INTR-03 | Phase 33 | Complete |
+| INTR-04 | Phase 33 | Complete |
 | NOTF-01 | Phase 34 | Pending |
 | NOTF-02 | Phase 34 | Pending |
 | NOTF-03 | Phase 34 | Pending |
-| MODR-01 | Phase 33 | Pending |
-| MODR-02 | Phase 33 | Pending |
+| MODR-01 | Phase 33 | Complete |
+| MODR-02 | Phase 33 | Complete |
 
 **Coverage:**
 - v5.0 requirements: 20 total
