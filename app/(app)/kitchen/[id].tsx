@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, ScrollView, Pressable, Share, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -25,12 +25,19 @@ export default function KitchenProfileScreen() {
     getOrCreateKitchenProfile,
     myKitchenProfile,
     clearViewedProfile,
+    isFollowing,
+    followLoading,
+    checkIsFollowing,
+    followKitchen,
+    unfollowKitchen,
   } = useSocialStore();
 
   const activeHousehold = useHouseholdStore((s) => s.activeHousehold());
   const activeHouseholdId = useHouseholdStore((s) => s.activeHouseholdId);
 
   const [copied, setCopied] = useState(false);
+
+  const [unfollowToast, setUnfollowToast] = useState<string | null>(null);
 
   useEffect(() => {
     if (id === 'me') {
@@ -45,12 +52,39 @@ export default function KitchenProfileScreen() {
         );
       }
     } else if (id) {
-      fetchKitchenProfile(id);
+      fetchKitchenProfile(id).then(() => {
+        // Check follow status for non-own profiles
+        const store = useSocialStore.getState();
+        const viewed = store.viewedProfile;
+        if (viewed && activeHouseholdId && viewed.household_id !== activeHouseholdId) {
+          const myProfile = store.myKitchenProfile;
+          if (myProfile) {
+            checkIsFollowing(myProfile.id, id);
+          } else if (activeHouseholdId && activeHousehold?.name) {
+            getOrCreateKitchenProfile(activeHouseholdId, activeHousehold.name).then(
+              (profile) => {
+                if (profile) checkIsFollowing(profile.id, id);
+              }
+            );
+          }
+        }
+      });
     }
     return () => {
       clearViewedProfile();
     };
   }, [id, activeHouseholdId]);
+
+  const handleFollowToggle = useCallback(() => {
+    if (!myKitchenProfile || !viewedProfile) return;
+    if (isFollowing) {
+      unfollowKitchen(myKitchenProfile.id, viewedProfile.id);
+      setUnfollowToast(`Unfollowed ${viewedProfile.display_name}`);
+      setTimeout(() => setUnfollowToast(null), 2500);
+    } else {
+      followKitchen(myKitchenProfile.id, viewedProfile.id);
+    }
+  }, [myKitchenProfile, viewedProfile, isFollowing, followKitchen, unfollowKitchen]);
 
   const isOwnProfile =
     viewedProfile != null &&
@@ -149,6 +183,15 @@ export default function KitchenProfileScreen() {
           onEditProfile={() => {
             // Edit profile sheet will be wired in a later phase
           }}
+          isFollowing={isFollowing}
+          followLoading={followLoading}
+          onFollowToggle={handleFollowToggle}
+          onFollowersPress={() => {
+            // Follower list navigation wired in Plan 02
+          }}
+          onFollowingPress={() => {
+            // Following list navigation wired in Plan 02
+          }}
         />
 
         {/* Invite sharing section -- only on own profile */}
@@ -203,6 +246,15 @@ export default function KitchenProfileScreen() {
           </View>
         )}
       </ScrollView>
+
+      {/* Unfollow toast */}
+      {unfollowToast ? (
+        <View style={s.toastContainer}>
+          <View style={s.toast}>
+            <Text style={s.toastText}>{unfollowToast}</Text>
+          </View>
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -349,5 +401,24 @@ const s = StyleSheet.create({
     ...typography.bodySm,
     color: colors.onSurfaceVariant,
     textAlign: 'center',
+  },
+
+  // Toast
+  toastContainer: {
+    position: 'absolute',
+    bottom: 100,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  toast: {
+    backgroundColor: colors.inverseSurface,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm + 2,
+    borderRadius: borderRadius.full,
+  },
+  toastText: {
+    ...typography.labelLg,
+    color: colors.inverseOnSurface,
   },
 });

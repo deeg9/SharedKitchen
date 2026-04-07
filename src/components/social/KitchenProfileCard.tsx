@@ -10,6 +10,11 @@ interface KitchenProfileCardProps {
   profile: KitchenProfileWithRecipeCount;
   isOwnProfile: boolean;
   onEditProfile?: () => void;
+  isFollowing?: boolean;
+  followLoading?: boolean;
+  onFollowToggle?: () => void;
+  onFollowersPress?: () => void;
+  onFollowingPress?: () => void;
 }
 
 function getInitials(name: string): string {
@@ -20,6 +25,11 @@ export function KitchenProfileCard({
   profile,
   isOwnProfile,
   onEditProfile,
+  isFollowing,
+  followLoading,
+  onFollowToggle,
+  onFollowersPress,
+  onFollowingPress,
 }: KitchenProfileCardProps) {
   return (
     <View style={s.container}>
@@ -63,19 +73,37 @@ export function KitchenProfileCard({
           <Text style={s.statLabel}>Recipes</Text>
         </View>
         <View style={s.statDivider} />
-        <View style={s.statItem}>
-          <Text style={s.statValue} testID="kitchen-profile-follower-count">
-            {profile.follower_count}
-          </Text>
-          <Text style={s.statLabel}>Followers</Text>
-        </View>
+        {onFollowersPress ? (
+          <Pressable style={s.statItem} onPress={onFollowersPress} testID="kitchen-profile-followers-tap">
+            <Text style={s.statValue} testID="kitchen-profile-follower-count">
+              {profile.follower_count}
+            </Text>
+            <Text style={s.statLabel}>Followers</Text>
+          </Pressable>
+        ) : (
+          <View style={s.statItem}>
+            <Text style={s.statValue} testID="kitchen-profile-follower-count">
+              {profile.follower_count}
+            </Text>
+            <Text style={s.statLabel}>Followers</Text>
+          </View>
+        )}
         <View style={s.statDivider} />
-        <View style={s.statItem}>
-          <Text style={s.statValue} testID="kitchen-profile-following-count">
-            {profile.following_count}
-          </Text>
-          <Text style={s.statLabel}>Following</Text>
-        </View>
+        {onFollowingPress ? (
+          <Pressable style={s.statItem} onPress={onFollowingPress} testID="kitchen-profile-following-tap">
+            <Text style={s.statValue} testID="kitchen-profile-following-count">
+              {profile.following_count}
+            </Text>
+            <Text style={s.statLabel}>Following</Text>
+          </Pressable>
+        ) : (
+          <View style={s.statItem}>
+            <Text style={s.statValue} testID="kitchen-profile-following-count">
+              {profile.following_count}
+            </Text>
+            <Text style={s.statLabel}>Following</Text>
+          </View>
+        )}
       </View>
 
       {/* Action Button */}
@@ -88,9 +116,19 @@ export function KitchenProfileCard({
           <Text style={s.editButtonText}>Edit Profile</Text>
         </Pressable>
       ) : (
-        <View style={s.followButtonDisabled}>
-          <Text style={s.followButtonDisabledText}>Follow</Text>
-        </View>
+        <Pressable
+          style={[
+            isFollowing ? s.followingButton : s.followButton,
+            followLoading && { opacity: 0.5 },
+          ]}
+          onPress={onFollowToggle}
+          disabled={followLoading}
+          testID="kitchen-profile-follow-button"
+        >
+          <Text style={isFollowing ? s.followingButtonText : s.followButtonText}>
+            {isFollowing ? 'Following' : 'Follow'}
+          </Text>
+        </Pressable>
       )}
     </View>
   );
@@ -192,17 +230,30 @@ const s = StyleSheet.create({
     fontWeight: '600',
     color: colors.primary,
   },
-  followButtonDisabled: {
+  followButton: {
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.sm + 2,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.outlineVariant,
-    opacity: 0.6,
+    backgroundColor: colors.primary,
   },
-  followButtonDisabledText: {
+  followButtonText: {
     fontFamily: fontFamily.bodySemiBold,
     fontSize: 14,
     fontWeight: '600',
-    color: colors.onSurface,
+    color: colors.onPrimary,
+  },
+  followingButton: {
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.sm + 2,
+    borderRadius: borderRadius.full,
+    borderWidth: 1,
+    borderColor: colors.secondary,
+    backgroundColor: colors.surface,
+  },
+  followingButtonText: {
+    fontFamily: fontFamily.bodySemiBold,
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.secondary,
   },
 });
