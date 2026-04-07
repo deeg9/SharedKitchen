@@ -131,11 +131,10 @@ Plans:
   1. User can follow and unfollow another kitchen from their profile screen
   2. User can view their own following list and followers list
   3. Follow/unfollow updates the follower and following counts on both kitchen profiles immediately
-**Plans**: 3 plans
+**Plans**: 2 plans
 Plans:
-- [x] 30-01-PLAN.md — Social database migration (all tables, RLS, triggers) + TypeScript types
-- [x] 30-02-PLAN.md — socialStore + kitchen profile modal screen
-- [ ] 30-03-PLAN.md — Kitchen search on Plan tab + invite link sharing
+- [ ] 31-01-PLAN.md — Follow/unfollow actions with optimistic UI + Follow button wiring
+- [ ] 31-02-PLAN.md — Followers/following list screen with segmented control
 **UI hint**: yes
 
 ### Phase 32: Feed & Auto-Post
@@ -223,7 +222,7 @@ Plans:
 | 28. Food Photo to Recipe Discovery | v4.0 | 2/2 | Complete | 2026-03-30 |
 | 29. Food Photo to Meal Logging | v4.0 | 2/2 | Complete | 2026-03-30 |
 | 30. Social Database & Kitchen Profiles | v5.0 | 3/3 | Complete   | 2026-04-07 |
-| 31. Follow System | v5.0 | 0/0 | Not started | - |
+| 31. Follow System | v5.0 | 0/2 | Planned | - |
 | 32. Feed & Auto-Post | v5.0 | 0/0 | Not started | - |
 | 33. Social Interactions & Moderation | v5.0 | 0/0 | Not started | - |
 | 34. Social Push Notifications | v5.0 | 0/0 | Not started | - |
