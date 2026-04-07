@@ -15,6 +15,9 @@ interface SocialState {
   // Search
   searchResults: KitchenProfile[];
   searchLoading: boolean;
+  // Follow state
+  isFollowing: boolean;
+  followLoading: boolean;
   // General
   loading: boolean;
   error: string | null;
@@ -31,6 +34,10 @@ interface SocialState {
     updates: KitchenProfileUpdate
   ) => Promise<void>;
   searchKitchens: (query: string) => Promise<void>;
+  checkIsFollowing: (myKitchenId: string, targetKitchenId: string) => Promise<void>;
+  followKitchen: (myKitchenId: string, targetKitchenId: string) => Promise<void>;
+  unfollowKitchen: (myKitchenId: string, targetKitchenId: string) => Promise<void>;
+  clearFollowState: () => void;
   clearSearch: () => void;
   clearViewedProfile: () => void;
 }
@@ -40,6 +47,8 @@ export const useSocialStore = create<SocialState>((set, get) => ({
   myKitchenProfile: null,
   searchResults: [],
   searchLoading: false,
+  isFollowing: false,
+  followLoading: false,
   loading: false,
   error: null,
 
@@ -185,7 +194,93 @@ export const useSocialStore = create<SocialState>((set, get) => ({
     set({ searchResults: [], searchLoading: false });
   },
 
+  checkIsFollowing: async (myKitchenId: string, targetKitchenId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('follows')
+        .select('id')
+        .eq('follower_kitchen_id', myKitchenId)
+        .eq('following_kitchen_id', targetKitchenId)
+        .maybeSingle();
+
+      if (error) throw error;
+      set({ isFollowing: !!data });
+    } catch (error: unknown) {
+      set({ error: getErrorMessage(error) });
+    }
+  },
+
+  followKitchen: async (myKitchenId: string, targetKitchenId: string) => {
+    if (get().followLoading) return;
+    set({ followLoading: true });
+
+    // Optimistic: set following state and increment counter
+    set((state) => ({
+      isFollowing: true,
+      viewedProfile: state.viewedProfile
+        ? { ...state.viewedProfile, follower_count: state.viewedProfile.follower_count + 1 }
+        : state.viewedProfile,
+    }));
+
+    try {
+      const { error } = await supabase
+        .from('follows')
+        .insert({ follower_kitchen_id: myKitchenId, following_kitchen_id: targetKitchenId });
+
+      if (error) throw error;
+      set({ followLoading: false });
+    } catch (error: unknown) {
+      // Rollback optimistic update
+      set((state) => ({
+        isFollowing: false,
+        followLoading: false,
+        error: getErrorMessage(error),
+        viewedProfile: state.viewedProfile
+          ? { ...state.viewedProfile, follower_count: Math.max(state.viewedProfile.follower_count - 1, 0) }
+          : state.viewedProfile,
+      }));
+    }
+  },
+
+  unfollowKitchen: async (myKitchenId: string, targetKitchenId: string) => {
+    if (get().followLoading) return;
+    set({ followLoading: true });
+
+    // Optimistic: unset following state and decrement counter
+    set((state) => ({
+      isFollowing: false,
+      viewedProfile: state.viewedProfile
+        ? { ...state.viewedProfile, follower_count: Math.max(state.viewedProfile.follower_count - 1, 0) }
+        : state.viewedProfile,
+    }));
+
+    try {
+      const { error } = await supabase
+        .from('follows')
+        .delete()
+        .eq('follower_kitchen_id', myKitchenId)
+        .eq('following_kitchen_id', targetKitchenId);
+
+      if (error) throw error;
+      set({ followLoading: false });
+    } catch (error: unknown) {
+      // Rollback optimistic update
+      set((state) => ({
+        isFollowing: true,
+        followLoading: false,
+        error: getErrorMessage(error),
+        viewedProfile: state.viewedProfile
+          ? { ...state.viewedProfile, follower_count: state.viewedProfile.follower_count + 1 }
+          : state.viewedProfile,
+      }));
+    }
+  },
+
+  clearFollowState: () => {
+    set({ isFollowing: false, followLoading: false });
+  },
+
   clearViewedProfile: () => {
-    set({ viewedProfile: null });
+    set({ viewedProfile: null, isFollowing: false, followLoading: false });
   },
 }));
