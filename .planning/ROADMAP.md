@@ -149,7 +149,7 @@ Plans:
   5. Feed loads more items seamlessly as user scrolls (cursor-based infinite scroll)
 **Plans**: 2 plans
 Plans:
-- [ ] 32-01-PLAN.md — Auto-post mechanism, meal photo upload, feed store methods
+- [x] 32-01-PLAN.md — Auto-post mechanism, meal photo upload, feed store methods
 - [ ] 32-02-PLAN.md — Feed UI on Plan tab with segmented control, feed cards, infinite scroll
 **UI hint**: yes
 
@@ -222,7 +222,7 @@ Plans:
 | 29. Food Photo to Meal Logging | v4.0 | 2/2 | Complete | 2026-03-30 |
 | 30. Social Database & Kitchen Profiles | v5.0 | 3/3 | Complete   | 2026-04-07 |
 | 31. Follow System | v5.0 | 2/2 | Complete   | 2026-04-07 |
-| 32. Feed & Auto-Post | v5.0 | 0/2 | Not started | - |
+| 32. Feed & Auto-Post | v5.0 | 1/2 | In Progress|  |
 | 33. Social Interactions & Moderation | v5.0 | 0/0 | Not started | - |
 | 34. Social Push Notifications | v5.0 | 0/0 | Not started | - |
 

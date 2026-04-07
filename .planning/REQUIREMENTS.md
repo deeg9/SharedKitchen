@@ -21,10 +21,10 @@ Requirements for Social Feed milestone. Each maps to roadmap phases.
 
 ### Feed
 
-- [ ] **FEED-01**: Meals added to plan auto-post to followers' feed (zero-friction content creation)
+- [x] **FEED-01**: Meals added to plan auto-post to followers' feed (zero-friction content creation)
 - [ ] **FEED-02**: User can scroll a chronological feed of meals from followed kitchens on the Plan tab
 - [ ] **FEED-03**: Feed cards show kitchen avatar + name, meal name, day/slot context, recipe photo, timestamp
-- [ ] **FEED-04**: User can attach meal photos to feed posts (leveraging v4.0 camera infrastructure)
+- [x] **FEED-04**: User can attach meal photos to feed posts (leveraging v4.0 camera infrastructure)
 - [ ] **FEED-05**: Feed supports infinite scroll with cursor-based pagination
 
 ### Interactions
@@ -88,10 +88,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOLL-01 | Phase 31 | Complete |
 | FOLL-02 | Phase 31 | Complete |
 | FOLL-03 | Phase 30 | Complete |
-| FEED-01 | Phase 32 | Pending |
+| FEED-01 | Phase 32 | Complete |
 | FEED-02 | Phase 32 | Pending |
 | FEED-03 | Phase 32 | Pending |
-| FEED-04 | Phase 32 | Pending |
+| FEED-04 | Phase 32 | Complete |
 | FEED-05 | Phase 32 | Pending |
 | INTR-01 | Phase 33 | Pending |
 | INTR-02 | Phase 33 | Pending |
