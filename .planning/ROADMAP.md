@@ -102,7 +102,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - [x] **Phase 30: Social Database & Kitchen Profiles** - Database foundation, Storage bucket, kitchen profile CRUD, search, and invite links (completed 2026-04-07)
 - [x] **Phase 31: Follow System** - Follow/unfollow kitchens, follower/following lists (completed 2026-04-07)
 - [x] **Phase 32: Feed & Auto-Post** - Auto-post meals to followers, chronological feed with cards, photos, and pagination (completed 2026-04-07)
-- [ ] **Phase 33: Social Interactions & Moderation** - Likes, comments, recipe saving, Cook This Too, report, and block
+- [x] **Phase 33: Social Interactions & Moderation** - Likes, comments, recipe saving, Cook This Too, report, and block (completed 2026-04-07)
 - [ ] **Phase 34: Social Push Notifications** - Server-triggered push for follows, likes, and comments
 
 ## Phase Details
@@ -167,7 +167,7 @@ Plans:
 Plans:
 - [x] 33-01-PLAN.md — Migration + socialStore interaction methods (like, comment, save, report, block)
 - [x] 33-02-PLAN.md — CommentSheet + FeedCard wiring (like animation, comment, save handlers)
-- [ ] 33-03-PLAN.md — Cook This Too with MealSlotPickerSheet + long-press report/block + checkpoint
+- [x] 33-03-PLAN.md — Cook This Too with MealSlotPickerSheet + long-press report/block + checkpoint
 **UI hint**: yes
 
 ### Phase 34: Social Push Notifications
@@ -223,7 +223,7 @@ Plans:
 | 30. Social Database & Kitchen Profiles | v5.0 | 3/3 | Complete   | 2026-04-07 |
 | 31. Follow System | v5.0 | 2/2 | Complete   | 2026-04-07 |
 | 32. Feed & Auto-Post | v5.0 | 2/2 | Complete   | 2026-04-07 |
-| 33. Social Interactions & Moderation | v5.0 | 2/3 | In Progress|  |
+| 33. Social Interactions & Moderation | v5.0 | 3/3 | Complete   | 2026-04-07 |
 | 34. Social Push Notifications | v5.0 | 0/0 | Not started | - |
 
 ---
