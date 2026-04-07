@@ -4,7 +4,9 @@ appId: com.sharedkitchen.app
 # Adds a meal to a day on the plan, then edits it by changing the recipe.
 # Assumes the user is logged in and at least one recipe exists.
 
-- launchApp
+- launchApp:
+    clearState: true
+- runFlow: "helpers/login.yaml"
 
 # Navigate to Plan tab
 - tapOn:

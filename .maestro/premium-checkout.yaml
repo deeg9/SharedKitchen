@@ -6,7 +6,8 @@ name: "Premium Subscription Checkout"
 # Note: Stripe checkout cannot be fully completed in E2E -- verifies up to payment UI
 
 - launchApp:
-    clearState: false
+    clearState: true
+- runFlow: "helpers/login.yaml"
 
 # Navigate to Profile tab
 - tapOn:

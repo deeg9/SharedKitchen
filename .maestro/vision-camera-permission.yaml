@@ -3,7 +3,9 @@ appId: com.sharedkitchen.app
 # Vision Camera Permission Flow
 # Tests: Camera FAB on Kitchen tab, CameraSheet opens with options.
 
-- launchApp
+- launchApp:
+    clearState: true
+- runFlow: "helpers/login.yaml"
 
 # Wait for app to fully load
 - extendedWaitUntil:

@@ -4,7 +4,9 @@ appId: com.sharedkitchen.app
 # Tests: On Hand segment camera flow triggers scan intent.
 # Verifies FAB, segment switching, and camera sheet on On Hand.
 
-- launchApp
+- launchApp:
+    clearState: true
+- runFlow: "helpers/login.yaml"
 
 # Wait for app to fully load (JS bundle download on relaunch)
 - extendedWaitUntil:

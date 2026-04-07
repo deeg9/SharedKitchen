@@ -3,9 +3,10 @@ name: "Profile View and Edit"
 ---
 # Profile View and Edit Flow
 # Opens profile tab, verifies sections, taps edit profile button.
-# Assumes user is logged in.
 
-- launchApp
+- launchApp:
+    clearState: true
+- runFlow: "helpers/login.yaml"
 
 # Navigate to Profile tab
 - tapOn:

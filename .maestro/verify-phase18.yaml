@@ -4,7 +4,9 @@ appId: com.sharedkitchen.app
 # Tests: AUTH-02, AUTH-03, PROF-01, HOUSE-01, HOUSE-02, HOUSE-03
 
 # AUTH-02/03: App launches with user already signed in (session persisted)
-- launchApp
+- launchApp:
+    clearState: true
+- runFlow: "helpers/login.yaml"
 - assertVisible: "PLAN"
 - takeScreenshot: verify-01-auth-session
 

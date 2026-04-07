@@ -1,6 +1,8 @@
 appId: com.sharedkitchen.app
 ---
-- launchApp
+- launchApp:
+    clearState: true
+- runFlow: "helpers/login.yaml"
 - tapOn:
     id: "profile-tab"
 - scrollUntilVisible:

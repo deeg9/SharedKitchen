@@ -2,10 +2,11 @@ appId: com.sharedkitchen.app
 name: "Profile Social Notifications"
 ---
 # Profile Social Notifications
-# Navigates to profile, finds the social notifications toggle, verifies it exists.
-# Assumes user is logged in.
+# Navigates to profile, finds the social notifications toggle.
 
-- launchApp
+- launchApp:
+    clearState: true
+- runFlow: "helpers/login.yaml"
 
 # Navigate to Profile tab
 - tapOn:

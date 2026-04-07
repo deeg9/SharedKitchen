@@ -2,10 +2,11 @@ appId: com.sharedkitchen.app
 name: "Kitchen Search"
 ---
 # Kitchen Search Flow
-# Opens the search overlay from Plan tab, types a query, verifies results area, closes search.
-# Assumes user is logged in.
+# Opens the search overlay from Plan tab, types a query, closes search.
 
-- launchApp
+- launchApp:
+    clearState: true
+- runFlow: "helpers/login.yaml"
 
 # Navigate to Plan tab
 - tapOn:

@@ -1,0 +1,18 @@
+appId: com.sharedkitchen.app
+---
+# Reusable login sub-flow. Include via: - runFlow: "helpers/login.yaml"
+# Signs in with the test user credentials.
+
+- assertVisible: "Sign In"
+- tapOn:
+    id: "sign-in-email-input"
+- inputText: "testuser@example.com"
+- tapOn:
+    id: "sign-in-password-input"
+- inputText: "***REMOVED***"
+- tapOn:
+    id: "sign-in-submit-button"
+- extendedWaitUntil:
+    visible:
+      text: ".*Plan.*|.*Recipes.*|.*Welcome.*"
+    timeout: 10000

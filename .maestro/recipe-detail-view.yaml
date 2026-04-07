@@ -4,7 +4,9 @@ appId: com.sharedkitchen.app
 # Navigates to a recipe detail page and interacts with favorite, cook, and add-to-plan buttons.
 # Assumes the user is already logged in and at least one recipe exists.
 
-- launchApp
+- launchApp:
+    clearState: true
+- runFlow: "helpers/login.yaml"
 
 # Navigate to Recipes tab
 - tapOn:

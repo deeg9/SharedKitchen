@@ -9,7 +9,9 @@ appId: com.sharedkitchen.app
 # We verify the Category button is tappable but cannot interact with the dropdown overlay in Maestro.
 # The filter logic itself is covered by unit tests in Plan 01.
 
-- launchApp
+- launchApp:
+    clearState: true
+- runFlow: "helpers/login.yaml"
 
 # Navigate to Recipes tab
 - tapOn:

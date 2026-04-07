@@ -7,7 +7,8 @@ name: "Negative Path: Failed/Cancelled Payment"
 # this flow navigates to checkout, dismisses it, and verifies user remains on free tier
 
 - launchApp:
-    clearState: false
+    clearState: true
+- runFlow: "helpers/login.yaml"
 
 # Navigate to Profile tab
 - tapOn:

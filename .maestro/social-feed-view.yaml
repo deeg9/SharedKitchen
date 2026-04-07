@@ -3,9 +3,10 @@ name: "Social Feed View"
 ---
 # Social Feed View
 # Navigates to Plan tab, switches to Feed segment, verifies feed loads.
-# Assumes user is logged in with at least one followed kitchen.
 
-- launchApp
+- launchApp:
+    clearState: true
+- runFlow: "helpers/login.yaml"
 
 # Navigate to Plan tab
 - tapOn:
@@ -21,7 +22,7 @@ name: "Social Feed View"
 - tapOn:
     text: "Feed"
 
-# Verify we are on the Feed view (Feed text should be selected/visible)
+# Verify we are on the Feed view
 - assertVisible:
     text: "Feed"
 

@@ -3,9 +3,10 @@ name: "Budget Add Expense"
 ---
 # Budget Add Expense Flow
 # Opens budget tab, taps FAB to add expense, fills form, submits.
-# Assumes user is logged in.
 
-- launchApp
+- launchApp:
+    clearState: true
+- runFlow: "helpers/login.yaml"
 
 # Navigate to Budget tab
 - tapOn:

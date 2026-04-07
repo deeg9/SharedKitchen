@@ -3,7 +3,9 @@ appId: com.sharedkitchen.app
 # Video Recipe Import from TikTok
 # User must be signed in already.
 
-- launchApp
+- launchApp:
+    clearState: true
+- runFlow: "helpers/login.yaml"
 
 # Wait for main app
 - extendedWaitUntil:

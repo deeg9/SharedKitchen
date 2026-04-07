@@ -2,10 +2,11 @@ appId: com.sharedkitchen.app
 name: "Budget Dashboard View"
 ---
 # Budget Dashboard View
-# Opens budget tab and verifies categories and weekly breakdown are visible.
-# Assumes user is logged in.
+# Opens budget tab and verifies categories are visible.
 
-- launchApp
+- launchApp:
+    clearState: true
+- runFlow: "helpers/login.yaml"
 
 # Navigate to Budget tab
 - tapOn:

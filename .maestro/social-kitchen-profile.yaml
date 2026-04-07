@@ -2,11 +2,11 @@ appId: com.sharedkitchen.app
 name: "Kitchen Profile View"
 ---
 # Kitchen Profile View
-# Navigates to the user's own kitchen profile via Profile tab kitchen row
-# and verifies profile card elements.
-# Assumes user is logged in and has at least one kitchen.
+# Navigates to the user's own kitchen profile and verifies profile card elements.
 
-- launchApp
+- launchApp:
+    clearState: true
+- runFlow: "helpers/login.yaml"
 
 # Navigate to Profile tab
 - tapOn:
@@ -19,7 +19,6 @@ name: "Kitchen Profile View"
     timeout: 5000
 
 # Tap on the first kitchen row to open its profile
-# Kitchen rows have dynamic testIDs, so tap by text on the kitchen name
 - tapOn:
     text: ".*"
     index: 0

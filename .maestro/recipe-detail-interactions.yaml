@@ -8,7 +8,9 @@ appId: com.sharedkitchen.app
 #          RDETAIL-04 (favorite), RDETAIL-05 (notes), RDETAIL-06 (scaling),
 #          RDETAIL-07 (ingredient checklist)
 
-- launchApp
+- launchApp:
+    clearState: true
+- runFlow: "helpers/login.yaml"
 
 # Navigate to Recipes tab
 - tapOn:

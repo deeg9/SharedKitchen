@@ -5,7 +5,8 @@ name: "Grocery List Generation"
 # Assumes user is logged in with meal plan data
 
 - launchApp:
-    clearState: false
+    clearState: true
+- runFlow: "helpers/login.yaml"
 
 # Navigate to Grocery tab
 - tapOn:
