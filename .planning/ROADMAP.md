@@ -100,7 +100,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 **Milestone Goal:** Let users follow other kitchens and see what they're eating in a Venmo-style social feed with full interactions.
 
 - [x] **Phase 30: Social Database & Kitchen Profiles** - Database foundation, Storage bucket, kitchen profile CRUD, search, and invite links (completed 2026-04-07)
-- [ ] **Phase 31: Follow System** - Follow/unfollow kitchens, follower/following lists
+- [x] **Phase 31: Follow System** - Follow/unfollow kitchens, follower/following lists (completed 2026-04-07)
 - [ ] **Phase 32: Feed & Auto-Post** - Auto-post meals to followers, chronological feed with cards, photos, and pagination
 - [ ] **Phase 33: Social Interactions & Moderation** - Likes, comments, recipe saving, Cook This Too, report, and block
 - [ ] **Phase 34: Social Push Notifications** - Server-triggered push for follows, likes, and comments
@@ -134,7 +134,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 31-01-PLAN.md — Follow/unfollow actions with optimistic UI + Follow button wiring
-- [ ] 31-02-PLAN.md — Followers/following list screen with segmented control
+- [x] 31-02-PLAN.md — Followers/following list screen with segmented control
 **UI hint**: yes
 
 ### Phase 32: Feed & Auto-Post
@@ -222,7 +222,7 @@ Plans:
 | 28. Food Photo to Recipe Discovery | v4.0 | 2/2 | Complete | 2026-03-30 |
 | 29. Food Photo to Meal Logging | v4.0 | 2/2 | Complete | 2026-03-30 |
 | 30. Social Database & Kitchen Profiles | v5.0 | 3/3 | Complete   | 2026-04-07 |
-| 31. Follow System | v5.0 | 1/2 | In Progress|  |
+| 31. Follow System | v5.0 | 2/2 | Complete   | 2026-04-07 |
 | 32. Feed & Auto-Post | v5.0 | 0/0 | Not started | - |
 | 33. Social Interactions & Moderation | v5.0 | 0/0 | Not started | - |
 | 34. Social Push Notifications | v5.0 | 0/0 | Not started | - |
