@@ -179,11 +179,10 @@ Plans:
   2. User receives a push notification when someone likes their feed item
   3. User receives a push notification when someone comments on their feed item
   4. Social notifications have a separate toggle in settings so users can mute them without affecting household notifications
-**Plans**: 3 plans
+**Plans**: 2 plans
 Plans:
-- [ ] 30-01-PLAN.md — Social database migration (all tables, RLS, triggers) + TypeScript types
-- [ ] 30-02-PLAN.md — socialStore + kitchen profile modal screen
-- [ ] 30-03-PLAN.md — Kitchen search on Plan tab + invite link sharing
+- [ ] 34-01-PLAN.md — Edge Function for social push notifications + notification settings update
+- [ ] 34-02-PLAN.md — Database webhook triggers + social notification toggle UI + checkpoint
 
 ## Progress
 
@@ -224,7 +223,7 @@ Plans:
 | 31. Follow System | v5.0 | 2/2 | Complete   | 2026-04-07 |
 | 32. Feed & Auto-Post | v5.0 | 2/2 | Complete   | 2026-04-07 |
 | 33. Social Interactions & Moderation | v5.0 | 3/3 | Complete   | 2026-04-07 |
-| 34. Social Push Notifications | v5.0 | 0/0 | Not started | - |
+| 34. Social Push Notifications | v5.0 | 0/2 | Not started | - |
 
 ---
-*Last updated: 2026-04-06 after Phase 33 planning*
+*Last updated: 2026-04-06 after Phase 34 planning*
