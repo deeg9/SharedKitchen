@@ -103,7 +103,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - [x] **Phase 31: Follow System** - Follow/unfollow kitchens, follower/following lists (completed 2026-04-07)
 - [x] **Phase 32: Feed & Auto-Post** - Auto-post meals to followers, chronological feed with cards, photos, and pagination (completed 2026-04-07)
 - [x] **Phase 33: Social Interactions & Moderation** - Likes, comments, recipe saving, Cook This Too, report, and block (completed 2026-04-07)
-- [ ] **Phase 34: Social Push Notifications** - Server-triggered push for follows, likes, and comments
+- [x] **Phase 34: Social Push Notifications** - Server-triggered push for follows, likes, and comments (completed 2026-04-07)
 
 ## Phase Details
 
@@ -182,7 +182,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 34-01-PLAN.md — Edge Function for social push notifications + notification settings update
-- [ ] 34-02-PLAN.md — Database webhook triggers + social notification toggle UI + checkpoint
+- [x] 34-02-PLAN.md — Database webhook triggers + social notification toggle UI + checkpoint
 
 ## Progress
 
@@ -223,7 +223,7 @@ Plans:
 | 31. Follow System | v5.0 | 2/2 | Complete   | 2026-04-07 |
 | 32. Feed & Auto-Post | v5.0 | 2/2 | Complete   | 2026-04-07 |
 | 33. Social Interactions & Moderation | v5.0 | 3/3 | Complete   | 2026-04-07 |
-| 34. Social Push Notifications | v5.0 | 1/2 | In Progress|  |
+| 34. Social Push Notifications | v5.0 | 2/2 | Complete   | 2026-04-07 |
 
 ---
 *Last updated: 2026-04-06 after Phase 34 planning*
