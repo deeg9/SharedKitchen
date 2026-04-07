@@ -9,6 +9,7 @@ export interface NotificationSettings {
   leftoverAlerts: boolean;
   budgetWarnings: boolean;
   householdActivity: boolean;
+  socialNotifications: boolean;
 }
 
 const DEFAULT_SETTINGS: NotificationSettings = {
@@ -16,6 +17,7 @@ const DEFAULT_SETTINGS: NotificationSettings = {
   leftoverAlerts: true,
   budgetWarnings: true,
   householdActivity: true,
+  socialNotifications: true,
 };
 
 export async function requestPermission(): Promise<boolean> {
@@ -184,6 +186,10 @@ export async function cancelLeftoverAlerts(leftoverId: string): Promise<void> {
 
 export async function getNotificationSettings(): Promise<NotificationSettings> {
   const val = await AsyncStorage.getItem('notification_settings');
-  if (val) return JSON.parse(val);
+  if (val) return { ...DEFAULT_SETTINGS, ...JSON.parse(val) };
   return { ...DEFAULT_SETTINGS };
+}
+
+export async function saveNotificationSettings(settings: NotificationSettings): Promise<void> {
+  await AsyncStorage.setItem('notification_settings', JSON.stringify(settings));
 }
