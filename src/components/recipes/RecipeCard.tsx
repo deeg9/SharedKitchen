@@ -12,14 +12,39 @@ import { getDefaultRecipeImage } from '../../lib/images';
 interface RecipeCardProps {
   recipe: Recipe;
   isFavorite?: boolean;
+  rating?: number;
 }
 
-export function RecipeCard({ recipe, isFavorite = false }: RecipeCardProps) {
+function getDifficulty(recipe: Recipe): { label: string; bg: string } {
+  const totalTime = (recipe.prep_time_minutes ?? 0) + (recipe.cook_time_minutes ?? 0);
+  if (totalTime <= 0) {
+    return { label: 'BEGINNER', bg: colors.primaryFixed };
+  }
+  if (totalTime < 20) {
+    return { label: 'BEGINNER', bg: colors.primaryFixed };
+  }
+  if (totalTime <= 45) {
+    return { label: 'INTERMEDIATE', bg: colors.secondaryFixed };
+  }
+  return { label: 'ADVANCED', bg: colors.surfaceContainerHigh };
+}
+
+function getTotalTime(recipe: Recipe): number | null {
+  const prep = recipe.prep_time_minutes ?? 0;
+  const cook = recipe.cook_time_minutes ?? 0;
+  const total = prep + cook;
+  return total > 0 ? total : null;
+}
+
+export function RecipeCard({ recipe, isFavorite = false, rating }: RecipeCardProps) {
   const router = useRouter();
 
   const handlePress = () => {
     router.push(`/recipe/${recipe.id}`);
   };
+
+  const difficulty = getDifficulty(recipe);
+  const totalTime = getTotalTime(recipe);
 
   return (
     <Pressable onPress={handlePress} style={styles.pressable} testID={`recipe-card-${recipe.id}`}>
@@ -39,27 +64,41 @@ export function RecipeCard({ recipe, isFavorite = false }: RecipeCardProps) {
 
         {/* Info */}
         <View style={styles.info}>
-          <Text style={styles.name} numberOfLines={2}>
-            {recipe.name}
-          </Text>
-          <View style={styles.badges}>
-            {recipe.prep_time_minutes != null && (
+          {/* Name + Rating row */}
+          <View style={styles.nameRow}>
+            <Text style={styles.name} numberOfLines={1}>
+              {recipe.name}
+            </Text>
+            {rating != null && rating > 0 && (
+              <View style={styles.ratingContainer}>
+                <MaterialCommunityIcons name="star" size={14} color={colors.secondary} />
+                <Text style={styles.ratingText}>{rating.toFixed(1)}</Text>
+              </View>
+            )}
+          </View>
+
+          {/* Description derived from first instruction step */}
+          {recipe.instructions != null && recipe.instructions.length > 0 && recipe.instructions[0].text.length > 0 && (
+            <Text style={styles.description} numberOfLines={2}>
+              {recipe.instructions[0].text}
+            </Text>
+          )}
+
+          {/* Bottom pills row */}
+          <View style={styles.pillRow}>
+            {totalTime != null && (
               <View style={styles.pill}>
                 <MaterialCommunityIcons
                   name="clock-outline"
                   size={12}
                   color={colors.onSurfaceVariant}
                 />
-                <Text style={styles.pillText}>{recipe.prep_time_minutes}m</Text>
+                <Text style={styles.pillText}>{totalTime}M</Text>
               </View>
             )}
-            {recipe.estimated_cost != null && (
-              <View style={styles.pill}>
-                <Text style={styles.pillText}>
-                  ${Number(recipe.estimated_cost).toFixed(0)}
-                </Text>
-              </View>
-            )}
+            <View style={[styles.difficultyBadge, { backgroundColor: difficulty.bg }]}>
+              <Text style={styles.difficultyText}>{difficulty.label}</Text>
+            </View>
           </View>
         </View>
       </Card>
@@ -69,8 +108,7 @@ export function RecipeCard({ recipe, isFavorite = false }: RecipeCardProps) {
 
 const styles = StyleSheet.create({
   pressable: {
-    flex: 1,
-    margin: spacing.xs,
+    marginBottom: spacing.md,
   },
   card: {
     padding: 0,
@@ -78,7 +116,7 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     width: '100%',
-    height: 120,
+    height: 200,
     position: 'relative',
   },
   image: {
@@ -96,16 +134,38 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   info: {
-    padding: spacing.sm,
+    padding: spacing.md,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   name: {
-    ...typography.labelLg,
+    ...typography.titleMd,
     color: colors.onSurface,
-    marginBottom: spacing.xs,
+    flex: 1,
+    marginRight: spacing.sm,
   },
-  badges: {
+  ratingContainer: {
     flexDirection: 'row',
-    gap: spacing.xs,
+    alignItems: 'center',
+    gap: 2,
+  },
+  ratingText: {
+    ...typography.labelMd,
+    color: colors.onSurface,
+  },
+  description: {
+    ...typography.bodyMd,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xs,
+  },
+  pillRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginTop: spacing.sm,
+    alignItems: 'center',
   },
   pill: {
     flexDirection: 'row',
@@ -119,6 +179,14 @@ const styles = StyleSheet.create({
   pillText: {
     ...typography.labelSm,
     color: colors.onSurfaceVariant,
-    textTransform: 'none',
+  },
+  difficultyBadge: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: borderRadius.full,
+  },
+  difficultyText: {
+    ...typography.labelSm,
+    color: colors.onSurface,
   },
 });
