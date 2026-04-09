@@ -113,18 +113,26 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 
 ### Active
 
-(None — planning next milestone)
+- [ ] USDA FoodData Central integration for nutrition data backbone
+- [ ] Open Food Facts integration for barcode scanning of packaged foods
+- [ ] FatSecret Premier Free integration for verified branded food data
+- [ ] Searchable food/ingredient database within the app
+- [ ] Nutrition facts display on recipes and meal plan items
+- [ ] Barcode scanner for quick food lookup and pantry additions
+- [ ] Enhanced AI features using structured food data
 
-## Current Milestone: v5.0 Social Feed (SHIPPED)
+## Current Milestone: v6.0 Food Data Integration
 
-**Shipped:** 2026-04-07
+**Goal:** Integrate external food databases (USDA, Open Food Facts, FatSecret) to provide comprehensive nutrition data, barcode scanning, and searchable food/ingredient data that powers recipes, meal plans, and AI features.
 
-**Delivered features:**
-- Kitchen-to-kitchen social graph with follow/unfollow, profiles, search, and invite links
-- Venmo-style social feed on Plan tab with auto-posted meals, photos, and infinite scroll
-- Full social interactions: likes, comments, recipe saving, Cook This Too
-- Moderation tools: report content and block kitchens
-- Server-side push notifications for social events via Edge Function + database webhooks
+**Target features:**
+- USDA FoodData Central integration for nutrition backbone (380K+ foods)
+- Open Food Facts integration for barcode scanning of packaged foods
+- FatSecret Premier Free integration for verified branded food data
+- Searchable food/ingredient database within the app
+- Nutrition facts display on recipes and meal plan items
+- Barcode scanner for quick food lookup and pantry additions
+- Enhanced AI features using structured food data (better meal suggestions, smarter grocery lists)
 
 ### Out of Scope
 
@@ -191,4 +199,4 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-04-07 after v5.0 milestone shipped*
+*Last updated: 2026-04-09 after v6.0 milestone started*
