@@ -191,7 +191,10 @@ Plans:
   3. User can tap "Sync with Plan" to regenerate the grocery list from the current meal plan
   4. Item rows display quantity, estimated price, and source/category tags
   5. Segment control shows Shopping List (left) / On Hand (right) — and real-time sync, presence avatars, barcode scanning, and photo scanning all work without regression
-**Plans**: 0 plans
+**Plans**: 2 plans
+Plans:
+- [ ] 42-01-PLAN.md — Redesign GrocerySummary, GroceryItem rows, and GrocerySection headers
+- [ ] 42-02-PLAN.md — Wire Sync with Plan button, swap segment order, pass presence to summary
 **UI hint**: yes
 
 ### Phase 43: Budget, Profile & Social Feed
@@ -254,7 +257,7 @@ Plans:
 | 39. Shared Components & Dependencies | v7.0 | 3/3 | Complete    | 2026-04-09 |
 | 40. Independent Screen Redesigns | v7.0 | 4/4 | Complete    | 2026-04-09 |
 | 41. Plan Tab Redesign | v7.0 | 2/2 | Complete    | 2026-04-09 |
-| 42. Grocery List Redesign | v7.0 | 0/0 | Not started | - |
+| 42. Grocery List Redesign | v7.0 | 0/2 | Not started | - |
 | 43. Budget, Profile & Social Feed | v7.0 | 0/0 | Not started | - |
 
 ---
