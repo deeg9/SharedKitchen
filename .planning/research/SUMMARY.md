@@ -1,171 +1,194 @@
 # Project Research Summary
 
-**Project:** SharedKitchen v5.0 -- Social Feed
-**Domain:** Social feed features for collaborative household dinner planning app
-**Researched:** 2026-04-06
+**Project:** SharedKitchen v6.0 — Food Data Integration
+**Domain:** External food database APIs + barcode scanning in an existing meal planning app
+**Researched:** 2026-04-07
 **Confidence:** HIGH
 
 ## Executive Summary
 
-SharedKitchen v5.0 adds a social feed layer to an existing household meal planning app built on React Native (Expo SDK 55) with Supabase as the backend. The key architectural insight across all research is that the social layer must be a clean, decoupled addition -- not a modification of existing household-scoped infrastructure. The existing codebase already provides nearly everything needed: Supabase client, FlashList for performant lists, Realtime subscriptions, push token registration, image capture/compression, and Zustand state management. Only one new npm package is required (`expo-image` for cached feed photo rendering). Everything else is infrastructure configuration (database tables, RLS policies, Storage buckets, one Edge Function).
+SharedKitchen v6.0 introduces a structured food data layer on top of an existing collaborative cooking and meal planning app. The existing stack (Expo SDK 55, Supabase, Zustand, Gemini 2.5 Flash, Stripe) is validated and unchanged. The new work adds three free external food APIs (USDA FoodData Central, Open Food Facts, FatSecret Premier Free), one new npm package (expo-camera, already used for fridge scanning), three new Supabase Edge Functions, and four new Postgres tables. The approach is additive and follows established codebase patterns throughout — API keys stored as Supabase secrets, Edge Functions as the API proxy layer, Zustand for client state, and Postgres for caching.
 
-The recommended approach is fan-out-on-read with a denormalized `feed_posts` table that snapshots shareable meal data. Kitchens (households) are the social unit, not individual users -- this is SharedKitchen's primary differentiator against Cookpad, Whisk, and Allrecipes, all of which use individual-user social models. Auto-posting from the meal plan with zero content-creation friction (the Venmo model) is the second differentiator. The feed query uses cursor-based pagination over a composite index, likes/comments use denormalized counters maintained by triggers, and Realtime is scoped narrowly to visible post interactions only (not the full feed).
+The recommended approach treats nutrition as **informational context on existing data**, not a new tracking workflow. This is the key strategic distinction from competitors like MyFitnessPal and Cronometer, which are diet trackers that bolted on recipes. SharedKitchen remains a household cooking planner where nutrition enriches the existing recipe, pantry, and meal planning flows. The household dimension — shared nutrition views across multiple members — is a genuine differentiator no competitor currently offers. LLM-powered ingredient matching via Gemini 2.5 Flash (an existing integration) is the other differentiator: it handles colloquial recipe text ("a handful of spinach," "a splash of olive oil") where competitor keyword matching fails.
 
-The dominant risk is household data leakage. The entire existing data model sits behind strict `is_household_member()` RLS gates. Adding social visibility requires a separate public-facing data layer (`kitchen_profiles`, `feed_posts`) that never JOINs to private household tables. Every pitfall researcher and architecture decision converges on this: the social layer is a snapshot layer, not a live view into household data. Secondary risks include RLS performance degradation on follow-based queries (mitigated by SECURITY DEFINER functions and `(select auth.uid())` wrapping), notification spam from social activity (mitigated by deferring push notifications to in-app indicators only for v5.0), and missing moderation tools alongside comments (mitigated by shipping a basic report/block system in the same phase as comments).
+The highest technical risk in the entire milestone is ingredient-to-food matching accuracy. Mapping free-text recipe ingredients like "chicken breast, boneless skinless" to USDA FoodData Central entries is a hard NLP problem with ~70-80% auto-match accuracy. Gemini-assisted matching plus a curated pre-populated mapping table for the top 200 cooking ingredients will bring this to an acceptable level, but user-facing confirmation flows and nutrition "partial" states are required from the start. Three other critical risks — NutritionInfo type mismatch between the existing string-based schema and the new numeric API data, unit conversion chaos across three APIs with incompatible serving size formats, and USDA API rate limit cascading failures — must all be resolved in the data layer phase before any API integration work begins.
 
 ## Key Findings
 
 ### Recommended Stack
 
-The existing stack covers nearly all requirements. SharedKitchen already uses Supabase (Postgres, Auth, Realtime, Storage, Edge Functions), FlashList, expo-notifications, expo-image-picker, expo-image-manipulator, Zustand, and Reanimated. The social feed is fundamentally CRUD plus real-time subscriptions plus image display -- no new frameworks needed.
+The new stack is minimal by design: one npm package, three Edge Functions, four Postgres tables, and three free external APIs. All external API calls are proxied through Edge Functions to protect API keys and enable shared caching. The `food_items` Postgres table is the canonical food data cache with a 30-day TTL, nutrition normalized to per-100g, and a trigram GIN index for local fuzzy search. A `food_search_cache` table with 24h TTL prevents redundant API calls for repeated queries.
 
-**Core additions:**
-- `expo-image` ~55.0.8: Cached image rendering with blurhash placeholders and disk caching (SDWebImage) -- React Native's built-in Image has no caching and will cause visible jank in an image-heavy feed
-- Supabase Storage `meal-photos` bucket: Persisting meal photos as CDN-served URLs instead of transient base64 (which is how v4.0 vision features work)
-- Supabase Database Webhooks + Edge Function: Server-triggered push notifications for social interactions (existing notifications are all local/device-scheduled)
+USDA FoodData Central is the nutrition backbone (380K+ foods, free, 1,000 req/hr, government-validated). Open Food Facts handles barcode lookups (2.8M+ global products, no auth required). FatSecret Premier Free fills branded food gaps in USDA and provides fallback barcode resolution (OAuth 2.0 client credentials, attribution required). expo-camera's built-in `onBarcodeScanned` callback replaces the deprecated expo-barcode-scanner and supports all grocery barcode formats in Expo managed workflow with no native rebuild.
 
-**Explicitly avoid:** GetStream ($499+/mo, over-engineering), React Query (codebase uses Zustand exclusively), react-native-fast-image (unmaintained, incompatible with Expo), OneSignal/Knock/Novu (existing Expo Push API is sufficient), video players (out of scope), Algolia (Supabase ilike is sufficient at this scale).
+**Core technologies:**
+- USDA FoodData Central API: nutrition data backbone — free, authoritative, 380K+ foods, 1,000 req/hr via Edge Function proxy
+- Open Food Facts API v2: barcode lookup — free, no auth, 2.8M+ products, primary barcode source
+- FatSecret Platform API (Premier Free): branded food data and fallback search — fills USDA gaps, OAuth 2.0 client credentials, attribution required
+- expo-camera (~55.0.14): barcode scanning — only new npm package, SDK 55 compatible, supports UPC/EAN natively
+- Postgres tsvector + GIN index: local food search — no external search service needed at this data volume
+- Supabase Edge Functions (Deno): API proxy layer — follows existing 8-function pattern exactly
 
 ### Expected Features
 
+The existing codebase stores all food data as unstructured text with no canonical food entity. This milestone creates that entity and links it across recipes, pantry, and grocery list. Every competitor nutrition app shows per-recipe calories and macros; not having this makes the feature feel incomplete. Ingredient-to-food matching is the hardest and most critical piece — without it, nothing else computes accurately.
+
 **Must have (table stakes):**
-- Kitchen-to-kitchen follow/unfollow with asymmetric model (like Instagram, not mutual friends)
-- Chronological feed of meals from followed kitchens with cursor-based pagination
-- Feed cards: kitchen avatar, meal name, day/slot context, recipe photo, timestamp
-- Like (heart) on feed items with optimistic UI
-- Flat comments (no threading)
-- Save recipe from feed to own library (clone with provenance tracking)
-- Share toggle per meal (controls what auto-posts)
-- Kitchen profile (public view: name, avatar, bio, recipe count, follower counts)
-- Push notifications for social events (followers, likes, comments)
-- Kitchen discovery/search
+- Per-recipe nutrition summary (calories + macros per serving) — every competitor has this; SharedKitchen's `nutrition_info` column is currently populated only from scraped source URLs
+- Searchable food database with autocomplete — standard expectation in any nutrition-aware app
+- Barcode scanner for packaged foods — expected by users who scan groceries; expo-camera already in use for fridge scanning
+- Nutrition label display component — reusable across recipe detail, meal plan, and search results
+- Ingredient-to-food matching engine — critical path; nothing else computes correctly without it
+- Daily/weekly nutrition totals from meal plan — natural extension once per-recipe nutrition is established
 
-**Should have (differentiators):**
-- Household-level social identity (kitchens follow kitchens, unique in the cooking app space)
-- Meal context in feed (day + slot, not just recipe name)
-- Auto-post from meal plan with zero friction (Venmo model)
-- Cooksnap-style meal photos leveraging v4.0 camera infrastructure
-- "Cook This Too" one-tap add-to-plan from feed
+**Should have (competitive differentiators):**
+- Household nutrition dashboard — no competitor offers shared/household nutrition; unique to SharedKitchen's multi-user model
+- AI-enhanced ingredient matching via Gemini — handles colloquial measurements competitors' keyword matching misses
+- Nutrition-aware meal suggestions — extends existing AI meal generator with nutritional intelligence
+- Barcode-to-pantry quick add — natural extension of existing fridge scan flow with different input
+- Smart grocery list with nutrition context — low effort, high perceived value
 
-**Defer (v5.x/v6+):**
-- Comment threading/replies
-- Public global feed / explore tab
-- Algorithmic feed ranking
-- Direct messaging between kitchens
-- Emoji reactions beyond heart
-- Stories / ephemeral content
+**Defer (v2+):**
+- Household nutrition dashboard (needs usage data to inform design)
+- Dietary goal tracking (needs user research on household vs individual goals)
+- Nutrition-aware meal suggestions (needs stable nutrition data before building AI on top)
+- Recipe nutrition comparison
+- Smart grocery list nutrition inline display
+
+**Do not build (anti-features):**
+- Full calorie diary / food logging — competes with MFP where SharedKitchen cannot win
+- Exercise/fitness tracking — different domain entirely
+- User-contributed food database — data quality risk; use verified sources only
+- Micronutrient deep-dive (82 nutrients) — Cronometer's niche; show "big 7" by default
+- Macro/calorie targets with enforcement — creates anxiety in shared household context
 
 ### Architecture Approach
 
-The architecture adds a clean social layer on top of the existing Supabase + Zustand stack. Five new database tables (`kitchen_profiles`, `follows`, `feed_posts`, `post_likes`, `post_comments`) with independent RLS policies that never touch existing household-scoped tables. Two new Zustand stores (`feedStore` for feed data/pagination/likes, `socialStore` for follows/kitchen profiles). Fan-out-on-read for the feed query (no materialized timeline table -- unnecessary at SharedKitchen's scale). Realtime is used sparingly: pull-to-refresh for new posts, postgres_changes only for likes/comments on currently visible posts.
+The architecture is strictly layered: React Native client calls Supabase Edge Functions exclusively; Edge Functions proxy to external APIs and write to Postgres; client reads from Postgres directly for display. No client-to-external-API calls exist. New components (`food-search`, `food-barcode` Edge Functions; `foodStore` Zustand store; `BarcodeScanner`, `FoodSearchSheet`, `NutritionCard`, `NutritionSummary` UI components) are additive. Existing components (`pantryStore`, `recipeStore`, `generate-meal`, `analyze-food-photo`) receive backward-compatible modifications. The `Ingredient` type gets optional `food_id` and `nutrition_per_serving` fields; existing recipes continue working with null values for both.
 
 **Major components:**
-1. `feedStore` + `FeedList`/`FeedCard` -- Feed data, cursor pagination, infinite scroll, optimistic likes
-2. `socialStore` + `KitchenProfile` screen -- Follow relationships, kitchen profiles, discovery/search
-3. `useFeedSync` hook -- Scoped Realtime subscriptions for interactions on visible posts only
-4. `send-social-notification` Edge Function -- Server-triggered push via Expo Push API on like/comment/follow inserts
-5. `meal-photos` Storage bucket + `expo-image` -- Photo persistence and cached display with blurhash placeholders
+1. `food-search` Edge Function — unified text search across USDA + FatSecret; parallel fetch, merge, dedup, rank, cache in `food_items`
+2. `food-barcode` Edge Function — waterfall barcode lookup: Postgres cache → Open Food Facts → FatSecret fallback
+3. `food_items` Postgres table — canonical food data cache; nutrition normalized per 100g; shared across all households; 30-day TTL
+4. `foodStore` (Zustand) — client-side search results, barcode scan state, nutrition display cache
+5. `NutritionCard` / `NutritionSummary` — reusable display components; big-4 default with expandable detail
+6. Nutrition normalization layer — canonical `NutritionData` interface; normalizers for USDA/OFF/FatSecret response formats
+7. Unit conversion module — weight, volume, and count units; normalizes to grams for computation; density tables for common foods
 
 ### Critical Pitfalls
 
-1. **Household data leakage** -- The biggest risk. Never JOIN live household tables for feed display. `feed_posts` must be a snapshot of shareable data. Zero modifications to existing RLS policies on household-scoped tables. Audit every migration.
-2. **User identity exposure across household boundaries** -- Create `kitchen_profiles` as the public-facing entity. Feed posts reference kitchen_profile_id, never user_id or household_id directly. Do not modify existing profiles/households SELECT policies.
-3. **Default-public sharing without opt-in** -- Default share toggle to OFF. Require explicit opt-in per meal or kitchen-level setting. Show education prompt on first enable.
-4. **RLS performance on follow-based queries** -- Wrap `auth.uid()` in `(select auth.uid())`, use SECURITY DEFINER functions for follow lookups, add composite indexes on follows and feed_posts.
-5. **Notification spam killing household notification value** -- Do NOT send push for social activity in v5.0 initial release. Use in-app indicators only. If added later, use separate notification category with independent toggle.
+1. **NutritionInfo type mismatch** — existing schema stores nutrition as strings ("350 kcal"); new APIs return numbers. Define canonical `NutritionData` with numeric fields and migrate existing data in Phase 1, before any API integration.
+
+2. **Serving size and unit chaos** — USDA reports per 100g, OFF per 100g + per serving (inconsistent), FatSecret per serving with variable descriptions. Build a dedicated unit conversion module in Phase 1. Store conversion factor alongside every ingredient match. Apply sanity bounds to all computed nutrition.
+
+3. **USDA rate limit cascade** — 1,000 req/hr per key is shared across all users. Cache-first architecture is mandatory: check `food_items` before any external call; batch multi-ingredient lookups into single USDA `/foods` calls; never call USDA twice for the same food.
+
+4. **Ingredient name mismatch** — "chicken breast, boneless skinless" vs USDA's formal naming. Gemini-assisted disambiguation is required. Accept ~70-80% auto-match accuracy. Pre-populate curated mapping for top 200 ingredients. Always show matched entry and allow user correction. Show "partial" indicator when some ingredients are unlinked.
+
+5. **Open Food Facts data quality variance** — crowd-sourced; many products have incomplete or wrong nutrition. Validate completeness (all core macros present), sanity-check calorie math (protein×4 + fat×9 + carbs×4 ≈ total within 20%), fall back to USDA text search when OFF data is partial.
 
 ## Implications for Roadmap
 
-Based on research, suggested phase structure:
+Based on research, a 6-phase build order is well-justified by critical dependencies. Data model must precede APIs; APIs must precede client; integration with existing features must follow proven new stack; AI enhancements come last. Skipping or reordering phases creates blocking rework.
 
-### Phase 1: Database Foundation and Kitchen Identity
+### Phase 1: Data Foundation
+**Rationale:** Three critical pitfalls (NutritionInfo type mismatch, unit chaos, source attribution) create downstream data corruption if not resolved before API integration begins. This phase has zero external dependencies and can be fully validated with unit tests.
+**Delivers:** `food_items` + `food_search_cache` Postgres migrations with RLS; canonical `FoodItem` and `NutritionData` TypeScript types; `nutrition-utils.ts` (unit conversion, scaling, computation with sanity bounds); `food-normalize.ts` shared module; `pantry_items` migration adding nullable `food_id` FK.
+**Addresses:** Nutrition data foundation, ingredient matching foundation
+**Avoids:** NutritionInfo type mismatch (Pitfall 1), unit chaos (Pitfall 3), source attribution technical debt
 
-**Rationale:** Every other phase depends on the data model. Kitchen profiles must exist before follows. Follows must exist before the feed query. The RLS design is the architectural firewall between private household data and public social data -- getting this wrong is the highest-risk pitfall.
-**Delivers:** All 5 new database tables with RLS policies, triggers for denormalized counters, Storage bucket for meal photos, `kitchen_profiles` CRUD, helper functions (`can_view_kitchen`, `get_followed_kitchen_ids`).
-**Addresses:** Feed item data model, kitchen profile, share toggle data layer (is_shared default FALSE).
-**Avoids:** Pitfall 1 (data leakage), Pitfall 2 (identity exposure), Pitfall 4 (N+1 queries via denormalized schema), Pitfall 5 (RLS performance via proper indexes and SECURITY DEFINER).
+### Phase 2: Edge Functions (Backend)
+**Rationale:** Backend before frontend. Edge Functions can be tested with curl. FatSecret OAuth2 complexity is isolated and resolved before any UI is built. USDA rate limit protection is built into the cache-first lookup pattern at this layer.
+**Delivers:** `fatsecret-client.ts` with OAuth2 token caching + auto-refresh; `food-search` Edge Function (parallel USDA + FatSecret, dedup, rank, cache); `food-barcode` Edge Function (waterfall: Postgres → OFF → FatSecret); USDA rate limit protection.
+**Uses:** USDA FDC API, Open Food Facts API, FatSecret API, Supabase Secrets pattern
+**Avoids:** USDA rate limit cascade (Pitfall 4), FatSecret OAuth token failures (Gotcha 3), barcode format mismatch (normalize to EAN-13)
 
-### Phase 2: Follow System and Kitchen Discovery
+### Phase 3: Client Store and Core UI
+**Rationale:** Store connects Edge Functions to UI. Build the reusable NutritionCard here so it can be dropped into any screen in later phases without redesign.
+**Delivers:** `foodStore` Zustand store; `FoodSearchSheet` with autocomplete; `NutritionCard` (big-4 default, expandable detail); `FoodItemRow` search result component.
+**Implements:** foodStore, FoodSearchSheet, NutritionCard architecture components
+**Avoids:** Nutrition display overwhelming recipe screen (big-4 default, not 82 nutrients)
 
-**Rationale:** The follow graph must exist before the feed has any content to show. Follow/unfollow is the core social primitive that everything builds on.
-**Delivers:** `socialStore`, follow/unfollow UI, kitchen search/discovery, kitchen profile screen, follower/following counts.
-**Addresses:** Follow/unfollow kitchens, kitchen discovery/search, kitchen profile public view.
-**Avoids:** Empty feed state (users build their follow graph before seeing the feed).
+### Phase 4: Barcode Scanner
+**Rationale:** Isolated to contain native build risk from expo-camera installation. Limits blast radius if EAS Build issues arise.
+**Delivers:** expo-camera installed; `BarcodeScanner` component with throttled scan (one scan per session); `useBarcodeScanner` hook; barcode-to-pantry quick add flow; graceful "not found" UX (fallback to name search or Gemini photo OCR).
+**Avoids:** Scanner re-render performance trap (Trap 3), expo-barcode-scanner deprecation (Gotcha 5), no-result dead end (UX 2)
 
-### Phase 3: Feed Display and Auto-Post
+### Phase 5: Integration with Existing Features
+**Rationale:** Integration touches existing stable features. The ingredient matching engine — highest-risk piece — lands here after data layer and APIs are proven. Building on a solid foundation avoids regressions.
+**Delivers:** Ingredient type extension (optional `food_id`, `nutrition_per_serving`); `IngredientFoodLinker` component; `recipeStore.computeRecipeNutrition()` (computes at write time, caches on recipe row); nutrition display on RecipeDetail and Plan screens; `NutritionSummary` daily/weekly totals; Gemini-assisted ingredient matching.
+**Avoids:** Ingredient name mismatch (Pitfall 2 — Gemini + curated mapping + user confirmation), nutrition calculation on every recipe view (Trap 1 — compute at write time), offline regression
 
-**Rationale:** With kitchen profiles and follows in place, the feed can now query and display content. Auto-post from meal plan creates the content that populates the feed.
-**Delivers:** `feedStore` with cursor pagination, FeedList/FeedCard components, Plan tab segmented control (My Plan | Feed), auto-post from `planStore.assignRecipe()` with share toggle, meal photo upload to Storage, `expo-image` integration for cached display.
-**Addresses:** Chronological feed, feed cards, auto-post with share toggle, meal photos on feed.
-**Uses:** `expo-image` (new), Supabase Storage `meal-photos` bucket, FlashList (existing).
-
-### Phase 4: Social Interactions
-
-**Rationale:** Interactions (likes, comments, save recipe) attach to feed items -- the feed must exist and have content first. Moderation tools (report/block) MUST ship alongside comments.
-**Delivers:** Like/unlike with optimistic UI, comments bottom sheet, `useFeedSync` for real-time interaction updates, save recipe from feed, report/block system, comment rate limiting.
-**Addresses:** Likes, comments, save recipe from feed, basic moderation.
-**Avoids:** Pitfall 6 (no moderation alongside comments), Pitfall 7 (notification spam -- use in-app indicators only, no push).
-
-### Phase 5: Server-Side Push Notifications
-
-**Rationale:** Push notifications are the engagement loop but are the highest risk for spam and user annoyance. Defer to last phase so the social features are validated before adding push. In-app indicators from Phase 4 provide engagement feedback in the interim.
-**Delivers:** `send-social-notification` Edge Function, database webhooks on likes/comments/follows, notification deduplication/batching, separate notification category with independent toggle in settings.
-**Addresses:** Push notifications for social events.
-**Avoids:** Pitfall 7 (notification spam) by shipping as a separate, carefully controlled phase.
+### Phase 6: AI Enhancement
+**Rationale:** AI enhancements are additive and depend on accurate nutrition data from prior phases. Building AI on top of unresolved ingredient matching would compound errors.
+**Delivers:** Modified `generate-meal` with nutrition context (daily consumed totals vs recommended values); modified `analyze-food-photo` to match identified foods to `food_items`; household nutrition dashboard view.
+**Avoids:** AI receiving garbage nutrition context from unresolved type mismatches
 
 ### Phase Ordering Rationale
 
-- Dependency chain: Database schema -> kitchen profiles -> follows -> feed content -> feed display -> interactions -> notifications. Each phase produces what the next phase consumes.
-- Risk front-loading: The highest-risk pitfall (data leakage) is addressed in Phase 1 before any UI work begins. RLS design is validated before any social data flows.
-- Privacy-first: Share toggle defaults to OFF, social is opt-in and additive, push notifications are deferred to the final phase.
-- Existing code stability: No existing Plan tab workflows are disrupted until Phase 3, which adds a segmented control rather than replacing content.
+- Data foundation comes first because type mismatch and unit chaos create silent data corruption in every downstream consumer if not resolved before API integration.
+- Backend before frontend because Edge Functions can be independently tested and OAuth/rate-limit complexity is best resolved in isolation before any UI depends on it.
+- Barcode scanning is isolated in its own phase to contain native build risk from expo-camera installation.
+- Integration with existing features comes after the new stack is proven to minimize regression risk in recipe/pantry/plan flows.
+- AI enhancements come last because they depend on nutrition data being both present and accurate — the ingredient matching accuracy baseline must be validated before building AI reasoning on top of it.
+- The waterfall API strategy and parallel search merge pattern established in Phase 2 are inherited by all later phases.
 
 ### Research Flags
 
 Phases likely needing deeper research during planning:
-- **Phase 1:** RLS policy design for social tables needs careful review -- the interaction between `can_view_kitchen()`, existing `is_household_member()`, and Supabase's per-row RLS evaluation is nuanced. Run EXPLAIN ANALYZE on feed queries with realistic data volumes.
-- **Phase 5:** Notification deduplication/batching strategy needs design. How to avoid spamming when 10 people like a post in quick succession. Expo Push API rate limits and batching patterns need verification.
+- **Phase 5 (Ingredient Matching):** Gemini prompt engineering for ingredient-to-food disambiguation has no precedent in the codebase. Prompt design, confidence threshold decisions, and hit rate measurement need a dedicated planning session.
+- **Phase 5 (Curated Mapping Table):** Pre-populating top 200 cooking ingredients with correct USDA FDC IDs is a data curation task that benefits from research before implementation.
+- **Phase 6 (AI Enhancement):** Prompt engineering for nutrition-aware meal suggestions (daily gap analysis → recipe recommendation) is novel and may need iteration.
 
 Phases with standard patterns (skip research-phase):
-- **Phase 2:** Well-documented asymmetric follow pattern. Simple CRUD on follows table.
-- **Phase 3:** Cursor-based pagination with FlashList is a standard pattern. Auto-post is a simple INSERT trigger.
-- **Phase 4:** Optimistic like toggle, flat comment list, bottom sheet -- all well-established React Native patterns.
+- **Phase 1 (Data Foundation):** Postgres migrations, TypeScript interfaces, and unit conversion math are well-documented standard patterns.
+- **Phase 2 (Edge Functions):** All three APIs have official documentation. OAuth2 client credentials and cache-first patterns are established. Follow existing Edge Function conventions exactly.
+- **Phase 3 (Client Store + Core UI):** Zustand store creation and bottom sheet UI follow existing codebase patterns.
+- **Phase 4 (Barcode Scanner):** expo-camera barcode scanning is officially documented; SharedKitchen already uses expo-camera for fridge scanning.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | Only one new npm package needed. All other stack elements already installed and proven in the codebase. Version compatibility verified against Expo SDK 55. |
-| Features | HIGH | Feature landscape well-documented across Cookpad, Venmo, Whisk, and Allrecipes comparables. Clear dependency chain and MVP definition. |
-| Architecture | HIGH | Fan-out-on-read at this scale is well-justified. Schema design follows established Supabase patterns. Existing codebase conventions (Zustand stores, Realtime hooks, RLS functions) provide clear templates. |
-| Pitfalls | HIGH | All pitfalls sourced from Supabase documentation, existing codebase analysis, and documented social feature failure patterns. Prevention strategies are concrete and phase-mapped. |
+| Stack | HIGH | All APIs have official documentation verified. expo-camera barcode support confirmed for SDK 55. Postgres tsvector GIN is Supabase-documented. Only uncertainty: FatSecret Premier Free approval process timeline. |
+| Features | HIGH | Based on official API docs, competitor feature analysis across 5 apps, and detailed existing codebase review. Anti-features are well-justified with competitive context. |
+| Architecture | HIGH | Existing codebase architecture well-understood. New patterns (waterfall lookup, parallel merge, OAuth token caching in Deno) are straightforward extensions of established codebase patterns. |
+| Pitfalls | HIGH | Critical pitfalls verified against official API docs, FatSecret developer community reports, and direct inspection of existing database schema types. |
 
 **Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **Expo Push API batching limits:** The exact rate limits and optimal batching strategy for Expo Push API when sending social notifications to many recipients need verification during Phase 5 planning.
-- **Multi-household feed context:** When a user belongs to multiple households, which kitchen identity is active for social actions? The architecture assumes active household context but the exact UX flow for switching needs design during Phase 2 planning.
-- **Recipe cloning edge cases:** When saving a recipe from feed, how to handle recipes with photos stored in the source household's Storage path. Need to verify whether photo URLs remain accessible or need to be copied during Phase 4 planning.
-- **Supabase Realtime `in` filter support:** The architecture recommends filtering post_likes/post_comments by `post_id=in.(...)` but the exact filter syntax and limitations for array-based filters in postgres_changes need verification during Phase 4 planning.
+- **FatSecret Premier Free approval:** The tier exists per pricing page but requires registration and approval. Exact rate limits need confirmation. If denied or delayed, treat FatSecret as fallback-only with USDA as primary for both search and branded foods.
+- **Ingredient matching accuracy baseline:** The ~70-80% estimate comes from general NLP matching research, not SharedKitchen-specific data. Real-world accuracy needs measurement in Phase 5 to determine if curated mapping needs more than 200 entries.
+- **Gemini prompt for ingredient disambiguation:** No existing prompt in codebase. Prompt design and testing is required before Phase 5 can be accurately estimated.
+- **Premium gating decision:** Which food data features are free vs. premium (barcode scanning? detailed nutrition? per-ingredient breakdown?) is a product decision that must be made before Phase 4-5 implementation begins.
+- **USDA Foundation Foods pre-population:** Whether to seed `food_items` with USDA Foundation Foods (~7,000 common foods) at Phase 1 vs. letting the cache populate organically needs a planning decision. Pre-population would eliminate most API calls for common foods.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- Expo SDK 55 Changelog -- expo-image version 55.0.8 compatibility confirmed
-- Supabase Push Notifications Guide -- Edge Function + Database Webhook pattern for Expo Push
-- Supabase Realtime Benchmarks -- postgres_changes single-thread limitation
-- Supabase RLS Documentation -- SECURITY DEFINER pattern, auth.uid() subselect optimization
-- Existing codebase: `useGrocerySync.ts`, `useActivityToast.ts`, `notifications.ts`, `push_tokens` migration, all existing Zustand stores
+- [USDA FoodData Central API Guide](https://fdc.nal.usda.gov/api-guide/) — endpoints, rate limits, data types, API key auth
+- [USDA FDC OpenAPI Specification](https://fdc.nal.usda.gov/api-spec/fdc_api.html) — complete response schemas
+- [USDA FDC Data Documentation](https://fdc.nal.usda.gov/data-documentation/) — Foundation vs Branded vs SR Legacy data types
+- [Open Food Facts API Documentation](https://openfoodfacts.github.io/openfoodfacts-server/api/) — no auth, rate limits, barcode lookup format
+- [Open Food Facts API Tutorial](https://openfoodfacts.github.io/openfoodfacts-server/api/tutorial-off-api/) — product fields, field selection, usage guidelines
+- [FatSecret OAuth 2.0 Documentation](https://platform.fatsecret.com/docs/guides/authentication/oauth2) — client credentials flow, token expiry
+- [Expo Camera Documentation](https://docs.expo.dev/versions/latest/sdk/camera/) — CameraView, onBarcodeScanned, supported barcode types in SDK 52+
+- [Expo Barcode Scanner Migration Guide](https://github.com/expo/fyi/blob/main/barcode-scanner-to-expo-camera.md) — expo-barcode-scanner removed in SDK 51+, use expo-camera
+- [Supabase Full Text Search](https://supabase.com/docs/guides/database/full-text-search) — tsvector, GIN index, textSearch() client method
+- [Supabase Edge Functions](https://supabase.com/docs/guides/functions) — Deno fetch, secrets, architecture
 
 ### Secondary (MEDIUM confidence)
-- Cookpad blog posts -- feature patterns for cooking social apps (follow, cooksnaps, community)
-- GetStream fan-out documentation -- fan-out-on-read vs write tradeoffs
-- Content moderation best practices (GetStream, Arena.im, Social Plus) -- moderation requirements at launch
+- [FatSecret API Editions and Pricing](https://platform.fatsecret.com/api-editions) — Premier Free tier existence and attribution requirements (approval process not documented in detail)
+- [FatSecret Unit Mismatch Issue](https://groups.google.com/g/fatsecret-platform-api/c/UD-zRYNQFDE) — recipe vs food unit discrepancy reported in developer community
+- [Nutrition API Accuracy Testing (2026)](https://dev.to/raviteja_nekkalapu_/i-tested-8-nutrition-apis-with-the-same-query-only-2-returned-correct-data-4kfg) — only 2/8 APIs returned correct data; validates USDA + FatSecret selection
+- [Top Nutrition APIs for Developers 2026](https://www.spikeapi.com/blog/top-nutrition-apis-for-developers-2026) — ecosystem context
+- [Best Nutrition Tracking Apps 2026](https://rouvy.com/blog/best-apps-for-nutrition-tracking) — competitor feature landscape
 
 ### Tertiary (LOW confidence)
-- Supabase Realtime `in` filter syntax for postgres_changes -- needs runtime verification, documentation is sparse on array filters
+- Ingredient matching accuracy (~70-80%) — inferred from general NLP food entity extraction literature, not SharedKitchen-specific measurement; needs validation in Phase 5.
 
 ---
-*Research completed: 2026-04-06*
+*Research completed: 2026-04-07*
 *Ready for roadmap: yes*

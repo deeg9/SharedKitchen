@@ -1,715 +1,619 @@
-# Architecture Research
+# Architecture Patterns: Food Data Integration
 
-**Domain:** Social feed features for collaborative dinner planning app (SharedKitchen v5.0)
-**Researched:** 2026-04-06
-**Confidence:** HIGH
+**Domain:** Food database integration into existing meal planning app
+**Researched:** 2026-04-07
+**Confidence:** HIGH (existing architecture well-understood, APIs documented)
 
 ## System Overview
 
 ```
-Existing Architecture (unchanged)
-===================================
-React Native + Expo  -->  Supabase (Postgres + Auth + Realtime + Storage + Edge Functions)
-Zustand stores       -->  RLS policies scoped to household_id via is_household_member()
+                          SharedKitchen v6.0 — Food Data Integration
+                          ==========================================
 
-New Social Layer (v5.0)
-===================================
-┌──────────────────────────────────────────────────────────────────┐
-│                        UI Layer                                   │
-│  ┌──────────┐  ┌───────────┐  ┌──────────┐  ┌────────────────┐  │
-│  │ FeedTab  │  │ FeedCard  │  │ Comments │  │ KitchenProfile │  │
-│  │ (Plan)   │  │ Component │  │ Sheet    │  │ Screen         │  │
-│  └────┬─────┘  └─────┬─────┘  └────┬─────┘  └──────┬─────────┘  │
-│       └───────────────┴─────────────┴───────────────┘            │
-├──────────────────────────────────────────────────────────────────┤
-│                     State Layer (Zustand)                         │
-│  ┌────────────┐  ┌─────────────┐  ┌──────────────┐              │
-│  │ feedStore  │  │ socialStore │  │ recipeStore  │ (modified)   │
-│  │ (NEW)      │  │ (NEW)       │  │ +saveFromFeed│              │
-│  └────────────┘  └─────────────┘  └──────────────┘              │
-├──────────────────────────────────────────────────────────────────┤
-│                    Data Layer (Supabase)                          │
-│  ┌──────────────┐  ┌──────────┐  ┌────────────┐  ┌───────────┐ │
-│  │ feed_posts   │  │ follows  │  │ post_likes │  │ post_     │ │
-│  │              │  │          │  │            │  │ comments  │ │
-│  └──────────────┘  └──────────┘  └────────────┘  └───────────┘ │
-│  ┌──────────────────┐  ┌─────────────────────┐                  │
-│  │ kitchen_profiles │  │ meal-photos bucket  │                  │
-│  └──────────────────┘  └─────────────────────┘                  │
-├──────────────────────────────────────────────────────────────────┤
-│                    Real-time Layer                                │
-│  ┌──────────────────────────────────────────────┐                │
-│  │ postgres_changes on post_likes, post_comments│                │
-│  │ (NOT on feed_posts -- poll/manual refresh)   │                │
-│  └──────────────────────────────────────────────┘                │
-└──────────────────────────────────────────────────────────────────┘
+  Mobile Client (React Native + Expo 55)
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │                                                                     │
+  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────┐  │
+  │  │ foodStore    │  │ pantryStore  │  │ recipeStore              │  │
+  │  │ (NEW)        │  │ (MODIFIED)   │  │ (MODIFIED: nutrition)    │  │
+  │  │              │  │ + food_id FK │  │ + ingredient food_id FK  │  │
+  │  │ - search()   │  │ + nutrition  │  │ + computeNutrition()     │  │
+  │  │ - barcode()  │  │   display    │  │                          │  │
+  │  │ - getFood()  │  │              │  │                          │  │
+  │  └──────┬───────┘  └──────────────┘  └──────────────────────────┘  │
+  │         │                                                           │
+  │  ┌──────┴───────────────────────────────────────────────────────┐   │
+  │  │  BarcodeScanner (NEW)  │  FoodSearch (NEW)  │ NutritionCard │   │
+  │  │  expo-camera barcode   │  Autocomplete UI   │ (NEW)         │   │
+  │  └────────────────────────┴────────────────────┴───────────────┘   │
+  └────────────────────────────────┬────────────────────────────────────┘
+                                   │ HTTPS
+                                   ▼
+  Supabase Edge Functions (Deno)
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │                                                                     │
+  │  ┌───────────────────┐  ┌───────────────────┐                      │
+  │  │ food-search (NEW) │  │ food-barcode(NEW) │                      │
+  │  │                   │  │                   │                      │
+  │  │ 1. Check cache    │  │ 1. Check OFF      │                      │
+  │  │ 2. USDA search    │  │ 2. Check FatSecret│                      │
+  │  │ 3. FatSecret srch │  │ 3. Cache result   │                      │
+  │  │ 4. Merge+rank     │  │                   │                      │
+  │  │ 5. Cache results  │  │                   │                      │
+  │  └────────┬──────────┘  └────────┬──────────┘                      │
+  │           │                      │                                  │
+  │  ┌────────┴──────────────────────┴──────────┐                      │
+  │  │ generate-meal (MODIFIED: nutrition ctx)   │                      │
+  │  │ analyze-food-photo (MODIFIED: food match) │                      │
+  │  └─────────────────────────────────────────  │                      │
+  └────────────────────────────────┬────────────────────────────────────┘
+                                   │
+                                   ▼
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │  External APIs                                                      │
+  │  ┌─────────────┐  ┌──────────────────┐  ┌────────────────────────┐ │
+  │  │ USDA FDC    │  │ Open Food Facts  │  │ FatSecret Premier Free │ │
+  │  │             │  │                  │  │                        │ │
+  │  │ /foods/     │  │ /api/v2/product/ │  │ foods.search           │ │
+  │  │   search    │  │   {barcode}      │  │ food.get               │ │
+  │  │ /food/      │  │                  │  │ food.find_id_for_      │ │
+  │  │   {fdcId}   │  │ Free, no key     │  │   barcode              │ │
+  │  │             │  │ User-Agent req'd │  │                        │ │
+  │  │ 1000/hr     │  │ ~1 req/user/scan │  │ No call limits         │ │
+  │  │ Free API key│  │                  │  │ OAuth2 client creds    │ │
+  │  └─────────────┘  └──────────────────┘  └────────────────────────┘ │
+  └─────────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+  Supabase Postgres (with RLS)
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │  food_items (NEW cache table)      │  recipes.ingredients (MODIFIED)│
+  │  ┌─────────────────────────────┐   │  ┌───────────────────────────┐│
+  │  │ id UUID PK                  │   │  │ JSONB array, each item    ││
+  │  │ fdc_id INT (USDA)           │   │  │ gets optional food_id     ││
+  │  │ off_barcode TEXT (OFF)      │   │  │ linking to food_items     ││
+  │  │ fatsecret_id BIGINT         │   │  └───────────────────────────┘│
+  │  │ name TEXT (normalized)      │   │                               │
+  │  │ brand TEXT                   │   │  pantry_items (MODIFIED)      │
+  │  │ barcode TEXT (UPC/EAN)      │   │  ┌───────────────────────────┐│
+  │  │ nutrition JSONB             │   │  │ + food_id UUID FK          ││
+  │  │ serving_sizes JSONB         │   │  │ + nutrition_per_serving   ││
+  │  │ source TEXT (usda|off|fs)   │   │  └───────────────────────────┘│
+  │  │ category TEXT               │   │                               │
+  │  │ image_url TEXT              │   │  food_search_cache (NEW)      │
+  │  │ fetched_at TIMESTAMPTZ      │   │  ┌───────────────────────────┐│
+  │  │ expires_at TIMESTAMPTZ      │   │  │ query_hash TEXT PK        ││
+  │  └─────────────────────────────┘   │  │ results JSONB             ││
+  │                                     │  │ created_at TIMESTAMPTZ    ││
+  │  UNIQUE(fdc_id), UNIQUE(barcode)   │  │ expires_at TIMESTAMPTZ    ││
+  │  idx on name (trigram for search)  │  └───────────────────────────┘│
+  └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### Component Responsibilities
-
-| Component | Responsibility | Implementation |
-|-----------|----------------|----------------|
-| `feedStore` (NEW) | Feed data, pagination, like/unlike, post creation | Zustand store, cursor-based fetch |
-| `socialStore` (NEW) | Follows, follower counts, kitchen discovery | Zustand store, follow/unfollow actions |
-| `recipeStore` (MODIFIED) | Add `saveRecipeFromFeed()` to clone recipe into household | Extend existing store |
-| `FeedCard` (NEW) | Render single feed post with interactions | Component in `src/components/feed/` |
-| `CommentsSheet` (NEW) | Bottom sheet for viewing/adding comments | Component in `src/components/feed/` |
-| `KitchenProfile` (NEW) | Public view of a kitchen's recent meals | Screen in `app/(app)/kitchen/` |
-| `useFeedSync` (NEW) | Realtime subscription for likes/comments on visible posts | Hook in `src/hooks/` |
-
-## Database Schema
-
-### New Tables
-
-#### `kitchen_profiles`
-Public-facing profile for a household. Decoupled from `households` so private data stays private.
-
-```sql
-CREATE TABLE kitchen_profiles (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  household_id UUID NOT NULL UNIQUE REFERENCES households(id) ON DELETE CASCADE,
-  display_name TEXT NOT NULL,
-  bio TEXT,
-  avatar_url TEXT,
-  is_public BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
-```
-
-**Rationale:** The existing `households` table contains private data (invite_code, created_by). A separate `kitchen_profiles` table lets us expose only what should be public, with simple RLS: anyone can SELECT public profiles; only household admins can UPDATE their own.
-
-#### `follows`
-User-to-kitchen follow relationship (not user-to-user, because kitchens are the social unit).
-
-```sql
-CREATE TABLE follows (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  follower_user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  following_kitchen_id UUID NOT NULL REFERENCES kitchen_profiles(id) ON DELETE CASCADE,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  UNIQUE(follower_user_id, following_kitchen_id)
-);
-
-CREATE INDEX idx_follows_follower ON follows(follower_user_id);
-CREATE INDEX idx_follows_following ON follows(following_kitchen_id);
-```
-
-**Key decision:** Users follow kitchens (households), not individual users. This matches SharedKitchen's household-centric model where meals belong to households.
-
-#### `feed_posts`
-Auto-generated when a meal is added to a plan (with share toggle).
-
-```sql
-CREATE TABLE feed_posts (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  kitchen_id UUID NOT NULL REFERENCES kitchen_profiles(id) ON DELETE CASCADE,
-  meal_plan_id UUID REFERENCES meal_plans(id) ON DELETE SET NULL,
-  recipe_id UUID REFERENCES recipes(id) ON DELETE SET NULL,
-  posted_by UUID NOT NULL REFERENCES profiles(id),
-  caption TEXT,
-  photo_url TEXT,
-  meal_name TEXT NOT NULL,
-  meal_type TEXT,
-  like_count INT DEFAULT 0,
-  comment_count INT DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
-CREATE INDEX idx_feed_posts_kitchen ON feed_posts(kitchen_id);
-CREATE INDEX idx_feed_posts_created ON feed_posts(created_at DESC);
--- Composite index for feed query (fan-out-on-read)
-CREATE INDEX idx_feed_posts_kitchen_created ON feed_posts(kitchen_id, created_at DESC);
-```
-
-**Key decisions:**
-- `meal_name` is denormalized from meal_plan/recipe so posts survive if the source meal is deleted.
-- `like_count` and `comment_count` are denormalized counters updated via triggers. Avoids COUNT(*) on every feed card render.
-- `recipe_id` is nullable -- recipe-less meals (photo meal logging from v4.0) can still be shared.
-
-#### `post_likes`
-
-```sql
-CREATE TABLE post_likes (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  post_id UUID NOT NULL REFERENCES feed_posts(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  UNIQUE(post_id, user_id)
-);
-
-CREATE INDEX idx_post_likes_post ON post_likes(post_id);
-CREATE INDEX idx_post_likes_user ON post_likes(user_id);
-```
-
-#### `post_comments`
-
-```sql
-CREATE TABLE post_comments (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  post_id UUID NOT NULL REFERENCES feed_posts(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  content TEXT NOT NULL CHECK (char_length(content) <= 500),
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
-CREATE INDEX idx_post_comments_post_created ON post_comments(post_id, created_at);
-```
-
-#### `saved_recipes` (bridge table)
-
-```sql
-CREATE TABLE saved_recipes (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  source_recipe_id UUID NOT NULL REFERENCES recipes(id) ON DELETE CASCADE,
-  target_recipe_id UUID NOT NULL REFERENCES recipes(id) ON DELETE CASCADE,
-  saved_at TIMESTAMPTZ DEFAULT now(),
-  UNIQUE(user_id, source_recipe_id)
-);
-```
-
-**Rationale:** When a user saves a recipe from the feed, we clone it into their household's `recipes` table (so they own it). `saved_recipes` tracks the lineage to avoid duplicate saves and could show "saved from Kitchen X."
-
-### Denormalized Counter Triggers
-
-```sql
--- Like count trigger
-CREATE OR REPLACE FUNCTION update_post_like_count()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF TG_OP = 'INSERT' THEN
-    UPDATE feed_posts SET like_count = like_count + 1 WHERE id = NEW.post_id;
-  ELSIF TG_OP = 'DELETE' THEN
-    UPDATE feed_posts SET like_count = like_count - 1 WHERE id = OLD.post_id;
-  END IF;
-  RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER post_likes_count
-  AFTER INSERT OR DELETE ON post_likes
-  FOR EACH ROW EXECUTE FUNCTION update_post_like_count();
-
--- Comment count trigger (same pattern)
-CREATE OR REPLACE FUNCTION update_post_comment_count()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF TG_OP = 'INSERT' THEN
-    UPDATE feed_posts SET comment_count = comment_count + 1 WHERE id = NEW.post_id;
-  ELSIF TG_OP = 'DELETE' THEN
-    UPDATE feed_posts SET comment_count = comment_count - 1 WHERE id = OLD.post_id;
-  END IF;
-  RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER post_comments_count
-  AFTER INSERT OR DELETE ON post_comments
-  FOR EACH ROW EXECUTE FUNCTION update_post_comment_count();
-```
-
-## RLS Policies
-
-### Design Principle: Social data is public-by-read, private-by-write
-
-Unlike existing household-scoped RLS (`is_household_member()`), social tables use a different model:
-- **Read:** Visible if the kitchen is public OR the user follows the kitchen
-- **Write:** Only the owner/author can create/modify
-
-### RLS Helper Function
-
-```sql
--- Check if user follows a kitchen or is a member of that kitchen's household
-CREATE OR REPLACE FUNCTION can_view_kitchen(p_kitchen_id UUID, p_user_id UUID)
-RETURNS BOOLEAN
-LANGUAGE sql
-SECURITY DEFINER
-STABLE
-AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM kitchen_profiles kp
-    WHERE kp.id = p_kitchen_id
-    AND (
-      kp.is_public = true
-      OR EXISTS (SELECT 1 FROM follows f WHERE f.follower_user_id = p_user_id AND f.following_kitchen_id = p_kitchen_id)
-      OR EXISTS (SELECT 1 FROM household_members hm WHERE hm.household_id = kp.household_id AND hm.user_id = p_user_id)
-    )
-  );
-$$;
-```
-
-**Performance note:** Using `SECURITY DEFINER` avoids recursive RLS checks (same pattern as existing `is_household_member`). The function short-circuits on `is_public = true` for the common case.
-
-### Policy Examples
-
-```sql
--- kitchen_profiles: public profiles readable by anyone authenticated
-CREATE POLICY "Anyone can view public kitchens"
-  ON kitchen_profiles FOR SELECT
-  USING (is_public = true OR is_household_member(household_id, auth.uid()));
-
-CREATE POLICY "Household admins can update kitchen profile"
-  ON kitchen_profiles FOR UPDATE
-  USING (is_household_admin(household_id, auth.uid()));
-
--- follows: users manage their own follows
-CREATE POLICY "Users can view follows"
-  ON follows FOR SELECT
-  USING (follower_user_id = auth.uid() OR following_kitchen_id IN (
-    SELECT id FROM kitchen_profiles WHERE is_household_member(household_id, auth.uid())
-  ));
-
-CREATE POLICY "Users can follow kitchens"
-  ON follows FOR INSERT
-  WITH CHECK (follower_user_id = auth.uid());
-
-CREATE POLICY "Users can unfollow"
-  ON follows FOR DELETE
-  USING (follower_user_id = auth.uid());
-
--- feed_posts: visible to followers and own household
-CREATE POLICY "Users can view feed posts from followed kitchens"
-  ON feed_posts FOR SELECT
-  USING (can_view_kitchen(kitchen_id, auth.uid()));
-
-CREATE POLICY "Household members can create posts"
-  ON feed_posts FOR INSERT
-  WITH CHECK (EXISTS (
-    SELECT 1 FROM kitchen_profiles kp
-    WHERE kp.id = kitchen_id
-    AND is_household_member(kp.household_id, auth.uid())
-  ));
-
--- post_likes: viewable on visible posts, users manage their own
-CREATE POLICY "Users can view likes on visible posts"
-  ON post_likes FOR SELECT
-  USING (EXISTS (
-    SELECT 1 FROM feed_posts fp
-    WHERE fp.id = post_likes.post_id
-    AND can_view_kitchen(fp.kitchen_id, auth.uid())
-  ));
-
-CREATE POLICY "Users can like posts"
-  ON post_likes FOR INSERT
-  WITH CHECK (user_id = auth.uid());
-
-CREATE POLICY "Users can unlike"
-  ON post_likes FOR DELETE
-  USING (user_id = auth.uid());
-
--- post_comments: same visibility as likes
-CREATE POLICY "Users can view comments on visible posts"
-  ON post_comments FOR SELECT
-  USING (EXISTS (
-    SELECT 1 FROM feed_posts fp
-    WHERE fp.id = post_comments.post_id
-    AND can_view_kitchen(fp.kitchen_id, auth.uid())
-  ));
-
-CREATE POLICY "Users can add comments"
-  ON post_comments FOR INSERT
-  WITH CHECK (user_id = auth.uid());
-
-CREATE POLICY "Users can delete own comments"
-  ON post_comments FOR DELETE
-  USING (user_id = auth.uid());
-```
-
-## Architectural Patterns
-
-### Pattern 1: Fan-Out-on-Read for Feed
-
-**What:** When a user opens the feed, query all posts from kitchens they follow, sorted by created_at DESC. No pre-materialized timeline table.
-
-**Why this over fan-out-on-write:** SharedKitchen is a small-scale social app (households, not millions of followers). Fan-out-on-write adds complexity (materialized feed tables, async workers) that is not justified. Fan-out-on-read with proper indexes handles the scale SharedKitchen will see.
-
-**Trade-offs:**
-- PRO: Simple schema, no write amplification, no stale-feed bugs
-- PRO: New follows immediately show historical posts (no backfill needed)
-- CON: Feed query joins follows + feed_posts (mitigated by composite index)
-- CON: Theoretically slower at extreme scale (irrelevant for this app)
-
-**Feed Query:**
-```sql
-SELECT fp.*, kp.display_name, kp.avatar_url,
-  EXISTS(SELECT 1 FROM post_likes pl WHERE pl.post_id = fp.id AND pl.user_id = $1) as is_liked
-FROM feed_posts fp
-JOIN kitchen_profiles kp ON kp.id = fp.kitchen_id
-WHERE fp.kitchen_id IN (
-  SELECT following_kitchen_id FROM follows WHERE follower_user_id = $1
-)
-AND fp.created_at < $2  -- cursor: last post's created_at
-ORDER BY fp.created_at DESC
-LIMIT 20;
-```
-
-**Supabase client equivalent:**
-```typescript
-const { data } = await supabase
-  .from('feed_posts')
-  .select(`
-    *,
-    kitchen_profiles!inner(display_name, avatar_url),
-    post_likes!left(user_id)
-  `)
-  .in('kitchen_id', followedKitchenIds)
-  .lt('created_at', cursor)
-  .order('created_at', { ascending: false })
-  .limit(20);
-```
-
-### Pattern 2: Cursor-Based Pagination
-
-**What:** Use `created_at` as the cursor for infinite scroll, not offset-based pagination.
-
-**Why:** Offset-based pagination breaks when new posts are inserted (items shift). Cursor-based pagination is stable and performant with the `idx_feed_posts_kitchen_created` index.
-
-**Implementation:**
-```typescript
-// In feedStore
-fetchFeed: async (followedIds: string[], cursor?: string) => {
-  let query = supabase
-    .from('feed_posts')
-    .select('*, kitchen_profiles(display_name, avatar_url)')
-    .in('kitchen_id', followedIds)
-    .order('created_at', { ascending: false })
-    .limit(20);
-
-  if (cursor) {
-    query = query.lt('created_at', cursor);
-  }
-
-  const { data, error } = await query;
-  // ...
-  const nextCursor = data.length === 20 ? data[data.length - 1].created_at : null;
-  return { posts: data, nextCursor };
-}
-```
-
-**React Native infinite scroll:** Use `FlatList` with `onEndReached` to trigger next page fetch. The cursor is the `created_at` of the last post in the current list.
-
-### Pattern 3: Optimistic UI for Likes
-
-**What:** Update like state locally before server confirms.
-
-**Why:** Like/unlike must feel instant. Network round-trip would make the app feel sluggish.
-
-```typescript
-toggleLike: async (postId: string, userId: string, isLiked: boolean) => {
-  // Optimistic update
-  set((state) => ({
-    posts: state.posts.map(p =>
-      p.id === postId
-        ? { ...p, is_liked: !isLiked, like_count: p.like_count + (isLiked ? -1 : 1) }
-        : p
-    ),
-  }));
-
-  try {
-    if (isLiked) {
-      await supabase.from('post_likes').delete().match({ post_id: postId, user_id: userId });
-    } else {
-      await supabase.from('post_likes').insert({ post_id: postId, user_id: userId });
-    }
-  } catch {
-    // Rollback on failure
-    set((state) => ({
-      posts: state.posts.map(p =>
-        p.id === postId
-          ? { ...p, is_liked: isLiked, like_count: p.like_count + (isLiked ? 1 : -1) }
-          : p
-      ),
-    }));
-  }
-}
-```
-
-### Pattern 4: Auto-Post with Share Toggle
-
-**What:** When a meal is added to the plan, auto-create a feed post if the kitchen has sharing enabled. Add a toggle on the meal assignment bottom sheet.
-
-**Implementation approach:** Extend `planStore.assignRecipe()` to optionally create a `feed_posts` row. The share toggle default comes from `kitchen_profiles.is_public`. Users can override per-meal.
-
-```typescript
-// In planStore.assignRecipe(), after successful meal plan insert:
-if (shouldShare && kitchenProfileId) {
-  await supabase.from('feed_posts').insert({
-    kitchen_id: kitchenProfileId,
-    meal_plan_id: mealPlanId,
-    recipe_id: recipeId,
-    posted_by: userId,
-    meal_name: recipeName || notes || 'Unnamed meal',
-    meal_type: mealType,
-    photo_url: photoUrl,
-  });
-}
-```
+## Component Responsibilities
+
+### NEW Components
+
+| Component | Type | Responsibility | Communicates With |
+|-----------|------|---------------|-------------------|
+| `food-search` Edge Function | Backend | Unified food search across USDA + FatSecret, with Postgres cache | USDA FDC API, FatSecret API, `food_items` table |
+| `food-barcode` Edge Function | Backend | Barcode lookup via OFF then FatSecret fallback, caching | Open Food Facts API, FatSecret API, `food_items` table |
+| `foodStore` (Zustand) | Client store | Client-side food search/barcode state, cached results | `food-search` EF, `food-barcode` EF, Supabase direct for `food_items` |
+| `food_items` table | Database | Canonical food data cache, deduplicated across sources | Referenced by `pantry_items.food_id`, recipe `ingredients[].food_id` |
+| `food_search_cache` table | Database | Short-lived cache of search query results (24h TTL) | `food-search` Edge Function reads/writes |
+| `BarcodeScanner` component | UI | Camera-based UPC/EAN barcode scanning | expo-camera, `foodStore.lookupBarcode()` |
+| `FoodSearchSheet` component | UI | Bottom sheet with autocomplete food search | `foodStore.searchFoods()` |
+| `NutritionCard` component | UI | Displays nutrition facts (FDA-style label) | Recipe/food nutrition data from stores |
+| `NutritionSummary` component | UI | Aggregated daily/weekly nutrition on Plan tab | `planStore` + `recipeStore` computed nutrition |
+
+### MODIFIED Components
+
+| Component | Modification | Why |
+|-----------|-------------|-----|
+| `pantryStore` | Add `food_id` linking, nutrition display per item | Pantry items can reference canonical food data |
+| `recipeStore` | Add `computeRecipeNutrition()` that sums ingredient nutrition | Recipes get computed nutrition from linked food_items |
+| `generate-meal` Edge Function | Include nutrition context in AI prompt (daily totals, goals) | AI can suggest meals that hit nutrition targets |
+| `analyze-food-photo` Edge Function | After identifying food, attempt food_items match for nutrition | Photo scan results get nutrition data attached |
+| `Ingredient` type | Add optional `food_id?: string` field | Link ingredients to canonical food database entries |
+| `NutritionInfo` type | Expand from string-based to number-based with units | Current type uses strings ("200 kcal"); needs numeric for computation |
+| `pantry_items` migration | Add `food_id` UUID column, nullable FK to `food_items` | Optional enrichment of pantry items with nutrition data |
 
 ## Data Flow
 
-### Feed Loading Flow
+### Flow 1: Food Search (text query)
 
 ```
-User opens Plan tab -> FeedSegment active
-    |
-feedStore.fetchFeed(followedKitchenIds, null)
-    |
-Supabase query: feed_posts JOIN kitchen_profiles
-WHERE kitchen_id IN (followed) ORDER BY created_at DESC LIMIT 20
-    |
-RLS: can_view_kitchen() checks public OR follows OR membership
-    |
-Response -> feedStore.posts[] -> FlatList renders FeedCards
-    |
-onEndReached -> feedStore.fetchFeed(followedKitchenIds, lastCursor)
+User types "chicken breast" in FoodSearchSheet
+  -> foodStore.searchFoods("chicken breast")
+    -> POST /food-search { query: "chicken breast" }
+      -> Edge Function:
+        1. Hash query, check food_search_cache (24h TTL)
+        2. If miss: parallel fetch from USDA + FatSecret
+           - USDA: GET /foods/search?query=chicken+breast&dataType=Foundation,SR+Legacy
+           - FatSecret: POST foods.search (OAuth2 token)
+        3. Deduplicate by name similarity
+        4. Rank: USDA Foundation > USDA SR Legacy > FatSecret > USDA Branded
+        5. Upsert top results into food_items (canonical cache)
+        6. Store search results in food_search_cache
+        7. Return ranked array of food_items
+      <- Array of FoodItem objects
+    <- foodStore sets searchResults
+  -> User taps item -> foodStore.getFood(id) for full nutrition
+  -> Used in: ingredient linking, pantry addition, food logging
 ```
 
-### Like Flow
+### Flow 2: Barcode Scan
 
 ```
-User taps heart icon on FeedCard
-    |
-feedStore.toggleLike(postId, userId, isLiked)
-    |
-Optimistic: update local state immediately
-    |
-Supabase: INSERT/DELETE post_likes
-    |
-DB trigger: update feed_posts.like_count +/- 1
-    |
-Success -> no action (already updated)
-Error -> rollback local state
+User opens BarcodeScanner, scans UPC/EAN barcode
+  -> expo-camera onBarcodeScanned({ type: "ean13", data: "3017624010701" })
+    -> foodStore.lookupBarcode("3017624010701")
+      -> POST /food-barcode { barcode: "3017624010701" }
+        -> Edge Function:
+          1. Check food_items WHERE barcode = "3017624010701"
+          2. If miss: GET Open Food Facts /api/v2/product/3017624010701
+             - OFF returns: product_name, nutriments, nutri-score, image
+          3. If OFF miss or incomplete: FatSecret food.find_id_for_barcode
+             - Returns food_id -> food.get for full nutrition
+          4. Upsert into food_items with source priority
+          5. Return FoodItem
+        <- FoodItem or null (not found)
+      <- foodStore sets scannedFood
+    -> Show food details bottom sheet
+    -> User action: "Add to Pantry" or "Add to Grocery List"
 ```
 
-### Recipe Save Flow
+### Flow 3: Recipe Nutrition Computation
 
 ```
-User taps "Save Recipe" on FeedCard
-    |
-recipeStore.saveRecipeFromFeed(sourceRecipeId, targetHouseholdId)
-    |
-1. Fetch source recipe (RLS allows via can_view_kitchen)
-2. Clone into target household's recipes (new ID, new household_id)
-3. Insert saved_recipes row (tracks lineage)
-    |
-Toast: "Recipe saved to your kitchen!"
+Recipe has ingredients: [{ name: "chicken breast", amount: 2, unit: "lbs", food_id: "abc123" }, ...]
+  -> recipeStore.computeRecipeNutrition(recipe)
+    -> For each ingredient with food_id:
+      1. Look up food_items by id (from local cache or Supabase)
+      2. Find matching serving size or convert to grams
+      3. Scale nutrition by ingredient amount
+    -> Sum all ingredient nutrition values
+    -> Return NutritionData { calories: 450, protein_g: 52, total_fat_g: 12, ... }
+  -> Display in NutritionCard on RecipeDetail screen
+  -> Store computed nutrition on recipe (recipes.nutrition_info) for fast access
 ```
 
-### Post Creation Flow
+### Flow 4: Enhanced AI Meal Generation
 
 ```
-User assigns meal in Plan tab (existing assignRecipe flow)
-    |
-Share toggle checked? (default: kitchen_profiles.is_public)
-    |
-YES -> planStore creates meal_plan row + feed_posts row
-NO  -> planStore creates meal_plan row only (existing behavior)
-```
-
-## Real-Time Strategy
-
-### What to make real-time and what not to
-
-| Data | Real-time? | Mechanism | Rationale |
-|------|-----------|-----------|-----------|
-| New feed posts | NO | Pull-to-refresh | Feed refresh is user-initiated; postgres_changes on a multi-kitchen query is expensive |
-| Likes on visible posts | YES (lightweight) | postgres_changes on post_likes filtered by post_id | Only subscribe to posts currently visible on screen; manageable scale |
-| Comments on open post | YES | postgres_changes on post_comments filtered by post_id | Only when comments sheet is open; single post scope |
-| Follow/unfollow | NO | Immediate local state update | Rare action, no real-time need |
-| Like/comment counts | NO | Denormalized in feed_posts, updated by triggers | Counts refresh on next feed fetch |
-
-**Critical constraint from Supabase docs:** postgres_changes processes on a single thread and every change event triggers an RLS check per subscriber. Subscribing all users to all feed_posts changes would create a bottleneck. Instead, subscribe only to specific post_ids when actively viewing interactions.
-
-```typescript
-// useFeedSync.ts -- only subscribe to likes/comments on visible posts
-export function useFeedSync(visiblePostIds: string[]) {
-  useEffect(() => {
-    if (visiblePostIds.length === 0) return;
-
-    const channel = supabase
-      .channel('feed-interactions')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'post_comments',
-        filter: `post_id=in.(${visiblePostIds.join(',')})`,
-      }, (payload) => {
-        useFeedStore.getState()._addComment(payload.new);
-      })
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
-  }, [visiblePostIds.join(',')]);
-}
-```
-
-## Image Storage for Meal Photos
-
-### New Storage Bucket
-
-```sql
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('meal-photos', 'meal-photos', true)
-ON CONFLICT (id) DO NOTHING;
-
--- Public read (feed photos are public)
-CREATE POLICY "Public read for meal photos"
-  ON storage.objects FOR SELECT
-  USING (bucket_id = 'meal-photos');
-
--- Authenticated upload
-CREATE POLICY "Authenticated upload meal photos"
-  ON storage.objects FOR INSERT
-  WITH CHECK (bucket_id = 'meal-photos' AND auth.role() = 'authenticated');
-
--- Users can delete own photos (stored as {user_id}/{filename})
-CREATE POLICY "Users can delete own meal photos"
-  ON storage.objects FOR DELETE
-  USING (bucket_id = 'meal-photos' AND auth.uid()::text = (storage.foldername(name))[1]);
-```
-
-**Photo handling:** Reuse the existing `expo-image-manipulator` compression pipeline from v4.0 (1024px JPEG 0.6). Upload to `meal-photos/{user_id}/{uuid}.jpg` via Supabase Storage. Store the public URL in `feed_posts.photo_url`.
-
-**Difference from v4.0 vision flow:** v4.0 uses base64 in JSON body because images are transient (analyzed by Gemini, not stored). Feed photos ARE persisted, so they go to Storage.
-
-## Recommended Project Structure
-
-```
-src/
-├── stores/
-│   ├── feedStore.ts          # NEW: feed posts, pagination, likes
-│   ├── socialStore.ts        # NEW: follows, kitchen profiles, discovery
-│   ├── recipeStore.ts        # MODIFIED: add saveRecipeFromFeed()
-│   └── planStore.ts          # MODIFIED: add share toggle to assignRecipe()
-├── hooks/
-│   ├── useFeedSync.ts        # NEW: realtime for visible post interactions
-│   └── ... (existing hooks unchanged)
-├── components/
-│   ├── feed/
-│   │   ├── FeedCard.tsx       # NEW: single post card (photo, caption, interactions)
-│   │   ├── FeedList.tsx       # NEW: FlatList with infinite scroll
-│   │   ├── LikeButton.tsx     # NEW: heart icon with optimistic toggle
-│   │   ├── CommentsSheet.tsx  # NEW: bottom sheet for comments
-│   │   ├── ShareToggle.tsx    # NEW: toggle for meal assignment sheet
-│   │   └── KitchenAvatar.tsx  # NEW: kitchen avatar + name row
-│   ├── plan/
-│   │   └── ... (existing, MODIFIED to add feed segment)
-│   └── ... (existing unchanged)
-├── types/
-│   └── database.ts            # MODIFIED: add social table types
-└── lib/
-    └── supabase.ts            # UNCHANGED
-app/
-├── (app)/
-│   ├── (tabs)/
-│   │   └── plan.tsx           # MODIFIED: add segmented control (My Plan | Feed)
-│   ├── kitchen/
-│   │   └── [id].tsx           # NEW: kitchen profile screen
-│   └── ... (existing unchanged)
+User requests "Surprise Me" meal suggestion
+  -> generate-meal Edge Function (MODIFIED):
+    1. Existing context gathering (dietary prefs, history, leftovers, budget)
+    2. NEW: Fetch today's planned meals -> compute consumed nutrition
+    3. NEW: Compare against recommended daily values
+    4. NEW: Add nutrition gap context to AI prompt:
+       "User has consumed 1200 cal, 30g protein so far today.
+        Suggest a dinner with higher protein content."
+    -> AI generates meal suggestion with nutrition awareness
 ```
 
 ## Integration Points with Existing Architecture
 
-### Existing Tables Referenced by Social Tables
+### 1. Edge Function Pattern (reuse existing conventions)
 
-| Social Table | References | Relationship |
-|-------------|-----------|--------------|
-| `kitchen_profiles` | `households(id)` | 1:1 -- each household has one public profile |
-| `feed_posts` | `meal_plans(id)`, `recipes(id)`, `profiles(id)` | Source meal, source recipe, posting user |
-| `follows` | `profiles(id)`, `kitchen_profiles(id)` | User follows kitchen |
-| `saved_recipes` | `recipes(id)` x2 | Source recipe -> cloned recipe |
+All existing Edge Functions follow the same pattern:
+- CORS headers constant
+- Auth via `supabase.auth.getUser()` from Authorization header
+- Admin client with `SUPABASE_SERVICE_ROLE_KEY` for writes
+- Premium check via `subscriptions` table
+- Rate limiting via usage log tables
 
-### Existing Stores Modified
+New `food-search` and `food-barcode` must follow this exact pattern. Rate limiting approach: log searches in `ai_usage_log` (reuse existing table with new `action_type`).
 
-| Store | Modification | Details |
-|-------|-------------|---------|
-| `planStore` | Add share toggle param to `assignRecipe()` | Optional `shouldShare` boolean + feed_posts insert |
-| `recipeStore` | Add `saveRecipeFromFeed()` action | Clone recipe into user's household |
-| `householdStore` | Add `kitchenProfile` state | Fetch/create kitchen profile for active household |
+### 2. Supabase Secrets (new API keys needed)
 
-### Existing Components Modified
+| Secret | Value | Where Used |
+|--------|-------|-----------|
+| `USDA_API_KEY` | data.gov API key | `food-search` Edge Function |
+| `FATSECRET_CLIENT_ID` | OAuth2 client ID | `food-search`, `food-barcode` Edge Functions |
+| `FATSECRET_CLIENT_SECRET` | OAuth2 client secret | `food-search`, `food-barcode` Edge Functions |
 
-| Component | Modification |
-|-----------|-------------|
-| Plan tab (`plan.tsx`) | Add segmented control: "My Plan" (existing) vs "Feed" (new FeedList) |
-| Meal assignment bottom sheet | Add ShareToggle component |
-| Profile screen | Add follower/following counts, link to kitchen profile setup |
+Open Food Facts requires NO API key -- just a User-Agent header identifying the app.
 
-### New Screens/Routes
+### 3. Ingredient Type Evolution
 
-| Route | Purpose |
-|-------|---------|
-| `app/(app)/kitchen/[id].tsx` | Public kitchen profile with recent posts |
-| Comments are a bottom sheet, not a route | Keeps navigation simple |
+Current `Ingredient` type:
+```typescript
+interface Ingredient {
+  amount: number;
+  unit: string;
+  name: string;
+  section?: string;
+}
+```
 
-## Scaling Considerations
+Extended for v6.0:
+```typescript
+interface Ingredient {
+  amount: number;
+  unit: string;
+  name: string;
+  section?: string;
+  food_id?: string;          // NEW: FK to food_items.id
+  nutrition_per_serving?: {   // NEW: denormalized for offline display
+    calories: number;
+    protein_g: number;
+    fat_g: number;
+    carbs_g: number;
+  } | null;
+}
+```
 
-| Scale | Architecture Adjustments |
-|-------|--------------------------|
-| 0-1k users | Fan-out-on-read with current schema is perfectly fine. Single Postgres instance handles it. |
-| 1k-10k users | Add `pg_trgm` index on kitchen_profiles.display_name for search. Monitor RLS policy performance on feed query. Consider caching followed kitchen IDs in feedStore to avoid re-fetching. |
-| 10k+ users | If feed query slows: add a materialized `user_feed` table (fan-out-on-write via trigger). Switch feed real-time to Broadcast instead of postgres_changes. This is unlikely to be needed. |
+This is backward-compatible -- existing recipes keep working since both fields are optional.
 
-### First Bottleneck: Feed Query Performance
+### 4. NutritionInfo Type Evolution
 
-The feed query joins follows + feed_posts. With the composite index `(kitchen_id, created_at DESC)` and limited to 20 rows, this should stay fast until a user follows hundreds of kitchens. Monitor with `EXPLAIN ANALYZE`.
+Current type (string-based, from recipe URL extraction):
+```typescript
+interface NutritionInfo {
+  calories?: string;     // "450 kcal"
+  protein?: string;      // "30g"
+  fat?: string;          // "15g"
+  carbohydrates?: string;// "40g"
+  fiber?: string;
+  sodium?: string;
+  sugar?: string;
+}
+```
 
-### Second Bottleneck: RLS on Social Tables
+New canonical type (number-based, for computation):
+```typescript
+interface NutritionData {
+  calories: number;          // kcal
+  protein_g: number;
+  total_fat_g: number;
+  saturated_fat_g?: number;
+  trans_fat_g?: number;
+  cholesterol_mg?: number;
+  sodium_mg?: number;
+  total_carbs_g: number;
+  dietary_fiber_g?: number;
+  total_sugars_g?: number;
+  added_sugars_g?: number;
+  vitamin_d_mcg?: number;
+  calcium_mg?: number;
+  iron_mg?: number;
+  potassium_mg?: number;
+  serving_size?: string;     // "100g" or "1 cup (240ml)"
+  serving_weight_g?: number; // grams for computation
+}
+```
 
-The `can_view_kitchen()` function does up to 3 subqueries. Being `SECURITY DEFINER` with `STABLE` marking helps Postgres cache results within a transaction. If it becomes slow, consider a materialized view of follow relationships.
+Both old `NutritionInfo` (from recipe parsing) and new `NutritionData` (from food DB) coexist. Display logic prefers `NutritionData` when available, falls back to parsed strings.
 
-## Anti-Patterns
+### 5. Database Schema: `food_items` Table
 
-### Anti-Pattern 1: Subscribing All Users to All Feed Changes via Realtime
+```sql
+CREATE TABLE food_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  -- External source IDs (at least one must be non-null)
+  fdc_id INTEGER UNIQUE,           -- USDA FoodData Central ID
+  off_barcode TEXT,                 -- Open Food Facts barcode (may differ from UPC)
+  fatsecret_id BIGINT UNIQUE,      -- FatSecret food_id
 
-**What people do:** Subscribe to `postgres_changes` on `feed_posts` table globally to show new posts in real-time.
-**Why it's wrong:** Every insert triggers an RLS authorization check for every subscriber. At 100 users, a single post triggers 100 RLS checks on a single thread. This is the documented Supabase Realtime bottleneck.
-**Do this instead:** Use pull-to-refresh for new feed posts. Only use postgres_changes for scoped interactions (likes/comments on specific post_ids currently on screen).
+  -- Core fields
+  name TEXT NOT NULL,
+  name_normalized TEXT NOT NULL,    -- lowercase, trimmed for search/dedup
+  brand TEXT,                       -- null for generic/unbranded foods
+  barcode TEXT UNIQUE,              -- UPC/EAN for barcode lookups
+  category TEXT,                    -- e.g., "Poultry", "Dairy", "Snacks"
 
-### Anti-Pattern 2: Storing Feed Photos as Base64 in the Database
+  -- Nutrition (per 100g canonical, plus serving info)
+  nutrition JSONB NOT NULL,         -- NutritionData per 100g
+  serving_sizes JSONB DEFAULT '[]', -- Array of { description, amount_g, nutrition }
 
-**What people do:** Store meal photos as base64 strings in feed_posts rows (following the v4.0 vision pattern).
-**Why it's wrong:** Feed photos are displayed repeatedly to many users. Base64 in Postgres bloats the table, increases query transfer size, and cannot be CDN-cached.
-**Do this instead:** Upload to Supabase Storage `meal-photos` bucket. Store the public URL in `feed_posts.photo_url`. Storage is CDN-backed.
+  -- Metadata
+  source TEXT NOT NULL CHECK (source IN ('usda', 'off', 'fatsecret')),
+  image_url TEXT,
+  data_quality SMALLINT DEFAULT 50, -- 0-100 quality score for ranking
+  fetched_at TIMESTAMPTZ DEFAULT now(),
+  expires_at TIMESTAMPTZ DEFAULT (now() + INTERVAL '30 days'),
 
-### Anti-Pattern 3: COUNT(*) for Like/Comment Counts on Every Render
+  CONSTRAINT at_least_one_source CHECK (
+    fdc_id IS NOT NULL OR off_barcode IS NOT NULL OR fatsecret_id IS NOT NULL
+  )
+);
 
-**What people do:** Query `SELECT COUNT(*) FROM post_likes WHERE post_id = X` for every feed card.
-**Why it's wrong:** N+1 query problem. 20 feed cards = 20 count queries.
-**Do this instead:** Denormalize counts into `feed_posts.like_count` and `comment_count`, maintained by triggers.
+-- Indexes
+CREATE INDEX idx_food_items_name_trgm ON food_items USING gin (name_normalized gin_trgm_ops);
+CREATE INDEX idx_food_items_barcode ON food_items (barcode) WHERE barcode IS NOT NULL;
+CREATE INDEX idx_food_items_fdc_id ON food_items (fdc_id) WHERE fdc_id IS NOT NULL;
+CREATE INDEX idx_food_items_expires ON food_items (expires_at);
 
-### Anti-Pattern 4: Fan-Out-on-Write at This Scale
+-- No RLS needed: food_items is a shared read-only cache
+-- Edge Functions write via service_role, clients read via anon key
+ALTER TABLE food_items ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can read food items" ON food_items FOR SELECT USING (true);
+```
 
-**What people do:** Create a `user_feed` materialized timeline table that gets a row inserted for every follower when a post is created.
-**Why it's wrong:** Adds write amplification, requires async workers or triggers, creates consistency issues, and is unnecessary for an app where users follow dozens of kitchens, not millions.
-**Do this instead:** Fan-out-on-read with proper indexes. Revisit only if query performance degrades at 10k+ users.
+Key design decisions:
+- **Per-100g canonical storage**: All nutrition normalized to 100g for consistent computation. Serving sizes stored separately.
+- **30-day TTL**: USDA data changes rarely, but OFF/FatSecret branded data updates. Edge Functions check `expires_at` before returning cached data.
+- **Trigram index**: Enables fuzzy text search (`%chicken%`) at the Postgres level, reducing API calls for common foods.
+- **No RLS write policy for clients**: Only Edge Functions (via `service_role`) write to this table. Prevents data pollution.
 
-## Suggested Build Order
+### 6. Database Schema: `food_search_cache` Table
 
-Based on dependency analysis:
+```sql
+CREATE TABLE food_search_cache (
+  query_hash TEXT PRIMARY KEY,    -- SHA-256 of normalized query
+  query_text TEXT NOT NULL,       -- original query for debugging
+  results JSONB NOT NULL,         -- array of food_item IDs + relevance scores
+  result_count INTEGER NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  expires_at TIMESTAMPTZ DEFAULT (now() + INTERVAL '24 hours')
+);
 
-1. **Database foundation** - Migrations for all new tables, RLS policies, triggers, storage bucket
-2. **Kitchen profiles + follows** - `kitchen_profiles` table, `socialStore`, follow/unfollow UI, kitchen profile screen
-3. **Feed posts + display** - `feed_posts` table, `feedStore`, FeedCard component, FeedList with pagination, Plan tab segmented control
-4. **Auto-post from plan** - Modify `planStore.assignRecipe()` with share toggle, meal photo upload to Storage
-5. **Interactions** - Likes (optimistic UI), comments (bottom sheet), real-time sync for visible posts
-6. **Recipe saving** - `saveRecipeFromFeed()`, saved_recipes tracking
+CREATE INDEX idx_search_cache_expires ON food_search_cache (expires_at);
+```
 
-**Rationale:** Each phase builds on the previous. Kitchen profiles must exist before follows. Follows must exist before the feed query works. Feed display must work before interactions make sense. Recipe saving is independent and can come last.
+### 7. Pantry Item Enhancement
+
+```sql
+ALTER TABLE pantry_items ADD COLUMN food_id UUID REFERENCES food_items(id);
+CREATE INDEX idx_pantry_items_food_id ON pantry_items (food_id) WHERE food_id IS NOT NULL;
+```
+
+## Patterns to Follow
+
+### Pattern 1: Waterfall API Lookup with Cache
+
+For barcode scans, use a waterfall pattern that tries the cheapest/fastest source first:
+
+```typescript
+// In food-barcode Edge Function
+async function lookupBarcode(barcode: string): Promise<FoodItem | null> {
+  // 1. Check local cache (Postgres)
+  const cached = await supabaseAdmin
+    .from('food_items')
+    .select('*')
+    .eq('barcode', barcode)
+    .gt('expires_at', new Date().toISOString())
+    .maybeSingle();
+
+  if (cached.data) return cached.data;
+
+  // 2. Try Open Food Facts (free, no key, fastest)
+  const offResult = await fetchOpenFoodFacts(barcode);
+  if (offResult) {
+    return await upsertFoodItem(offResult);
+  }
+
+  // 3. Fall back to FatSecret (needs OAuth, more reliable for US brands)
+  const fsResult = await fetchFatSecretBarcode(barcode);
+  if (fsResult) {
+    return await upsertFoodItem(fsResult);
+  }
+
+  return null; // Not found in any source
+}
+```
+
+### Pattern 2: Parallel Search with Merge
+
+For text search, query USDA and FatSecret in parallel, then merge:
+
+```typescript
+// In food-search Edge Function
+async function searchFoods(query: string): Promise<FoodItem[]> {
+  const [usdaResults, fsResults] = await Promise.all([
+    searchUSDA(query),
+    searchFatSecret(query),
+  ]);
+
+  // Deduplicate by normalized name similarity
+  const merged = deduplicateAndRank(usdaResults, fsResults);
+
+  // Batch upsert into food_items cache
+  await batchUpsertFoodItems(merged);
+
+  return merged;
+}
+```
+
+### Pattern 3: FatSecret OAuth2 Token Management
+
+FatSecret uses OAuth2 Client Credentials. Token must be cached in Deno's runtime memory (not Postgres -- tokens are short-lived).
+
+```typescript
+let tokenCache: { token: string; expiresAt: number } | null = null;
+
+async function getFatSecretToken(): Promise<string> {
+  if (tokenCache && tokenCache.expiresAt > Date.now()) {
+    return tokenCache.token;
+  }
+
+  const response = await fetch('https://oauth.fatsecret.com/connect/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'client_credentials',
+      client_id: Deno.env.get('FATSECRET_CLIENT_ID')!,
+      client_secret: Deno.env.get('FATSECRET_CLIENT_SECRET')!,
+      scope: 'premier',
+    }),
+  });
+
+  const data = await response.json();
+  tokenCache = {
+    token: data.access_token,
+    expiresAt: Date.now() + (data.expires_in - 60) * 1000,
+  };
+  return tokenCache.token;
+}
+```
+
+**Important caveat**: Deno Deploy (which Supabase Edge Functions use) has ephemeral isolates. The in-memory token cache helps within a warm instance but will be lost on cold starts. This is fine -- the token fetch adds ~200ms on cold start, which is acceptable for the user flow.
+
+### Pattern 4: Nutrition Normalization Layer
+
+All three APIs return nutrition in different formats. Normalize to a canonical schema at the Edge Function level:
+
+```typescript
+interface CanonicalNutrition {
+  calories: number;       // kcal per 100g
+  protein_g: number;
+  total_fat_g: number;
+  total_carbs_g: number;
+  dietary_fiber_g: number;
+  total_sugars_g: number;
+  sodium_mg: number;
+  // ... extended nutrients
+}
+
+function normalizeUSDA(nutrients: USDANutrient[]): CanonicalNutrition { ... }
+function normalizeOFF(nutriments: OFFNutriments): CanonicalNutrition { ... }
+function normalizeFatSecret(servings: FSServing[]): CanonicalNutrition { ... }
+```
+
+## Anti-Patterns to Avoid
+
+### Anti-Pattern 1: Client-Side API Calls
+
+**What:** Having the React Native app call USDA/OFF/FatSecret APIs directly.
+**Why bad:** Exposes API keys in client bundle; CORS issues; cannot cache across users; cannot rate-limit; no deduplication.
+**Instead:** All external API calls go through Edge Functions. Client only talks to Supabase.
+
+### Anti-Pattern 2: Storing Nutrition on Recipes Only
+
+**What:** Computing recipe nutrition once and storing it, never updating.
+**Why bad:** When food data is corrected upstream, or user changes ingredients, stored nutrition becomes stale.
+**Instead:** Store `food_id` references on ingredients. Compute nutrition on-demand (with caching). Re-compute when ingredients change.
+
+### Anti-Pattern 3: Requiring Food Linking for All Ingredients
+
+**What:** Forcing users to link every ingredient to a food database entry.
+**Why bad:** Destroys the quick recipe creation UX. "2 pinches of love" does not need nutrition data.
+**Instead:** Food linking is optional. AI can suggest links. Nutrition display shows "partial" indicator when some ingredients are unlinked.
+
+### Anti-Pattern 4: Syncing Full USDA Database Locally
+
+**What:** Downloading the 380K+ USDA foods into the app's local storage.
+**Why bad:** Massive initial download (hundreds of MB), stale data, complex sync logic.
+**Instead:** On-demand lookup via Edge Functions with 30-day Postgres cache. Most households use 200-500 unique foods; cache fills naturally.
+
+## Recommended Project Structure Additions
+
+```
+src/
+  stores/
+    foodStore.ts                    # NEW: food search, barcode, cached results
+  types/
+    food.ts                         # NEW: FoodItem, NutritionData, ServingSize types
+    database.ts                     # MODIFIED: add food_items table types, extend Ingredient
+  components/
+    food/
+      FoodSearchSheet.tsx           # NEW: bottom sheet with autocomplete search
+      BarcodeScanner.tsx            # NEW: camera-based barcode scanner
+      NutritionCard.tsx             # NEW: FDA-style nutrition facts display
+      NutritionSummary.tsx          # NEW: daily/weekly nutrition summary
+      FoodItemRow.tsx               # NEW: search result row with nutrition preview
+      IngredientFoodLinker.tsx      # NEW: link ingredient to food_item during recipe edit
+    scan/
+      ScanReviewScreen.tsx          # MODIFIED: add food_id linking for scanned items
+  lib/
+    nutrition-utils.ts              # NEW: nutrition computation, unit conversion, scaling
+  hooks/
+    useFoodSearch.ts                # NEW: debounced search hook
+    useBarcodeScanner.ts            # NEW: barcode scan state management
+
+supabase/
+  functions/
+    food-search/index.ts            # NEW: unified text search across USDA + FatSecret
+    food-barcode/index.ts           # NEW: barcode lookup via OFF + FatSecret
+    _shared/
+      food-normalize.ts             # NEW: nutrition normalization across sources
+      fatsecret-client.ts           # NEW: FatSecret OAuth2 client
+  migrations/
+    00017_create_food_items.sql     # NEW: food_items + food_search_cache tables
+    00018_add_pantry_food_id.sql    # NEW: pantry_items.food_id column
+```
+
+## Build Order (considering existing dependencies)
+
+### Phase 1: Data Foundation
+
+1. **Migration: `food_items` + `food_search_cache` tables** -- No dependencies, pure additive
+2. **`food-normalize.ts` shared module** -- Normalization functions for all three API response formats
+3. **`FoodItem` / `NutritionData` TypeScript types** -- Needed by everything else
+4. **`nutrition-utils.ts`** -- Pure functions for scaling, summing, unit conversion
+
+**Rationale:** Everything else depends on the data model and types being stable first.
+
+### Phase 2: Edge Functions (Backend)
+
+5. **`food-search` Edge Function** -- USDA + FatSecret search with caching
+6. **`food-barcode` Edge Function** -- OFF + FatSecret barcode lookup with caching
+7. **FatSecret OAuth2 client** (`fatsecret-client.ts`) -- Shared by both Edge Functions
+
+**Rationale:** Backend before frontend. Edge Functions can be tested with curl before building UI.
+
+### Phase 3: Client Store + Basic UI
+
+8. **`foodStore`** -- Search, barcode lookup, result caching
+9. **`FoodSearchSheet`** -- Autocomplete UI for food search
+10. **`NutritionCard`** -- Display component for nutrition facts
+
+**Rationale:** Store connects to Edge Functions. UI components consume store.
+
+### Phase 4: Barcode Scanner
+
+11. **Install `expo-camera`** (requires `npx expo install expo-camera`)
+12. **`BarcodeScanner` component** -- Camera view with barcode detection
+13. **`useBarcodeScanner` hook** -- Permission flow, scan state
+
+**Rationale:** Barcode scanning is a distinct UX flow. expo-camera may require native rebuild (EAS Build), so isolate this risk.
+
+### Phase 5: Integration with Existing Features
+
+14. **Extend `Ingredient` type** with optional `food_id`
+15. **`IngredientFoodLinker` component** -- Link ingredients during recipe creation/edit
+16. **`recipeStore.computeRecipeNutrition()`** -- Sum ingredient nutrition
+17. **`pantry_items.food_id` migration + pantryStore updates**
+18. **Nutrition display on RecipeDetail and Plan screens**
+
+**Rationale:** Integration touches existing stable features. Build on solid foundation from phases 1-4.
+
+### Phase 6: AI Enhancement
+
+19. **Modify `generate-meal` to include nutrition context**
+20. **Modify `analyze-food-photo` to match scanned food to food_items**
+21. **`NutritionSummary` on Plan tab** (daily nutrition totals)
+
+**Rationale:** AI enhancements are additive and depend on nutrition data being available. Ship last to avoid blocking core functionality.
+
+## API Rate Limit Strategy
+
+| API | Limit | Strategy |
+|-----|-------|----------|
+| USDA FDC | 1,000/hour per IP | Edge Function IP is Supabase's; cache aggressively in `food_items` (30-day TTL). Typical household searches ~10-20 foods/week. |
+| Open Food Facts | 1 req per real user scan | Only called for barcode scans, which are user-initiated. Well within limits. |
+| FatSecret Premier Free | No hard limit | OAuth2 token cached. Use as secondary source after USDA (search) and OFF (barcode). |
+
+At SharedKitchen's scale (early-stage consumer app), none of these limits are a concern. The Postgres cache means repeated lookups for common foods (chicken breast, rice, eggs) hit the database, not the external API.
+
+## Scalability Considerations
+
+| Concern | At 100 users | At 10K users | At 1M users |
+|---------|--------------|--------------|-------------|
+| food_items table size | ~2K rows | ~20K rows | ~100K rows (most foods are shared) |
+| USDA rate limit | No issue | May need multiple API keys | Consider USDA bulk download to own DB |
+| FatSecret OAuth tokens | Cold starts fine | Token reuse across warm isolates | May need dedicated token service |
+| Search latency | ~500ms (API call) | ~100ms (mostly cached) | ~50ms (heavily cached, trigram local search) |
+| Barcode scan latency | ~800ms (OFF API) | ~200ms (mostly cached) | ~100ms (heavily cached) |
 
 ## Sources
 
-- [Supabase Realtime Benchmarks](https://supabase.com/docs/guides/realtime/benchmarks) -- postgres_changes single-thread limitation, Broadcast alternative
-- [Supabase Postgres Changes Docs](https://supabase.com/docs/guides/realtime/postgres-changes) -- subscription patterns, filter syntax
-- [Supabase RLS Docs](https://supabase.com/docs/guides/database/postgres/row-level-security) -- SECURITY DEFINER pattern, policy structure
-- [Supabase Storage Access Control](https://supabase.com/docs/guides/storage/security/access-control) -- bucket policies
-- [Fan-Out Patterns - GetStream](https://getstream.io/glossary/fan-out/) -- fan-out-on-read vs write tradeoffs
-- [Supabase Pagination Discussion](https://github.com/orgs/supabase/discussions/2141) -- cursor-based pagination patterns
-- Existing codebase: `is_household_member()` SECURITY DEFINER pattern from `00002_create_households.sql`
-- Existing codebase: Storage bucket RLS from `00008_create_storage_buckets.sql`
-- Existing codebase: postgres_changes pattern from `src/hooks/useGrocerySync.ts`
-
----
-*Architecture research for: SharedKitchen v5.0 Social Feed*
-*Researched: 2026-04-06*
+- [USDA FoodData Central API Guide](https://fdc.nal.usda.gov/api-guide/) -- endpoints, rate limits, data types
+- [USDA FDC OpenAPI Spec](https://fdc.nal.usda.gov/api-spec/fdc_api.html) -- response schemas
+- [Open Food Facts API Documentation](https://openfoodfacts.github.io/openfoodfacts-server/api/) -- barcode lookup, nutriments fields
+- [Open Food Facts API Tutorial](https://openfoodfacts.github.io/openfoodfacts-server/api/tutorial-off-api/) -- product fields, usage guidelines
+- [FatSecret Platform API Documentation](https://platform.fatsecret.com/docs/guides) -- methods, OAuth2
+- [FatSecret API Editions and Pricing](https://platform.fatsecret.com/api-editions) -- Premier Free tier details
+- [FatSecret OAuth2 Documentation](https://platform.fatsecret.com/docs/guides/authentication/oauth2) -- client credentials flow
+- [Expo Camera Documentation](https://docs.expo.dev/versions/latest/sdk/camera/) -- barcode scanning in SDK 52+

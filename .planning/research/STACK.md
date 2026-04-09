@@ -1,227 +1,208 @@
-# Stack Research
+# Technology Stack: v6.0 Food Data Integration
 
-**Domain:** Social feed features for collaborative dinner planning app
-**Researched:** 2026-04-06
-**Confidence:** HIGH
+**Project:** SharedKitchen
+**Researched:** 2026-04-07
+**Scope:** New additions only -- existing stack (Expo SDK 55, Supabase, Zustand, Gemini 2.5 Flash, Stripe) is validated and unchanged.
 
-## Context: What Already Exists
+## Recommended Stack
 
-The existing stack handles most of what the social feed needs. This research focuses exclusively on **new additions and pattern changes** required for v5.0.
+### External Food APIs (called from Edge Functions, NOT client)
 
-**Already in place (DO NOT add):**
-- `@supabase/supabase-js` ^2.100.0 -- Postgres, Auth, Realtime, Storage, Edge Functions
-- `@shopify/flash-list` ^2.3.1 -- performant lists (already used in scan review)
-- `expo-notifications` ~55.0.13 -- local notifications + push token registration
-- `expo-image-picker` ~55.0.13 -- photo capture
-- `expo-image-manipulator` ~55.0.11 -- client-side compression
-- `zustand` ^5.0.12 -- state management
-- `date-fns` ^4.1.0 -- date formatting
-- `react-native-reanimated` 4.2.1 -- animations
-- `@gorhom/bottom-sheet` -- modal sheets
-- Supabase Realtime (`postgres_changes` + Presence) -- proven patterns in `useGrocerySync`, `useActivityToast`, `usePresence`
-- `push_tokens` table with user_id, expo_push_token, RLS policies, and device tracking
+| Technology | Version/Tier | Purpose | Why |
+|------------|-------------|---------|-----|
+| USDA FoodData Central API | v1 | Nutrition data backbone (380K+ foods) | Free, authoritative US government data. Foundation Foods + SR Legacy cover whole foods; Branded Foods covers 350K+ packaged items. 1,000 req/hr rate limit is generous for Edge Function proxy. API key is free and instant. |
+| Open Food Facts API | v2 | Barcode lookup for packaged foods | Free, no auth required, 2.8M+ products globally, no rate limit. Community-maintained with broad international coverage. Barcode endpoint returns nutriments per 100g directly. |
+| FatSecret Platform API | Premier Free (OAuth 2.0) | Verified branded food data, fills gaps between USDA and OFF | 1.9M+ food items with daily updates. Premier Free tier available for startups (<$1M revenue). OAuth 2.0 client_credentials flow fits Edge Function pattern. Requires attribution in UI. |
 
-## Recommended Stack Additions
+**API call flow:** Client -> Supabase Edge Function -> External API -> Cache result in Postgres -> Return to client. API keys stored as Supabase secrets (same pattern as SERPER_API_KEY, GEMINI_API_KEY).
 
-### Core Technologies
+**Waterfall lookup strategy for barcode scans:**
+1. Check `barcode_cache` table first (instant, free)
+2. Open Food Facts barcode endpoint (free, no auth, broadest barcode coverage)
+3. FatSecret food search as fallback (if OFF has no result)
+4. Return "not found" with option to manually enter
 
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| `expo-image` | ~55.0.8 | Cached image rendering in feed | React Native's built-in `Image` (currently used everywhere in the app) has no disk caching, no blurhash placeholders, no progressive loading. A social feed with many meal photos will cause visible loading flicker and memory pressure without these. `expo-image` uses SDWebImage (iOS) under the hood with automatic memory + disk cache management. Part of Expo SDK 55, no native rebuild needed. |
-| Supabase Storage | (included in `@supabase/supabase-js`) | Meal photo persistence | Currently photos are transient (base64 in JSON body for vision analysis). Social feed photos must be persisted and served via CDN URLs. Supabase Storage is already part of the installed SDK -- just needs bucket creation and RLS policies. No new dependency. |
-| Supabase Database Webhooks + Edge Function | (infrastructure, no npm dep) | Server-side push notifications for social interactions | Current notifications are ALL local (cooking reminders, leftover alerts, budget warnings via `scheduleNotificationAsync`). Social notifications (someone liked your meal, new comment, new follower) require server-triggered push. The existing `push_tokens` table and Expo Push API token registration are already in place. Need one new Edge Function + database webhook triggers. |
+**Waterfall lookup strategy for text search:**
+1. Check local `foods` cache table via Postgres full-text search (instant)
+2. USDA FoodData Central search endpoint (authoritative nutrition data)
+3. FatSecret search for branded items USDA may lack
+4. Merge and deduplicate results, cache in `foods` table
 
-### Supporting Libraries
+### Client Libraries (new npm packages)
 
-| Library | Version | Purpose | When to Use |
-|---------|---------|---------|-------------|
-| None required | -- | -- | -- |
+| Library | Version | Purpose | Why |
+|---------|---------|---------|-----|
+| expo-camera | ~55.0.14 | Barcode scanning via CameraView | SDK 55 compatible. Built-in barcode scanning via `onBarcodeScanned` prop on `CameraView` component. Supports EAN-13, EAN-8, UPC-A, UPC-E, Code-128 -- all standard grocery barcodes. Replaces the deprecated (and removed) expo-barcode-scanner. No native rebuild needed in Expo managed workflow. |
 
-**Why no new supporting libraries:** The social feed features are fundamentally CRUD + real-time subscriptions + image display. The existing stack covers all of this. Adding libraries for "social" features (feed frameworks, notification services, activity stream SDKs) would be over-engineering for a kitchen-following feed with low post volume.
+**That is the only new npm package.** Everything else is backend (Edge Functions + Postgres). All external API calls happen server-side using Deno's native `fetch()`.
 
-### Development Tools
+### Supabase Edge Functions (new)
 
-| Tool | Purpose | Notes |
-|------|---------|-------|
-| Supabase CLI (`supabase`) | Storage bucket setup, new migrations, Edge Function deployment | Already installed and used for existing Edge Functions |
+| Function | Purpose | External API | Auth |
+|----------|---------|-------------|------|
+| search-foods | Searchable food/ingredient database | USDA FoodData Central + FatSecret | User auth required |
+| lookup-barcode | Barcode -> product + nutrition data | Open Food Facts, FatSecret fallback | User auth required |
+| get-food-nutrition | Detailed nutrition for a specific food by source ID | USDA or FatSecret (by cached food_id) | User auth required |
+
+**Pattern:** Follow existing Edge Function conventions exactly:
+- CORS headers object
+- Supabase Auth check via `getUser()`
+- Admin client with `SUPABASE_SERVICE_ROLE_KEY` for writes
+- Rate limiting via `ai_usage_log` table (reuse for food API calls)
+- `Deno.env.get()` for API keys
+- Native `fetch()` for external calls
+
+### Database (Postgres tables -- no new extensions needed)
+
+| Table | Purpose | Key Columns |
+|-------|---------|-------------|
+| `foods` | Cached food data from all three APIs | id (UUID), fdc_id (int, nullable), off_barcode (text, nullable), fatsecret_id (int, nullable), name (text), brand (text, nullable), source (enum: usda/off/fatsecret), category (text, nullable), serving_size (text), serving_unit (text), search_vector (tsvector, generated) |
+| `food_nutrients` | Nutrition facts per food | food_id (FK foods), nutrient_name (text), amount (numeric), unit (text), per_serving (numeric, nullable), per_100g (numeric) |
+| `recipe_nutrition` | Computed aggregate nutrition per recipe | recipe_id (FK recipes), calories (numeric), protein_g (numeric), carbs_g (numeric), fat_g (numeric), fiber_g (numeric), sodium_mg (numeric), computed_at (timestamptz) |
+| `barcode_cache` | Barcode -> food_id for instant repeat lookups | barcode (text, primary key), food_id (FK foods), last_verified_at (timestamptz) |
+
+**Full-text search:** Use Postgres `tsvector` generated column on `foods.name || ' ' || coalesce(foods.brand, '')` with a GIN index. Query via Supabase JS client `.textSearch('search_vector', query)`. No external search engine needed -- Postgres FTS handles hundreds of thousands of food records easily with GIN indexing. This is the same approach Supabase officially documents.
+
+### Supporting Libraries (already installed, no changes)
+
+| Library | Already Installed | Use For Food Data |
+|---------|-------------------|-------------------|
+| @supabase/supabase-js | Yes | Client calls to new Edge Functions, `.textSearch()` for food search, standard CRUD for recipe_nutrition |
+| zustand | Yes | New `foodStore` for search results, barcode scan state, nutrition display cache |
+| expo-image | Yes (~55.0.8) | Display product images from Open Food Facts CDN |
+| @shopify/flash-list | Yes (^2.3.1) | Food search results list (performant for long result sets) |
+| expo-haptics | Yes (if installed) | Haptic feedback on successful barcode scan |
+| expo-image-manipulator | Yes (~55.0.11) | Not needed for this milestone (no image upload) |
 
 ## Installation
 
 ```bash
-# Only ONE new package needed
-npx expo install expo-image
+# Only ONE new client package
+npx expo install expo-camera
+
+# Edge Function secrets (via Supabase CLI)
+supabase secrets set USDA_API_KEY=your_key_here
+supabase secrets set FATSECRET_CLIENT_ID=your_client_id
+supabase secrets set FATSECRET_CLIENT_SECRET=your_client_secret
+# Open Food Facts needs NO API key
 ```
 
-That is the only `npm install` required. Everything else is infrastructure configuration (Supabase Storage buckets, database tables, RLS policies, Edge Functions).
+**No new Supabase extensions required.** Full-text search uses built-in `tsvector`/`to_tsvector()`/GIN available in every Postgres instance. No pgvector, no pg_trgm, nothing extra.
 
-## Key Integration Patterns
+## API Authentication Details
 
-### 1. Feed Pagination: Cursor-based with Supabase + FlashList
+### USDA FoodData Central
+- **Auth:** API key as query parameter `?api_key=YOUR_KEY`
+- **Signup:** https://fdc.nal.usda.gov/api-key-signup/ (instant, free, no approval)
+- **Rate limit:** 1,000 requests/hour per IP address
+- **Key endpoints:**
+  - `GET https://api.nal.usda.gov/fdc/v1/foods/search?query={term}&dataType=Foundation,SR%20Legacy,Branded&pageSize=25&api_key={key}`
+  - `GET https://api.nal.usda.gov/fdc/v1/food/{fdcId}?api_key={key}`
+- **Data types to query:** Foundation Foods (whole ingredients, best quality), SR Legacy (comprehensive legacy data), Branded Foods (packaged items with labels)
+- **Nutrient fields:** Response includes `foodNutrients` array with `nutrientName`, `value`, `unitName` per nutrient
 
-Use Supabase's `.lt()` cursor for keyset pagination. Do NOT use offset-based `.range(start, end)` pagination because it breaks when new posts are inserted (items get skipped or duplicated).
+### Open Food Facts
+- **Auth:** None required (set `User-Agent: SharedKitchen/6.0` header per their guidelines)
+- **Rate limit:** None enforced (be respectful, cache aggressively)
+- **Key endpoint:**
+  - `GET https://world.openfoodfacts.net/api/v2/product/{barcode}?fields=product_name,brands,nutriments,image_url,categories,serving_size`
+- **Response structure:** `nutriments` object contains `energy-kcal_100g`, `proteins_100g`, `carbohydrates_100g`, `fat_100g`, `fiber_100g`, `sodium_100g`, `sugars_100g`
+- **Status codes:** `status: 1` = found, `status: 0` = not found
 
-```typescript
-// Pattern: keyset/cursor pagination via created_at
-const { data } = await supabase
-  .from('feed_posts')
-  .select('*, kitchen:kitchens(name, avatar_url), likes_count, comments_count')
-  .in('kitchen_id', followedKitchenIds)
-  .lt('created_at', cursor) // cursor = last item's created_at
-  .order('created_at', { ascending: false })
-  .limit(20);
-```
-
-Use FlashList's `onEndReached` with `onEndReachedThreshold={0.5}` for infinite scroll trigger. FlashList (`@shopify/flash-list` ^2.3.1) is already installed and used in `ScanReviewScreen` and `ListExtractReviewScreen`.
-
-### 2. Real-time Feed Updates: Follow Existing Patterns
-
-The existing `useGrocerySync` and `useActivityToast` hooks establish the Realtime pattern. For the social feed, create a `useFeedSync` hook. Important constraint:
-
-**Supabase Realtime filter limitation:** `postgres_changes` only supports `eq` filters on a single column, not `in`. For a feed with multiple followed kitchens, two options exist:
-
-- **Option A:** Subscribe to one channel per followed kitchen. Supabase allows up to 100 concurrent channels.
-- **Option B (recommended):** Subscribe to ALL inserts on `feed_posts` and filter client-side in the callback. Use a Set of followed kitchen IDs for O(1) lookup.
-
-**Use Option B.** The feed volume for a dinner-planning app is low (a few posts per day per kitchen). Client-side filtering on a single channel is simpler and avoids managing channel-per-follow lifecycle. Matches the existing `useActivityToast` pattern which also subscribes broadly and filters by `currentUserId`.
-
-### 3. Image Handling: Supabase Storage + expo-image
-
-```
-Flow: Camera/picker -> expo-image-manipulator (compress to 1024px JPEG 0.6)
-      -> Supabase Storage upload -> CDN URL stored in feed_posts.photo_url
-      -> expo-image (cached display with blurhash placeholder)
-```
-
-- Create a `meal-photos` Storage bucket with public read access (photos are meant to be shared)
-- Upload compressed images reusing existing 1024px JPEG 0.6 compression pattern from vision features
-- Store the public URL in the `feed_posts.photo_url` column
-- Display with `expo-image` which provides: disk caching (SDWebImage), blurhash placeholders during load, memory management for scroll performance, progressive JPEG support
-
-**Do NOT use Supabase Storage signed URLs.** Meal photos in the feed are public to followers -- use `getPublicUrl()` for simple, cacheable CDN URLs without token expiry concerns.
-
-### 4. Push Notifications for Social: Server-side Edge Function
-
-Current architecture: all notifications are LOCAL (scheduled on device via `Notifications.scheduleNotificationAsync`). Social notifications must be SERVER-TRIGGERED because the event originates from another user's device.
-
-```
-Flow: User A likes a post
-      -> INSERT into likes table
-      -> Database Webhook fires on INSERT
-      -> Edge Function: send-social-notification
-        -> Reads push_tokens for post author (User B)
-        -> Sends via Expo Push API: POST https://exp.host/--/api/v2/push/send
-        -> Notification arrives on User B's device
-```
-
-What already exists:
-- `push_tokens` table with `user_id`, `expo_push_token`, RLS policies, device tracking
-- `registerPushToken()` function that upserts tokens on app launch
-- `NotificationSettings` with `householdActivity` toggle (extend with `socialActivity`)
-
-What needs to be built:
-1. One new Edge Function: `send-social-notification`
-2. Database webhook triggers on: `likes` INSERT, `comments` INSERT, `follows` INSERT
-3. Edge Function looks up recipient's push tokens and sends via Expo Push API
-4. Store `EXPO_ACCESS_TOKEN` as Supabase secret (for enhanced push security)
-5. Notification deduplication (don't spam if 10 people like a post in quick succession -- batch or throttle)
-
-### 5. State Management: New Zustand Stores
-
-Follow existing store patterns (`groceryStore`, `planStore`, `recipeStore`):
-
-| Store | Responsibility |
-|-------|---------------|
-| `feedStore` | Feed posts, pagination cursor, loading states, optimistic like/unlike, prepend new posts from Realtime |
-| `socialStore` | Follow/unfollow, follower/following counts, followed kitchen IDs (used for feed queries and Realtime filtering) |
-
-Comments can live in `feedStore` as a nested concern (comments are always viewed in context of a post). Do NOT create a separate `commentStore` -- it adds indirection for a simple list.
-
-### 6. Recipe Saving: No New Infrastructure
-
-"Save recipe from feed" is just an INSERT into the existing `recipes` table with the current user's `household_id`. The recipe data comes from the feed post's linked `recipe_id`. This is a simple Supabase query -- no new table needed. Track the save source via a `source_feed_post_id` column on `recipes` or a separate `saved_recipes` junction table if you want to show "saved from [Kitchen Name]" attribution.
+### FatSecret
+- **Auth:** OAuth 2.0 Client Credentials (server-to-server)
+  1. POST `https://oauth.fatsecret.com/connect/token`
+  2. Authorization header: `Basic base64(client_id:client_secret)`
+  3. Body: `grant_type=client_credentials&scope=basic`
+  4. Returns `{ access_token, expires_in, token_type: "Bearer" }`
+  5. Cache token in Edge Function (or Postgres row with expiry) -- tokens last ~24h
+- **Rate limit:** 5,000 requests/day (Basic free); higher on Premier Free
+- **Key endpoints:**
+  - `GET https://platform.fatsecret.com/rest/foods/search/v1?search_expression={term}&format=json` (Bearer token in header)
+  - `GET https://platform.fatsecret.com/rest/food/v4?food_id={id}&format=json`
+- **Attribution requirement:** Must display "Powered by FatSecret" where FatSecret-sourced data appears. Plan for a small attribution line on nutrition cards that show FatSecret data.
 
 ## Alternatives Considered
 
-| Recommended | Alternative | Why Not |
-|-------------|-------------|---------|
-| `expo-image` | React Native `Image` (current) | No caching, no placeholders, will cause visible jank in image-heavy feed scroll |
-| `expo-image` | `react-native-fast-image` | Unmaintained since 2023, not compatible with Expo managed workflow. `expo-image` is the official Expo replacement with better performance. |
-| Supabase Storage | Cloudinary / AWS S3 | Another service to manage, separate billing, separate auth. Supabase Storage is included in the plan, has CDN via `supabase.co/storage/v1/object/public/`, and uses existing RLS auth. |
-| Cursor pagination (keyset via `created_at`) | Offset pagination (`.range(0, 20)`) | Offset breaks with real-time inserts: items get skipped or duplicated when new posts push the offset window. |
-| Database Webhooks -> Edge Function | Supabase `pg_net` extension | Database webhooks are simpler to configure (visible in Supabase Dashboard), follow documented patterns, and don't require installing a Postgres extension. |
-| Client-side Realtime filter (Option B) | Per-kitchen channels (Option A) | Simpler -- one channel, no lifecycle management per follow/unfollow. Feed volume is low enough that filtering a few extra posts client-side is negligible. |
-| Separate `feedStore` + `socialStore` | Single monolithic `socialStore` | Violates existing codebase convention of domain-specific stores. Feed pagination state and follow relationship state have different lifecycles. |
+| Category | Recommended | Alternative | Why Not |
+|----------|-------------|-------------|---------|
+| Barcode scanning | expo-camera (built-in) | react-native-vision-camera | Requires native rebuild / custom dev client, not in Expo managed SDK. expo-camera covers all grocery barcode types natively in managed workflow. |
+| Barcode scanning | expo-camera (built-in) | Scanbot SDK | Commercial license ($500+/yr), overkill for simple product barcode lookup. |
+| Food search | Postgres tsvector + GIN | Algolia / Typesense / Meilisearch | External service adds cost and complexity. Postgres FTS handles 100K-500K food records easily with GIN index. SharedKitchen's food cache will be well under 100K records. |
+| Food search | Postgres tsvector + GIN | Supabase pgvector (semantic search) | Semantic search is overkill for food name lookup. Users search "chicken breast" not "lean poultry protein." Keyword matching via tsvector is simpler, faster, and requires no embedding model. |
+| Nutrition API | USDA + OFF + FatSecret (free) | Nutritionix | $299/mo minimum for production. Three free APIs cover same data. |
+| Nutrition API | USDA + OFF + FatSecret (free) | Spoonacular | $29-$299/mo. Bundles recipe features SharedKitchen already has. Paying for capabilities we don't need. |
+| Nutrition API | USDA + OFF + FatSecret (free) | Edamam Nutrition API | Free tier limited to 100 calls/day. USDA alone provides 1,000/hr. |
+| API proxy | Supabase Edge Functions | Direct client API calls | Exposes API keys to client bundle. Edge Functions keep keys server-side. This is the established codebase pattern. |
+| Food data cache | Postgres tables | Redis | Postgres is already the primary data store. Caching food lookups in a `foods` table means subsequent searches hit the DB first (instant, free) before making external API calls. No need for a separate cache layer. |
+| Food data cache | Postgres tables | AsyncStorage | Food data must be shared across household members, survive reinstalls, and be searchable. AsyncStorage is device-local and not queryable. |
 
 ## What NOT to Use
 
-| Avoid | Why | Use Instead |
-|-------|-----|-------------|
-| Stream / GetStream.io | Massive over-engineering. Adds cost ($499+/mo for production), complexity, vendor lock-in. Feed is simple chronological with no algorithmic ranking. | Supabase Postgres + RLS + Realtime |
-| React Query / TanStack Query | Codebase uses Zustand exclusively for all data fetching and caching. Adding a second state/cache layer creates confusion about source of truth and doubles the patterns developers must learn. | Zustand stores with pagination state |
-| `react-native-fast-image` | Unmaintained since 2023, requires custom dev client, incompatible with Expo managed workflow | `expo-image` |
-| Notification service (OneSignal, Knock, Novu) | Push token registration already exists, Expo Push API is straightforward, volume is low. A notification service adds recurring cost for no benefit at this scale. | Direct Expo Push API calls from Edge Function |
-| `expo-av` or video players | Out of scope per PROJECT.md ("text + photos only, no video content in recipes"). Don't add video support to feed. | Static images only |
-| Algolia / Typesense for kitchen search | Supabase `ilike` or full-text search via `tsvector` is sufficient for finding kitchens by name at this scale (< 10K kitchens). | Supabase `ilike` search |
-| Firebase Cloud Messaging directly | Already using Expo Push API which abstracts FCM/APNs. Adding FCM directly bypasses existing push infrastructure and adds a second notification pathway. | Expo Push API via Edge Function |
-| WebSocket-based "live feed" | Supabase Realtime `postgres_changes` already provides this. Don't build custom WebSocket handling. | Existing Supabase Realtime pattern |
+| Technology | Why Avoid |
+|------------|-----------|
+| expo-barcode-scanner | **Removed** from Expo SDK 51+. Completely gone. Use expo-camera's built-in barcode scanning instead. |
+| Any npm nutrition SDK (nutritionix, fatsecret-js, etc.) | No well-maintained RN-compatible SDKs exist for these APIs. Use native `fetch()` in Edge Functions. Keeps client dependency count minimal. |
+| Spoonacular / Nutritionix / Edamam | Paid APIs that duplicate what USDA + OFF + FatSecret provide for free. Combined free tier coverage exceeds any single paid API. |
+| react-native-vision-camera | Requires custom dev client / native rebuild. expo-camera barcode scanning is sufficient for product barcodes. |
+| External search engine (Algolia, Meilisearch) | Unnecessary at this data volume. Postgres FTS with GIN index is more than adequate. |
+| GraphQL layer | REST Edge Functions are the established pattern across 8 existing functions. Adding GraphQL for food queries would be architecturally inconsistent. |
+| Calorie counting / macro tracking libraries | Build nutrition display from raw data in `food_nutrients` table. No SDK needed for simple arithmetic (sum ingredient nutrients for recipe totals). |
+| react-native-reanimated for scanner overlay | Simple View + StyleSheet overlay is sufficient for barcode scanner UI. Don't over-animate the scanner frame. |
 
-## Database Schema Additions (no npm deps, just migrations)
+## Integration Points with Existing Stack
 
-These are the Postgres tables needed. All accessed through existing `@supabase/supabase-js`.
+| Existing System | How Food Data Integrates |
+|----------------|--------------------------|
+| **Edge Functions** | New functions (`search-foods`, `lookup-barcode`, `get-food-nutrition`) follow identical pattern to `search-recipes` and `analyze-food-photo`: auth check, rate limit, external fetch, JSON response. |
+| **Supabase Secrets** | `USDA_API_KEY`, `FATSECRET_CLIENT_ID`, `FATSECRET_CLIENT_SECRET` stored same way as `GEMINI_API_KEY`, `SERPER_API_KEY`. |
+| **Supabase Postgres** | New tables (`foods`, `food_nutrients`, `recipe_nutrition`, `barcode_cache`) with RLS policies. `foods` table uses `tsvector` generated column for search. |
+| **Zustand stores** | New `foodStore` for search state, barcode results, nutrition display. Same create/pattern as `recipeStore`, `pantryStore`. |
+| **Gemini 2.5 Flash** | Enhanced AI: `generate-meal` Edge Function can query `recipe_nutrition` to suggest meals that hit calorie/macro targets. Prompts enriched with actual nutrition data instead of guessing. |
+| **Existing recipes** | `recipe_nutrition` table links to `recipes` via `recipe_id`. Nutrition computed by summing constituent ingredient `food_nutrients`. |
+| **Existing pantry** | Barcode scan adds items to `pantry_items` with `food_id` FK, enabling nutrition lookup for on-hand ingredients. |
+| **Existing grocery list** | Grocery items can optionally link to `foods` table for nutrition-aware shopping. |
+| **expo-image** | Display product images from Open Food Facts `image_url` field using existing cached image rendering. |
+| **@shopify/flash-list** | Food search results displayed in FlashList for performant scrolling through long result lists. |
 
-| Table | Purpose | Key Columns | Indexes |
-|-------|---------|-------------|---------|
-| `follows` | Follow relationships between kitchens | `follower_id (UUID, FK users)`, `following_kitchen_id (UUID, FK households)`, `created_at` | Composite unique on (follower_id, following_kitchen_id), index on following_kitchen_id |
-| `feed_posts` | Shared meals appearing in feed | `id`, `kitchen_id (FK households)`, `meal_plan_id (FK meal_plans)`, `recipe_id (FK recipes, nullable)`, `photo_url (text, nullable)`, `caption`, `created_at` | Index on (kitchen_id, created_at DESC), index on created_at DESC |
-| `likes` | Post likes | `user_id`, `feed_post_id`, `created_at` | Composite unique on (user_id, feed_post_id), index on feed_post_id |
-| `comments` | Post comments | `id`, `user_id`, `feed_post_id`, `content (text)`, `created_at` | Index on (feed_post_id, created_at) |
-| `kitchen_profiles` | Public kitchen profile data | `household_id`, `display_name`, `bio`, `avatar_url`, `is_public (boolean)`, `created_at` | Index on household_id (unique) |
+## Environment Variables (New Supabase Secrets)
 
-All tables use RLS following existing patterns (`auth.uid()` checks). The `follows` table needs a policy that allows users to see who follows a kitchen but only modify their own follow records.
+| Variable | Where | How to Get |
+|----------|-------|------------|
+| `USDA_API_KEY` | Supabase Edge Function secrets | Sign up at https://fdc.nal.usda.gov/api-key-signup/ (instant, free) |
+| `FATSECRET_CLIENT_ID` | Supabase Edge Function secrets | Register at https://platform.fatsecret.com/register (requires approval for Premier Free) |
+| `FATSECRET_CLIENT_SECRET` | Supabase Edge Function secrets | Provided after FatSecret app registration |
 
-**Denormalized counts:** Add `likes_count` and `comments_count` columns to `feed_posts` maintained by Postgres triggers (not computed on every query). This avoids N+1 count queries in the feed list.
+Open Food Facts requires NO API key or secret. Just set a proper `User-Agent` header.
 
-## Environment Variables (New)
+## Confidence Assessment
 
-| Variable | Where | Purpose |
-|----------|-------|---------|
-| `EXPO_ACCESS_TOKEN` | Supabase Edge Function secrets | Enhanced security for Expo Push API. Set via `supabase secrets set EXPO_ACCESS_TOKEN=...` |
-
-One new secret. The Expo Access Token is created at [expo.dev/accounts/settings/access-tokens](https://expo.dev/accounts/settings/access-tokens).
-
-## Version Compatibility
-
-| Package | Compatible With | Notes |
-|---------|-----------------|-------|
-| `expo-image` ~55.0.8 | Expo SDK 55, React Native 0.83.x | Same SDK versioning scheme as all Expo packages. Must match SDK major version. |
-| `@supabase/supabase-js` ^2.100.0 | Supabase Storage, Realtime, Edge Functions | Already installed. Storage API is part of the client -- no version change needed. |
-| `@shopify/flash-list` ^2.3.1 | React Native 0.83.x, Reanimated 4.x | Already installed and working. |
-
-## Migration Effort Summary
-
-| Category | Effort | Details |
-|----------|--------|---------|
-| New npm packages | Minimal | Just `expo-image` (`npx expo install expo-image`) |
-| Supabase Storage setup | Low | Create `meal-photos` bucket, add RLS policy for public read, add upload helper |
-| Database migrations | Medium | 5 new tables + RLS policies + indexes + 2 count trigger functions |
-| Edge Function for push | Medium | One new `send-social-notification` function following existing patterns |
-| Database Webhooks | Low | 3 webhook triggers (likes INSERT, comments INSERT, follows INSERT) configured in Dashboard |
-| Zustand stores | Medium | 2 new stores (`feedStore`, `socialStore`) following existing patterns |
-| Realtime subscription | Low | One new `useFeedSync` hook following `useGrocerySync` pattern |
-| Feed UI components | Medium-High | Feed card, comment sheet, kitchen profile screen, follow button -- but these are UI, not stack |
+| Decision | Confidence | Basis |
+|----------|------------|-------|
+| USDA FoodData Central as nutrition backbone | HIGH | Official government API, well-documented OpenAPI spec, free, widely used in nutrition apps |
+| Open Food Facts for barcode lookup | HIGH | Official docs confirm free/no-auth v2 barcode endpoint, 2.8M+ products verified |
+| FatSecret Premier Free eligibility | MEDIUM | Tier exists per pricing page, but approval process and exact Premier Free limits need verification during signup |
+| expo-camera ~55.0.14 for barcode scanning | HIGH | Expo official docs confirm built-in barcode scanning since SDK 52; project is on SDK 55; supports all grocery barcode formats |
+| Postgres tsvector for food search | HIGH | Supabase official documentation, proven pattern at this data volume, GIN index well-documented |
+| Edge Function proxy pattern | HIGH | Matches existing codebase exactly (8 existing Edge Functions use identical auth/fetch/respond pattern) |
+| Only 1 new npm package needed | HIGH | All API calls are server-side in Edge Functions using native Deno fetch(); no client SDKs exist or are needed |
+| Waterfall lookup strategy | MEDIUM | Logical based on API coverage and cost, but exact hit rates (what % of barcodes OFF covers vs FatSecret) need real-world testing |
 
 ## Sources
 
-- [Expo SDK 55 Changelog](https://expo.dev/changelog/sdk-55) -- expo-image version 55.0.8 confirmed compatible with SDK 55 (HIGH confidence)
-- [expo-image npm](https://www.npmjs.com/package/expo-image) -- Latest version 55.0.8, uses SDWebImage on iOS (HIGH confidence)
-- [Expo Image Documentation](https://docs.expo.dev/versions/latest/sdk/image/) -- Caching, blurhash, progressive loading features confirmed (HIGH confidence)
-- [Supabase Push Notifications Guide](https://supabase.com/docs/guides/functions/examples/push-notifications) -- Edge Function + Database Webhook pattern for Expo Push confirmed as official pattern (HIGH confidence)
-- Codebase: `src/hooks/useGrocerySync.ts` -- Realtime `postgres_changes` subscription pattern (HIGH confidence)
-- Codebase: `src/hooks/useActivityToast.ts` -- Broad subscription + client-side filter pattern (HIGH confidence)
-- Codebase: `src/lib/notifications.ts` -- Push token registration, local notification scheduling, existing `NotificationSettings` (HIGH confidence)
-- Codebase: `supabase/migrations/00013_create_push_tokens.sql` -- Push token table schema confirmed (HIGH confidence)
-- Codebase: `package.json` -- All existing dependency versions verified (HIGH confidence)
+- [USDA FoodData Central API Guide](https://fdc.nal.usda.gov/api-guide/) -- endpoints, rate limits, auth (HIGH confidence)
+- [USDA FDC OpenAPI Specification](https://fdc.nal.usda.gov/api-spec/fdc_api.html) -- complete endpoint spec (HIGH confidence)
+- [USDA FDC Data Documentation](https://fdc.nal.usda.gov/data-documentation/) -- data types explained (HIGH confidence)
+- [USDA FDC API Key Signup](https://fdc.nal.usda.gov/api-key-signup/) -- free instant registration (HIGH confidence)
+- [Open Food Facts API Tutorial](https://openfoodfacts.github.io/openfoodfacts-server/api/tutorial-off-api/) -- v2 endpoints, field selection, barcode lookup (HIGH confidence)
+- [Open Food Facts API Introduction](https://openfoodfacts.github.io/openfoodfacts-server/api/) -- no auth, no rate limit confirmed (HIGH confidence)
+- [FatSecret API Editions & Pricing](https://platform.fatsecret.com/api-editions) -- Premier Free tier, attribution requirements (MEDIUM confidence)
+- [FatSecret OAuth 2.0 Documentation](https://platform.fatsecret.com/docs/guides/authentication/oauth2) -- client credentials flow (HIGH confidence)
+- [Expo Camera Documentation](https://docs.expo.dev/versions/latest/sdk/camera/) -- CameraView, onBarcodeScanned, supported barcode types (HIGH confidence)
+- [Expo Barcode Scanner Migration Guide](https://github.com/expo/fyi/blob/main/barcode-scanner-to-expo-camera.md) -- expo-barcode-scanner removed, use expo-camera (HIGH confidence)
+- [Supabase Full Text Search](https://supabase.com/docs/guides/database/full-text-search) -- tsvector, GIN index, textSearch() client method (HIGH confidence)
+- [Supabase Edge Functions](https://supabase.com/docs/guides/functions) -- Deno fetch, secrets, architecture (HIGH confidence)
 
 ---
-*Stack research for: SharedKitchen v5.0 Social Feed*
-*Researched: 2026-04-06*
+*Stack research for: SharedKitchen v6.0 Food Data Integration*
+*Researched: 2026-04-07*

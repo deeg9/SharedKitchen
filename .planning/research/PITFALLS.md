@@ -1,314 +1,287 @@
-# Pitfalls Research
+# Domain Pitfalls: Food Data Integration
 
-**Domain:** Adding social feed features (follow, feed, likes, comments) to a private household dinner planning app
-**Researched:** 2026-04-06
-**Confidence:** HIGH
+**Domain:** Adding external food database APIs (USDA, Open Food Facts, FatSecret) and barcode scanning to an existing meal planning app
+**Researched:** 2026-04-07
+**Confidence:** HIGH (verified against official API docs and community reports)
+
+---
 
 ## Critical Pitfalls
 
-### Pitfall 1: Household Data Leakage Through Social Feed
+Mistakes that cause data corruption, rewrites, or major regressions in existing functionality.
 
-**What goes wrong:**
-The entire existing data model is household-scoped behind strict RLS (`is_household_member` checks on every table). Adding a social feed means meal plans, recipes, and user profiles must become partially visible to followers who are NOT household members. Developers open up RLS too broadly (e.g., making recipes globally readable) and accidentally expose private household data -- grocery lists, budget info, pantry contents, leftovers, meal notes, assigned cooks, and household member names.
+### Pitfall 1: NutritionInfo Type Mismatch With Existing Schema
 
-**Why it happens:**
-The current RLS policies use a single `is_household_member()` gate on all tables. There is no concept of "public" vs "private" data. When adding feed visibility, it is tempting to add a permissive SELECT policy like `true` or `follower_id = auth.uid()` to recipes/meal_plans, which inadvertently exposes all columns and related data that should remain private.
+**What goes wrong:** SharedKitchen already stores nutrition data as a `NutritionInfo` JSONB column on `recipes` with string values (`calories?: string`, `protein?: string`, etc.) extracted from JSON-LD/schema.org. USDA, Open Food Facts, and FatSecret all return nutrition as **numeric values per 100g or per serving** with explicit units. Developers bolt the new API data directly onto the existing `NutritionInfo` interface, creating a system where some recipes have `"calories": "350 kcal"` (string from web scraping) and others have `"calories": 350` (number from USDA). Every downstream consumer (UI display, AI meal suggestions, daily totals) must handle both formats, leading to NaN errors, wrong totals, and silent data corruption.
 
-**How to avoid:**
-- Create a separate `feed_posts` table that contains only the data intended for public consumption (meal name, recipe name, photo URL, kitchen display name). Never expose raw `meal_plans`, `recipes`, or `households` rows to non-members.
-- The feed post is a materialized snapshot, not a live join to household data. When a meal is shared, copy the shareable fields into `feed_posts`. This decouples the social layer from the private household layer entirely.
-- Keep ALL existing RLS policies on `households`, `meal_plans`, `recipes`, `grocery_items`, `expenses`, `pantry_items`, and `leftovers` completely untouched. New social tables get their own independent policies.
-- Audit rule: any migration that ALTERs an existing RLS policy on a household-scoped table is a red flag.
+**Why it happens:** The existing `NutritionInfo` interface in `src/types/database.ts` uses `string` types because schema.org nutrition values include units in the string (e.g., "350 calories", "25g protein"). USDA/OFF/FatSecret return structured numeric data with separate unit fields.
 
-**Warning signs:**
-- Any migration that modifies existing RLS policies on household-scoped tables
-- Queries that JOIN `recipes` or `meal_plans` directly to `follows` without going through `feed_posts`
-- Followers able to see recipe ingredients, instructions, grocery lists, or budget data
-- The word "household_id" appearing in any follower-facing query
+**Consequences:** Calorie totals show NaN. AI meal generator receives garbage nutrition context. Users see inconsistent formatting across recipes.
 
-**Phase to address:**
-Phase 1 (Data Model) -- the feed_posts table and its RLS policies must be designed before any UI work. This is the architectural firewall between private and public data.
+**Prevention:**
+- Define a new canonical `NutritionData` interface with numeric fields, explicit units, and source attribution: `{ calories_kcal: number, protein_g: number, fat_g: number, ... source: 'usda' | 'off' | 'fatsecret' | 'scraped', per_serving: boolean }`.
+- Write a migration function that parses existing string-based `NutritionInfo` into the new numeric format (extract numbers, normalize units).
+- Add a DB migration to evolve the `nutrition_info` JSONB column or add a parallel `nutrition_data` column, backfill existing data, then deprecate the old format.
+- Phase mapping: **Must be addressed in the first phase** (data layer/schema design) before any API integration.
+
+**Detection:** Unit tests that assert nutrition values are always numeric. TypeScript strict typing on the new interface.
 
 ---
 
-### Pitfall 2: Exposing User Identity Across Household Boundaries
+### Pitfall 2: Ingredient Name Mismatch Between Recipe Data and Food Database
 
-**What goes wrong:**
-The current `profiles` table RLS only allows reading your own profile or co-household-members' profiles (via the joined policy in migration 00002). When followers view a kitchen's feed posts, they need to see display names and avatars. Developers add a broad SELECT policy to `profiles` (e.g., `true` for all authenticated users) which exposes ALL user profiles -- including email-derived display names that were never intended to be public.
+**What goes wrong:** Existing recipes store ingredients as `{ amount: number, unit: string, name: string }` with freeform names like "chicken breast, boneless skinless", "2% milk", or "extra virgin olive oil". USDA Foundation Foods uses names like "Chicken, broilers or fryers, breast, skinless, boneless, meat only, raw". Open Food Facts uses product names like "Great Value 2% Reduced Fat Milk". FatSecret uses "Skinless Chicken Breast". Naive string matching (even fuzzy) between recipe ingredient names and food database entries produces wrong matches, leading to wildly inaccurate nutrition calculations (matching "chicken breast" to "chicken broth" or "chicken thigh with skin").
 
-**Why it happens:**
-The existing profile visibility policy joins through `household_members` -- there is no mechanism for "this profile is visible because I follow their kitchen." The easy fix is making profiles globally readable, but this leaks private identity information.
+**Why it happens:** Food databases are designed for precise nutritional reference, not for matching against user-entered recipe ingredients. There is no universal food identifier shared across recipe websites and nutrition databases.
 
-**How to avoid:**
-- Create a `kitchen_profiles` table (or view) that contains only public-facing kitchen information: kitchen display name, kitchen avatar, optional bio, follower count. This is separate from `profiles` (individual user data) and `households` (private household data).
-- Feed posts reference `kitchen_id` and the `kitchen_profiles` table, never individual `user_id` or `profiles`.
-- The social unit is the KITCHEN (household), not the USER. A kitchen has members, but followers see the kitchen identity only. Individual member names/avatars should not appear in the feed.
-- Do NOT modify the existing profiles SELECT policy. Do NOT modify the existing households SELECT policy.
+**Consequences:** Recipe nutrition totals are wrong by 50-300%. Users who care about nutrition lose trust. AI features make bad recommendations based on wrong data.
 
-**Warning signs:**
-- Any migration modifying the profiles or households SELECT policy
-- Feed UI showing individual user names instead of kitchen names
-- Followers able to enumerate household member lists
-- `profiles.id` appearing as a foreign key in any social table visible to followers
+**Prevention:**
+- Do NOT attempt real-time ingredient-to-food matching on the client. This is a server-side problem.
+- Build an Edge Function that uses a combination of: (1) USDA search API with the ingredient name, (2) AI-assisted disambiguation using gpt-5-mini to select the best match from top-5 results, (3) a local mapping cache table (`ingredient_food_mappings`) that stores confirmed matches.
+- Accept that automatic matching will have ~70-80% accuracy. Always show users which food database entry was matched and let them correct it.
+- For common ingredients, pre-populate a curated mapping table (top 200 cooking ingredients to their USDA FDC IDs).
+- Phase mapping: **Phase 2-3** (after data layer, as part of nutrition calculation engine).
 
-**Phase to address:**
-Phase 1 (Data Model) -- kitchen_profiles must be created as part of the follow/kitchen identity schema before any follow or feed UI is built.
+**Detection:** Log match confidence scores. Alert when a recipe's total calories per serving exceeds 2000 or falls below 50 (likely bad matches).
 
 ---
 
-### Pitfall 3: Default-Public Sharing Without Explicit Opt-In
+### Pitfall 3: Serving Size and Unit Chaos Across Three APIs
 
-**What goes wrong:**
-Meals are auto-posted to the social feed without explicit user consent. Users who joined SharedKitchen for private household planning suddenly discover their dinner plans are visible to followers they forgot they had. This violates user expectations and erodes trust, especially for a product whose entire value proposition is private household coordination.
+**What goes wrong:** USDA reports nutrients per 100g. Open Food Facts reports per 100g AND per serving (but serving sizes vary wildly and are often missing). FatSecret reports per serving with serving descriptions like "1 cup" or "1 medium". Recipe ingredients use "2 tablespoons", "1/4 cup", "3 cloves". The app must convert between all these unit systems to calculate per-recipe and per-serving nutrition. Developers skip building a proper unit conversion layer and hardcode conversions, leading to off-by-10x errors (confusing grams with ounces, or per-100g with per-serving).
 
-**Why it happens:**
-The project spec says "auto-post meals from plan with manual share toggle." If the toggle defaults to ON, every meal plan entry becomes a feed post automatically. Users who set up follows during initial excitement may not realize every dinner is being broadcast.
+**Why it happens:** This is a documented issue in the FatSecret developer community -- recipe units and food database units frequently don't match. The USDA API returns "portion" descriptions that don't always parse cleanly. Open Food Facts serving sizes are user-contributed and inconsistent.
 
-**How to avoid:**
-- Default the share toggle to OFF for the initial release. Users must explicitly opt in per meal or enable auto-sharing at the kitchen level.
-- Add a kitchen-level "auto-share new meals" setting that defaults to OFF. Users must visit settings to enable it.
-- Show a one-time education prompt when a user first enables sharing: "Meals you share will be visible to your followers. Your grocery list, budget, and other household data remain private."
-- Never auto-share meals that were logged via the "notes" fallback (recipe-less photo meals from v4.0) -- these feel more personal and informal.
-- When auto-sharing is enabled, show a visible indicator on the meal plan card so users always know which meals will be shared.
+**Consequences:** A recipe shows 5,000 calories per serving because an ingredient was matched per-100g but the recipe uses 1 tablespoon. Users immediately lose trust in the nutrition feature.
 
-**Warning signs:**
-- No share toggle visible on the meal plan creation/edit flow
-- Feed posts appearing for meals the user never explicitly shared
-- No kitchen-level sharing preference in settings
-- User confusion or complaints about what is "public" vs "private"
+**Prevention:**
+- Build a dedicated unit conversion module that handles: weight (g, kg, oz, lb), volume (ml, L, tsp, tbsp, cup, fl oz), and count (each, clove, slice, medium, large).
+- Always normalize to grams internally. Convert ingredient amounts to grams using density tables for common foods (1 cup flour = 120g, 1 cup sugar = 200g, 1 tbsp olive oil = 13.5g).
+- Store the conversion factor alongside the match: `{ fdc_id: 12345, amount_grams: 13.5, original_amount: 1, original_unit: 'tbsp' }`.
+- The app already has metric/imperial toggle (v2.0). This conversion layer must integrate with it, not duplicate it.
+- Phase mapping: **Phase 1** (core data layer, must exist before any nutrition calculations).
 
-**Phase to address:**
-Phase 1 (Data Model) for the `is_shared` column default (FALSE), Phase 2 (Feed UI) for the toggle and education prompt.
+**Detection:** Sanity bounds on all nutrition calculations: per-ingredient calorie check (flag if > 900 kcal per ingredient line), per-recipe check (flag if total < 100 or > 5000 kcal for a 4-serving recipe).
 
 ---
 
-### Pitfall 4: N+1 Queries and Unbounded Feed Loading
+### Pitfall 4: USDA API Rate Limit Causing Cascading Failures
 
-**What goes wrong:**
-The feed query becomes: "For this user, get all kitchens they follow, then for each kitchen get recent shared meals, then for each meal get the recipe details, then get like counts, then get comments." This cascading query pattern creates N+1 problems that degrade linearly with the number of followed kitchens. Combined with unbounded loading (no pagination), the feed screen becomes a performance disaster.
+**What goes wrong:** USDA FoodData Central limits to 1,000 requests per hour per API key. When a user opens a recipe with 15 ingredients and the app fires 15 parallel food search requests, that is 15 of the 1,000 hourly budget. A household of 4 users browsing 10 recipes in an hour could burn through 600 requests. Add barcode lookups, pantry additions, and search-as-you-type, and the rate limit is exceeded within the first day of launch. Once exceeded, the API key is blocked for 1 hour, killing nutrition features for ALL users.
 
-**Why it happens:**
-The existing codebase fetches data in Zustand stores that call Supabase directly (e.g., `recipeStore`, `planStore`). Developers follow the same pattern for the feed, making separate queries per followed kitchen. Supabase's client makes it easy to write `select('*, recipe(*), likes(*), comments(*)')` which generates massive JOIN queries.
+**Why it happens:** The USDA API key is shared across all Edge Function invocations. Unlike per-user rate limits (which SharedKitchen already implements for AI features), USDA limits are per-key globally.
 
-**How to avoid:**
-- Use a single denormalized query: `feed_posts` table contains kitchen name, meal name, recipe name, photo URL, like count, comment count -- no JOINs needed for the feed list view.
-- Implement cursor-based pagination from day one. Use `created_at` + `id` as the cursor, not OFFSET. Fetch 20 posts per page.
-- Like and comment counts should be denormalized counters on `feed_posts`, updated via triggers, not computed via `COUNT(*)` subqueries on every render.
-- Use a single Postgres function or view for the feed query rather than multiple sequential client-side calls.
-- Comments load lazily only when user taps into a post detail view -- never preloaded in the feed list.
+**Consequences:** All nutrition lookups fail for all users for 1 hour. No graceful degradation -- features just break.
 
-**Warning signs:**
-- Feed load time exceeding 500ms
-- Multiple sequential `.from()` calls in the feed store
-- No LIMIT clause on feed queries
-- Like/comment counts computed via subquery per card
+**Prevention:**
+- **Cache aggressively in Postgres.** Create a `food_data_cache` table that stores USDA responses keyed by FDC ID. Most foods don't change. Set a 30-day TTL for cache entries.
+- **Never call USDA for the same food twice.** Before any API call, check the cache.
+- **Batch searches.** USDA's `/foods` endpoint accepts multiple FDC IDs in one call (up to 20). When calculating recipe nutrition, batch all ingredient lookups into 1-2 API calls instead of 15.
+- **Implement a server-side request queue** in the Edge Function with rate tracking. If approaching the limit, serve from cache only and defer new lookups.
+- **Register multiple API keys** for different functions (search vs. lookup vs. barcode) to multiply the effective limit.
+- Consider downloading the USDA Foundation Foods dataset (~300MB CSV) and importing it into Postgres for zero-API-call lookups on common foods.
+- Phase mapping: **Phase 1** (caching infrastructure must exist before any API calls go live).
 
-**Phase to address:**
-Phase 1 (Data Model) for denormalized schema and pagination design. Phase 2 (Feed UI) for implementing cursor-based infinite scroll.
-
----
-
-### Pitfall 5: RLS Performance Degradation on Follow-Based Queries
-
-**What goes wrong:**
-RLS policies on the `feed_posts` table use subqueries like `EXISTS (SELECT 1 FROM follows WHERE follower_id = auth.uid() AND following_kitchen_id = feed_posts.kitchen_id)`. This subquery executes per row, and without proper indexing and the `(select auth.uid())` wrapper, it becomes catastrophically slow as the feed table grows.
-
-**Why it happens:**
-The existing `is_household_member()` SECURITY DEFINER function works well because household membership is a tiny set (2-6 members). Follow relationships can be orders of magnitude larger (hundreds or thousands). The same RLS pattern that works for households will not scale for social feeds. Supabase documentation confirms that unwrapped `auth.uid()` calls evaluate per-row, causing up to 10,000x performance degradation.
-
-**How to avoid:**
-- Always wrap `auth.uid()` in a subselect: `(select auth.uid())` to cache it per statement, not per row. Supabase docs confirm this yields up to 99.99% improvement.
-- Create a `SECURITY DEFINER` function `get_followed_kitchen_ids(p_user_id UUID)` that returns `UUID[]` and use `kitchen_id = ANY(get_followed_kitchen_ids((select auth.uid())))` in the policy. This avoids per-row subquery evaluation.
-- Add composite indexes: `follows(follower_id, following_kitchen_id)` and `feed_posts(kitchen_id, created_at DESC)`.
-- Always add explicit WHERE filters client-side that match the policy logic -- this helps Postgres construct better query plans even when RLS provides the same implicit filter.
-
-**Warning signs:**
-- Feed queries slowing as total feed_posts rows grow, even for users with few followed kitchens
-- `EXPLAIN ANALYZE` showing sequential scans on `follows` table
-- Supabase dashboard showing slow queries (>200ms) on feed-related tables
-
-**Phase to address:**
-Phase 1 (Data Model) -- must be built into the initial migration and RLS design, not retrofitted.
-
----
-
-### Pitfall 6: No Moderation System Alongside Comments
-
-**What goes wrong:**
-Comments go live with no reporting mechanism, no spam detection, and no ability to remove abusive content. A single bad actor can post offensive comments on meal photos across many kitchens. Since SharedKitchen is a household/family app, exposure to inappropriate content is especially damaging to trust. Without tools to address it, there is no way to remove content, no way to block users, and no recourse for affected users.
-
-**Why it happens:**
-For an MVP social feed in a small community, moderation feels like over-engineering. "We only have 200 users, who would spam?" But even one incident with no tools to address it creates a crisis. Content moderation experts consistently identify skipping moderation at launch as a top mistake -- the cost of adding it retroactively during a crisis is 5-10x higher than building basic tools alongside comments.
-
-**How to avoid:**
-- Ship a `content_reports` table and basic report flow in the same phase as comments. It does not need AI moderation -- just a "Report" button that flags content and an admin query to review flags.
-- Add a `blocked_kitchens` table so users can block kitchens whose comments they do not want to see. Client-side filtering is acceptable for MVP.
-- Add an `is_hidden` boolean on comments so content can be soft-deleted without losing evidence for review.
-- Rate-limit comments per user (e.g., max 20 comments per hour) via a simple count check in the Edge Function or RLS policy.
-- Plain text only for comments. Strip all markup. Limit to 500 characters.
-
-**Warning signs:**
-- Comments feature shipping without a "Report" option in the UI
-- No admin tooling for reviewing reported content (even a simple SQL query counts)
-- No ability to hide/remove individual comments without deleting the row
-- No rate limiting on comment creation
-
-**Phase to address:**
-Phase 3 (Interactions) -- must ship alongside comments, not as a follow-up.
-
----
-
-### Pitfall 7: Notification Spam from Social Activity
-
-**What goes wrong:**
-Users who follow 20 kitchens start receiving push notifications for every new meal shared, every like on their posts, and every comment. The notification volume overwhelms the existing notification system (which currently only fires for cooking reminders, leftover expiry, and budget alerts -- all low-volume, high-signal) and users disable notifications entirely, losing the valuable household notifications too.
-
-**Why it happens:**
-The app already has push notifications via expo-notifications and Expo Push API. It is tempting to reuse the same channel for social activity. But household notifications are low-volume (3-5 per day maximum). Social notifications can be high-volume (50+ per day with active following). iOS does not let users selectively disable notification categories within a single app -- they either allow or disallow all.
-
-**How to avoid:**
-- Do NOT send push notifications for social activity in the initial release. Use in-app indicators only (badge count on feed tab, dot indicators on new posts).
-- If push notifications are added later, use a separate notification category with its own toggle in app settings.
-- Never send push notifications for likes. Only send for comments on YOUR posts, and batch those ("3 people commented on your meal").
-- Respect the existing notification permission pre-prompt flow -- do not trigger a new permission request for social features.
-
-**Warning signs:**
-- Social notifications using the same code path as household notifications
-- No per-category notification settings in the app
-- Users reporting "too many notifications" after social feature launch
-- Notification opt-out rate increasing after social features ship
-
-**Phase to address:**
-Phase 3 (Interactions) -- explicitly decide what does and does not trigger notifications before implementing likes/comments.
+**Detection:** Monitor API call counts per hour in Edge Function logs. Alert at 750/1000.
 
 ---
 
 ## Technical Debt Patterns
 
-Shortcuts that seem reasonable but create long-term problems.
+Issues that work initially but become expensive to fix as the feature matures.
 
-| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
-|----------|-------------------|----------------|-----------------|
-| JOINing live household tables for feed display instead of snapshotting into feed_posts | No data duplication | Feed queries coupled to private data, RLS complexity explosion, privacy risk | Never -- always snapshot into feed_posts |
-| Storing like/comment counts as computed aggregates (COUNT subqueries) | No denormalization to maintain | O(n) per feed card on every render, degrades linearly | Never at scale -- denormalize counters from day one |
-| Using OFFSET pagination for feed | Simple to implement | Performance degrades linearly, skips/duplicates when new posts arrive | Never for user-facing feed -- use cursor pagination |
-| Single notification channel for household + social | Less code, fewer categories | Users disable all notifications to escape social spam, losing household alerts | Never -- keep channels separate even if social push is deferred |
-| Skipping blocked/muted kitchen support | Faster MVP | First harassment incident has no mitigation path | Only if comments are not shipped yet |
-| Making follow relationships symmetric (auto-follow-back) | Simpler data model | Users cannot curate their feed, forced reciprocity feels invasive for a cooking app | Never -- follows should be unidirectional |
-| Using household_id as the social identifier in feed_posts | No new table needed | Leaks internal household UUID to followers, who could probe other endpoints | Never -- use a public-facing kitchen_profile_id |
+### Debt 1: Storing Raw API Responses Instead of Normalized Data
+
+**What goes wrong:** Developers store the raw JSON from USDA, OFF, and FatSecret in a single JSONB column. Each API has a completely different schema (USDA uses `foodNutrients[].nutrient.nutrientId`, OFF uses `nutriments.energy-kcal_100g`, FatSecret uses `calories`). Every UI component and calculation function must handle all three formats.
+
+**Prevention:** Normalize all external data into a single canonical schema at ingestion time. Store the raw response separately (or not at all) for debugging. The canonical `foods` table should have consistent columns regardless of source.
+
+### Debt 2: No Source Attribution on Nutrition Data
+
+**What goes wrong:** Nutrition values are stored without recording where they came from. Six months later, when USDA updates their database or a user reports wrong data, there is no way to know which values came from USDA vs. Open Food Facts vs. web scraping vs. user edits.
+
+**Prevention:** Every nutrition record must include: `source` (usda/off/fatsecret/scraped/user), `source_id` (FDC ID, OFF barcode, FatSecret food_id), `fetched_at` timestamp, and `confidence` (high/medium/low).
+
+### Debt 3: Pantry Items Without Food Database Links
+
+**What goes wrong:** The existing `pantry_items` table has freeform `name`, `quantity`, and `unit` fields with no foreign key to any food database. Barcode scanning creates new pantry items linked to food database entries, but existing pantry items (from grocery list auto-copy and AI fridge scanning) remain unlinked. The app ends up with two classes of pantry items: "smart" ones with nutrition data and "dumb" ones without, creating an inconsistent user experience.
+
+**Prevention:** Add an optional `food_id` (nullable FK) and `food_source` column to `pantry_items`. When displaying nutrition, gracefully handle items without links (show "nutrition not available" rather than hiding the section). Build a background process or user flow to link existing pantry items to food database entries over time.
+
+---
 
 ## Integration Gotchas
 
-Common mistakes when connecting social features to existing SharedKitchen systems.
+Specific to combining USDA + Open Food Facts + FatSecret.
 
-| Integration | Common Mistake | Correct Approach |
-|-------------|----------------|------------------|
-| Supabase Realtime for feed | Subscribing to `feed_posts` changes for live feed updates, creating a channel per user with broad filters | Use Realtime only for comment threads on a single open post. Poll or use badge counts for the main feed list. |
-| Supabase Storage for feed photos | Storing shared meal photos in a bucket without proper RLS, making them accessible via URL guessing | Use signed URLs with short expiry, or serve through the existing Storage RLS patterns. Feed photos should be read-only to followers. |
-| Existing recipe save flow | Copying the full recipe object (ingredients, instructions, timers) when user saves from feed | Save a snapshot of the recipe at share time into feed_posts or a published_recipes table. The original household recipe may be edited or deleted later -- the feed snapshot must be independent. |
-| Supabase Auth identity | Using `auth.uid()` as the social identity in feed posts | Social identity is the kitchen (household), not the individual user. Multiple household members share one social identity. Use kitchen_profile_id. |
-| Expo Push Notifications | Sending social push notifications through the same Edge Function as household notifications | Create a separate Edge Function (or at minimum separate logic branch) for social notifications with its own rate limiting and batching. |
-| Plan tab integration | Replacing the existing Plan tab content with a social feed | Keep the Plan tab focused on the user's own meal plan. Add the social feed as a separate section (subtab, swipe, or new tab). Do not displace existing functionality. |
-| Meal plan mutations | Creating feed_posts synchronously inside the meal plan save transaction | Create feed_posts asynchronously (trigger or background) so meal plan saves are not slowed by social layer failures. A failed feed post should never block a meal plan update. |
+### Gotcha 1: Same Food, Three Different Calorie Counts
+
+**What goes wrong:** "Whole milk" in USDA Foundation Foods: 61 kcal/100g. In Open Food Facts (specific brand): 65 kcal/100g. In FatSecret: 60 kcal/100g. When the app shows nutrition for a recipe ingredient, which value wins? If different recipes use different sources, the daily total becomes meaningless.
+
+**Prevention:** Establish a clear source priority hierarchy and document it:
+1. **User override** (highest) -- if the user manually edited nutrition, preserve it.
+2. **Barcode match** (Open Food Facts or FatSecret) -- if the user scanned a specific product, use that product's data.
+3. **USDA Foundation Foods** -- gold standard for generic/unbranded ingredients.
+4. **USDA Branded Foods** -- for branded items not found via barcode.
+5. **FatSecret** -- fallback for items not in USDA.
+6. **Web-scraped** (lowest) -- existing `NutritionInfo` from recipe import.
+
+Always show the source to the user: "Nutrition from USDA" or "Nutrition from Kroger Whole Milk (scanned)".
+
+### Gotcha 2: Open Food Facts Data Quality is Highly Variable
+
+**What goes wrong:** Open Food Facts is crowd-sourced. Many products have incomplete nutrition (only calories, missing protein/fat/carbs). Some have clearly wrong data (e.g., 5000 calories per serving for a candy bar -- the contributor entered kJ instead of kcal). Some barcodes resolve to products from the wrong country.
+
+**Prevention:**
+- Validate OFF responses: check that calories, protein, fat, and carbs are all present and non-null. If any core field is missing, mark the entry as "partial" and fall back to USDA search.
+- Sanity-check values: calories per 100g should be between 0 and 900. Protein + fat + carbs should roughly account for the calorie total (protein*4 + fat*9 + carbs*4 within 20% of calories).
+- Use the `completeness` or `nutrition_grade_fr` (Nutri-Score) fields from OFF to gauge data quality.
+- Always display a "Report incorrect data" option for crowd-sourced entries.
+
+### Gotcha 3: FatSecret OAuth 2.0 Complexity
+
+**What goes wrong:** FatSecret uses OAuth 2.0 for its API (client credentials flow for server-to-server). Developers familiar with simple API key auth (like USDA) forget that FatSecret tokens expire and must be refreshed. The Edge Function gets a 401, doesn't handle token refresh, and all FatSecret lookups fail silently.
+
+**Prevention:**
+- Implement token caching with TTL in the Edge Function. FatSecret access tokens are valid for a limited time.
+- Build a helper function that checks token expiry before each request and refreshes if needed.
+- Handle 401 responses by refreshing the token and retrying once before failing.
+
+### Gotcha 4: Barcode Formats and Regional Differences
+
+**What goes wrong:** UPC-A (US, 12 digits), EAN-13 (international, 13 digits), and UPC-E (compressed, 8 digits) all exist. A US product might have a UPC-A barcode but be stored in Open Food Facts as EAN-13 (with a leading zero). The scanner returns "012345678901" but OFF expects "0012345678901". Lookup fails, user thinks the feature is broken.
+
+**Prevention:**
+- Normalize all barcodes to EAN-13 format (13 digits, zero-padded on the left) before any API lookup.
+- Try both the raw scanned code and the normalized version.
+- Open Food Facts also supports searching by the barcode without leading zeros via their API.
+- Implement fallback: if OFF returns no result, try FatSecret barcode search, then USDA branded foods search.
+
+### Gotcha 5: expo-barcode-scanner is Deprecated
+
+**What goes wrong:** Developers add `expo-barcode-scanner` (the standalone package) which was deprecated in Expo SDK 51. It may still install but will have bugs and eventually be removed entirely.
+
+**Prevention:** Use `expo-camera` (CameraView component) with `onBarcodeScanned` callback. This is the officially supported approach as of Expo SDK 52+. SharedKitchen already uses `expo-camera` for the food photo features (v4.0), so barcode scanning should reuse the same camera infrastructure.
+
+---
 
 ## Performance Traps
 
-Patterns that work at small scale but fail as usage grows.
+### Trap 1: Calculating Nutrition on Every Recipe View
 
-| Trap | Symptoms | Prevention | When It Breaks |
-|------|----------|------------|----------------|
-| Fan-out on read (assembling feed at query time by joining follows + meal_plans) | Feed load time grows linearly with followed kitchen count | Use a denormalized feed_posts table. Fan-out on read is acceptable at SharedKitchen's scale (<10K users) but requires cursor pagination and denormalized counts. | >50 followed kitchens per user |
-| COUNT(*) for likes/comments per feed card | Feed list view slows on scroll, especially with popular posts | Denormalize `like_count` and `comment_count` into feed_posts, update via Postgres trigger on insert/delete | >100 likes per post or >50 posts in a single feed load |
-| Loading all comments for all visible feed posts at once | Memory spike, slow initial load, wasted bandwidth for comments user never reads | Lazy-load comments only when user taps into post detail view. Feed cards show comment_count only. | >10 comments per post average |
-| Full recipe data embedded in feed cards | Large payloads per card, slow FlatList rendering | Feed cards show recipe name + photo only. Full recipe data loads on tap into detail. | >20 posts with full recipe payloads in feed |
-| Supabase Realtime subscription per followed kitchen | Connection limit exhaustion (default 200 concurrent connections per project) | Use a single subscription with array-based filter, or avoid Realtime for feed entirely (poll on pull-to-refresh) | >20 followed kitchens per user |
-| Unindexed follower lookups in RLS policies | Every feed query triggers sequential scan on follows table | Add composite index on `follows(follower_id, following_kitchen_id)` and use SECURITY DEFINER helper | >1,000 rows in follows table |
+**What goes wrong:** When a user opens a recipe detail, the app loops through all ingredients, looks up each in the food database, converts units, and calculates totals. This adds 2-5 seconds to every recipe view (even for previously viewed recipes) and makes the recipe detail screen feel sluggish compared to its current instant-load behavior.
 
-## Security Mistakes
+**Prevention:**
+- Calculate and cache recipe nutrition at write time (when recipe is created/edited or when ingredient-food mappings are confirmed). Store the computed totals on the recipe row itself.
+- Only recalculate when ingredients change or when the user explicitly requests a nutrition refresh.
+- Show cached nutrition immediately; if stale, refresh in background.
 
-Domain-specific security issues for social feed features.
+### Trap 2: Search-as-You-Type Against External APIs
 
-| Mistake | Risk | Prevention |
-|---------|------|------------|
-| Feed posts containing raw `household_id` visible to followers | Followers can probe other household-scoped endpoints using the leaked UUID | Feed posts reference `kitchen_profile_id` (a public-facing ID), never `household_id`. Ensure no API endpoint accepts household_id from non-members without RLS check. |
-| No rate limiting on follow/unfollow requests | Spam follow bots, follower count manipulation, follow/unfollow harassment loops | Limit to 100 max followed kitchens per user. Rate-limit follow/unfollow to 10 per minute. Prevent self-follow. |
-| Comments allowing HTML, markdown, or link injection | XSS if any WebView rendering is used, phishing links, misleading formatted content | Plain text only for comments. Strip all markup server-side. Limit to 500 characters. No clickable URLs. |
-| Recipe "save from feed" bypassing premium gating | Free users saving unlimited recipes through feed instead of manual creation | Feed recipe saves count toward the same limits as recipe creation if any exist. Check subscription status server-side. |
-| Invite codes discoverable through kitchen profiles | Non-members could join private households by finding invite codes on the public kitchen profile | Kitchen profiles must NEVER expose invite codes. Invite codes and kitchen profiles are completely separate concepts. |
-| No input sanitization on kitchen profile bio/name | Stored XSS, inappropriate content in kitchen names | Sanitize and length-limit all user-provided text in kitchen profiles. No HTML/markdown. |
+**What goes wrong:** The food search feature fires an API request on every keystroke. User types "chick" -- 5 requests in 2 seconds. This burns through rate limits and creates a laggy experience.
+
+**Prevention:**
+- Debounce search input (300-500ms minimum).
+- Use local Postgres full-text search against the cached food data as the primary search. Only hit external APIs when local search returns < 3 results.
+- Pre-populate the local food cache with USDA Foundation Foods (~7,000 common foods) so most searches never need an external API call.
+
+### Trap 3: Barcode Scanner Re-Renders Killing Performance
+
+**What goes wrong:** The barcode scanner fires `onBarcodeScanned` continuously (every frame where a barcode is detected). Without throttling, this triggers dozens of API lookups and re-renders per second, freezing the UI.
+
+**Prevention:**
+- Set a flag after the first successful scan and ignore subsequent callbacks until the user explicitly triggers a new scan.
+- Use `barcodeScannerSettings={{ isHighlightingEnabled: false }}` and process only the first detected barcode per scan session.
+- Show a loading/result overlay immediately after first detection.
+
+---
 
 ## UX Pitfalls
 
-Common user experience mistakes when adding social features to a private app.
+### UX 1: Nutrition Display Overwhelming the Recipe Experience
 
-| Pitfall | User Impact | Better Approach |
-|---------|-------------|-----------------|
-| Forcing social features on existing users | Users who want private planning feel the app changed on them -- churn risk | Social feed is opt-in and additive. Existing Plan tab stays unchanged. Feed is a new section or subtab that users discover naturally. |
-| Empty feed state with no guidance | New social users see a blank feed and do not understand how to populate it | Show a clear "Follow kitchens to see what they're cooking" prompt with a discovery/search mechanism or invite link flow. |
-| No way to discover kitchens to follow | Users cannot find interesting kitchens, feed stays permanently empty, feature feels dead | Provide invite-link-based following (share your kitchen link) and optionally a kitchen search/browse. Do not rely on organic discovery alone. |
-| Showing follower counts prominently | Turns a cozy, warm cooking app into a social status competition -- misaligned with the "Culinary Curator" design philosophy | De-emphasize or hide follower counts. Focus on the food, not the numbers. Show "X kitchens you follow" not "X followers this kitchen has." |
-| Share toggle buried in settings | Users cannot easily control what gets shared on a per-meal basis, leading to frustration or accidental shares | Show the share toggle inline on the meal plan card or meal creation bottom sheet, clearly visible during the normal planning flow. |
-| Comments without context | Flat comment lists with no attribution feel anonymous and potentially hostile | Show the commenter's kitchen name and avatar on each comment. Keep comments flat (no threading) for MVP, but provide clear identity context. |
-| Treating "save recipe" as cloning the full recipe | Users expect a lightweight "bookmark" but get a full recipe clone in their library, creating duplicates and confusion | Save creates a reference/bookmark with attribution ("Saved from Kitchen X"). Recipe data is a snapshot, clearly marked as saved from feed. |
+**What goes wrong:** The recipe detail screen is currently clean and cooking-focused. Adding a full nutrition facts panel (calories, 13 vitamins, 8 minerals from USDA) buries the cooking instructions and makes the screen feel like a medical document instead of a recipe card.
+
+**Prevention:**
+- Show only the "big 4" by default: calories, protein, fat, carbs (per serving).
+- Offer expandable "Full nutrition" section for users who want detail.
+- Match the existing Culinary Curator design language -- warm, inviting, not clinical.
+- Keep nutrition secondary to the cooking experience.
+
+### UX 2: Barcode Scanner With No Result is a Dead End
+
+**What goes wrong:** User excitedly scans a product barcode. The product isn't in Open Food Facts or FatSecret. The app shows "Product not found" with no next step. User feels the feature is broken.
+
+**Prevention:**
+- On "not found": offer to (1) search by product name instead, (2) manually enter basic nutrition info, (3) take a photo of the nutrition label for AI extraction using the existing Gemini vision pipeline.
+- Track "not found" barcodes to identify gaps and potentially contribute back to Open Food Facts.
+
+### UX 3: Nutrition Data Conflicts Confuse Users
+
+**What goes wrong:** A recipe imported from a website shows "350 calories" (from schema.org scraping). After food database integration, the calculated nutrition from USDA ingredient data shows "425 calories". The user sees both numbers and doesn't know which to trust.
+
+**Prevention:**
+- When calculated nutrition differs from scraped nutrition by more than 15%, show the calculated value with a note: "Calculated from ingredients (USDA data)".
+- Provide a way to toggle between "Source website nutrition" and "Calculated nutrition".
+- Default to calculated (more accurate) but be transparent about the source.
+
+---
 
 ## "Looks Done But Isn't" Checklist
 
-Things that appear complete but are missing critical pieces.
+Items that pass a demo but fail in production.
 
-- [ ] **Follow system:** Often missing unfollow confirmation, follow request rate limiting, and self-follow prevention -- verify all three exist
-- [ ] **Feed pagination:** Often missing handling of new posts arriving while user scrolls (duplicates/skips with OFFSET) -- verify cursor-based pagination handles concurrent insertions
-- [ ] **Like toggle:** Often missing optimistic UI rollback on network failure -- verify like state reverts if server request fails
-- [ ] **Comment posting:** Often missing empty-string validation, max-length enforcement, and rate limiting -- verify all three are enforced server-side, not just client-side
-- [ ] **Kitchen profile:** Often missing the case where a kitchen has no shared meals yet -- verify empty state exists
-- [ ] **Recipe save from feed:** Often missing handling of original recipe deletion -- verify the saved snapshot is independent and survives the source being removed
-- [ ] **Share toggle:** Often missing the "retroactive" case -- if a user turns sharing OFF, do existing feed posts get removed? Decide and implement consistently.
-- [ ] **Feed post deletion:** Often missing cascade cleanup of likes and comments -- verify ON DELETE CASCADE on foreign keys from likes/comments to feed_posts
-- [ ] **Block/Report:** Often missing immediate effect -- blocked kitchen's posts should hide from feed instantly (client-side filter), not just on next refresh
-- [ ] **Multi-household users:** Often missing which kitchen identity is used when a user belongs to multiple households -- verify the active household context is clear when sharing
-- [ ] **Existing RLS audit:** Often missing a verification that NO existing RLS policies were modified -- run a diff against migration 00001-00017 to confirm zero changes
+- [ ] **Offline mode**: USDA/OFF/FatSecret all require network. Cached data must work offline. Currently, SharedKitchen works offline for most features. Food data features must not regress this.
+- [ ] **Existing recipe backfill**: The 380K+ USDA foods are available, but existing user recipes need their ingredients mapped to food database entries. This is not automatic -- requires a migration strategy and user-facing "link your ingredients" flow.
+- [ ] **Metric/imperial consistency**: The app has a metric/imperial toggle (v2.0). Nutrition is always in metric (kcal, g). The toggle must NOT convert nutrition units (nobody says "0.88 oz of protein"). But ingredient amounts in the nutrition calculation must respect the user's unit preference.
+- [ ] **Premium gating**: Which food data features are free vs. premium? Barcode scanning? Detailed nutrition? Per-ingredient breakdown? This needs a clear decision before implementation, not after.
+- [ ] **AI feature integration**: The existing AI meal generator and recipe parser should use food database data for better suggestions. This is not "add nutrition display" -- it requires updating AI prompts and context to include structured nutrition constraints.
+- [ ] **Multi-household scope**: Food database cache should be global (not per-household). But recipe nutrition calculations are per-recipe (household-scoped). Pantry food links are per-household. RLS must reflect this.
+- [ ] **Data freshness**: USDA Branded Foods updates monthly. Open Food Facts updates continuously. Cached data needs a TTL and refresh strategy, not just "cache forever".
+- [ ] **Edge Function cold starts**: Adding USDA/OFF/FatSecret API calls to Edge Functions increases cold start time. Multiple sequential API calls (search, then fetch details) in a single function invocation can hit the Supabase Edge Function timeout (default 60s).
 
-## Recovery Strategies
-
-When pitfalls occur despite prevention, how to recover.
-
-| Pitfall | Recovery Cost | Recovery Steps |
-|---------|---------------|----------------|
-| Household data leaked via overly permissive RLS | HIGH | Audit all feed-related RLS policies immediately. Drop overly permissive policies. Migrate feed_posts to use snapshots instead of JOINs. Notify affected users if PII was exposed. Review access logs. |
-| N+1 feed queries causing timeouts | MEDIUM | Add denormalized feed_posts table if not present. Backfill from existing data. Swap queries. No client-side change if API contract is stable. |
-| Notification spam causing opt-outs | MEDIUM | Add notification categories retroactively. Reset all social notification preferences to OFF. Consider a one-time apology/explanation in-app message. |
-| No moderation tools after abuse incident | HIGH | Emergency deploy: add is_hidden column to comments, build admin flag review query, manually hide offending content via SQL. Reputational damage to a family-focused app is hard to undo. |
-| User profiles exposed to all authenticated users | HIGH | Revert the RLS policy change immediately. Audit Supabase access logs for data exposure scope. Create kitchen_profiles table as the proper public-facing entity. |
-| Auto-shared meals without user consent | MEDIUM | Set all existing feed_posts to hidden/draft. Add retroactive opt-in prompt. Let users review and explicitly re-share what they want public. |
-| Feed performance degradation | LOW | Add missing indexes, wrap auth.uid() in subselect, add SECURITY DEFINER function. All fixable via migration without app update. |
+---
 
 ## Pitfall-to-Phase Mapping
 
-How roadmap phases should address these pitfalls.
+| Phase Topic | Likely Pitfall | Severity | Mitigation |
+|---|---|---|---|
+| Schema & data layer design | NutritionInfo type mismatch (Pitfall 1) | CRITICAL | Design canonical nutrition schema first, migrate existing data |
+| Schema & data layer design | Serving size/unit chaos (Pitfall 3) | CRITICAL | Build unit conversion module with density tables |
+| Schema & data layer design | No source attribution (Debt 2) | HIGH | Include source/confidence in schema from day one |
+| Schema & data layer design | Pantry items without food links (Debt 3) | MEDIUM | Add nullable food_id FK to pantry_items |
+| API integration (USDA) | Rate limit cascade (Pitfall 4) | CRITICAL | Cache-first architecture, batch API calls, consider local dataset import |
+| API integration (USDA) | USDA data type confusion | MEDIUM | Use Foundation Foods for generics, Branded Foods for products |
+| API integration (OFF) | Data quality variance (Gotcha 2) | HIGH | Validate completeness, sanity-check values, fallback chain |
+| API integration (OFF) | Barcode format mismatch (Gotcha 4) | MEDIUM | Normalize to EAN-13, try multiple formats |
+| API integration (FatSecret) | OAuth token management (Gotcha 3) | MEDIUM | Token caching with auto-refresh in Edge Function |
+| API integration (all) | Conflicting nutrition values (Gotcha 1) | HIGH | Establish source priority hierarchy, show source to user |
+| API integration (all) | Raw response storage (Debt 1) | HIGH | Normalize at ingestion, canonical schema |
+| Ingredient matching | Name mismatch (Pitfall 2) | CRITICAL | AI-assisted matching, curated mapping table, user confirmation |
+| Barcode scanning | expo-barcode-scanner deprecated (Gotcha 5) | MEDIUM | Use expo-camera CameraView, reuse existing camera infra |
+| Barcode scanning | Scanner re-renders (Trap 3) | MEDIUM | Throttle to one scan per session |
+| Barcode scanning | No-result dead end (UX 2) | MEDIUM | Fallback to name search, manual entry, or photo OCR |
+| Nutrition display | Overwhelming recipe screen (UX 1) | MEDIUM | Big-4 default, expandable detail |
+| Nutrition display | Scraped vs calculated conflict (UX 3) | MEDIUM | Show calculated with source attribution |
+| Performance | Nutrition calc on every view (Trap 1) | HIGH | Calculate at write time, cache on recipe row |
+| Performance | Search-as-you-type rate burn (Trap 2) | HIGH | Debounce + local-first search |
+| Integration testing | Offline regression | HIGH | Ensure cached data works without network |
+| Integration testing | Existing recipe backfill | HIGH | Migration strategy + user-facing linking flow |
 
-| Pitfall | Prevention Phase | Verification |
-|---------|------------------|--------------|
-| Household data leakage (#1) | Phase 1 (Data Model) | Zero changes to existing RLS policies in migrations 00001-00017. feed_posts contains only snapshot data. Manual RLS audit before merge. |
-| User identity exposure (#2) | Phase 1 (Data Model) | kitchen_profiles table exists. No modifications to profiles or households SELECT policies. Feed shows kitchen names only, never individual user names to followers. |
-| Default-public sharing (#3) | Phase 1 (Data Model) + Phase 2 (UI) | is_shared column defaults to FALSE in migration. Share toggle visible in UI with OFF as default state. |
-| N+1 feed queries (#4) | Phase 1 (Data Model) | Single query returns paginated feed. EXPLAIN ANALYZE shows index scans, not sequential scans. Feed loads in <200ms. |
-| RLS performance (#5) | Phase 1 (Data Model) | Feed query with 50 followed kitchens completes in <100ms. auth.uid() wrapped in subselect. SECURITY DEFINER function for follow lookup. |
-| No moderation system (#6) | Phase 3 (Interactions) | Report button exists on every comment. content_reports table exists. Admin can hide comments. Comment rate limiting active. |
-| Notification spam (#7) | Phase 3 (Interactions) | Social activity produces zero push notifications in v1. In-app badge indicators only. |
-| Forced social on existing users | Phase 2 (Feed UI) | Existing Plan tab layout unchanged. Feed is additive. No existing workflow disrupted. |
-| Empty feed state | Phase 2 (Feed UI) | Empty state component with clear call-to-action for discovering/following kitchens. |
-| Multi-household identity | Phase 1 (Data Model) | Kitchen profile is tied to household, not user. Active household context determines which kitchen identity is used for social actions. |
+---
 
 ## Sources
 
-- SharedKitchen codebase: migrations 00001-00004 (current RLS policies, household/recipe/meal_plan data model, profile visibility rules)
-- [Supabase RLS documentation](https://supabase.com/docs/guides/database/postgres/row-level-security) -- performance best practices: subselect wrapping for auth.uid(), SECURITY DEFINER functions, index optimization, minimize joins in policies
-- [Supabase RLS data leaking patterns](https://dev.to/gifteddev/why-your-supabase-app-might-be-leaking-user-data-and-how-to-fix-it-with-rls-2fbf) -- common mistakes with overly permissive policies
-- [Supabase RLS best practices for multi-tenant apps](https://makerkit.dev/blog/tutorials/supabase-rls-best-practices) -- production patterns for role-based access
-- [Facebook News Feed system design](https://www.hellointerview.com/learn/system-design/problem-breakdowns/fb-news-feed) -- fan-out on read vs write tradeoffs, feed pagination patterns
-- [Content moderation mistakes](https://getstream.io/blog/content-moderation-mistakes/) -- top 6 mistakes when building social features
-- [Content moderation best practices 2025](https://arena.im/uncategorized/content-moderation-best-practices-for-2025/) -- hybrid moderation approaches
-- [The Moderation Stack 2025](https://www.social.plus/blog/the-moderation-stack-what-every-in-app-community-needs-in-2025/) -- what every in-app community needs at launch
-
----
-*Pitfalls research for: Social feed features in SharedKitchen v5.0*
-*Researched: 2026-04-06*
+- [USDA FoodData Central API Guide](https://fdc.nal.usda.gov/api-guide/) -- rate limits, data types, API structure
+- [USDA FoodData Central FAQ](https://fdc.nal.usda.gov/faq/) -- data type differences, SR Legacy deprecation
+- [USDA Data Documentation](https://fdc.nal.usda.gov/data-documentation/) -- Foundation vs Branded vs SR Legacy
+- [Open Food Facts API Tutorial](https://openfoodfacts.github.io/openfoodfacts-server/api/tutorial-off-api/) -- usage policy, rate limits
+- [Open Food Facts Data & API](https://world.openfoodfacts.org/data) -- barcode format, data fields
+- [FatSecret Platform API Docs](https://platform.fatsecret.com/docs/guides) -- OAuth, rate limits
+- [FatSecret Unit Mismatch Issue](https://groups.google.com/g/fatsecret-platform-api/c/UD-zRYNQFDE) -- recipe vs food unit discrepancy
+- [Nutrition API Accuracy Testing](https://dev.to/raviteja_nekkalapu_/i-tested-8-nutrition-apis-with-the-same-query-only-2-returned-correct-data-4kfg) -- only 2/8 APIs returned correct data
+- [expo-barcode-scanner to expo-camera Migration](https://github.com/expo/fyi/blob/main/barcode-scanner-to-expo-camera.md) -- deprecated library migration
+- [Expo Camera Docs](https://docs.expo.dev/versions/latest/sdk/camera/) -- CameraView barcode scanning API
+- [Expo Camera Barcode iOS Issues](https://github.com/expo/expo/issues/26764) -- SDK 50 iOS barcode bugs
+- SharedKitchen codebase: `src/types/database.ts` (existing NutritionInfo interface, pantry_items schema), `src/lib/jsonld.ts` (existing schema.org nutrition extraction), `supabase/migrations/00014_add_recipe_nutrition_and_timers.sql` (existing nutrition column)
