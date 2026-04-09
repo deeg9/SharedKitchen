@@ -38,6 +38,7 @@ import { VisionLoadingOverlay } from '../../../src/components/camera/VisionLoadi
 import { analyzePhoto, VisionRateLimitError } from '../../../src/lib/vision';
 import { ScanReviewScreen } from '../../../src/components/scan/ScanReviewScreen';
 import { ListExtractReviewScreen } from '../../../src/components/scan/ListExtractReviewScreen';
+import { FoodSearchSheet } from '../../../src/components/food/FoodSearchSheet';
 
 const SECTION_ORDER = ['Proteins', 'Produce', 'Dairy & Eggs', 'Pantry', 'Other'];
 
@@ -52,6 +53,7 @@ export default function GroceryScreen() {
   const [actionSheetOpen, setActionSheetOpen] = useState(false);
   const [pantryAddSheetOpen, setPantryAddSheetOpen] = useState(false);
   const [cameraSheetOpen, setCameraSheetOpen] = useState(false);
+  const [foodSearchOpen, setFoodSearchOpen] = useState(false);
   const [visionLoading, setVisionLoading] = useState(false);
   const [scanResults, setScanResults] = useState<Array<{ name: string; category?: string; quantity?: string; brand?: string }> | null>(null);
   const [extractResults, setExtractResults] = useState<Array<{ name: string; category?: string; quantity?: string }> | null>(null);
@@ -325,9 +327,18 @@ export default function GroceryScreen() {
           <View style={styles.titleSpacer} />
         </View>
         {segmentedControl}
+        <Pressable
+          style={styles.searchFoodsBtn}
+          onPress={() => setFoodSearchOpen(true)}
+          testID="search-foods-button"
+        >
+          <MaterialCommunityIcons name="magnify" size={20} color={colors.primary} />
+          <Text style={styles.searchFoodsBtnText}>Search Foods</Text>
+        </Pressable>
         <OnHandList />
 
         {unifiedFab}
+        <FoodSearchSheet isOpen={foodSearchOpen} onClose={() => setFoodSearchOpen(false)} />
         {sharedComponents}
         {scanReview}
         {extractReview}
@@ -547,6 +558,20 @@ const styles = StyleSheet.create({
   },
   skeletonContainer: {
     padding: spacing.md,
+  },
+  searchFoodsBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: spacing.md,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.md,
+    backgroundColor: colors.primaryFixed,
+    borderRadius: borderRadius.md,
+  },
+  searchFoodsBtnText: {
+    ...typography.labelLg,
+    color: colors.primary,
+    marginLeft: spacing.sm,
   },
   fab: {
     position: 'absolute',
