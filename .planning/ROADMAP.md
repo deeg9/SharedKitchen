@@ -127,7 +127,10 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
   2. App can convert between common cooking units (cups, tbsp, oz, ml, g) using food-specific density tables
   3. Food data cache table exists with full-text search (tsvector + GIN index) and 30-day TTL cleanup
   4. TypeScript types (FoodItem, NutritionData) are defined and shared between client and Edge Functions
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 35-01-PLAN.md — Database migration (food_items + food_search_cache tables with indexes and RLS)
+- [ ] 35-02-PLAN.md — Nutrition utilities (density tables, computation functions) + database.ts types
 
 ### Phase 36: Food Search
 **Goal**: Users can search for any food by name and see nutrition information from a unified database
@@ -206,10 +209,10 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 | 32. Feed & Auto-Post | v5.0 | 2/2 | Complete | 2026-04-07 |
 | 33. Social Interactions & Moderation | v5.0 | 3/3 | Complete | 2026-04-07 |
 | 34. Social Push Notifications | v5.0 | 2/2 | Complete | 2026-04-07 |
-| 35. Data Foundation | v6.0 | 0/0 | Not started | - |
+| 35. Data Foundation | v6.0 | 0/2 | Not started | - |
 | 36. Food Search | v6.0 | 0/0 | Not started | - |
 | 37. Barcode Scanning | v6.0 | 0/0 | Not started | - |
 | 38. Recipe Nutrition | v6.0 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-04-09 after v6.0 roadmap created*
+*Last updated: 2026-04-09 after Phase 35 planning complete*
