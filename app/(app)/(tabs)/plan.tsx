@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { KitchenSearchBar } from '../../../src/components/social/KitchenSearchBar';
 import { FeedList } from '../../../src/components/social/FeedList';
@@ -9,11 +10,16 @@ import { DaySection } from '../../../src/components/plan/DayCard';
 import { PlanEditSheet } from '../../../src/components/plan/PlanEditSheet';
 import { SurpriseMe } from '../../../src/components/plan/SurpriseMe';
 import { SuggestionCard } from '../../../src/components/plan/SuggestionCard';
+import { DateStrip } from '../../../src/components/ui/DateStrip';
+import { HeroDinnerCard } from '../../../src/components/plan/HeroDinnerCard';
+import { DayViewMealSlot } from '../../../src/components/plan/DayViewMealSlot';
+import { GroceryShortcutCard } from '../../../src/components/plan/GroceryShortcutCard';
 import { usePlanStore } from '../../../src/stores/planStore';
 import { useHouseholdStore } from '../../../src/stores/householdStore';
 import { useRecipeStore } from '../../../src/stores/recipeStore';
 import { useSubscriptionStore } from '../../../src/stores/subscriptionStore';
 import { useSocialStore } from '../../../src/stores/socialStore';
+import { useGroceryStore } from '../../../src/stores/groceryStore';
 import { UpgradePrompt } from '../../../src/components/premium/UpgradePrompt';
 import { toDateString, makePlanKey } from '../../../src/lib/dates';
 import { generateSuggestions } from '../../../src/lib/suggestions';
@@ -27,9 +33,12 @@ import { TAB_BAR_HEIGHT } from '../../../src/lib/constants';
 
 export default function PlanScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { activeHouseholdId, households } = useHouseholdStore();
   const { myKitchenProfile, getOrCreateKitchenProfile, clearFeed } = useSocialStore();
   const [activeSegment, setActiveSegment] = useState<'plan' | 'feed'>('plan');
+  const [viewMode, setViewMode] = useState<'day' | 'week'>('day');
+  const [selectedDayDate, setSelectedDayDate] = useState<Date>(new Date());
   const { fetchRecipes, recipes, ratings } = useRecipeStore();
   const {
     weekOffset,
@@ -42,6 +51,7 @@ export default function PlanScreen() {
   } = usePlanStore();
 
   const subscription = useSubscriptionStore();
+  const groceryItems = useGroceryStore(state => state.items);
 
   const [editSheetOpen, setEditSheetOpen] = useState(false);
   const [surpriseVisible, setSurpriseVisible] = useState(false);
@@ -82,6 +92,21 @@ export default function PlanScreen() {
       fetchRecipes(activeHouseholdId);
     }
   }, [activeHouseholdId, weekOffset]);
+
+  // Reset selectedDayDate when weekOffset changes
+  useEffect(() => {
+    if (weekOffset === 0) {
+      setSelectedDayDate(new Date());
+    } else {
+      // Check if current selectedDayDate is within the new week range
+      const weekStart = days[0]?.getTime() ?? 0;
+      const weekEnd = days[6]?.getTime() ?? 0;
+      const current = selectedDayDate.getTime();
+      if (current < weekStart || current > weekEnd) {
+        setSelectedDayDate(days[0]);
+      }
+    }
+  }, [weekOffset]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleMealPress = useCallback((date: Date, mealType: MealType) => {
     setSelectedDate(date);
@@ -142,6 +167,24 @@ export default function PlanScreen() {
 
       {activeSegment === 'plan' ? (
         <>
+          {/* Day/Week Toggle */}
+          <View style={styles.viewToggleRow} testID="plan-view-toggle">
+            <Pressable
+              onPress={() => setViewMode('day')}
+              style={[styles.viewToggleBtn, viewMode === 'day' && styles.viewToggleBtnActive]}
+              testID="plan-view-day"
+            >
+              <Text style={[styles.viewToggleText, viewMode === 'day' && styles.viewToggleTextActive]}>Day</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setViewMode('week')}
+              style={[styles.viewToggleBtn, viewMode === 'week' && styles.viewToggleBtnActive]}
+              testID="plan-view-week"
+            >
+              <Text style={[styles.viewToggleText, viewMode === 'week' && styles.viewToggleTextActive]}>Week</Text>
+            </Pressable>
+          </View>
+
           {/* Week Navigation */}
           <WeekHeader
             weekLabel={label}
@@ -151,84 +194,143 @@ export default function PlanScreen() {
             onToday={() => setWeekOffset(0)}
           />
 
-          {/* Day Sections */}
-          <ScrollView
-            style={styles.scroll}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-          >
-            {loading && mealPlan.size === 0 ? (
-              // Skeleton loading state
-              Array.from({ length: 7 }).map((_, i) => (
-                <View key={i} style={styles.skeletonCard}>
-                  <Skeleton width={40} height={40} borderRadius={8} />
-                  <View style={styles.skeletonContent}>
-                    <Skeleton width="60%" height={16} borderRadius={4} />
-                    <Skeleton width="40%" height={12} borderRadius={4} />
-                    <Skeleton width="40%" height={12} borderRadius={4} />
-                  </View>
-                </View>
-              ))
-            ) : (
-              days.map((date) => {
-                const dateStr = toDateString(date);
-                const isToday = dateStr === todayStr;
+          {viewMode === 'day' ? (
+            <>
+              {/* DateStrip for day navigation */}
+              <DateStrip
+                selectedDate={selectedDayDate}
+                onSelectDate={setSelectedDayDate}
+                startDate={days[0]}
+                endDate={days[6]}
+              />
 
-                // Build meals record for this day
-                const meals: Partial<Record<MealType, any>> = {};
-                for (const mt of MEAL_TYPES) {
-                  meals[mt] = mealPlan.get(makePlanKey(dateStr, mt));
-                }
+              {/* Day View Content */}
+              <ScrollView
+                style={styles.scroll}
+                contentContainerStyle={[styles.scrollContent, styles.dayViewContent]}
+                showsVerticalScrollIndicator={false}
+              >
+                {loading && mealPlan.size === 0 ? (
+                  // Skeleton loading state for day view
+                  <>
+                    <Skeleton width="100%" height={220} borderRadius={borderRadius.lg} />
+                    <Skeleton width="100%" height={80} borderRadius={borderRadius.lg} />
+                    <Skeleton width="100%" height={80} borderRadius={borderRadius.lg} />
+                  </>
+                ) : (
+                  (() => {
+                    const selectedDayStr = toDateString(selectedDayDate);
+                    const dinnerPlan = mealPlan.get(makePlanKey(selectedDayStr, 'dinner'));
+                    const breakfastPlan = mealPlan.get(makePlanKey(selectedDayStr, 'breakfast'));
+                    const lunchPlan = mealPlan.get(makePlanKey(selectedDayStr, 'lunch'));
 
-                return (
-                  <DaySection
-                    key={dateStr}
-                    date={date}
-                    meals={meals}
-                    isToday={isToday}
-                    onMealPress={(mt) => handleMealPress(date, mt)}
-                  />
-                );
-              })
-            )}
-
-            {/* AI Suggestion Cards */}
-            {suggestions.length > 0 && (
-              <View style={styles.suggestionsSection}>
-                <View style={styles.suggestionsTitleRow}>
-                  <Text style={styles.suggestionsTitle}>Suggestions</Text>
-                  {!subscription.canAccess('advanced_suggestions') && (
-                    <View style={styles.proIndicator}>
-                      <Text style={styles.proIndicatorText}>PRO</Text>
+                    return (
+                      <>
+                        <HeroDinnerCard
+                          plan={dinnerPlan}
+                          onPress={() => handleMealPress(selectedDayDate, 'dinner')}
+                          onStartCooking={dinnerPlan?.recipe_id ? () => router.push(`/(app)/cooking/${dinnerPlan.recipe_id}` as any) : undefined}
+                        />
+                        <DayViewMealSlot
+                          mealType="breakfast"
+                          plan={breakfastPlan}
+                          onPress={() => handleMealPress(selectedDayDate, 'breakfast')}
+                        />
+                        <DayViewMealSlot
+                          mealType="lunch"
+                          plan={lunchPlan}
+                          onPress={() => handleMealPress(selectedDayDate, 'lunch')}
+                        />
+                        <GroceryShortcutCard
+                          itemCount={groceryItems.length}
+                          onPress={() => router.push('/(app)/(tabs)/grocery' as any)}
+                        />
+                      </>
+                    );
+                  })()
+                )}
+              </ScrollView>
+            </>
+          ) : (
+            /* Week View */
+            <ScrollView
+              style={styles.scroll}
+              contentContainerStyle={styles.scrollContent}
+              showsVerticalScrollIndicator={false}
+            >
+              {loading && mealPlan.size === 0 ? (
+                // Skeleton loading state
+                Array.from({ length: 7 }).map((_, i) => (
+                  <View key={i} style={styles.skeletonCard}>
+                    <Skeleton width={40} height={40} borderRadius={8} />
+                    <View style={styles.skeletonContent}>
+                      <Skeleton width="60%" height={16} borderRadius={4} />
+                      <Skeleton width="40%" height={12} borderRadius={4} />
+                      <Skeleton width="40%" height={12} borderRadius={4} />
                     </View>
-                  )}
-                  <Pressable
-                    onPress={() => {
-                      if (!subscription.canAccess('advanced_suggestions')) {
-                        setShowUpgradePrompt(true);
-                      }
-                    }}
-                    style={styles.viewAllButton}
-                  >
-                    <Text style={styles.viewAllText}>View All</Text>
-                  </Pressable>
-                </View>
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.suggestionsScroll}
-                >
-                  {suggestions.map((s) => (
-                    <SuggestionCard
-                      key={s.recipeId}
-                      suggestion={s}
-                      onAddToPlan={handleAddSuggestionToPlan}
+                  </View>
+                ))
+              ) : (
+                days.map((date) => {
+                  const dateStr = toDateString(date);
+                  const isToday = dateStr === todayStr;
+
+                  // Build meals record for this day
+                  const meals: Partial<Record<MealType, any>> = {};
+                  for (const mt of MEAL_TYPES) {
+                    meals[mt] = mealPlan.get(makePlanKey(dateStr, mt));
+                  }
+
+                  return (
+                    <DaySection
+                      key={dateStr}
+                      date={date}
+                      meals={meals}
+                      isToday={isToday}
+                      onMealPress={(mt) => handleMealPress(date, mt)}
                     />
-                  ))}
-                </ScrollView>
-              </View>
-            )}
-          </ScrollView>
+                  );
+                })
+              )}
+
+              {/* AI Suggestion Cards (Week view only) */}
+              {suggestions.length > 0 && (
+                <View style={styles.suggestionsSection}>
+                  <View style={styles.suggestionsTitleRow}>
+                    <Text style={styles.suggestionsTitle}>Suggestions</Text>
+                    {!subscription.canAccess('advanced_suggestions') && (
+                      <View style={styles.proIndicator}>
+                        <Text style={styles.proIndicatorText}>PRO</Text>
+                      </View>
+                    )}
+                    <Pressable
+                      onPress={() => {
+                        if (!subscription.canAccess('advanced_suggestions')) {
+                          setShowUpgradePrompt(true);
+                        }
+                      }}
+                      style={styles.viewAllButton}
+                    >
+                      <Text style={styles.viewAllText}>View All</Text>
+                    </Pressable>
+                  </View>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.suggestionsScroll}
+                  >
+                    {suggestions.map((s) => (
+                      <SuggestionCard
+                        key={s.recipeId}
+                        suggestion={s}
+                        onAddToPlan={handleAddSuggestionToPlan}
+                      />
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
+            </ScrollView>
+          )}
 
           {/* Surprise Me FAB */}
           <Pressable
@@ -404,5 +506,36 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  viewToggleRow: {
+    flexDirection: 'row',
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.xs,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: borderRadius.full,
+    padding: 3,
+  },
+  viewToggleBtn: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 32,
+    borderRadius: borderRadius.full,
+  },
+  viewToggleBtnActive: {
+    backgroundColor: colors.primary,
+  },
+  viewToggleText: {
+    ...typography.labelSm,
+    color: colors.onSurfaceVariant,
+    fontWeight: '600',
+    textTransform: 'none',
+  },
+  viewToggleTextActive: {
+    color: colors.onPrimary,
+  },
+  dayViewContent: {
+    paddingHorizontal: spacing.md,
+    gap: spacing.md,
   },
 });
