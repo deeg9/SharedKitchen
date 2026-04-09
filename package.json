@@ -23,6 +23,7 @@
     "date-fns": "^4.1.0",
     "expo": "~55.0.8",
     "expo-blur": "~55.0.10",
+    "expo-camera": "~55.0.15",
     "expo-clipboard": "~55.0.9",
     "expo-constants": "~55.0.9",
     "expo-crypto": "~55.0.10",

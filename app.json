@@ -59,6 +59,12 @@
         }
       ],
       [
+        "expo-camera",
+        {
+          "cameraPermission": "SharedKitchen needs camera access to scan barcodes and take photos"
+        }
+      ],
+      [
         "expo-image-picker",
         {
           "cameraPermission": "SharedKitchen uses your camera to scan food and identify dishes."
