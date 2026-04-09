@@ -276,16 +276,16 @@ export default function GroceryScreen() {
   const segmentedControl = (
     <View style={styles.segmentRow}>
       <Pressable
-        onPress={() => setActiveSegment('onhand')}
-        style={[styles.segmentBtn, activeSegment === 'onhand' && styles.segmentBtnActive]}
-      >
-        <Text style={[styles.segmentText, activeSegment === 'onhand' && styles.segmentTextActive]}>On Hand</Text>
-      </Pressable>
-      <Pressable
         onPress={() => setActiveSegment('shopping')}
         style={[styles.segmentBtn, activeSegment === 'shopping' && styles.segmentBtnActive]}
       >
         <Text style={[styles.segmentText, activeSegment === 'shopping' && styles.segmentTextActive]}>Shopping List</Text>
+      </Pressable>
+      <Pressable
+        onPress={() => setActiveSegment('onhand')}
+        style={[styles.segmentBtn, activeSegment === 'onhand' && styles.segmentBtnActive]}
+      >
+        <Text style={[styles.segmentText, activeSegment === 'onhand' && styles.segmentTextActive]}>On Hand</Text>
       </Pressable>
     </View>
   );
@@ -462,16 +462,27 @@ export default function GroceryScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.titleRow}>
-        <PresenceAvatarStack members={presenceMembers} />
+        <View style={styles.titleSpacer} />
         <Text style={styles.screenTitle}>Kitchen</Text>
-        <Pressable onPress={() => setCatSheetOpen(true)} style={styles.editCatBtn}>
-          <MaterialCommunityIcons name="tag-edit-outline" size={20} color={colors.onSurfaceVariant} />
-        </Pressable>
+        <View style={styles.headerActions}>
+          <Pressable
+            onPress={handleGenerate}
+            style={styles.syncBtn}
+            testID="sync-with-plan-button"
+            disabled={loading}
+          >
+            <MaterialCommunityIcons name="sync" size={18} color={colors.onSurface} />
+            <Text style={styles.syncBtnText}>Sync with Plan</Text>
+          </Pressable>
+          <Pressable onPress={() => setCatSheetOpen(true)} style={styles.editCatBtn}>
+            <MaterialCommunityIcons name="calendar-outline" size={20} color={colors.onSurfaceVariant} />
+          </Pressable>
+        </View>
       </View>
 
       {segmentedControl}
 
-      <GrocerySummary summary={summaryData} />
+      <GrocerySummary summary={summaryData} presenceMembers={presenceMembers} />
 
       <Pressable
         style={[styles.searchFoodsBtn, styles.scanBarcodeShoppingBtn]}
@@ -600,6 +611,24 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.full,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  syncBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surfaceContainerHigh,
+    borderRadius: borderRadius.full,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    gap: spacing.xs,
+  },
+  syncBtnText: {
+    ...typography.labelMd,
+    color: colors.onSurface,
   },
   screenTitle: {
     ...typography.headlineMd,
