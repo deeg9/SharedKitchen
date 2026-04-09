@@ -114,7 +114,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - [x] **Phase 35: Data Foundation** - Postgres schema, TypeScript types, unit conversion, and nutrition normalization layer (completed 2026-04-09)
 - [x] **Phase 36: Food Search** - Edge Functions for USDA/FatSecret search, client store, and searchable food interface (completed 2026-04-09)
 - [x] **Phase 37: Barcode Scanning** - Camera barcode scanner, Open Food Facts/FatSecret lookup, and add-to-pantry/grocery flows (completed 2026-04-09)
-- [ ] **Phase 38: Recipe Nutrition** - AI-assisted ingredient matching, per-recipe nutrition computation, and nutrition display on recipes and meal plans
+- [x] **Phase 38: Recipe Nutrition** - AI-assisted ingredient matching, per-recipe nutrition computation, and nutrition display on recipes and meal plans (completed 2026-04-09)
 
 ## Phase Details
 
@@ -174,8 +174,8 @@ Plans:
   4. Plan tab shows aggregated daily and weekly nutrition totals for all planned meals
 **Plans**: 2 plans
 Plans:
-- [ ] 38-01-PLAN.md — match-ingredients Edge Function (Gemini AI matching), migration, recipeStore.computeNutrition
-- [ ] 38-02-PLAN.md — NutritionCard component on recipe detail, daily nutrition totals on Plan tab
+- [x] 38-01-PLAN.md — match-ingredients Edge Function (Gemini AI matching), migration, recipeStore.computeNutrition
+- [x] 38-02-PLAN.md — NutritionCard component on recipe detail, daily nutrition totals on Plan tab
 **UI hint**: yes
 
 ## Progress
@@ -221,7 +221,7 @@ Plans:
 | 35. Data Foundation | v6.0 | 2/2 | Complete    | 2026-04-09 |
 | 36. Food Search | v6.0 | 2/2 | Complete    | 2026-04-09 |
 | 37. Barcode Scanning | v6.0 | 2/2 | Complete    | 2026-04-09 |
-| 38. Recipe Nutrition | v6.0 | 0/2 | Not started | - |
+| 38. Recipe Nutrition | v6.0 | 2/2 | Complete    | 2026-04-09 |
 
 ---
 *Last updated: 2026-04-09 after Phase 38 planning complete*
