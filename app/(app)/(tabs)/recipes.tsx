@@ -157,7 +157,7 @@ export default function RecipesScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <RecipeGrid favorites={favorites} />
+      <RecipeGrid favorites={favorites} ratings={ratings} />
 
       {/* Single FAB — opens menu */}
       <Pressable
