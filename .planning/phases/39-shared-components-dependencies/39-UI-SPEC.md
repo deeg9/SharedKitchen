@@ -44,20 +44,29 @@ Exceptions: DonutChart internal label uses 0 spacing (center-aligned via absolut
 
 ## Typography
 
-Tokens used by the 5 shared components — all reference existing `typography.*` tokens:
+Tokens used by the 5 shared components — all reference existing `typography.*` tokens.
 
-| Role | Token | Size | Weight | Line Height | Used By |
-|------|-------|------|--------|-------------|---------|
-| DonutChart value | headlineLg | 28px | PlusJakartaSans 700 Bold | 36px | Center dollar amount in donut ring |
-| DonutChart sublabel | bodySm | 12px | Inter 400 Regular | 16px | "of $X spent" text below value |
-| DonutChart badge | labelMd | 12px | Inter 500 Medium | 16px | Percentage badge ("71%") |
-| ProgressBar label | labelLg | 14px | Inter 600 SemiBold | 20px | "SHOPPING PROGRESS" label |
-| ProgressBar value | bodyMd | 14px | Inter 400 Regular | 20px | "12 of 18 items checked" |
-| InsightCard message | bodyMd | 14px | Inter 400 Regular | 20px | Insight body text |
-| InsightCard badge | labelSm | 10px | Inter 500 Medium (uppercase) | 14px | "SAVINGS ALERT" badge |
-| FilterChip label | labelLg | 14px | Inter 600 SemiBold | 20px | Chip text ("All", "Quick Meals") |
-| DateStrip day name | labelSm | 10px | Inter 500 Medium (uppercase) | 14px | "MON", "TUE", etc. |
-| DateStrip date number | titleMd | 16px | Inter 600 SemiBold | 24px | "23", "24", "25" |
+**Weight slots (2 declared):**
+
+| Slot | Font + Weight | Used For |
+|------|---------------|----------|
+| Regular | Inter 400 Regular | Body text, sublabels, descriptions, value readouts |
+| Bold | Inter 600 SemiBold / Plus Jakarta Sans 700 Bold | Headlines, labels, badges, active elements |
+
+**Size scale (4 declared): 12px, 14px, 16px, 28px**
+
+| Role | Token | Size | Weight Slot | Line Height | Used By |
+|------|-------|------|-------------|-------------|---------|
+| DonutChart value | headlineLg | 28px | Bold (PlusJakartaSans 700) | 36px | Center dollar amount in donut ring |
+| DonutChart sublabel | bodySm | 12px | Regular (Inter 400) | 16px | "of $X spent" text below value |
+| DonutChart badge | labelMd | 12px | Bold (Inter 600) | 16px | Percentage badge ("71%") |
+| ProgressBar label | labelLg | 14px | Bold (Inter 600) | 20px | "SHOPPING PROGRESS" label |
+| ProgressBar value | bodyMd | 14px | Regular (Inter 400) | 20px | "12 of 18 items checked" |
+| InsightCard message | bodyMd | 14px | Regular (Inter 400) | 20px | Insight body text |
+| InsightCard badge | labelSm | 12px | Bold (Inter 600, uppercase) | 16px | "SAVINGS ALERT" badge |
+| FilterChip label | labelLg | 14px | Bold (Inter 600) | 20px | Chip text ("All", "Quick Meals") |
+| DateStrip day name | labelSm | 12px | Bold (Inter 600, uppercase) | 16px | "MON", "TUE", etc. |
+| DateStrip date number | titleMd | 16px | Bold (Inter 600) | 24px | "23", "24", "25" |
 
 ---
 
@@ -173,7 +182,7 @@ Note: Label and value text are NOT part of ProgressBar. The consuming screen com
 | Icon color | primary | Stitch budget screenshot |
 | Message area | flex: 1, marginHorizontal: spacing.sm (8) | Stitch budget screenshot |
 | Message text | bodyMd, onSurface | Stitch budget screenshot |
-| Badge text | labelSm, secondary (#904d00), uppercase | "SAVINGS ALERT" in Stitch |
+| Badge text | labelSm (12px, Inter 600, uppercase), secondary (#904d00) | "SAVINGS ALERT" in Stitch |
 | Right badge icon | 36x36 circle, surfaceContainer bg, MaterialCommunityIcons 20px | Stitch budget screenshot |
 | Shadow | none (filled card variant, no elevation) | Stitch budget screenshot |
 
@@ -219,16 +228,16 @@ interface FilterChipsProps {
 | Property | Value | Source |
 |----------|-------|--------|
 | Container | horizontal ScrollView, showsHorizontalScrollIndicator false | Stitch planner screenshot |
-| Visible days | 5 (Mon-Fri), scrollable to weekends | CONTEXT.md decision |
+| Visible days | 5 (Mon-Fri), scrollable for weekends | CONTEXT.md decision |
 | Day cell width | 56px | Calculated: ~5 cells in ~300px content area with gaps |
 | Day cell height | 68px | Stitch planner screenshot — day name + date number + padding |
 | Day cell gap | spacing.sm (8) | Stitch planner screenshot |
 | Day cell border radius | borderRadius.md (12) | Stitch planner screenshot |
-| Day name | labelSm, onSurfaceVariant, uppercase | "MON", "TUE" — Stitch planner screenshot |
+| Day name | labelSm (12px, Inter 600, uppercase), onSurfaceVariant | "MON", "TUE" — Stitch planner screenshot |
 | Date number | titleMd, onSurfaceVariant | "23", "24" — Stitch planner screenshot |
 | Today circle | 36x36, primary bg, borderRadius.full, centered on date number | Stitch planner screenshot |
 | Today date text | titleMd, onPrimary (#ffffff) | Stitch planner screenshot |
-| Today day name | labelSm, primary (bold contrast) | Stitch planner screenshot |
+| Today day name | labelSm (12px, Inter 600), primary | Stitch planner screenshot |
 | Selected (non-today) | surfaceContainer bg on cell | Stitch planner screenshot |
 | Container padding | horizontal spacing.md (16) | Stitch planner screenshot |
 | Tap target | Full cell (56x68) is tappable | Accessibility minimum |
