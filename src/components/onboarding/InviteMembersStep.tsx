@@ -1,16 +1,27 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, Share, Alert } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Share, Alert, ScrollView } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { colors } from '../../theme/colors';
-import { typography, fontFamily } from '../../theme/typography';
+import { typography } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
 import { shadows } from '../../theme/shadows';
 import { useOnboardingStore } from '../../stores/onboardingStore';
 import { useHouseholdStore } from '../../stores/householdStore';
+import { OnboardingProgress } from './OnboardingProgress';
+
+const SHARE_ICONS: Array<{
+  icon: 'message-text-outline' | 'email-outline' | 'share-variant';
+  label: string;
+}> = [
+  { icon: 'message-text-outline', label: 'Message' },
+  { icon: 'email-outline', label: 'Email' },
+  { icon: 'share-variant', label: 'Share' },
+];
 
 export function InviteMembersStep() {
   const nextStep = useOnboardingStore((s) => s.nextStep);
+  const prevStep = useOnboardingStore((s) => s.prevStep);
   const activeHousehold = useHouseholdStore((s) => s.activeHousehold);
   const household = activeHousehold();
   const inviteCode = household?.invite_code ?? '------';
@@ -37,177 +48,258 @@ export function InviteMembersStep() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.headline}>Invite your people</Text>
-        <Text style={styles.subtitle}>
-          Share your kitchen code so family or roommates can join and collaborate on meals.
-        </Text>
-
-        <View style={styles.codeSection}>
-          <Text style={styles.codeLabel}>YOUR KITCHEN CODE</Text>
-          <View style={styles.codeBox}>
-            <Text style={styles.codeText}>{inviteCode}</Text>
-            <Pressable onPress={handleCopy} hitSlop={12}>
-              <MaterialCommunityIcons
-                name={copied ? 'check' : 'content-copy'}
-                size={22}
-                color={colors.primary}
-              />
-            </Pressable>
-          </View>
-        </View>
-
-        <View style={styles.actions}>
-          <Pressable
-            style={({ pressed }) => [styles.shareButton, pressed && styles.pressed]}
-            onPress={handleShare}
-            testID="onboarding-invite-share"
-          >
-            <MaterialCommunityIcons name="message-text-outline" size={20} color={colors.onPrimary} />
-            <Text style={styles.shareText}>Share via Text</Text>
-          </Pressable>
-
-          <Pressable
-            style={({ pressed }) => [styles.copyButton, pressed && styles.pressed]}
-            onPress={handleCopy}
-          >
-            <MaterialCommunityIcons name="link-variant" size={20} color={colors.secondary} />
-            <Text style={styles.copyText}>
-              {copied ? 'Copied!' : 'Copy Link'}
-            </Text>
-          </Pressable>
-        </View>
-
-        <View style={styles.avatarRow}>
-          {[0, 1, 2].map((i) => (
-            <View key={i} style={[styles.avatarPlaceholder, i > 0 && styles.avatarOverlap]}>
-              <MaterialCommunityIcons name="account" size={24} color={colors.outlineVariant} />
-            </View>
-          ))}
-          <Text style={styles.avatarHint}>Waiting for members...</Text>
-        </View>
-      </View>
-
-      <View style={styles.footer}>
-        <Pressable onPress={nextStep} style={styles.skipLink} testID="onboarding-invite-skip">
-          <Text style={styles.skipText}>Skip for now</Text>
+    <ScrollView
+      style={styles.scrollView}
+      contentContainerStyle={styles.container}
+      bounces={false}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* Top bar */}
+      <View style={styles.topBar}>
+        <Pressable onPress={prevStep} hitSlop={12} style={styles.backButton}>
+          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.onSurface} />
         </Pressable>
+        <Text style={styles.brandText}>
+          <Text style={styles.italic}>SharedKitchen</Text>
+        </Text>
+        <View style={styles.backButton} />
       </View>
-    </View>
+
+      {/* Progress row with "Almost there" */}
+      <View style={styles.progressRow}>
+        <OnboardingProgress currentStep={2} totalSteps={6} />
+        <Text style={styles.almostThere}>Almost there</Text>
+      </View>
+
+      {/* Headline + subtitle */}
+      <Text style={styles.headline}>
+        <Text style={styles.italic}>Invite your people</Text>
+      </Text>
+      <Text style={styles.subtitle}>
+        Planning is better with help. Send this link to your partner or roommates to start curating together.
+      </Text>
+
+      {/* Photo placeholder with avatar overlay */}
+      <View style={styles.photoArea}>
+        <View style={styles.photoPlaceholder}>
+          <MaterialCommunityIcons name="account-group" size={48} color={colors.outlineVariant} />
+        </View>
+        <View style={styles.avatarOverlay}>
+          <MaterialCommunityIcons name="account-multiple" size={24} color={colors.primary} />
+        </View>
+      </View>
+
+      {/* Invite code card */}
+      <View style={styles.codeCard}>
+        <Text style={styles.codeLabel}>YOUR UNIQUE INVITE CODE</Text>
+        <View style={styles.codeRow}>
+          <Text style={styles.codeText}>{inviteCode}</Text>
+          <Pressable
+            onPress={handleCopy}
+            style={({ pressed }) => [
+              styles.copyPill,
+              pressed && styles.pressed,
+            ]}
+            hitSlop={8}
+          >
+            <MaterialCommunityIcons
+              name={copied ? 'check' : 'content-copy'}
+              size={14}
+              color={colors.onPrimary}
+            />
+            <Text style={styles.copyPillText}>{copied ? 'COPIED' : 'COPY'}</Text>
+          </Pressable>
+        </View>
+      </View>
+
+      {/* Share icons */}
+      <Text style={styles.shareViaText}>Or share directly via</Text>
+      <View style={styles.shareIconsRow}>
+        {SHARE_ICONS.map((item) => (
+          <Pressable
+            key={item.label}
+            onPress={handleShare}
+            style={({ pressed }) => [
+              styles.shareIconCircle,
+              pressed && styles.pressed,
+            ]}
+          >
+            <MaterialCommunityIcons name={item.icon} size={22} color={colors.onSurface} />
+          </Pressable>
+        ))}
+      </View>
+
+      {/* Continue + Skip */}
+      <Pressable
+        style={({ pressed }) => [
+          styles.continueButton,
+          pressed && styles.pressed,
+        ]}
+        onPress={nextStep}
+        testID="onboarding-invite-continue"
+      >
+        <Text style={styles.continueText}>Continue</Text>
+      </Pressable>
+
+      <Pressable
+        onPress={nextStep}
+        style={styles.skipButton}
+        testID="onboarding-invite-skip"
+      >
+        <Text style={styles.skipText}>Skip for now</Text>
+      </Pressable>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  scrollView: {
     flex: 1,
+  },
+  container: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxl,
-    justifyContent: 'space-between',
   },
-  content: {
-    flex: 1,
-    paddingTop: spacing.lg,
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.sm,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  brandText: {
+    ...typography.headlineMd,
+    color: colors.onSurface,
+  },
+  italic: {
+    fontStyle: 'italic',
+  },
+  progressRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: spacing.sm,
+  },
+  almostThere: {
+    ...typography.bodySm,
+    color: colors.onSurfaceVariant,
   },
   headline: {
     ...typography.headlineLg,
     color: colors.onSurface,
+    marginTop: spacing.md,
   },
   subtitle: {
-    ...typography.bodyLg,
+    ...typography.bodyMd,
     color: colors.onSurfaceVariant,
+    textAlign: 'center',
     marginTop: spacing.sm,
-    marginBottom: spacing.xl,
+    marginBottom: spacing.md,
   },
-  codeSection: {
-    marginBottom: spacing.lg,
+  photoArea: {
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  photoPlaceholder: {
+    width: '100%',
+    height: 120,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: borderRadius.lg,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarOverlay: {
+    position: 'absolute',
+    bottom: -16,
+    right: spacing.xl,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.primaryFixed,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: colors.surface,
+    ...shadows.float,
+  },
+  codeCard: {
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    marginTop: spacing.md,
   },
   codeLabel: {
     ...typography.labelSm,
     color: colors.onSurfaceVariant,
     marginBottom: spacing.sm,
   },
-  codeBox: {
+  codeRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.surfaceContainerLow,
-    borderWidth: 1,
-    borderColor: colors.outlineVariant,
-    borderRadius: borderRadius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
   },
   codeText: {
-    fontFamily: fontFamily.bodySemiBold,
-    fontSize: 24,
-    letterSpacing: 4,
+    ...typography.headlineMd,
     color: colors.onSurface,
+    letterSpacing: 2,
   },
-  actions: {
-    gap: spacing.sm,
-    marginBottom: spacing.xl,
-  },
-  shareButton: {
-    backgroundColor: colors.primary,
-    borderRadius: borderRadius.lg,
-    paddingVertical: spacing.md - 2,
+  copyPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    ...shadows.editorial,
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.full,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs + 2,
+    gap: spacing.xs,
+  },
+  copyPillText: {
+    ...typography.labelMd,
+    color: colors.onPrimary,
   },
   pressed: {
     opacity: 0.85,
   },
-  shareText: {
+  shareViaText: {
+    ...typography.bodySm,
+    color: colors.onSurfaceVariant,
+    textAlign: 'center',
+    marginTop: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  shareIconsRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: spacing.md,
+    marginBottom: spacing.xl,
+  },
+  shareIconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.surfaceContainerLow,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  continueButton: {
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.full,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...shadows.editorial,
+  },
+  continueText: {
     ...typography.titleMd,
     color: colors.onPrimary,
   },
-  copyButton: {
-    borderWidth: 1.5,
-    borderColor: colors.secondary,
-    borderRadius: borderRadius.lg,
-    paddingVertical: spacing.md - 2,
-    flexDirection: 'row',
+  skipButton: {
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-  },
-  copyText: {
-    ...typography.titleMd,
-    color: colors.secondary,
-  },
-  avatarRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  avatarPlaceholder: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.surfaceContainer,
-    borderWidth: 2,
-    borderColor: colors.surface,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  avatarOverlap: {
-    marginLeft: -12,
-  },
-  avatarHint: {
-    ...typography.bodySm,
-    color: colors.onSurfaceVariant,
-    marginLeft: spacing.xs,
-  },
-  footer: {
-    alignItems: 'center',
-    paddingTop: spacing.md,
-  },
-  skipLink: {
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.md,
   },
   skipText: {
     ...typography.labelLg,

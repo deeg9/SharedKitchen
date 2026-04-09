@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
-import { spacing } from '../../theme/spacing';
+import { spacing, borderRadius } from '../../theme/spacing';
 
 interface OnboardingProgressProps {
   currentStep: number;
@@ -12,7 +12,10 @@ interface OnboardingProgressProps {
 export function OnboardingProgress({ currentStep, totalSteps }: OnboardingProgressProps) {
   return (
     <View style={styles.container}>
-      <View style={styles.dotsRow}>
+      <Text style={styles.stepLabel}>
+        STEP {currentStep + 1} OF {totalSteps}
+      </Text>
+      <View style={styles.segmentRow}>
         {Array.from({ length: totalSteps }, (_, i) => {
           const isCompleted = i < currentStep;
           const isCurrent = i === currentStep;
@@ -21,55 +24,40 @@ export function OnboardingProgress({ currentStep, totalSteps }: OnboardingProgre
             <View
               key={i}
               style={[
-                styles.dot,
-                isCompleted && styles.dotCompleted,
-                isCurrent && styles.dotCurrent,
-                !isCompleted && !isCurrent && styles.dotFuture,
+                styles.segment,
+                (isCompleted || isCurrent) ? styles.segmentActive : styles.segmentInactive,
               ]}
             />
           );
         })}
       </View>
-      <Text style={styles.stepText}>
-        Step {currentStep + 1} of {totalSteps}
-      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    paddingVertical: spacing.md,
+    alignItems: 'flex-start',
+    paddingVertical: spacing.sm,
   },
-  dotsRow: {
+  stepLabel: {
+    ...typography.labelSm,
+    color: colors.primary,
+    marginBottom: spacing.xs,
+  },
+  segmentRow: {
     flexDirection: 'row',
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+  segment: {
+    width: 24,
+    height: 4,
+    borderRadius: borderRadius.full,
   },
-  dotCompleted: {
+  segmentActive: {
     backgroundColor: colors.primary,
   },
-  dotCurrent: {
-    backgroundColor: colors.primary,
-    borderWidth: 2,
-    borderColor: colors.primary,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  dotFuture: {
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: colors.outlineVariant,
-  },
-  stepText: {
-    ...typography.labelMd,
-    color: colors.onSurfaceVariant,
-    marginTop: spacing.sm,
+  segmentInactive: {
+    backgroundColor: colors.outlineVariant,
   },
 });

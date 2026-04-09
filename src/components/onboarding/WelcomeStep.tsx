@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { colors } from '../../theme/colors';
@@ -7,42 +7,70 @@ import { typography } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
 import { shadows } from '../../theme/shadows';
 import { useOnboardingStore } from '../../stores/onboardingStore';
+import { OnboardingProgress } from './OnboardingProgress';
+
+const FEATURES = [
+  {
+    icon: 'format-list-checks' as const,
+    title: 'Shared Lists',
+    description: 'Sync groceries in real-time with your partner.',
+  },
+  {
+    icon: 'book-open-variant' as const,
+    title: 'Recipe Curation',
+    description: 'Import from any site and organize together.',
+  },
+];
 
 export function WelcomeStep() {
   const router = useRouter();
   const nextStep = useOnboardingStore((s) => s.nextStep);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.heroSection}>
-        <View style={styles.iconCircle}>
+    <ScrollView
+      style={styles.scrollView}
+      contentContainerStyle={styles.container}
+      bounces={false}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* Hero photo area */}
+      <View style={styles.heroContainer}>
+        <View style={styles.heroImage}>
           <MaterialCommunityIcons
             name="silverware-fork-knife"
-            size={64}
+            size={56}
             color={colors.primary}
           />
         </View>
       </View>
 
+      {/* Progress */}
+      <View style={styles.progressContainer}>
+        <OnboardingProgress currentStep={0} totalSteps={6} />
+      </View>
+
+      {/* Headline + subtitle */}
       <View style={styles.content}>
         <Text style={styles.headline}>
-          Welcome to <Text style={styles.italic}>SharedKitchen</Text>
+          Welcome to{'\n'}
+          <Text style={styles.italic}>SharedKitchen</Text>
         </Text>
         <Text style={styles.subtitle}>
-          Plan dinners together, not alone.
+          Plan dinners together, not alone. The collaborative kitchen assistant for couples and households.
         </Text>
       </View>
 
-      <View style={styles.footer}>
+      {/* CTAs */}
+      <View style={styles.ctaSection}>
         <Pressable
           style={({ pressed }) => [
-            styles.continueButton,
+            styles.primaryButton,
             pressed && styles.pressed,
           ]}
           onPress={nextStep}
           testID="onboarding-welcome-continue"
         >
-          <Text style={styles.continueText}>Continue</Text>
+          <Text style={styles.primaryButtonText}>Get Started</Text>
           <MaterialCommunityIcons
             name="arrow-right"
             size={20}
@@ -52,48 +80,66 @@ export function WelcomeStep() {
 
         <Pressable
           onPress={() => router.push('/(auth)/sign-in')}
-          style={styles.signInLink}
+          style={styles.secondaryButton}
           testID="onboarding-welcome-signin"
         >
-          <Text style={styles.signInText}>
-            Already have an account?{' '}
-            <Text style={styles.signInBold}>Sign In</Text>
+          <Text style={styles.secondaryButtonText}>
+            I already have an account
           </Text>
         </Pressable>
       </View>
-    </View>
+
+      {/* Feature highlights */}
+      <View style={styles.featuresSection}>
+        {FEATURES.map((feature) => (
+          <View key={feature.title} style={styles.featureRow}>
+            <View style={styles.featureIconCircle}>
+              <MaterialCommunityIcons
+                name={feature.icon}
+                size={22}
+                color={colors.primary}
+              />
+            </View>
+            <View style={styles.featureTextContainer}>
+              <Text style={styles.featureTitle}>{feature.title}</Text>
+              <Text style={styles.featureDescription}>{feature.description}</Text>
+            </View>
+          </View>
+        ))}
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  scrollView: {
     flex: 1,
-    justifyContent: 'space-between',
+  },
+  container: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxl,
   },
-  heroSection: {
-    flex: 1,
+  heroContainer: {
+    alignItems: 'center',
+    marginTop: spacing.md,
+  },
+  heroImage: {
+    width: '100%',
+    height: 220,
+    borderRadius: borderRadius.lg,
+    backgroundColor: colors.surfaceContainerHigh,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  iconCircle: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: colors.primaryFixed,
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...shadows.float,
+  progressContainer: {
+    marginTop: spacing.md,
   },
   content: {
-    alignItems: 'center',
-    paddingBottom: spacing.xxl,
+    marginTop: spacing.sm,
   },
   headline: {
     ...typography.displayLg,
     color: colors.onSurface,
-    textAlign: 'center',
   },
   italic: {
     fontStyle: 'italic',
@@ -101,17 +147,17 @@ const styles = StyleSheet.create({
   subtitle: {
     ...typography.bodyLg,
     color: colors.onSurfaceVariant,
-    textAlign: 'center',
+    textAlign: 'left',
     marginTop: spacing.sm,
   },
-  footer: {
-    gap: spacing.md,
+  ctaSection: {
+    marginTop: spacing.xl,
+    gap: spacing.sm,
   },
-  continueButton: {
+  primaryButton: {
     backgroundColor: colors.primary,
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.full,
     paddingVertical: spacing.md,
-    paddingHorizontal: spacing.xl,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -121,20 +167,45 @@ const styles = StyleSheet.create({
   pressed: {
     opacity: 0.85,
   },
-  continueText: {
+  primaryButtonText: {
     ...typography.titleMd,
     color: colors.onPrimary,
   },
-  signInLink: {
+  secondaryButton: {
     alignItems: 'center',
     paddingVertical: spacing.sm,
   },
-  signInText: {
-    ...typography.bodyMd,
-    color: colors.onSurfaceVariant,
-  },
-  signInBold: {
+  secondaryButtonText: {
     ...typography.labelLg,
-    color: colors.primary,
+    color: colors.onSurface,
+  },
+  featuresSection: {
+    marginTop: spacing.xl,
+    gap: spacing.md,
+  },
+  featureRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+  },
+  featureIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.primaryFixed,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  featureTextContainer: {
+    flex: 1,
+  },
+  featureTitle: {
+    ...typography.labelLg,
+    color: colors.onSurface,
+  },
+  featureDescription: {
+    ...typography.bodySm,
+    color: colors.onSurfaceVariant,
+    marginTop: 2,
   },
 });
