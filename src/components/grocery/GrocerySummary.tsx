@@ -1,47 +1,44 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Card } from '../ui/Card';
+import { ProgressBar } from '../ui/ProgressBar';
+import { PresenceAvatarStack } from '../presence/PresenceAvatarStack';
+import { PresenceMember } from '../../hooks/usePresence';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
-import { spacing, borderRadius } from '../../theme/spacing';
+import { spacing } from '../../theme/spacing';
 import { GrocerySummary as GrocerySummaryType } from '../../types/database';
 
 interface GrocerySummaryProps {
   summary: GrocerySummaryType;
+  presenceMembers?: PresenceMember[];
 }
 
-export function GrocerySummary({ summary }: GrocerySummaryProps) {
+export function GrocerySummary({ summary, presenceMembers = [] }: GrocerySummaryProps) {
   return (
-    <Card variant="filled" style={styles.container} testID="grocery-summary">
-      <View style={styles.stats}>
-        <View style={styles.stat}>
-          <Text style={styles.statValue}>{summary.totalItems}</Text>
-          <Text style={styles.statLabel}>items</Text>
-        </View>
-        <View style={styles.divider} />
-        <View style={styles.stat}>
-          <Text style={styles.statValue}>
-            ~${summary.estimatedTotal.toFixed(2)}
-          </Text>
-          <Text style={styles.statLabel}>est. total</Text>
-        </View>
-        <View style={styles.divider} />
-        <View style={styles.stat}>
-          <Text style={styles.statValue}>
-            {summary.checkedItems}/{summary.totalItems}
-          </Text>
-          <Text style={styles.statLabel}>checked</Text>
-        </View>
+    <Card variant="elevated" style={styles.container} testID="grocery-summary">
+      {/* Title row */}
+      <View style={styles.titleRow}>
+        <Text style={styles.title}>Weekly Grocery List</Text>
+        {presenceMembers.length > 0 && (
+          <PresenceAvatarStack members={presenceMembers} />
+        )}
       </View>
 
-      {/* Progress bar */}
-      <View style={styles.progressTrack}>
-        <View
-          style={[
-            styles.progressFill,
-            { width: `${summary.progressPercent}%` },
-          ]}
-        />
+      {/* Subtitle row */}
+      <Text style={styles.subtitle}>
+        {summary.totalItems} items {'\u00B7'} ~${summary.estimatedTotal.toFixed(0)} estimated
+      </Text>
+
+      {/* Progress section */}
+      <View style={styles.progressSection}>
+        <View style={styles.progressLabelRow}>
+          <Text style={styles.progressLabel}>SHOPPING PROGRESS</Text>
+          <Text style={styles.progressCount}>
+            {summary.checkedItems} of {summary.totalItems} items checked
+          </Text>
+        </View>
+        <ProgressBar value={summary.checkedItems} max={summary.totalItems} height={10} />
       </View>
     </Card>
   );
@@ -52,38 +49,39 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.md,
     marginVertical: spacing.sm,
   },
-  stats: {
+  titleRow: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    marginBottom: spacing.sm + 4,
-  },
-  stat: {
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
-  statValue: {
+  title: {
     ...typography.titleMd,
     color: colors.onSurface,
+    fontWeight: '700',
   },
-  statLabel: {
+  subtitle: {
+    ...typography.bodyMd,
+    color: colors.onSurfaceVariant,
+    marginTop: 4,
+  },
+  progressSection: {
+    marginTop: spacing.md,
+  },
+  progressLabelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.sm,
+  },
+  progressLabel: {
+    ...typography.labelSm,
+    color: colors.onSurfaceVariant,
+    textTransform: 'uppercase',
+    fontWeight: '700',
+  },
+  progressCount: {
     ...typography.labelSm,
     color: colors.onSurfaceVariant,
     textTransform: 'none',
-  },
-  divider: {
-    width: 1,
-    height: 28,
-    backgroundColor: colors.outlineVariant,
-  },
-  progressTrack: {
-    height: 6,
-    backgroundColor: colors.surfaceContainerHigh,
-    borderRadius: borderRadius.full,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: colors.primary,
-    borderRadius: borderRadius.full,
   },
 });
