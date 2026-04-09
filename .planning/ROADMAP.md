@@ -174,8 +174,8 @@ Plans:
   4. Plan tab shows aggregated daily and weekly nutrition totals for all planned meals
 **Plans**: 2 plans
 Plans:
-- [x] 37-01-PLAN.md — food-barcode Edge Function (OFF + FatSecret lookup), client API, foodStore barcode state, BarcodeScannerScreen
-- [x] 37-02-PLAN.md — BarcodeResultCard with add-to-pantry/grocery, Kitchen tab scanner integration
+- [ ] 38-01-PLAN.md — match-ingredients Edge Function (Gemini AI matching), migration, recipeStore.computeNutrition
+- [ ] 38-02-PLAN.md — NutritionCard component on recipe detail, daily nutrition totals on Plan tab
 **UI hint**: yes
 
 ## Progress
@@ -221,7 +221,7 @@ Plans:
 | 35. Data Foundation | v6.0 | 2/2 | Complete    | 2026-04-09 |
 | 36. Food Search | v6.0 | 2/2 | Complete    | 2026-04-09 |
 | 37. Barcode Scanning | v6.0 | 2/2 | Complete    | 2026-04-09 |
-| 38. Recipe Nutrition | v6.0 | 0/0 | Not started | - |
+| 38. Recipe Nutrition | v6.0 | 0/2 | Not started | - |
 
 ---
-*Last updated: 2026-04-09 after Phase 36 planning complete*
+*Last updated: 2026-04-09 after Phase 38 planning complete*
