@@ -49,7 +49,7 @@ export function AllSetStep() {
               pressed && styles.pressed,
             ]}
             onPress={handleFinish}
-            testID="onboarding-allset-go"
+            testID="onboarding-allset-done"
           >
             <Text style={styles.ctaText}>Go to my kitchen</Text>
             <MaterialCommunityIcons
