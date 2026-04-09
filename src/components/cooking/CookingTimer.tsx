@@ -4,8 +4,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Notifications from 'expo-notifications';
 import { SchedulableTriggerInputTypes } from 'expo-notifications';
 import { colors } from '../../theme/colors';
-import { spacing } from '../../theme/spacing';
-import { fontFamily } from '../../theme/typography';
+import { spacing, borderRadius } from '../../theme/spacing';
+import { typography, fontFamily } from '../../theme/typography';
 import { useCountdown } from '../../lib/timer';
 
 interface CookingTimerProps {
@@ -19,17 +19,9 @@ export function CookingTimer({ durationSeconds, label, onComplete }: CookingTime
     useCountdown(durationSeconds);
   const notifIdRef = useRef<string | null>(null);
 
-  // Determine color based on state
-  const timerColor = isComplete
-    ? colors.error
-    : isRunning
-      ? colors.secondaryContainer
-      : colors.secondaryFixedDim;
-
   // Schedule / cancel notification on start/pause/reset
   useEffect(() => {
     if (isRunning && remaining > 0) {
-      // Schedule notification for when timer would expire
       Notifications.scheduleNotificationAsync({
         content: { title: 'Timer done!', body: `${label} is ready` },
         trigger: {
@@ -62,90 +54,107 @@ export function CookingTimer({ durationSeconds, label, onComplete }: CookingTime
     }
   };
 
-  const progress = durationSeconds > 0
-    ? (durationSeconds - remaining) / durationSeconds
-    : 0;
+  const buttonLabel = isComplete
+    ? 'RESET'
+    : isRunning
+      ? 'PAUSE'
+      : 'START';
+  const accessLabel = isComplete
+    ? 'Reset timer'
+    : isRunning
+      ? 'Pause timer'
+      : `Start timer, ${label}`;
 
   return (
     <View style={s.container}>
-      <Text style={s.label}>{label}</Text>
-      <Text style={[s.digits, { color: timerColor }]}>{formattedTime}</Text>
-      <View style={[s.progressTrack]}>
-        <View style={[s.progressFill, { width: `${progress * 100}%`, backgroundColor: timerColor }]} />
+      {/* Timer icon circle */}
+      <View style={s.iconCircle}>
+        <MaterialCommunityIcons name="timer-outline" size={20} color={colors.onSecondary} />
       </View>
-      <View style={s.controls}>
-        <Pressable
-          onPress={handleStartPause}
-          style={s.controlBtn}
-          accessibilityRole="button"
-          accessibilityLabel={
-            isComplete ? 'Reset timer' : isRunning ? 'Pause timer' : `Start timer, ${label}`
-          }
-          testID={isRunning ? 'cooking-timer-pause' : 'cooking-timer-start'}
-        >
-          <MaterialCommunityIcons
-            name={isComplete ? 'refresh' : isRunning ? 'pause' : 'play'}
-            size={28}
-            color={colors.inverseOnSurface}
-          />
-        </Pressable>
-        {!isComplete && (
-          <Pressable
-            onPress={reset}
-            style={s.controlBtn}
-            accessibilityRole="button"
-            accessibilityLabel="Reset timer"
-          >
-            <MaterialCommunityIcons name="refresh" size={24} color={colors.outlineVariant} />
-          </Pressable>
-        )}
+
+      {/* Middle section: label + digits */}
+      <View style={s.middle}>
+        <Text style={s.label}>{label.toUpperCase()}</Text>
+        <Text style={s.digits}>{formattedTime}</Text>
       </View>
+
+      {/* Action button */}
+      <Pressable
+        onPress={handleStartPause}
+        style={[
+          s.actionBtn,
+          isRunning && s.actionBtnRunning,
+          isComplete && s.actionBtnComplete,
+        ]}
+        accessibilityRole="button"
+        accessibilityLabel={accessLabel}
+        testID={isRunning ? 'cooking-timer-pause' : 'cooking-timer-start'}
+      >
+        <Text style={[
+          s.actionBtnText,
+          isRunning && s.actionBtnTextRunning,
+          isComplete && s.actionBtnTextComplete,
+        ]}>
+          {buttonLabel}
+        </Text>
+      </Pressable>
     </View>
   );
 }
 
 const s = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: colors.outlineVariant,
-    marginBottom: spacing.xs,
-  },
-  digits: {
-    fontSize: 36,
-    fontWeight: '700',
-    fontFamily: fontFamily.headlineBold,
-    fontVariant: ['tabular-nums'],
-    textAlign: 'center',
-  },
-  progressTrack: {
-    width: '80%',
-    height: 4,
-    backgroundColor: colors.onSurfaceVariant,
-    borderRadius: 2,
-    marginTop: spacing.sm,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 2,
-  },
-  controls: {
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.md,
+    justifyContent: 'space-between',
     marginTop: spacing.md,
   },
-  controlBtn: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  iconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.secondaryContainer,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  middle: {
+    flex: 1,
+    marginLeft: spacing.md,
+  },
+  label: {
+    ...typography.labelSm,
+    color: colors.onSurfaceVariant,
+  },
+  digits: {
+    fontFamily: fontFamily.headlineBold,
+    fontSize: 32,
+    color: colors.onSurface,
+    fontVariant: ['tabular-nums'],
+  },
+  actionBtn: {
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.full,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  actionBtnRunning: {
+    backgroundColor: colors.surfaceContainer,
+  },
+  actionBtnComplete: {
+    backgroundColor: colors.errorContainer,
+  },
+  actionBtnText: {
+    ...typography.labelMd,
+    color: colors.onPrimary,
+    fontWeight: '600',
+  },
+  actionBtnTextRunning: {
+    color: colors.onSurface,
+  },
+  actionBtnTextComplete: {
+    color: colors.onErrorContainer,
   },
 });

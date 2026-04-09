@@ -2,13 +2,15 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
+import { typography } from '../../theme/typography';
 
 interface CookingProgressProps {
   currentStep: number;
   totalSteps: number;
+  recipeName?: string;
 }
 
-export function CookingProgress({ currentStep, totalSteps }: CookingProgressProps) {
+export function CookingProgress({ currentStep, totalSteps, recipeName }: CookingProgressProps) {
   return (
     <View
       testID="cooking-progress"
@@ -16,13 +18,18 @@ export function CookingProgress({ currentStep, totalSteps }: CookingProgressProp
       accessibilityValue={{ min: 1, max: totalSteps, now: currentStep + 1 }}
       style={s.container}
     >
+      {/* Step counter */}
+      <Text style={s.stepLabel}>Step {currentStep + 1} of {totalSteps}</Text>
+      {recipeName ? (
+        <Text style={s.recipeName} numberOfLines={1}>{recipeName.toUpperCase()}</Text>
+      ) : null}
+
+      {/* Segmented progress bar */}
       <View style={s.barRow}>
         {Array.from({ length: totalSteps }, (_, i) => {
-          let color = colors.onSurfaceVariant; // remaining
-          if (i < currentStep) {
-            color = colors.inversePrimary; // completed
-          } else if (i === currentStep) {
-            color = 'rgba(183,204,185,0.6)'; // current (inversePrimary at 60%)
+          let color = colors.outlineVariant; // remaining
+          if (i <= currentStep) {
+            color = colors.primary; // completed + current
           }
           return (
             <View
@@ -36,7 +43,6 @@ export function CookingProgress({ currentStep, totalSteps }: CookingProgressProp
           );
         })}
       </View>
-      <Text style={s.label}>Step {currentStep + 1} of {totalSteps}</Text>
     </View>
   );
 }
@@ -45,10 +51,25 @@ const s = StyleSheet.create({
   container: {
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
+    alignItems: 'center',
+  },
+  stepLabel: {
+    ...typography.titleMd,
+    color: colors.onSurface,
+    textAlign: 'center',
+  },
+  recipeName: {
+    ...typography.bodySm,
+    color: colors.onSurfaceVariant,
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    marginTop: spacing.xs,
   },
   barRow: {
     flexDirection: 'row',
     height: 4,
+    marginTop: spacing.sm,
+    width: '100%',
   },
   segment: {
     flex: 1,
@@ -56,12 +77,5 @@ const s = StyleSheet.create({
   },
   segmentGap: {
     marginRight: 2,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: colors.outlineVariant,
-    textAlign: 'center',
-    marginTop: spacing.xs,
   },
 });
