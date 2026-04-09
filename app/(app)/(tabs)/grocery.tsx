@@ -39,6 +39,9 @@ import { analyzePhoto, VisionRateLimitError } from '../../../src/lib/vision';
 import { ScanReviewScreen } from '../../../src/components/scan/ScanReviewScreen';
 import { ListExtractReviewScreen } from '../../../src/components/scan/ListExtractReviewScreen';
 import { FoodSearchSheet } from '../../../src/components/food/FoodSearchSheet';
+import { BarcodeScannerScreen } from '../../../src/components/barcode/BarcodeScannerScreen';
+import { BarcodeResultCard } from '../../../src/components/barcode/BarcodeResultCard';
+import type { FoodItem } from '../../../src/types/food';
 
 const SECTION_ORDER = ['Proteins', 'Produce', 'Dairy & Eggs', 'Pantry', 'Other'];
 
@@ -54,6 +57,8 @@ export default function GroceryScreen() {
   const [pantryAddSheetOpen, setPantryAddSheetOpen] = useState(false);
   const [cameraSheetOpen, setCameraSheetOpen] = useState(false);
   const [foodSearchOpen, setFoodSearchOpen] = useState(false);
+  const [barcodeScannerOpen, setBarcodeScannerOpen] = useState(false);
+  const [barcodeProduct, setBarcodeProduct] = useState<FoodItem | null>(null);
   const [visionLoading, setVisionLoading] = useState(false);
   const [scanResults, setScanResults] = useState<Array<{ name: string; category?: string; quantity?: string; brand?: string }> | null>(null);
   const [extractResults, setExtractResults] = useState<Array<{ name: string; category?: string; quantity?: string }> | null>(null);
@@ -234,6 +239,36 @@ export default function GroceryScreen() {
     }
   }, [checkAndPrompt]);
 
+  // --- Barcode scanning handlers ---
+  const handleBarcodeScanPress = useCallback(async () => {
+    const granted = await checkAndPrompt();
+    if (granted) {
+      setBarcodeScannerOpen(true);
+    }
+  }, [checkAndPrompt]);
+
+  const handleBarcodeProductFound = useCallback((food: FoodItem) => {
+    setBarcodeScannerOpen(false);
+    setBarcodeProduct(food);
+  }, []);
+
+  const handleBarcodeNotFound = useCallback((_barcode: string) => {
+    setBarcodeScannerOpen(false);
+    setFoodSearchOpen(true);
+  }, []);
+
+  const handleBarcodeResultClose = useCallback(() => {
+    setBarcodeProduct(null);
+  }, []);
+
+  const handleBarcodeAddedToPantry = useCallback(() => {
+    setBarcodeProduct(null);
+  }, []);
+
+  const handleBarcodeAddedToGrocery = useCallback(() => {
+    setBarcodeProduct(null);
+  }, []);
+
   const summaryData = summary();
   const { sections, completed } = groupedItems();
 
@@ -327,18 +362,43 @@ export default function GroceryScreen() {
           <View style={styles.titleSpacer} />
         </View>
         {segmentedControl}
-        <Pressable
-          style={styles.searchFoodsBtn}
-          onPress={() => setFoodSearchOpen(true)}
-          testID="search-foods-button"
-        >
-          <MaterialCommunityIcons name="magnify" size={20} color={colors.primary} />
-          <Text style={styles.searchFoodsBtnText}>Search Foods</Text>
-        </Pressable>
+        <View style={styles.actionButtonRow}>
+          <Pressable
+            style={[styles.searchFoodsBtn, styles.actionButtonFlex]}
+            onPress={() => setFoodSearchOpen(true)}
+            testID="search-foods-button"
+          >
+            <MaterialCommunityIcons name="magnify" size={20} color={colors.primary} />
+            <Text style={styles.searchFoodsBtnText}>Search Foods</Text>
+          </Pressable>
+          <Pressable
+            style={[styles.searchFoodsBtn, styles.actionButtonFlex]}
+            onPress={handleBarcodeScanPress}
+            testID="barcode-scan-button"
+          >
+            <MaterialCommunityIcons name="barcode-scan" size={20} color={colors.primary} />
+            <Text style={styles.searchFoodsBtnText}>Scan Barcode</Text>
+          </Pressable>
+        </View>
         <OnHandList />
 
         {unifiedFab}
         <FoodSearchSheet isOpen={foodSearchOpen} onClose={() => setFoodSearchOpen(false)} />
+        <BarcodeScannerScreen
+          visible={barcodeScannerOpen}
+          onClose={() => setBarcodeScannerOpen(false)}
+          onProductFound={handleBarcodeProductFound}
+          onNotFound={handleBarcodeNotFound}
+        />
+        {barcodeProduct && (
+          <BarcodeResultCard
+            food={barcodeProduct}
+            visible={!!barcodeProduct}
+            onClose={handleBarcodeResultClose}
+            onAddedToPantry={handleBarcodeAddedToPantry}
+            onAddedToGrocery={handleBarcodeAddedToGrocery}
+          />
+        )}
         {sharedComponents}
         {scanReview}
         {extractReview}
@@ -412,6 +472,15 @@ export default function GroceryScreen() {
       {segmentedControl}
 
       <GrocerySummary summary={summaryData} />
+
+      <Pressable
+        style={[styles.searchFoodsBtn, styles.scanBarcodeShoppingBtn]}
+        onPress={handleBarcodeScanPress}
+        testID="barcode-scan-button-shopping"
+      >
+        <MaterialCommunityIcons name="barcode-scan" size={20} color={colors.primary} />
+        <Text style={styles.searchFoodsBtnText}>Scan Barcode</Text>
+      </Pressable>
 
       <ScrollView
         style={styles.scrollView}
@@ -487,6 +556,21 @@ export default function GroceryScreen() {
         />
       )}
 
+      <BarcodeScannerScreen
+        visible={barcodeScannerOpen}
+        onClose={() => setBarcodeScannerOpen(false)}
+        onProductFound={handleBarcodeProductFound}
+        onNotFound={handleBarcodeNotFound}
+      />
+      {barcodeProduct && (
+        <BarcodeResultCard
+          food={barcodeProduct}
+          visible={!!barcodeProduct}
+          onClose={handleBarcodeResultClose}
+          onAddedToPantry={handleBarcodeAddedToPantry}
+          onAddedToGrocery={handleBarcodeAddedToGrocery}
+        />
+      )}
       {sharedComponents}
       {scanReview}
       {extractReview}
@@ -559,6 +643,16 @@ const styles = StyleSheet.create({
   skeletonContainer: {
     padding: spacing.md,
   },
+  actionButtonRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.md,
+  },
+  actionButtonFlex: {
+    flex: 1,
+    marginHorizontal: 0,
+  },
   searchFoodsBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -572,6 +666,9 @@ const styles = StyleSheet.create({
     ...typography.labelLg,
     color: colors.primary,
     marginLeft: spacing.sm,
+  },
+  scanBarcodeShoppingBtn: {
+    marginBottom: spacing.sm,
   },
   fab: {
     position: 'absolute',
