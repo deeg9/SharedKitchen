@@ -142,7 +142,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
   5. DateStrip component renders a scrollable horizontal day selector with today highlight and tap-to-select
 **Plans**: 3 plans
 Plans:
-- [ ] 39-01-PLAN.md — Install dependencies + build ProgressBar and InsightCard
+- [x] 39-01-PLAN.md — Install dependencies + build ProgressBar and InsightCard
 - [ ] 39-02-PLAN.md — Build FilterChips and DateStrip
 - [ ] 39-03-PLAN.md — Build DonutChart (animated SVG ring)
 **UI hint**: yes
@@ -243,7 +243,7 @@ Plans:
 | 36. Food Search | v6.0 | 2/2 | Complete | 2026-04-09 |
 | 37. Barcode Scanning | v6.0 | 2/2 | Complete | 2026-04-09 |
 | 38. Recipe Nutrition | v6.0 | 2/2 | Complete | 2026-04-09 |
-| 39. Shared Components & Dependencies | v7.0 | 0/3 | In progress | - |
+| 39. Shared Components & Dependencies | v7.0 | 1/3 | In Progress|  |
 | 40. Independent Screen Redesigns | v7.0 | 0/0 | Not started | - |
 | 41. Plan Tab Redesign | v7.0 | 0/0 | Not started | - |
 | 42. Grocery List Redesign | v7.0 | 0/0 | Not started | - |
