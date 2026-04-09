@@ -175,12 +175,10 @@ Plans:
   3. Empty meal slots show soft illustrated placeholders with contextual prompts ("What's for breakfast?", "Lunch time?")
   4. User can toggle to Week view showing all 7 days with breakfast/lunch/dinner slots, with prev/next navigation working in both views
   5. Grocery shortcut card appears at screen bottom showing current week item count and linking to Kitchen tab
-**Plans**: 4 plans
+**Plans**: 2 plans
 Plans:
-- [x] 40-01-PLAN.md — Redesign all 6 onboarding screens (Welcome through All Set)
-- [x] 40-02-PLAN.md — Redesign Recipe Library with FilterChips and full-width cards
-- [x] 40-03-PLAN.md — Redesign Cooking Mode with step photos, badges, tips, and Previous/Next buttons
-- [x] 40-04-PLAN.md — Redesign Premium Upgrade screen with hero photo, comparison table, and pricing tiers
+- [ ] 41-01-PLAN.md — Build HeroDinnerCard, DayViewMealSlot, and GroceryShortcutCard components
+- [ ] 41-02-PLAN.md — Wire Day/Week toggle, DateStrip, and new components into plan.tsx
 **UI hint**: yes
 
 ### Phase 42: Grocery List Redesign
@@ -193,12 +191,7 @@ Plans:
   3. User can tap "Sync with Plan" to regenerate the grocery list from the current meal plan
   4. Item rows display quantity, estimated price, and source/category tags
   5. Segment control shows Shopping List (left) / On Hand (right) — and real-time sync, presence avatars, barcode scanning, and photo scanning all work without regression
-**Plans**: 4 plans
-Plans:
-- [x] 40-01-PLAN.md — Redesign all 6 onboarding screens (Welcome through All Set)
-- [x] 40-02-PLAN.md — Redesign Recipe Library with FilterChips and full-width cards
-- [x] 40-03-PLAN.md — Redesign Cooking Mode with step photos, badges, tips, and Previous/Next buttons
-- [ ] 40-04-PLAN.md — Redesign Premium Upgrade screen with hero photo, comparison table, and pricing tiers
+**Plans**: 0 plans
 **UI hint**: yes
 
 ### Phase 43: Budget, Profile & Social Feed
@@ -211,12 +204,7 @@ Plans:
   3. Social feed displays a horizontal following avatar strip at top, hero-sized meal photos with overlay text, "Try this recipe" CTA buttons, quoted descriptions, and "View Full Recipe" actions
   4. All existing functionality (expense logging, settings changes, feed likes/comments/save) works without regression on redesigned screens
   5. Maestro E2E flows for budget, profile, and social feed screens pass with updated testID references
-**Plans**: 4 plans
-Plans:
-- [x] 40-01-PLAN.md — Redesign all 6 onboarding screens (Welcome through All Set)
-- [x] 40-02-PLAN.md — Redesign Recipe Library with FilterChips and full-width cards
-- [ ] 40-03-PLAN.md — Redesign Cooking Mode with step photos, badges, tips, and Previous/Next buttons
-- [ ] 40-04-PLAN.md — Redesign Premium Upgrade screen with hero photo, comparison table, and pricing tiers
+**Plans**: 0 plans
 **UI hint**: yes
 
 ## Progress
@@ -265,7 +253,7 @@ Plans:
 | 38. Recipe Nutrition | v6.0 | 2/2 | Complete | 2026-04-09 |
 | 39. Shared Components & Dependencies | v7.0 | 3/3 | Complete    | 2026-04-09 |
 | 40. Independent Screen Redesigns | v7.0 | 4/4 | Complete    | 2026-04-09 |
-| 41. Plan Tab Redesign | v7.0 | 0/0 | Not started | - |
+| 41. Plan Tab Redesign | v7.0 | 0/2 | Planning | - |
 | 42. Grocery List Redesign | v7.0 | 0/0 | Not started | - |
 | 43. Budget, Profile & Social Feed | v7.0 | 0/0 | Not started | - |
 
