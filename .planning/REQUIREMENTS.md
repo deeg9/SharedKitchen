@@ -85,10 +85,10 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 
 ### Premium Upgrade
 
-- [ ] **PREM-01**: Upgrade screen shows a hero kitchen photo with editorial headline
-- [ ] **PREM-02**: Feature comparison table shows Free vs Premium columns with checkmarks and feature descriptions
-- [ ] **PREM-03**: Monthly and yearly pricing tiers are displayed with "BEST VALUE" badge on yearly
-- [ ] **PREM-04**: CTA buttons for each pricing tier (Get Monthly / Upgrade to Premium)
+- [x] **PREM-01**: Upgrade screen shows a hero kitchen photo with editorial headline
+- [x] **PREM-02**: Feature comparison table shows Free vs Premium columns with checkmarks and feature descriptions
+- [x] **PREM-03**: Monthly and yearly pricing tiers are displayed with "BEST VALUE" badge on yearly
+- [x] **PREM-04**: CTA buttons for each pricing tier (Get Monthly / Upgrade to Premium)
 
 ## Future Requirements
 
@@ -162,10 +162,10 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 | FEED-03 | Phase 43 | Pending |
 | FEED-04 | Phase 43 | Pending |
 | FEED-05 | Phase 43 | Pending |
-| PREM-01 | Phase 40 | Pending |
-| PREM-02 | Phase 40 | Pending |
-| PREM-03 | Phase 40 | Pending |
-| PREM-04 | Phase 40 | Pending |
+| PREM-01 | Phase 40 | Complete |
+| PREM-02 | Phase 40 | Complete |
+| PREM-03 | Phase 40 | Complete |
+| PREM-04 | Phase 40 | Complete |
 
 **Coverage:**
 - v7.0 requirements: 44 total
