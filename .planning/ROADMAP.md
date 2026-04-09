@@ -111,7 +111,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 **Milestone Goal:** Integrate external food databases (USDA, Open Food Facts, FatSecret) to provide comprehensive nutrition data, barcode scanning, and searchable food/ingredient data that powers recipes, meal plans, and AI features.
 
-- [ ] **Phase 35: Data Foundation** - Postgres schema, TypeScript types, unit conversion, and nutrition normalization layer
+- [x] **Phase 35: Data Foundation** - Postgres schema, TypeScript types, unit conversion, and nutrition normalization layer (completed 2026-04-09)
 - [ ] **Phase 36: Food Search** - Edge Functions for USDA/FatSecret search, client store, and searchable food interface
 - [ ] **Phase 37: Barcode Scanning** - Camera barcode scanner, Open Food Facts/FatSecret lookup, and add-to-pantry/grocery flows
 - [ ] **Phase 38: Recipe Nutrition** - AI-assisted ingredient matching, per-recipe nutrition computation, and nutrition display on recipes and meal plans
@@ -129,8 +129,8 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
   4. TypeScript types (FoodItem, NutritionData) are defined and shared between client and Edge Functions
 **Plans**: 2 plans
 Plans:
-- [ ] 35-01-PLAN.md — Database migration (food_items + food_search_cache tables with indexes and RLS)
-- [ ] 35-02-PLAN.md — Nutrition utilities (density tables, computation functions) + database.ts types
+- [x] 35-01-PLAN.md — Database migration (food_items + food_search_cache tables with indexes and RLS)
+- [x] 35-02-PLAN.md — Nutrition utilities (density tables, computation functions) + database.ts types
 
 ### Phase 36: Food Search
 **Goal**: Users can search for any food by name and see nutrition information from a unified database
@@ -209,7 +209,7 @@ Plans:
 | 32. Feed & Auto-Post | v5.0 | 2/2 | Complete | 2026-04-07 |
 | 33. Social Interactions & Moderation | v5.0 | 3/3 | Complete | 2026-04-07 |
 | 34. Social Push Notifications | v5.0 | 2/2 | Complete | 2026-04-07 |
-| 35. Data Foundation | v6.0 | 0/2 | Not started | - |
+| 35. Data Foundation | v6.0 | 2/2 | Complete    | 2026-04-09 |
 | 36. Food Search | v6.0 | 0/0 | Not started | - |
 | 37. Barcode Scanning | v6.0 | 0/0 | Not started | - |
 | 38. Recipe Nutrition | v6.0 | 0/0 | Not started | - |
