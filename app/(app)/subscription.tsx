@@ -3,11 +3,13 @@ import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { SubscriptionSheet } from '../../src/components/premium/SubscriptionSheet';
 import { useSubscriptionStore } from '../../src/stores/subscriptionStore';
 import { colors } from '../../src/theme/colors';
 import { typography } from '../../src/theme/typography';
-import { spacing } from '../../src/theme/spacing';
+import { spacing, borderRadius } from '../../src/theme/spacing';
+import { shadows } from '../../src/theme/shadows';
 
 export default function SubscriptionScreen() {
   const router = useRouter();
@@ -26,9 +28,9 @@ export default function SubscriptionScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.backButton} testID="subscription-back-button">
-          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.onSurface} />
+          <MaterialCommunityIcons name="close" size={24} color={colors.onSurfaceVariant} />
         </Pressable>
-        <Text style={styles.headerTitle}>Subscription</Text>
+        <Text style={styles.headerTitle}>Upgrade to Premium</Text>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -36,26 +38,45 @@ export default function SubscriptionScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* Hero Section */}
-        <View style={styles.hero}>
-          {isPremium() ? (
-            <>
-              <MaterialCommunityIcons name="crown" size={48} color={colors.secondary} />
-              <Text style={styles.heroTitle}>You're on Premium!</Text>
-              <Text style={styles.heroSubtitle}>
-                Enjoy all the exclusive features of your premium membership.
-              </Text>
-            </>
-          ) : (
-            <>
-              <MaterialCommunityIcons name="star-four-points" size={48} color={colors.secondary} />
-              <Text style={styles.heroTitle}>Upgrade Your Kitchen</Text>
-              <Text style={styles.heroSubtitle}>
-                Unlock advanced analytics, AI suggestions, and more.
-              </Text>
-            </>
-          )}
-        </View>
+        {isPremium() ? (
+          /* Premium hero -- existing crown view */
+          <View style={styles.premiumHero}>
+            <MaterialCommunityIcons name="crown" size={48} color={colors.secondary} />
+            <Text style={styles.premiumHeroTitle}>You're on Premium!</Text>
+            <Text style={styles.premiumHeroSubtitle}>
+              Enjoy all the exclusive features of your premium membership.
+            </Text>
+          </View>
+        ) : (
+          /* Free user editorial hero */
+          <>
+            {/* Hero Kitchen Photo */}
+            <View style={styles.heroImageContainer}>
+              <Image
+                source={require('../../assets/food-images/heroes/kitchen-cooking.jpg')}
+                style={styles.heroImage}
+                contentFit="cover"
+                transition={300}
+              />
+            </View>
+
+            {/* "LEVEL UP YOUR KITCHEN" badge */}
+            <View style={styles.badgePill}>
+              <Text style={styles.badgeText}>LEVEL UP YOUR KITCHEN</Text>
+            </View>
+
+            {/* Editorial headline */}
+            <Text style={styles.editorialHeadline}>
+              Unlock your kitchen's{' '}
+              <Text style={styles.italicText}>full potential.</Text>
+            </Text>
+
+            {/* Subtitle */}
+            <Text style={styles.editorialSubtitle}>
+              Get organized, save money, and cook together seamlessly with SharedKitchen Premium. The ultimate toolkit for the intentional chef.
+            </Text>
+          </>
+        )}
 
         {/* Subscription Content */}
         <SubscriptionSheet />
@@ -87,25 +108,67 @@ const styles = StyleSheet.create({
     width: 32,
   },
   content: {
-    paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxl,
   },
-  hero: {
+  // Premium hero (existing view for premium users)
+  premiumHero: {
     alignItems: 'center',
     paddingVertical: spacing.xl,
+    paddingHorizontal: spacing.lg,
     marginBottom: spacing.lg,
   },
-  heroTitle: {
+  premiumHeroTitle: {
     ...typography.headlineMd,
     color: colors.onSurface,
     marginTop: spacing.md,
     textAlign: 'center',
   },
-  heroSubtitle: {
+  premiumHeroSubtitle: {
     ...typography.bodyMd,
     color: colors.onSurfaceVariant,
     marginTop: spacing.sm,
     textAlign: 'center',
     maxWidth: 280,
+  },
+  // Free user editorial hero
+  heroImageContainer: {
+    height: 240,
+    borderRadius: borderRadius.lg,
+    marginHorizontal: spacing.lg,
+    overflow: 'hidden',
+    ...shadows.editorial,
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
+  },
+  badgePill: {
+    backgroundColor: colors.primaryFixed,
+    borderRadius: borderRadius.full,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    alignSelf: 'flex-start',
+    marginLeft: spacing.lg,
+    marginTop: spacing.lg,
+  },
+  badgeText: {
+    ...typography.labelSm,
+    color: colors.primary,
+    fontWeight: '600',
+  },
+  editorialHeadline: {
+    ...typography.displayLg,
+    color: colors.onSurface,
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.md,
+  },
+  italicText: {
+    fontStyle: 'italic',
+  },
+  editorialSubtitle: {
+    ...typography.bodyMd,
+    color: colors.onSurfaceVariant,
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.sm,
   },
 });
