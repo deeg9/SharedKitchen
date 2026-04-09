@@ -704,6 +704,88 @@ export interface Database {
           created_at?: string;
         };
       };
+      food_items: {
+        Row: {
+          id: string;
+          fdc_id: number | null;
+          off_barcode: string | null;
+          fatsecret_id: number | null;
+          name: string;
+          name_normalized: string;
+          brand: string | null;
+          barcode: string | null;
+          category: string | null;
+          nutrition: Json;
+          serving_sizes: Json;
+          source: 'usda' | 'off' | 'fatsecret';
+          image_url: string | null;
+          data_quality: number;
+          fetched_at: string;
+          expires_at: string;
+        };
+        Insert: {
+          id?: string;
+          fdc_id?: number | null;
+          off_barcode?: string | null;
+          fatsecret_id?: number | null;
+          name: string;
+          name_normalized: string;
+          brand?: string | null;
+          barcode?: string | null;
+          category?: string | null;
+          nutrition: Json;
+          serving_sizes?: Json;
+          source: 'usda' | 'off' | 'fatsecret';
+          image_url?: string | null;
+          data_quality?: number;
+          fetched_at?: string;
+          expires_at?: string;
+        };
+        Update: {
+          id?: string;
+          fdc_id?: number | null;
+          off_barcode?: string | null;
+          fatsecret_id?: number | null;
+          name?: string;
+          name_normalized?: string;
+          brand?: string | null;
+          barcode?: string | null;
+          category?: string | null;
+          nutrition?: Json;
+          serving_sizes?: Json;
+          source?: 'usda' | 'off' | 'fatsecret';
+          image_url?: string | null;
+          data_quality?: number;
+          fetched_at?: string;
+          expires_at?: string;
+        };
+      };
+      food_search_cache: {
+        Row: {
+          query_hash: string;
+          query_text: string;
+          results: Json;
+          result_count: number;
+          created_at: string;
+          expires_at: string;
+        };
+        Insert: {
+          query_hash: string;
+          query_text: string;
+          results: Json;
+          result_count: number;
+          created_at?: string;
+          expires_at?: string;
+        };
+        Update: {
+          query_hash?: string;
+          query_text?: string;
+          results?: Json;
+          result_count?: number;
+          created_at?: string;
+          expires_at?: string;
+        };
+      };
     };
     Views: {
       [_ in never]: never;
@@ -761,6 +843,11 @@ export type PostCommentInsert = Database['public']['Tables']['post_comments']['I
 export type SavedRecipe = Database['public']['Tables']['saved_recipes']['Row'];
 export type BlockedKitchen = Database['public']['Tables']['blocked_kitchens']['Row'];
 export type ReportedContent = Database['public']['Tables']['reported_content']['Row'];
+
+export type FoodItemRow = Database['public']['Tables']['food_items']['Row'];
+export type FoodItemInsert = Database['public']['Tables']['food_items']['Insert'];
+export type FoodItemUpdate = Database['public']['Tables']['food_items']['Update'];
+export type FoodSearchCacheRow = Database['public']['Tables']['food_search_cache']['Row'];
 
 export interface KitchenProfileWithRecipeCount extends KitchenProfile {
   recipe_count: number;
