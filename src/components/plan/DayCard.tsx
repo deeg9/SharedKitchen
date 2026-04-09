@@ -6,7 +6,7 @@ import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
 import { formatDayLabel } from '../../lib/dates';
-import { MealPlanWithRecipe } from '../../stores/planStore';
+import { MealPlanWithRecipe, computeDayNutrition } from '../../stores/planStore';
 import { MealType, MEAL_TYPES, MEAL_TYPE_CONFIG } from '../../types/database';
 import { getDefaultRecipeImage } from '../../lib/images';
 
@@ -193,6 +193,7 @@ interface DaySectionProps {
 
 export function DaySection({ date, meals, isToday, onMealPress }: DaySectionProps) {
   const label = formatDayLabel(date);
+  const dayNutrition = computeDayNutrition(meals);
 
   return (
     <View style={sectionStyles.container} testID={`plan-day-${label.weekday}`}>
@@ -220,6 +221,32 @@ export function DaySection({ date, meals, isToday, onMealPress }: DaySectionProp
           ))}
         </View>
       </View>
+
+      {/* Daily nutrition totals */}
+      {dayNutrition.nutrition && (
+        <View style={sectionStyles.nutritionRow}>
+          <Text style={sectionStyles.nutritionText}>
+            {Math.round(dayNutrition.nutrition.calories)} cal
+          </Text>
+          <Text style={sectionStyles.nutritionDot}>{'\u00B7'}</Text>
+          <Text style={sectionStyles.nutritionText}>
+            {Math.round(dayNutrition.nutrition.protein_g)}g protein
+          </Text>
+          <Text style={sectionStyles.nutritionDot}>{'\u00B7'}</Text>
+          <Text style={sectionStyles.nutritionText}>
+            {Math.round(dayNutrition.nutrition.total_carbs_g)}g carbs
+          </Text>
+          <Text style={sectionStyles.nutritionDot}>{'\u00B7'}</Text>
+          <Text style={sectionStyles.nutritionText}>
+            {Math.round(dayNutrition.nutrition.total_fat_g)}g fat
+          </Text>
+          {dayNutrition.matchedMeals < dayNutrition.totalMeals && (
+            <Text style={sectionStyles.nutritionPartial}>
+              ({dayNutrition.matchedMeals} of {dayNutrition.totalMeals} meals)
+            </Text>
+          )}
+        </View>
+      )}
     </View>
   );
 }
@@ -262,6 +289,29 @@ const sectionStyles = StyleSheet.create({
   slotsCol: {
     flex: 1,
     gap: spacing.xs + 2,
+  },
+  nutritionRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    paddingTop: spacing.xs,
+    paddingLeft: 52 + spacing.sm + 1,
+    gap: 4,
+  },
+  nutritionText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.onSurfaceVariant,
+  },
+  nutritionDot: {
+    fontSize: 11,
+    color: colors.outlineVariant,
+  },
+  nutritionPartial: {
+    fontSize: 10,
+    fontWeight: '500',
+    color: colors.outline,
+    fontStyle: 'italic',
   },
 });
 

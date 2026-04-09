@@ -8,6 +8,8 @@ import { createFeedPost } from '../lib/feedHelpers';
 import { scheduleCookingReminder, cancelNotification } from '../lib/notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getErrorMessage } from '../lib/errors';
+import { NutritionData } from '../types/food';
+import { sumNutrition } from '../lib/nutrition-utils';
 
 export type MealPlan = Database['public']['Tables']['meal_plans']['Row'];
 
@@ -41,6 +43,31 @@ interface PlanState {
   clearMeal: (householdId: string, date: string, mealType: MealType) => Promise<void>;
   getRandomSuggestion: (householdId: string) => Promise<Recipe | null>;
   clear: () => void;
+}
+
+/**
+ * Compute aggregated daily nutrition from a day's meal plan entries.
+ * Returns null nutrition if no meals have computed_nutrition data.
+ */
+export function computeDayNutrition(
+  meals: Partial<Record<MealType, MealPlanWithRecipe | undefined>>
+): { nutrition: NutritionData | null; matchedMeals: number; totalMeals: number } {
+  const mealEntries = Object.values(meals).filter(Boolean) as MealPlanWithRecipe[];
+  const totalMeals = mealEntries.filter(m => m.recipes != null).length;
+  if (totalMeals === 0) return { nutrition: null, matchedMeals: 0, totalMeals: 0 };
+
+  const nutritionItems: NutritionData[] = [];
+  let matchedMeals = 0;
+  for (const meal of mealEntries) {
+    const computed = meal.recipes?.computed_nutrition as NutritionData | null | undefined;
+    if (computed && typeof computed.calories === 'number') {
+      nutritionItems.push(computed);
+      matchedMeals++;
+    }
+  }
+
+  if (nutritionItems.length === 0) return { nutrition: null, matchedMeals: 0, totalMeals };
+  return { nutrition: sumNutrition(nutritionItems), matchedMeals, totalMeals };
 }
 
 export const usePlanStore = create<PlanState>((set, get) => ({
@@ -265,3 +292,4 @@ export const usePlanStore = create<PlanState>((set, get) => ({
     }
   },
 }));
+
