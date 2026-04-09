@@ -3,85 +3,123 @@
 **Defined:** 2026-04-09
 **Core Value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
 
-## v6.0 Requirements
+## v7.0 Requirements
 
-Requirements for Food Data Integration milestone. Each maps to roadmap phases.
+Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 
-### Data Foundation
+### Shared Components
 
-- [ ] **DATA-01**: App stores nutrition data in canonical numeric format (calories, protein, carbs, fat, fiber, sodium per serving and per 100g)
-- [ ] **DATA-02**: App converts between food-specific units (cups, tbsp, oz) and grams using density tables
-- [ ] **DATA-03**: App caches food data from external APIs in Postgres with full-text search and 30-day TTL
+- [ ] **COMP-01**: App includes a reusable animated donut ring chart component (SVG-based, accepts value/max/label props)
+- [ ] **COMP-02**: App includes a reusable animated progress bar component (horizontal fill, accepts value/max props)
+- [ ] **COMP-03**: App includes a reusable insight card component (icon, message, badge, used across budget and profile)
+- [ ] **COMP-04**: App includes a reusable filter chips component (horizontal scrollable, single-select, used on recipes and potentially other screens)
+- [ ] **COMP-05**: App includes a reusable horizontal date strip component (scrollable day selector with today highlight)
+- [ ] **COMP-06**: react-native-svg and expo-linear-gradient are installed and verified working
 
-### Food Search
+### Meal Planner
 
-- [ ] **SRCH-01**: User can search foods by name across USDA, FatSecret, and cached data from a single search interface
-- [ ] **SRCH-02**: Search results show food name, brand (if applicable), and key nutrition facts (calories, protein, carbs, fat)
-- [ ] **SRCH-03**: User can view detailed nutrition breakdown for any search result
+- [ ] **PLAN-01**: User sees a Day/Week toggle in the plan header, defaulting to Day view
+- [ ] **PLAN-02**: User can swipe or tap the horizontal date strip to navigate between days in Day view
+- [ ] **PLAN-03**: User sees today's dinner as a hero card with large recipe photo, description, presence indicator, and "Start Cooking" CTA
+- [ ] **PLAN-04**: Empty meal slots show soft illustrated placeholders with inviting prompts ("What's for breakfast?", "Lunch time?")
+- [ ] **PLAN-05**: User can toggle to Week view to see all 7 days with breakfast/lunch/dinner slots (existing layout, refined)
+- [ ] **PLAN-06**: User sees a grocery shortcut card at the bottom showing item count for the current week, linking to Kitchen tab
+- [ ] **PLAN-07**: Week navigation (prev/next arrows, Today button) works in both Day and Week views
 
-### Barcode Scanning
+### Recipe Library
 
-- [ ] **SCAN-01**: User can scan a product barcode using the device camera
-- [ ] **SCAN-02**: App looks up scanned barcode via Open Food Facts and FatSecret, displaying product name and nutrition
-- [ ] **SCAN-03**: User can add scanned product to pantry/fridge inventory with nutrition data
-- [ ] **SCAN-04**: User can add scanned product to grocery list with product details
+- [ ] **RCPE-01**: User sees a horizontal filter chip row (All, Quick Meals, Favorites) above the recipe list
+- [ ] **RCPE-02**: Recipe cards display as full-width cards with description text, cook time pill, difficulty badge, and rating star
+- [ ] **RCPE-03**: User sees an "Import New Recipe" CTA card at the bottom of the recipe list
+- [ ] **RCPE-04**: Search bar is visible at the top of the recipes screen
 
-### Recipe Nutrition
+### Grocery & Kitchen
 
-- [ ] **NUTR-01**: App matches recipe ingredients to food database entries using AI-assisted text matching
-- [ ] **NUTR-02**: App calculates per-recipe nutrition totals from matched ingredient data
-- [ ] **NUTR-03**: User sees a nutrition card (calories, protein, carbs, fat) on recipe detail screen
-- [ ] **NUTR-04**: User sees aggregated daily/weekly nutrition totals on the Plan tab for planned meals
+- [ ] **GROC-01**: User sees a summary card at the top showing item count, estimated cost, and presence avatars
+- [ ] **GROC-02**: User sees a shopping progress bar ("12 of 18 items checked") with animated fill
+- [ ] **GROC-03**: User can tap "Sync with Plan" in the header to regenerate the grocery list from the current meal plan
+- [ ] **GROC-04**: Grocery item rows show quantity, estimated price, and source/category tags
+- [ ] **GROC-05**: Segment control order is Shopping List (left) / On Hand/Pantry (right)
+
+### Budget Dashboard
+
+- [ ] **BUDG-01**: User sees a donut ring chart hero showing total spent vs budget with percentage
+- [ ] **BUDG-02**: User can navigate between months using left/right arrow month picker
+- [ ] **BUDG-03**: User sees a Budget Insights section with contextual cards (e.g., "You spent 15% less on dining out this month")
+- [ ] **BUDG-04**: Spending categories show inline progress bars (spent vs budget per category)
+- [ ] **BUDG-05**: Weekly breakdown section shows mini bar charts per week
+
+### Profile & Settings
+
+- [ ] **PROF-01**: User sees a Cooking Insights section with streak counter and plan completion percentage ring
+- [ ] **PROF-02**: User sees their most-cooked recipe with photo and frequency badge
+- [ ] **PROF-03**: User sees a household distribution chart showing cooking contribution per member
+- [ ] **PROF-04**: Preferences (Dietary, Default Servings, Notifications) display as grouped navigation rows that push to detail screens
+- [ ] **PROF-05**: Account & Subscription section (Manage Subscription, Dark Mode toggle, Data Export) displays as grouped navigation rows
+
+### Onboarding
+
+- [ ] **ONBR-01**: Welcome screen (Step 1/6) shows hero kitchen photo, tagline, Get Started/Sign In CTAs, and feature highlights
+- [ ] **ONBR-02**: Create Household screen (Step 2/6) shows illustration, "Name your kitchen" prompt with input field
+- [ ] **ONBR-03**: Invite Members screen (Step 3/6) shows invite code with copy/share actions and share-via icons
+- [ ] **ONBR-04**: Add First Recipes screen (Step 4/6) shows progress counter (0 of 3), starter recipe cards, and "Import from URL" option
+- [ ] **ONBR-05**: Plan Your Week screen (Step 5/6) shows day-by-day meal slot pickers with saved recipes list
+- [ ] **ONBR-06**: All Set screen (Step 6/6) shows celebration glassmorphism card with "Go to my kitchen" CTA
+
+### Cooking Mode
+
+- [ ] **COOK-01**: Cooking mode shows a step photo at the top of each instruction step
+- [ ] **COOK-02**: Timer card displays prominently with step name, countdown, and Start button
+- [ ] **COOK-03**: Step type badge (MARINATING, PREP, COOKING) appears above the instruction text
+- [ ] **COOK-04**: Chef's Tip callout card appears when a tip is available for the current step
+- [ ] **COOK-05**: Ingredient chips for the current step are listed below the instruction text
+- [ ] **COOK-06**: Previous/Next Step navigation buttons replace horizontal swipe for step advancement
+
+### Social Feed
+
+- [ ] **FEED-01**: Feed shows a horizontal following avatar strip at the top with kitchen photos
+- [ ] **FEED-02**: Feed cards display hero-sized meal photos with overlay text for meal name
+- [ ] **FEED-03**: Feed cards include a "Try this recipe" CTA button
+- [ ] **FEED-04**: Feed cards show quoted description text and "View Full Recipe" action
+- [ ] **FEED-05**: Feed header shows "Feed" title with consistent navigation
+
+### Premium Upgrade
+
+- [ ] **PREM-01**: Upgrade screen shows a hero kitchen photo with editorial headline
+- [ ] **PREM-02**: Feature comparison table shows Free vs Premium columns with checkmarks and feature descriptions
+- [ ] **PREM-03**: Monthly and yearly pricing tiers are displayed with "BEST VALUE" badge on yearly
+- [ ] **PREM-04**: CTA buttons for each pricing tier (Get Monthly / Upgrade to Premium)
 
 ## Future Requirements
 
-### AI Enhancement
+### Post-v7.0 Polish
 
-- **AIEN-01**: Meal generator considers nutrition balance when suggesting meals
-- **AIEN-02**: Nutrition-aware grocery list suggestions based on dietary goals
-- **AIEN-03**: Household nutrition dashboard with weekly trends
-
-### Premium Features
-
-- **PREM-01**: Detailed micronutrient breakdown (vitamins, minerals) beyond basic macros
-- **PREM-02**: Dietary goal setting and progress tracking per household member
-- **PREM-03**: Unlimited barcode scans (free tier: N/month)
+- **POLSH-01**: Dark mode audit for all redesigned screens
+- **POLSH-02**: Skeleton loading state parity for new component layouts
+- **POLSH-03**: Haptic feedback on key interactions (toggle, filter selection)
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Calorie counting / food diary | SharedKitchen is meal planning, not diet tracking — anti-feature per research |
-| Individual user nutrition tracking | Household-first model; per-person tracking adds complexity without core value |
-| Custom food database entries | Users creating food items leads to data quality issues; defer to v7+ |
-| Nutrition label OCR from photos | Barcode scanning covers packaged foods; OCR adds complexity for marginal gain |
-| Real-time API calls without caching | USDA rate limits (1K/hr global) make cache-first mandatory |
-| USDA bulk CSV import | On-demand caching is simpler; bulk import adds migration complexity |
+| New backend APIs or Edge Functions | UI-only milestone — all data comes from existing stores |
+| New database tables or migrations | Visual redesign only, no schema changes |
+| Yearly Stripe pricing tier | Requires new Stripe price_id creation — business decision deferred |
+| AI-generated Chef's Tips | Tips come from recipe instruction text or are static, not AI-generated |
+| Recipe difficulty field in DB | Derived from prep+cook time, not stored separately |
+| Android-specific UI adjustments | iOS-first; cross-platform via Expo foundation |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DATA-01 | Phase 35 | Pending |
-| DATA-02 | Phase 35 | Pending |
-| DATA-03 | Phase 35 | Pending |
-| SRCH-01 | Phase 36 | Pending |
-| SRCH-02 | Phase 36 | Pending |
-| SRCH-03 | Phase 36 | Pending |
-| SCAN-01 | Phase 37 | Pending |
-| SCAN-02 | Phase 37 | Pending |
-| SCAN-03 | Phase 37 | Pending |
-| SCAN-04 | Phase 37 | Pending |
-| NUTR-01 | Phase 38 | Pending |
-| NUTR-02 | Phase 38 | Pending |
-| NUTR-03 | Phase 38 | Pending |
-| NUTR-04 | Phase 38 | Pending |
+| (To be filled during roadmap creation) | | |
 
 **Coverage:**
-- v6.0 requirements: 14 total
-- Mapped to phases: 14
-- Unmapped: 0
+- v7.0 requirements: 44 total
+- Mapped to phases: 0 (pending roadmap)
+- Unmapped: 44
 
 ---
 *Requirements defined: 2026-04-09*
-*Last updated: 2026-04-09 after roadmap phase mapping*
+*Last updated: 2026-04-09 after initial definition*
