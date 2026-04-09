@@ -122,7 +122,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 **Milestone Goal:** Implement 14 Google Stitch UI designs across all major app surfaces — preserving all existing functionality while elevating the visual design to match the Stitch reference screens, constrained by the existing SharedKitchen design system (colors, typography, spacing, tab bar, FAB).
 
-- [ ] **Phase 39: Shared Components & Dependencies** - Reusable UI primitives (DonutChart, ProgressBar, InsightCard, FilterChips, DateStrip) and new dependency installation that unblock all subsequent phases
+- [x] **Phase 39: Shared Components & Dependencies** - Reusable UI primitives (DonutChart, ProgressBar, InsightCard, FilterChips, DateStrip) and new dependency installation that unblock all subsequent phases (completed 2026-04-09)
 - [ ] **Phase 40: Independent Screen Redesigns** - Onboarding (6 screens), Recipe Library, Cooking Mode, and Premium Upgrade — screens requiring no store changes
 - [ ] **Phase 41: Plan Tab Redesign** - Flagship day-focused meal planner with hero card, date strip, day/week toggle, and grocery shortcut
 - [ ] **Phase 42: Grocery List Redesign** - High-risk grocery screen with shopping progress, sync-with-plan, and enhanced item rows while preserving 4 real-time hooks
@@ -144,7 +144,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 Plans:
 - [x] 39-01-PLAN.md — Install dependencies + build ProgressBar and InsightCard
 - [x] 39-02-PLAN.md — Build FilterChips and DateStrip
-- [ ] 39-03-PLAN.md — Build DonutChart (animated SVG ring)
+- [x] 39-03-PLAN.md — Build DonutChart (animated SVG ring)
 **UI hint**: yes
 
 ### Phase 40: Independent Screen Redesigns
@@ -243,7 +243,7 @@ Plans:
 | 36. Food Search | v6.0 | 2/2 | Complete | 2026-04-09 |
 | 37. Barcode Scanning | v6.0 | 2/2 | Complete | 2026-04-09 |
 | 38. Recipe Nutrition | v6.0 | 2/2 | Complete | 2026-04-09 |
-| 39. Shared Components & Dependencies | v7.0 | 2/3 | In Progress|  |
+| 39. Shared Components & Dependencies | v7.0 | 3/3 | Complete   | 2026-04-09 |
 | 40. Independent Screen Redesigns | v7.0 | 0/0 | Not started | - |
 | 41. Plan Tab Redesign | v7.0 | 0/0 | Not started | - |
 | 42. Grocery List Redesign | v7.0 | 0/0 | Not started | - |

@@ -9,7 +9,7 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 
 ### Shared Components
 
-- [ ] **COMP-01**: App includes a reusable animated donut ring chart component (SVG-based, accepts value/max/label props)
+- [x] **COMP-01**: App includes a reusable animated donut ring chart component (SVG-based, accepts value/max/label props)
 - [x] **COMP-02**: App includes a reusable animated progress bar component (horizontal fill, accepts value/max props)
 - [x] **COMP-03**: App includes a reusable insight card component (icon, message, badge, used across budget and profile)
 - [x] **COMP-04**: App includes a reusable filter chips component (horizontal scrollable, single-select, used on recipes and potentially other screens)
@@ -113,7 +113,7 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| COMP-01 | Phase 39 | Pending |
+| COMP-01 | Phase 39 | Complete |
 | COMP-02 | Phase 39 | Complete |
 | COMP-03 | Phase 39 | Complete |
 | COMP-04 | Phase 39 | Complete |
