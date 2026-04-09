@@ -55,6 +55,48 @@ export async function searchFoods(query: string): Promise<FoodSearchResult[]> {
 }
 
 /**
+ * Look up a food product by barcode via the food-barcode Edge Function.
+ * Returns { found: true, food } or { found: false }.
+ * Throws SearchLimitError if daily limit reached.
+ */
+export async function lookupBarcode(barcode: string): Promise<{ found: boolean; food?: FoodItem }> {
+  const { data, error } = await supabase.functions.invoke('food-barcode', {
+    body: { barcode },
+  });
+
+  if (error) {
+    // Try to read the response body for specific error types
+    try {
+      const ctx = (error as any).context;
+      if (ctx && !ctx.bodyUsed) {
+        const body = await ctx.json();
+        if (body.type === 'search_limit_exceeded') {
+          throw new SearchLimitError(
+            body.error ?? 'Daily food search limit reached',
+            body.limit ?? 20,
+            body.used ?? 0
+          );
+        }
+        throw new Error(body?.error ?? 'Barcode lookup failed');
+      }
+    } catch (readErr: any) {
+      if (readErr instanceof SearchLimitError) {
+        throw readErr;
+      }
+      if (readErr.message && readErr.message !== error.message) {
+        throw readErr;
+      }
+    }
+    throw new Error(error.message ?? 'Barcode lookup failed');
+  }
+
+  return {
+    found: data?.found ?? false,
+    food: data?.food ?? undefined,
+  };
+}
+
+/**
  * Fetch full food item detail from the food_items cache table.
  * Returns null if not found or on error.
  */
