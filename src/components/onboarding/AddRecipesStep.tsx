@@ -18,10 +18,12 @@ import { useOnboardingStore } from '../../stores/onboardingStore';
 import { useRecipeStore } from '../../stores/recipeStore';
 import { useHouseholdStore } from '../../stores/householdStore';
 import { useAuthStore } from '../../stores/authStore';
+import { OnboardingProgress } from './OnboardingProgress';
 
 export function AddRecipesStep() {
   const router = useRouter();
   const nextStep = useOnboardingStore((s) => s.nextStep);
+  const prevStep = useOnboardingStore((s) => s.prevStep);
   const addedRecipeIds = useOnboardingStore((s) => s.addedRecipeIds);
   const addRecipeId = useOnboardingStore((s) => s.addRecipeId);
   const householdId = useOnboardingStore((s) => s.householdId);
@@ -71,16 +73,41 @@ export function AddRecipesStep() {
 
   return (
     <View style={styles.container}>
+      {/* Top bar */}
+      <View style={styles.topBar}>
+        <Pressable onPress={prevStep} hitSlop={12} style={styles.backButton}>
+          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.onSurface} />
+        </Pressable>
+        <Text style={styles.brandText}>
+          <Text style={styles.italic}>SharedKitchen</Text>
+        </Text>
+        <View style={styles.stepBadge}>
+          <Text style={styles.stepBadgeText}>STEP 4 OF 6</Text>
+        </View>
+      </View>
+
+      {/* Headline + subtitle */}
       <Text style={styles.headline}>Add 3 recipes to get started</Text>
+      <Text style={styles.subtitle}>
+        Select from our most-loved starters or import your own secret family recipes from across the web.
+      </Text>
 
-      <Pressable
-        style={({ pressed }) => [styles.importButton, pressed && styles.pressed]}
-        onPress={handleImportUrl}
-      >
-        <MaterialCommunityIcons name="link-variant" size={20} color={colors.primary} />
-        <Text style={styles.importText}>Import from URL</Text>
-      </Pressable>
+      {/* Progress counter + Import row */}
+      <View style={styles.counterRow}>
+        <View style={styles.progressCard}>
+          <Text style={styles.progressLabel}>CURRENT PROGRESS</Text>
+          <Text style={styles.progressCount}>{addedRecipeIds.length} of 3 added</Text>
+        </View>
+        <Pressable
+          style={({ pressed }) => [styles.importCard, pressed && styles.pressed]}
+          onPress={handleImportUrl}
+        >
+          <MaterialCommunityIcons name="link-variant" size={24} color={colors.primary} />
+          <Text style={styles.importText}>Import from URL</Text>
+        </Pressable>
+      </View>
 
+      {/* Starter recipe cards */}
       <ScrollView
         style={styles.list}
         contentContainerStyle={styles.listContent}
@@ -91,8 +118,13 @@ export function AddRecipesStep() {
           const isAdding = addingIndex === index;
 
           return (
-            <View key={recipe.name} style={styles.recipeCard}>
-              <View style={styles.recipeIcon}>
+            <Pressable
+              key={recipe.name}
+              style={styles.recipeCard}
+              onPress={() => handleAddRecipe(recipe, index)}
+              disabled={isAdded || isAdding}
+            >
+              <View style={styles.recipePhoto}>
                 <MaterialCommunityIcons
                   name="food-variant"
                   size={28}
@@ -102,17 +134,12 @@ export function AddRecipesStep() {
               <View style={styles.recipeInfo}>
                 <Text style={styles.recipeName}>{recipe.name}</Text>
                 <Text style={styles.recipeMeta}>
-                  {recipe.prep_time_minutes + recipe.cook_time_minutes}min
-                  {' \u00B7 '}
                   {recipe.category}
+                  {' \u00B7 '}
+                  {recipe.prep_time_minutes + recipe.cook_time_minutes} min
                 </Text>
               </View>
-              <Pressable
-                style={[styles.addButton, isAdded && styles.addedButton]}
-                onPress={() => handleAddRecipe(recipe, index)}
-                disabled={isAdded || isAdding}
-                hitSlop={8}
-              >
+              <View style={[styles.selectToggle, isAdded && styles.selectToggleActive]}>
                 {isAdding ? (
                   <ActivityIndicator size="small" color={colors.primary} />
                 ) : isAdded ? (
@@ -120,16 +147,14 @@ export function AddRecipesStep() {
                 ) : (
                   <MaterialCommunityIcons name="plus" size={20} color={colors.onPrimary} />
                 )}
-              </Pressable>
-            </View>
+              </View>
+            </Pressable>
           );
         })}
       </ScrollView>
 
+      {/* Footer */}
       <View style={styles.footer}>
-        <Text style={styles.counter}>
-          {addedRecipeIds.length} / 3 recipes
-        </Text>
         <Pressable
           style={({ pressed }) => [
             styles.continueButton,
@@ -153,28 +178,82 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxl,
   },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.sm,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  brandText: {
+    ...typography.headlineMd,
+    color: colors.onSurface,
+  },
+  italic: {
+    fontStyle: 'italic',
+  },
+  stepBadge: {
+    backgroundColor: colors.primaryFixed,
+    borderRadius: borderRadius.full,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
+  stepBadgeText: {
+    ...typography.labelSm,
+    color: colors.primary,
+  },
   headline: {
     ...typography.headlineLg,
     color: colors.onSurface,
+    marginTop: spacing.sm,
+  },
+  subtitle: {
+    ...typography.bodyMd,
+    color: colors.onSurfaceVariant,
+    textAlign: 'center',
+    marginTop: spacing.sm,
     marginBottom: spacing.md,
   },
-  importButton: {
+  counterRow: {
     flexDirection: 'row',
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  progressCard: {
+    flex: 1,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+  },
+  progressLabel: {
+    ...typography.labelSm,
+    color: colors.onSurfaceVariant,
+  },
+  progressCount: {
+    ...typography.titleMd,
+    color: colors.onSurface,
+    marginTop: spacing.xs,
+  },
+  importCard: {
+    flex: 1,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.sm,
-    borderWidth: 1.5,
-    borderColor: colors.primary,
-    borderRadius: borderRadius.lg,
-    paddingVertical: spacing.sm + 2,
-    marginBottom: spacing.md,
+    gap: spacing.xs,
+  },
+  importText: {
+    ...typography.labelMd,
+    color: colors.primary,
   },
   pressed: {
     opacity: 0.85,
-  },
-  importText: {
-    ...typography.labelLg,
-    color: colors.primary,
   },
   list: {
     flex: 1,
@@ -186,16 +265,16 @@ const styles = StyleSheet.create({
   recipeCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surfaceContainerLow,
+    backgroundColor: colors.surfaceContainerLowest,
     borderRadius: borderRadius.md,
     padding: spacing.md,
     gap: spacing.md,
     ...shadows.editorial,
   },
-  recipeIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: borderRadius.sm,
+  recipePhoto: {
+    width: 64,
+    height: 64,
+    borderRadius: borderRadius.md,
     backgroundColor: colors.primaryFixed,
     justifyContent: 'center',
     alignItems: 'center',
@@ -212,7 +291,7 @@ const styles = StyleSheet.create({
     color: colors.onSurfaceVariant,
     marginTop: 2,
   },
-  addButton: {
+  selectToggle: {
     width: 36,
     height: 36,
     borderRadius: 18,
@@ -220,24 +299,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  addedButton: {
+  selectToggleActive: {
     backgroundColor: colors.primaryFixed,
   },
   footer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     paddingTop: spacing.md,
-  },
-  counter: {
-    ...typography.labelLg,
-    color: colors.onSurfaceVariant,
   },
   continueButton: {
     backgroundColor: colors.primary,
-    borderRadius: borderRadius.lg,
-    paddingVertical: spacing.sm + 4,
-    paddingHorizontal: spacing.xl,
+    borderRadius: borderRadius.full,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
     ...shadows.editorial,
   },
   disabled: {
