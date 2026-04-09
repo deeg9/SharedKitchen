@@ -113,13 +113,65 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (To be filled during roadmap creation) | | |
+| COMP-01 | Phase 39 | Pending |
+| COMP-02 | Phase 39 | Pending |
+| COMP-03 | Phase 39 | Pending |
+| COMP-04 | Phase 39 | Pending |
+| COMP-05 | Phase 39 | Pending |
+| COMP-06 | Phase 39 | Pending |
+| PLAN-01 | Phase 41 | Pending |
+| PLAN-02 | Phase 41 | Pending |
+| PLAN-03 | Phase 41 | Pending |
+| PLAN-04 | Phase 41 | Pending |
+| PLAN-05 | Phase 41 | Pending |
+| PLAN-06 | Phase 41 | Pending |
+| PLAN-07 | Phase 41 | Pending |
+| RCPE-01 | Phase 40 | Pending |
+| RCPE-02 | Phase 40 | Pending |
+| RCPE-03 | Phase 40 | Pending |
+| RCPE-04 | Phase 40 | Pending |
+| GROC-01 | Phase 42 | Pending |
+| GROC-02 | Phase 42 | Pending |
+| GROC-03 | Phase 42 | Pending |
+| GROC-04 | Phase 42 | Pending |
+| GROC-05 | Phase 42 | Pending |
+| BUDG-01 | Phase 43 | Pending |
+| BUDG-02 | Phase 43 | Pending |
+| BUDG-03 | Phase 43 | Pending |
+| BUDG-04 | Phase 43 | Pending |
+| BUDG-05 | Phase 43 | Pending |
+| PROF-01 | Phase 43 | Pending |
+| PROF-02 | Phase 43 | Pending |
+| PROF-03 | Phase 43 | Pending |
+| PROF-04 | Phase 43 | Pending |
+| PROF-05 | Phase 43 | Pending |
+| ONBR-01 | Phase 40 | Pending |
+| ONBR-02 | Phase 40 | Pending |
+| ONBR-03 | Phase 40 | Pending |
+| ONBR-04 | Phase 40 | Pending |
+| ONBR-05 | Phase 40 | Pending |
+| ONBR-06 | Phase 40 | Pending |
+| COOK-01 | Phase 40 | Pending |
+| COOK-02 | Phase 40 | Pending |
+| COOK-03 | Phase 40 | Pending |
+| COOK-04 | Phase 40 | Pending |
+| COOK-05 | Phase 40 | Pending |
+| COOK-06 | Phase 40 | Pending |
+| FEED-01 | Phase 43 | Pending |
+| FEED-02 | Phase 43 | Pending |
+| FEED-03 | Phase 43 | Pending |
+| FEED-04 | Phase 43 | Pending |
+| FEED-05 | Phase 43 | Pending |
+| PREM-01 | Phase 40 | Pending |
+| PREM-02 | Phase 40 | Pending |
+| PREM-03 | Phase 40 | Pending |
+| PREM-04 | Phase 40 | Pending |
 
 **Coverage:**
 - v7.0 requirements: 44 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 44
+- Mapped to phases: 44
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-09*
-*Last updated: 2026-04-09 after initial definition*
+*Last updated: 2026-04-07 after roadmap creation — all 44 requirements mapped to phases 39-43*

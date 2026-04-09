@@ -2,7 +2,7 @@
 
 ## Overview
 
-SharedKitchen delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP. v2.0 (Phases 5-9) added Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and E2E testing. v2.1 (Phases 10-12) added recipe discovery filters, Stripe test mode E2E, and code quality polish. v2.2 (Phases 13-15) fixes layout bugs, polishes the sign-in screen, repairs the meal generator edge function, and cleans up profile/settings. v2.3 (Phases 16-17) adds multi-kitchen switching so users can belong to multiple kitchens and have all app data scoped to the active one. v2.4 (Phases 18-22) systematically tests and validates every feature area to ensure production readiness. v3.0 (Phases 23-25) adds video recipe import from TikTok, Instagram, YouTube, and any video URL via paste or share sheet, with transcript-based AI extraction, freemium rate limiting, and a unified Kitchen tab with pantry tracking. v4.0 (Phases 26-29) adds AI vision features: camera-based fridge/pantry scanning to bulk-add inventory, food photo identification for recipe discovery, and meal plan logging from photos. v5.0 (Phases 30-34) adds a Venmo-style social feed layer: kitchen profiles, follow/unfollow, auto-posted meals from the plan, feed with likes, comments, recipe saving, and push notifications for social interactions. v6.0 (Phases 35-38) integrates external food databases (USDA, Open Food Facts, FatSecret) to provide searchable food data, barcode scanning for packaged foods, and per-recipe/per-day nutrition display powered by AI-assisted ingredient matching.
+SharedKitchen delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP. v2.0 (Phases 5-9) added Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and E2E testing. v2.1 (Phases 10-12) added recipe discovery filters, Stripe test mode E2E, and code quality polish. v2.2 (Phases 13-15) fixes layout bugs, polishes the sign-in screen, repairs the meal generator edge function, and cleans up profile/settings. v2.3 (Phases 16-17) adds multi-kitchen switching so users can belong to multiple kitchens and have all app data scoped to the active one. v2.4 (Phases 18-22) systematically tests and validates every feature area to ensure production readiness. v3.0 (Phases 23-25) adds video recipe import from TikTok, Instagram, YouTube, and any video URL via paste or share sheet, with transcript-based AI extraction, freemium rate limiting, and a unified Kitchen tab with pantry tracking. v4.0 (Phases 26-29) adds AI vision features: camera-based fridge/pantry scanning to bulk-add inventory, food photo identification for recipe discovery, and meal plan logging from photos. v5.0 (Phases 30-34) adds a Venmo-style social feed layer: kitchen profiles, follow/unfollow, auto-posted meals from the plan, feed with likes, comments, recipe saving, and push notifications for social interactions. v6.0 (Phases 35-38) integrates external food databases (USDA, Open Food Facts, FatSecret) to provide searchable food data, barcode scanning, and per-recipe/per-day nutrition display powered by AI-assisted ingredient matching. v7.0 (Phases 39-43) implements 14 Google Stitch UI designs across all major app surfaces — elevating the visual design while preserving all existing functionality, constrained by the existing design system.
 
 ## Milestones
 
@@ -13,9 +13,10 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - **v2.3 Kitchen Switching** — Phases 16-17 (shipped 2026-03-27)
 - **v2.4 Comprehensive QA Testing** — Phases 18-22 (shipped 2026-03-27)
 - **v3.0 Video Recipe Import & Kitchen Tab** — Phases 23-25 (shipped 2026-03-29) — [Archive](milestones/v3.0-ROADMAP.md)
-- ✅ **v4.0 AI Vision — Scan, Snap & Add** — Phases 26-29 (shipped 2026-03-30) — [Archive](milestones/v4.0-ROADMAP.md)
-- ✅ **v5.0 Social Feed** — Phases 30-34 (shipped 2026-04-07) — [Archive](milestones/v5.0-ROADMAP.md)
-- **v6.0 Food Data Integration** — Phases 35-38 (in progress)
+- **v4.0 AI Vision — Scan, Snap & Add** — Phases 26-29 (shipped 2026-03-30) — [Archive](milestones/v4.0-ROADMAP.md)
+- **v5.0 Social Feed** — Phases 30-34 (shipped 2026-04-07) — [Archive](milestones/v5.0-ROADMAP.md)
+- **v6.0 Food Data Integration** — Phases 35-38 (shipped 2026-04-09)
+- **v7.0 Stitch UI Redesign** — Phases 39-43 (in progress)
 
 ## Phases
 
@@ -107,80 +108,96 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 </details>
 
-### v6.0 Food Data Integration (In Progress)
+<details>
+<summary>v6.0 Food Data Integration (Phases 35-38) — SHIPPED 2026-04-09</summary>
 
-**Milestone Goal:** Integrate external food databases (USDA, Open Food Facts, FatSecret) to provide comprehensive nutrition data, barcode scanning, and searchable food/ingredient data that powers recipes, meal plans, and AI features.
+- [x] Phase 35: Data Foundation (2/2 plans) — Postgres schema, TypeScript types, unit conversion, and nutrition normalization layer
+- [x] Phase 36: Food Search (2/2 plans) — Edge Functions for USDA/FatSecret search, client store, and searchable food interface
+- [x] Phase 37: Barcode Scanning (2/2 plans) — Camera barcode scanner, Open Food Facts/FatSecret lookup, and add-to-pantry/grocery flows
+- [x] Phase 38: Recipe Nutrition (2/2 plans) — AI-assisted ingredient matching, per-recipe nutrition computation, and nutrition display
 
-- [x] **Phase 35: Data Foundation** - Postgres schema, TypeScript types, unit conversion, and nutrition normalization layer (completed 2026-04-09)
-- [x] **Phase 36: Food Search** - Edge Functions for USDA/FatSecret search, client store, and searchable food interface (completed 2026-04-09)
-- [x] **Phase 37: Barcode Scanning** - Camera barcode scanner, Open Food Facts/FatSecret lookup, and add-to-pantry/grocery flows (completed 2026-04-09)
-- [x] **Phase 38: Recipe Nutrition** - AI-assisted ingredient matching, per-recipe nutrition computation, and nutrition display on recipes and meal plans (completed 2026-04-09)
+</details>
+
+### v7.0 Stitch UI Redesign (In Progress)
+
+**Milestone Goal:** Implement 14 Google Stitch UI designs across all major app surfaces — preserving all existing functionality while elevating the visual design to match the Stitch reference screens, constrained by the existing SharedKitchen design system (colors, typography, spacing, tab bar, FAB).
+
+- [ ] **Phase 39: Shared Components & Dependencies** - Reusable UI primitives (DonutChart, ProgressBar, InsightCard, FilterChips, DateStrip) and new dependency installation that unblock all subsequent phases
+- [ ] **Phase 40: Independent Screen Redesigns** - Onboarding (6 screens), Recipe Library, Cooking Mode, and Premium Upgrade — screens requiring no store changes
+- [ ] **Phase 41: Plan Tab Redesign** - Flagship day-focused meal planner with hero card, date strip, day/week toggle, and grocery shortcut
+- [ ] **Phase 42: Grocery List Redesign** - High-risk grocery screen with shopping progress, sync-with-plan, and enhanced item rows while preserving 4 real-time hooks
+- [ ] **Phase 43: Budget, Profile & Social Feed** - Store-enhanced screens (budget insights, cooking stats) plus social feed redesign and cross-app Maestro test updates
 
 ## Phase Details
 
-### Phase 35: Data Foundation
-**Goal**: App has a canonical food data layer with numeric nutrition storage, unit conversion, and caching infrastructure ready for external API integration
-**Depends on**: Phase 34 (v5.0 complete)
-**Requirements**: DATA-01, DATA-02, DATA-03
+### Phase 39: Shared Components & Dependencies
+**Goal**: All reusable UI primitives needed by subsequent phases are built, tested, and importable — plus new npm dependencies are installed and verified
+**Depends on**: Phase 38 (v6.0 complete)
+**Requirements**: COMP-01, COMP-02, COMP-03, COMP-04, COMP-05, COMP-06
 **Success Criteria** (what must be TRUE):
-  1. Nutrition data is stored as canonical numeric values (calories, protein, carbs, fat, fiber, sodium) per serving and per 100g in Postgres
-  2. App can convert between common cooking units (cups, tbsp, oz, ml, g) using food-specific density tables
-  3. Food data cache table exists with full-text search (tsvector + GIN index) and 30-day TTL cleanup
-  4. TypeScript types (FoodItem, NutritionData) are defined and shared between client and Edge Functions
-**Plans**: 2 plans
-Plans:
-- [x] 35-01-PLAN.md — Database migration (food_items + food_search_cache tables with indexes and RLS)
-- [x] 35-02-PLAN.md — Nutrition utilities (density tables, computation functions) + database.ts types
-
-### Phase 36: Food Search
-**Goal**: Users can search for any food by name and see nutrition information from a unified database
-**Depends on**: Phase 35
-**Requirements**: SRCH-01, SRCH-02, SRCH-03
-**Success Criteria** (what must be TRUE):
-  1. User can open a food search interface and type a food name to get results from USDA and FatSecret combined
-  2. Each search result displays the food name, brand (if applicable), and key macros (calories, protein, carbs, fat)
-  3. User can tap a search result to see a detailed nutrition breakdown with all tracked nutrients
-  4. Search results are cached in Postgres so repeated queries do not hit external APIs
-**Plans**: 2 plans
-Plans:
-- [x] 36-01-PLAN.md — food-search Edge Function (USDA + FatSecret with cache-first lookup, normalization, rate limiting)
-- [x] 36-02-PLAN.md — Client store, API wrapper, and FoodSearchSheet UI (search, macro pills, inline nutrition detail)
+  1. DonutChart component renders an animated SVG ring with configurable value, max, and label — verified in Budget and Profile contexts
+  2. ProgressBar component renders an animated horizontal fill bar with value/max — verified in Grocery and Budget contexts
+  3. InsightCard component displays an icon, message text, and optional badge — verified standalone
+  4. FilterChips component renders a horizontally scrollable row of selectable pills with single-select behavior
+  5. DateStrip component renders a scrollable horizontal day selector with today highlight and tap-to-select
+**Plans**: TBD
 **UI hint**: yes
 
-### Phase 37: Barcode Scanning
-**Goal**: Users can scan any packaged food barcode to instantly look up the product and add it to their pantry or grocery list
-**Depends on**: Phase 36
-**Requirements**: SCAN-01, SCAN-02, SCAN-03, SCAN-04
+### Phase 40: Independent Screen Redesigns
+**Goal**: Users experience the redesigned Onboarding, Recipe Library, Cooking Mode, and Premium Upgrade screens — all screens that need no store changes and can be built entirely from existing data
+**Depends on**: Phase 39
+**Requirements**: ONBR-01, ONBR-02, ONBR-03, ONBR-04, ONBR-05, ONBR-06, RCPE-01, RCPE-02, RCPE-03, RCPE-04, COOK-01, COOK-02, COOK-03, COOK-04, COOK-05, COOK-06, PREM-01, PREM-02, PREM-03, PREM-04
 **Success Criteria** (what must be TRUE):
-  1. User can point the device camera at a product barcode and the app reads it automatically
-  2. Scanned barcode resolves to a product with name and nutrition data via Open Food Facts or FatSecret fallback
-  3. User can add a scanned product directly to their pantry/fridge inventory with nutrition data attached
-  4. User can add a scanned product to their grocery list with product details preserved
-  5. When a barcode is not found, the app gracefully falls back to name-based food search
-**Plans**: 2 plans
-Plans:
-- [x] 37-01-PLAN.md — food-barcode Edge Function (OFF + FatSecret lookup), client API, foodStore barcode state, BarcodeScannerScreen
-- [x] 37-02-PLAN.md — BarcodeResultCard with add-to-pantry/grocery, Kitchen tab scanner integration
+  1. New user completing onboarding passes through all 6 redesigned screens (Welcome, Create Kitchen, Invite, Add Recipes, Plan Week, All Set) with progress indicators and functional CTAs
+  2. Recipe library displays full-width cards with description, cook time pill, difficulty badge, and rating — with horizontal filter chips (All, Quick Meals, Favorites) replacing the old FilterBar dropdown
+  3. Cooking mode shows step photos, step type badges (PREP/COOKING/MARINATING), chef tip callouts, ingredient chips, and Previous/Next navigation buttons
+  4. Premium upgrade screen displays hero photo, feature comparison table (Free vs Premium), and monthly/yearly pricing tiers with BEST VALUE badge
+  5. All existing Maestro E2E flows touching these screens pass with updated testID references
+**Plans**: TBD
 **UI hint**: yes
 
-### Phase 38: Recipe Nutrition
-**Goal**: Users see accurate nutrition information on every recipe and across their weekly meal plan, powered by AI-assisted ingredient matching
-**Depends on**: Phase 37
-**Requirements**: NUTR-01, NUTR-02, NUTR-03, NUTR-04
+### Phase 41: Plan Tab Redesign
+**Goal**: Users experience a day-focused meal planner as the app's flagship screen — with hero dinner card, horizontal date navigation, and day/week toggle
+**Depends on**: Phase 39
+**Requirements**: PLAN-01, PLAN-02, PLAN-03, PLAN-04, PLAN-05, PLAN-06, PLAN-07
 **Success Criteria** (what must be TRUE):
-  1. App matches recipe ingredient text to food database entries using AI-assisted matching with user confirmation for low-confidence matches
-  2. Per-recipe nutrition totals (calories, protein, carbs, fat per serving) are computed from matched ingredient data and cached on the recipe
-  3. Recipe detail screen displays a nutrition card showing calories, protein, carbs, and fat per serving
-  4. Plan tab shows aggregated daily and weekly nutrition totals for all planned meals
-**Plans**: 2 plans
-Plans:
-- [x] 38-01-PLAN.md — match-ingredients Edge Function (Gemini AI matching), migration, recipeStore.computeNutrition
-- [x] 38-02-PLAN.md — NutritionCard component on recipe detail, daily nutrition totals on Plan tab
+  1. User sees Day/Week toggle in the plan header and can switch between views, defaulting to Day view
+  2. In Day view, user can swipe or tap the date strip to navigate days, with today's dinner displayed as a hero card showing recipe photo, description, presence indicator, and "Start Cooking" CTA
+  3. Empty meal slots show soft illustrated placeholders with contextual prompts ("What's for breakfast?", "Lunch time?")
+  4. User can toggle to Week view showing all 7 days with breakfast/lunch/dinner slots, with prev/next navigation working in both views
+  5. Grocery shortcut card appears at screen bottom showing current week item count and linking to Kitchen tab
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 42: Grocery List Redesign
+**Goal**: Users experience a redesigned grocery list with shopping progress tracking, plan sync, and enhanced item details — without any regression in real-time sync, presence, or camera flows
+**Depends on**: Phase 39
+**Requirements**: GROC-01, GROC-02, GROC-03, GROC-04, GROC-05
+**Success Criteria** (what must be TRUE):
+  1. Summary card at list top shows item count, estimated cost, and live presence avatars of other household members shopping
+  2. Shopping progress bar displays "X of Y items checked" with animated fill that updates in real time as items are checked
+  3. User can tap "Sync with Plan" to regenerate the grocery list from the current meal plan
+  4. Item rows display quantity, estimated price, and source/category tags
+  5. Segment control shows Shopping List (left) / On Hand (right) — and real-time sync, presence avatars, barcode scanning, and photo scanning all work without regression
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 43: Budget, Profile & Social Feed
+**Goal**: Users experience redesigned Budget dashboard with insights, Profile with cooking stats, and Social Feed with hero photos — the final screens completing the Stitch UI redesign
+**Depends on**: Phase 39, Phase 41
+**Requirements**: BUDG-01, BUDG-02, BUDG-03, BUDG-04, BUDG-05, PROF-01, PROF-02, PROF-03, PROF-04, PROF-05, FEED-01, FEED-02, FEED-03, FEED-04, FEED-05
+**Success Criteria** (what must be TRUE):
+  1. Budget dashboard shows donut ring hero (spent vs budget), month picker navigation, budget insights cards with contextual messages, category progress bars, and weekly mini bar charts
+  2. Profile screen shows cooking insights (streak counter, plan completion ring), most-cooked recipe with photo, household distribution chart, and grouped settings navigation rows for Preferences and Account sections
+  3. Social feed displays a horizontal following avatar strip at top, hero-sized meal photos with overlay text, "Try this recipe" CTA buttons, quoted descriptions, and "View Full Recipe" actions
+  4. All existing functionality (expense logging, settings changes, feed likes/comments/save) works without regression on redesigned screens
+  5. Maestro E2E flows for budget, profile, and social feed screens pass with updated testID references
+**Plans**: TBD
 **UI hint**: yes
 
 ## Progress
 
-**Execution Order:** Phases execute in numeric order: 35 -> 36 -> 37 -> 38
+**Execution Order:** Phases execute in numeric order: 39 -> 40 -> 41 -> 42 -> 43 (Phases 41 and 42 can run in parallel after 39)
 
 | Phase | Milestone | Plans | Status | Completed |
 |-------|-----------|-------|--------|-----------|
@@ -218,10 +235,15 @@ Plans:
 | 32. Feed & Auto-Post | v5.0 | 2/2 | Complete | 2026-04-07 |
 | 33. Social Interactions & Moderation | v5.0 | 3/3 | Complete | 2026-04-07 |
 | 34. Social Push Notifications | v5.0 | 2/2 | Complete | 2026-04-07 |
-| 35. Data Foundation | v6.0 | 2/2 | Complete    | 2026-04-09 |
-| 36. Food Search | v6.0 | 2/2 | Complete    | 2026-04-09 |
-| 37. Barcode Scanning | v6.0 | 2/2 | Complete    | 2026-04-09 |
-| 38. Recipe Nutrition | v6.0 | 2/2 | Complete    | 2026-04-09 |
+| 35. Data Foundation | v6.0 | 2/2 | Complete | 2026-04-09 |
+| 36. Food Search | v6.0 | 2/2 | Complete | 2026-04-09 |
+| 37. Barcode Scanning | v6.0 | 2/2 | Complete | 2026-04-09 |
+| 38. Recipe Nutrition | v6.0 | 2/2 | Complete | 2026-04-09 |
+| 39. Shared Components & Dependencies | v7.0 | 0/0 | Not started | - |
+| 40. Independent Screen Redesigns | v7.0 | 0/0 | Not started | - |
+| 41. Plan Tab Redesign | v7.0 | 0/0 | Not started | - |
+| 42. Grocery List Redesign | v7.0 | 0/0 | Not started | - |
+| 43. Budget, Profile & Social Feed | v7.0 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-04-09 after Phase 38 planning complete*
+*Last updated: 2026-04-07 after v7.0 roadmap creation*
