@@ -1,287 +1,272 @@
-# Domain Pitfalls: Food Data Integration
+# Domain Pitfalls: Stitch UI Redesign
 
-**Domain:** Adding external food database APIs (USDA, Open Food Facts, FatSecret) and barcode scanning to an existing meal planning app
+**Domain:** Comprehensive UI redesign of existing React Native + Expo app (14 screens)
+**Project:** SharedKitchen v7.0
 **Researched:** 2026-04-07
-**Confidence:** HIGH (verified against official API docs and community reports)
+**Confidence:** HIGH (verified against codebase analysis, React Native docs, and community reports)
 
 ---
 
 ## Critical Pitfalls
 
-Mistakes that cause data corruption, rewrites, or major regressions in existing functionality.
+Mistakes that cause regressions, rewrites, or ship-blocking issues.
 
-### Pitfall 1: NutritionInfo Type Mismatch With Existing Schema
+### Pitfall 1: Real-Time Subscription Teardown During Component Restructuring
 
-**What goes wrong:** SharedKitchen already stores nutrition data as a `NutritionInfo` JSONB column on `recipes` with string values (`calories?: string`, `protein?: string`, etc.) extracted from JSON-LD/schema.org. USDA, Open Food Facts, and FatSecret all return nutrition as **numeric values per 100g or per serving** with explicit units. Developers bolt the new API data directly onto the existing `NutritionInfo` interface, creating a system where some recipes have `"calories": "350 kcal"` (string from web scraping) and others have `"calories": 350` (number from USDA). Every downstream consumer (UI display, AI meal suggestions, daily totals) must handle both formats, leading to NaN errors, wrong totals, and silent data corruption.
+**What goes wrong:** Redesigning screen components (especially grocery.tsx at 684 LOC and plan.tsx at 408 LOC) often means extracting, splitting, or replacing components that host Supabase Realtime subscriptions and Presence channels. If the component tree changes, `useEffect` cleanup runs, tearing down subscriptions. The new component tree may not re-subscribe correctly, or subscriptions may briefly lapse -- causing missed real-time updates, ghost presence avatars, or stale grocery list state.
 
-**Why it happens:** The existing `NutritionInfo` interface in `src/types/database.ts` uses `string` types because schema.org nutrition values include units in the string (e.g., "350 calories", "25g protein"). USDA/OFF/FatSecret return structured numeric data with separate unit fields.
+**Why it happens:** SharedKitchen has real-time sync hooks (`useGrocerySync`, `usePantrySync`, `usePresence`, `useActivityToast`) wired into tab screens. Redesigning these screens means the hooks' lifecycle changes. Developers focus on visual output and forget that these hooks silently manage WebSocket connections.
 
-**Consequences:** Calorie totals show NaN. AI meal generator receives garbage nutrition context. Users see inconsistent formatting across recipes.
+**Consequences:** Grocery items checked off by a household member stop syncing. Presence avatars disappear or show stale users. Activity toasts stop firing. All of these are invisible during solo testing -- they only manifest when two users are active simultaneously.
 
 **Prevention:**
-- Define a new canonical `NutritionData` interface with numeric fields, explicit units, and source attribution: `{ calories_kcal: number, protein_g: number, fat_g: number, ... source: 'usda' | 'off' | 'fatsecret' | 'scraped', per_serving: boolean }`.
-- Write a migration function that parses existing string-based `NutritionInfo` into the new numeric format (extract numbers, normalize units).
-- Add a DB migration to evolve the `nutrition_info` JSONB column or add a parallel `nutrition_data` column, backfill existing data, then deprecate the old format.
-- Phase mapping: **Must be addressed in the first phase** (data layer/schema design) before any API integration.
+- Identify every screen that uses real-time hooks BEFORE redesigning it. The affected screens are: grocery (`useGrocerySync`, `usePantrySync`, `usePresence`, `useActivityToast`), plan (social feed subscriptions), and recipe detail (`usePresence`).
+- Keep real-time hooks at the same component level or higher in the tree -- never push them deeper into a child that conditionally renders.
+- After each screen redesign, run a two-device manual test: open the screen on two devices, perform actions on one, verify the other receives updates.
+- Write a "real-time smoke test" checklist per screen before starting the redesign.
 
-**Detection:** Unit tests that assert nutrition values are always numeric. TypeScript strict typing on the new interface.
+**Detection:** Presence avatars not appearing, grocery items not syncing across devices, activity toasts silent during collaborative use.
+
+**Phase guidance:** Address in the earliest phase -- establish the "hooks stay at tab-screen level" rule before any component extraction begins.
 
 ---
 
-### Pitfall 2: Ingredient Name Mismatch Between Recipe Data and Food Database
+### Pitfall 2: Maestro Test Fragility from Changed Element Hierarchy
 
-**What goes wrong:** Existing recipes store ingredients as `{ amount: number, unit: string, name: string }` with freeform names like "chicken breast, boneless skinless", "2% milk", or "extra virgin olive oil". USDA Foundation Foods uses names like "Chicken, broilers or fryers, breast, skinless, boneless, meat only, raw". Open Food Facts uses product names like "Great Value 2% Reduced Fat Milk". FatSecret uses "Skinless Chicken Breast". Naive string matching (even fuzzy) between recipe ingredient names and food database entries produces wrong matches, leading to wildly inaccurate nutrition calculations (matching "chicken breast" to "chicken broth" or "chicken thigh with skin").
+**What goes wrong:** SharedKitchen has 25+ Maestro E2E flows that rely on `testID` attributes (e.g., `grocery-tab`, `grocery-summary`, `grocery-item-.*`) and visible text patterns. Redesigning screens changes element hierarchy, removes/renames components, and shifts layouts -- silently breaking Maestro selectors. Tests that passed before the redesign start failing with "element not found" errors, but the failures cascade: a broken navigation tap early in a flow causes every subsequent assertion to fail, making it impossible to tell what actually broke.
 
-**Why it happens:** Food databases are designed for precise nutritional reference, not for matching against user-entered recipe ingredients. There is no universal food identifier shared across recipe websites and nutrition databases.
+**Why it happens:** Maestro tests are outside the TypeScript codebase (YAML in `.maestro/`), so there is no compiler warning when a `testID` is removed or a text label changes. Developers restructuring components naturally clean up or rename IDs without checking Maestro flows.
 
-**Consequences:** Recipe nutrition totals are wrong by 50-300%. Users who care about nutrition lose trust. AI features make bad recommendations based on wrong data.
+**Consequences:** E2E test suite becomes red. Teams either (a) ignore the failing tests and lose the safety net, or (b) spend days fixing tests instead of shipping features. Worst case: tests are bulk-deleted "to fix later" and never restored.
 
 **Prevention:**
-- Do NOT attempt real-time ingredient-to-food matching on the client. This is a server-side problem.
-- Build an Edge Function that uses a combination of: (1) USDA search API with the ingredient name, (2) AI-assisted disambiguation using gpt-5-mini to select the best match from top-5 results, (3) a local mapping cache table (`ingredient_food_mappings`) that stores confirmed matches.
-- Accept that automatic matching will have ~70-80% accuracy. Always show users which food database entry was matched and let them correct it.
-- For common ingredients, pre-populate a curated mapping table (top 200 cooking ingredients to their USDA FDC IDs).
-- Phase mapping: **Phase 2-3** (after data layer, as part of nutrition calculation engine).
+- Before redesigning a screen, grep all Maestro YAML files for any `id:` or `text:` selectors that reference that screen's elements. Document them.
+- Preserve all existing `testID` props on new components. Treat `testID` as a contract, not an implementation detail.
+- Update Maestro flows incrementally -- fix flows for each screen immediately after redesigning it, not in a batch at the end.
+- Use `extendedWaitUntil` with generous timeouts (already in use) rather than positional taps, which break when layouts shift.
 
-**Detection:** Log match confidence scores. Alert when a recipe's total calories per serving exceeds 2000 or falls below 50 (likely bad matches).
+**Detection:** Maestro CI pipeline goes red. Individual flow runs show "element not found" for previously stable selectors.
+
+**Phase guidance:** Each phase that redesigns a screen MUST include a task to update the corresponding Maestro flows. Never defer test fixes to a later phase.
 
 ---
 
-### Pitfall 3: Serving Size and Unit Chaos Across Three APIs
+### Pitfall 3: Bottom Sheet State Conflicts with New UI Interactions
 
-**What goes wrong:** USDA reports nutrients per 100g. Open Food Facts reports per 100g AND per serving (but serving sizes vary wildly and are often missing). FatSecret reports per serving with serving descriptions like "1 cup" or "1 medium". Recipe ingredients use "2 tablespoons", "1/4 cup", "3 cloves". The app must convert between all these unit systems to calculate per-recipe and per-serving nutrition. Developers skip building a proper unit conversion layer and hardcode conversions, leading to off-by-10x errors (confusing grams with ounces, or per-100g with per-serving).
+**What goes wrong:** SharedKitchen uses bottom sheets extensively (PlanEditSheet, AddItemSheet, EditCategoriesSheet, AddPantryItemSheet, CameraSheet, FoodSearchSheet, CommentSheet, AddActionSheet). Redesigning a screen often introduces new interactive overlays (expanded sections, view toggles, filter chips) that compete with bottom sheet open/close state. The result: tapping a new UI element opens a sheet AND triggers a state change, or closing a sheet resets new UI state, or gesture conflicts between bottom sheet drag and new horizontal swipe gestures.
 
-**Why it happens:** This is a documented issue in the FatSecret developer community -- recipe units and food database units frequently don't match. The USDA API returns "portion" descriptions that don't always parse cleanly. Open Food Facts serving sizes are user-contributed and inconsistent.
+**Why it happens:** Bottom sheets in React Native consume gestures (pan, swipe). New UI elements like horizontal date strips, swipeable cards, or collapsible sections also consume gestures. Without explicit gesture arbitration, both respond to the same touch, causing visual glitches or navigation to unintended states.
 
-**Consequences:** A recipe shows 5,000 calories per serving because an ingredient was matched per-100g but the recipe uses 1 tablespoon. Users immediately lose trust in the nutrition feature.
+**Consequences:** User swipes horizontally on date strip but bottom sheet intercepts the gesture and opens/closes. Tapping a filter chip triggers the underlying list item. The app feels broken and unresponsive even though the visual redesign looks correct.
 
 **Prevention:**
-- Build a dedicated unit conversion module that handles: weight (g, kg, oz, lb), volume (ml, L, tsp, tbsp, cup, fl oz), and count (each, clove, slice, medium, large).
-- Always normalize to grams internally. Convert ingredient amounts to grams using density tables for common foods (1 cup flour = 120g, 1 cup sugar = 200g, 1 tbsp olive oil = 13.5g).
-- Store the conversion factor alongside the match: `{ fdc_id: 12345, amount_grams: 13.5, original_amount: 1, original_unit: 'tbsp' }`.
-- The app already has metric/imperial toggle (v2.0). This conversion layer must integrate with it, not duplicate it.
-- Phase mapping: **Phase 1** (core data layer, must exist before any nutrition calculations).
+- Map all existing bottom sheets per screen before redesigning. The grocery screen alone has 7+ sheets/overlays.
+- Test every gesture interaction between new UI elements and existing bottom sheets.
+- Use `simultaneousHandlers` and `waitFor` from react-native-gesture-handler to explicitly define gesture priority.
+- Do not add new bottom sheets without removing or consolidating existing ones -- screen-level sheet count should not increase.
 
-**Detection:** Sanity bounds on all nutrition calculations: per-ingredient calorie check (flag if > 900 kcal per ingredient line), per-recipe check (flag if total < 100 or > 5000 kcal for a 4-serving recipe).
+**Detection:** Gesture conflicts during manual testing. Bottom sheets opening when they should not. UI state resetting unexpectedly when sheets close.
+
+**Phase guidance:** Define gesture interaction rules in the first phase. Document which gestures each screen's bottom sheets consume.
 
 ---
 
-### Pitfall 4: USDA API Rate Limit Causing Cascading Failures
+### Pitfall 4: Nested ScrollView / FlatList Virtualization Breakage
 
-**What goes wrong:** USDA FoodData Central limits to 1,000 requests per hour per API key. When a user opens a recipe with 15 ingredients and the app fires 15 parallel food search requests, that is 15 of the 1,000 hourly budget. A household of 4 users browsing 10 recipes in an hour could burn through 600 requests. Add barcode lookups, pantry additions, and search-as-you-type, and the rate limit is exceeded within the first day of launch. Once exceeded, the API key is blocked for 1 hour, killing nutrition features for ALL users.
+**What goes wrong:** Stitch designs commonly produce layouts with a scrollable header area (date strip, filter chips, progress bar) above a scrollable list (meal cards, recipe grid, grocery items). Implementing this naively puts a FlatList inside a ScrollView, which disables FlatList's virtualization. All items render at once, causing memory spikes and janky scrolling -- especially on the grocery screen (potentially hundreds of items) and recipe library (large grid).
 
-**Why it happens:** The USDA API key is shared across all Edge Function invocations. Unlike per-user rate limits (which SharedKitchen already implements for AI features), USDA limits are per-key globally.
+**Why it happens:** Design tools output full-page layouts where everything scrolls together. In web CSS, this is trivial (the whole page scrolls). In React Native, ScrollView and FlatList are fundamentally different scroll containers that cannot be trivially nested.
 
-**Consequences:** All nutrition lookups fail for all users for 1 hour. No graceful degradation -- features just break.
+**Consequences:** On recipe library: all recipe cards render at once instead of being virtualized, causing 2-3 second mount delays with 50+ recipes. On grocery: checking items causes the entire list to re-render because virtualization is broken. Memory usage climbs, especially with recipe card images.
 
 **Prevention:**
-- **Cache aggressively in Postgres.** Create a `food_data_cache` table that stores USDA responses keyed by FDC ID. Most foods don't change. Set a 30-day TTL for cache entries.
-- **Never call USDA for the same food twice.** Before any API call, check the cache.
-- **Batch searches.** USDA's `/foods` endpoint accepts multiple FDC IDs in one call (up to 20). When calculating recipe nutrition, batch all ingredient lookups into 1-2 API calls instead of 15.
-- **Implement a server-side request queue** in the Edge Function with rate tracking. If approaching the limit, serve from cache only and defer new lookups.
-- **Register multiple API keys** for different functions (search vs. lookup vs. barcode) to multiply the effective limit.
-- Consider downloading the USDA Foundation Foods dataset (~300MB CSV) and importing it into Postgres for zero-API-call lookups on common foods.
-- Phase mapping: **Phase 1** (caching infrastructure must exist before any API calls go live).
+- NEVER nest a FlatList inside a ScrollView. Use FlatList's `ListHeaderComponent` for sticky headers, date strips, filter chips, and progress bars.
+- For the recipe grid (2-column layout), use FlatList with `numColumns={2}` and `ListHeaderComponent` for filters -- not a ScrollView wrapping a FlatList.
+- For grocery with section headers, use SectionList (already partially in use via `groupedItems`).
+- Set `removeClippedSubviews={true}` and tune `windowSize` (default 21 is often too large; try 5-7).
+- Memoize `renderItem` with `React.memo` and use `keyExtractor` with stable IDs.
 
-**Detection:** Monitor API call counts per hour in Edge Function logs. Alert at 750/1000.
+**Detection:** Scroll jank visible at 30fps. Yellow box warning: "VirtualizedLists should never be nested inside plain ScrollViews." Memory usage climbing in Xcode Instruments when scrolling lists.
+
+**Phase guidance:** Establish the "FlatList + ListHeaderComponent" pattern in the first screen redesigned, then replicate across all list screens.
 
 ---
 
-## Technical Debt Patterns
+## Moderate Pitfalls
 
-Issues that work initially but become expensive to fix as the feature matures.
+### Pitfall 5: Zustand Store Bloat from UI-Only State
 
-### Debt 1: Storing Raw API Responses Instead of Normalized Data
+**What goes wrong:** When adding new UI state for the redesign (view toggles like day/week, expanded sections, animation progress, selected filter chips, scroll positions), developers add these to existing Zustand stores alongside business data. This causes unnecessary re-renders: toggling a view mode in `planStore` triggers re-renders in every component that subscribes to ANY `planStore` state, including components that only need meal plan data.
 
-**What goes wrong:** Developers store the raw JSON from USDA, OFF, and FatSecret in a single JSONB column. Each API has a completely different schema (USDA uses `foodNutrients[].nutrient.nutrientId`, OFF uses `nutriments.energy-kcal_100g`, FatSecret uses `calories`). Every UI component and calculation function must handle all three formats.
+**Prevention:**
+- Keep UI-only state as local `useState` in the screen component or in a dedicated `useScreenUIState` hook -- NOT in Zustand stores.
+- The existing stores (planStore, groceryStore, budgetStore, etc.) should remain purely for server-synced business data.
+- Use Zustand selectors (`useStore(store, selector)`) to subscribe to specific slices, not the whole store.
+- Rule of thumb: if the state resets when you navigate away from the screen, it is local state, not store state.
 
-**Prevention:** Normalize all external data into a single canonical schema at ingestion time. Store the raw response separately (or not at all) for debugging. The canonical `foods` table should have consistent columns regardless of source.
+**Detection:** Component profiler showing unnecessary re-renders when UI toggles change. Store files growing with `isExpanded`, `activeView`, `selectedChip` properties.
 
-### Debt 2: No Source Attribution on Nutrition Data
-
-**What goes wrong:** Nutrition values are stored without recording where they came from. Six months later, when USDA updates their database or a user reports wrong data, there is no way to know which values came from USDA vs. Open Food Facts vs. web scraping vs. user edits.
-
-**Prevention:** Every nutrition record must include: `source` (usda/off/fatsecret/scraped/user), `source_id` (FDC ID, OFF barcode, FatSecret food_id), `fetched_at` timestamp, and `confidence` (high/medium/low).
-
-### Debt 3: Pantry Items Without Food Database Links
-
-**What goes wrong:** The existing `pantry_items` table has freeform `name`, `quantity`, and `unit` fields with no foreign key to any food database. Barcode scanning creates new pantry items linked to food database entries, but existing pantry items (from grocery list auto-copy and AI fridge scanning) remain unlinked. The app ends up with two classes of pantry items: "smart" ones with nutrition data and "dumb" ones without, creating an inconsistent user experience.
-
-**Prevention:** Add an optional `food_id` (nullable FK) and `food_source` column to `pantry_items`. When displaying nutrition, gracefully handle items without links (show "nutrition not available" rather than hiding the section). Build a background process or user flow to link existing pantry items to food database entries over time.
+**Phase guidance:** Establish the "local UI state vs store state" boundary in the first phase. Code review should enforce this throughout.
 
 ---
 
-## Integration Gotchas
+### Pitfall 6: Design-to-Code Visual Gaps
 
-Specific to combining USDA + Open Food Facts + FatSecret.
-
-### Gotcha 1: Same Food, Three Different Calorie Counts
-
-**What goes wrong:** "Whole milk" in USDA Foundation Foods: 61 kcal/100g. In Open Food Facts (specific brand): 65 kcal/100g. In FatSecret: 60 kcal/100g. When the app shows nutrition for a recipe ingredient, which value wins? If different recipes use different sources, the daily total becomes meaningless.
-
-**Prevention:** Establish a clear source priority hierarchy and document it:
-1. **User override** (highest) -- if the user manually edited nutrition, preserve it.
-2. **Barcode match** (Open Food Facts or FatSecret) -- if the user scanned a specific product, use that product's data.
-3. **USDA Foundation Foods** -- gold standard for generic/unbranded ingredients.
-4. **USDA Branded Foods** -- for branded items not found via barcode.
-5. **FatSecret** -- fallback for items not in USDA.
-6. **Web-scraped** (lowest) -- existing `NutritionInfo` from recipe import.
-
-Always show the source to the user: "Nutrition from USDA" or "Nutrition from Kroger Whole Milk (scanned)".
-
-### Gotcha 2: Open Food Facts Data Quality is Highly Variable
-
-**What goes wrong:** Open Food Facts is crowd-sourced. Many products have incomplete nutrition (only calories, missing protein/fat/carbs). Some have clearly wrong data (e.g., 5000 calories per serving for a candy bar -- the contributor entered kJ instead of kcal). Some barcodes resolve to products from the wrong country.
+**What goes wrong:** Stitch generates designs that use visual effects which are expensive or inconsistent in React Native:
+- **Complex shadows:** Android's `elevation` property cannot match iOS's `shadowColor/shadowOffset/shadowBlur/shadowRadius` fidelity. Even on iOS-only, applying shadows to every card in a FlatList is expensive because each shadow is a separate bitmap render. Also: `shadowRadius` in React Native is half the "blur" value from design tools like Figma/Stitch (a documented discrepancy).
+- **Blur effects:** `expo-blur` works on iOS but has performance costs. Backdrop blur behind bottom sheets or overlay cards causes frame drops during animations.
+- **Gradient overlays:** Linear gradients on images (for text readability over hero photos) require `expo-linear-gradient` and add rendering overhead per card in a list.
+- **SVG-heavy charts:** Donut rings, progress bars, and circular charts from Stitch may use complex SVG paths that are expensive to animate.
 
 **Prevention:**
-- Validate OFF responses: check that calories, protein, fat, and carbs are all present and non-null. If any core field is missing, mark the entry as "partial" and fall back to USDA search.
-- Sanity-check values: calories per 100g should be between 0 and 900. Protein + fat + carbs should roughly account for the calorie total (protein*4 + fat*9 + carbs*4 within 20% of calories).
-- Use the `completeness` or `nutrition_grade_fr` (Nutri-Score) fields from OFF to gauge data quality.
-- Always display a "Report incorrect data" option for crowd-sourced entries.
+- Audit each Stitch design for these effects BEFORE implementation. Flag any design that uses: blur, gradient overlays on list items, colored/inset shadows, or complex SVG animations.
+- For shadows on list items: use a single shadow style with `shadowOpacity: 0.08` -- subtle enough to look good, cheap enough to render per item. The existing `shadows` theme module should define the approved shadow styles.
+- For the budget donut ring: use `react-native-svg` with Reanimated's `createAnimatedComponent` (proven pattern). Do NOT add a heavy charting library for a single donut.
+- For gradient overlays on feed photos: apply the gradient at image load time (server-side or cached), not as a runtime overlay per card.
+- Prefer `backgroundColor` tonal layering (the existing "Tactile Sophistication" approach) over blur effects.
+- Remember: `shadowRadius` in RN = blur / 2 from Stitch/Figma designs.
 
-### Gotcha 3: FatSecret OAuth 2.0 Complexity
+**Detection:** Frame rate dropping below 50fps on screens with many cards. Visible shadow rendering lag when scrolling.
 
-**What goes wrong:** FatSecret uses OAuth 2.0 for its API (client credentials flow for server-to-server). Developers familiar with simple API key auth (like USDA) forget that FatSecret tokens expire and must be refreshed. The Edge Function gets a 401, doesn't handle token refresh, and all FatSecret lookups fail silently.
-
-**Prevention:**
-- Implement token caching with TTL in the Edge Function. FatSecret access tokens are valid for a limited time.
-- Build a helper function that checks token expiry before each request and refreshes if needed.
-- Handle 401 responses by refreshing the token and retrying once before failing.
-
-### Gotcha 4: Barcode Formats and Regional Differences
-
-**What goes wrong:** UPC-A (US, 12 digits), EAN-13 (international, 13 digits), and UPC-E (compressed, 8 digits) all exist. A US product might have a UPC-A barcode but be stored in Open Food Facts as EAN-13 (with a leading zero). The scanner returns "012345678901" but OFF expects "0012345678901". Lookup fails, user thinks the feature is broken.
-
-**Prevention:**
-- Normalize all barcodes to EAN-13 format (13 digits, zero-padded on the left) before any API lookup.
-- Try both the raw scanned code and the normalized version.
-- Open Food Facts also supports searching by the barcode without leading zeros via their API.
-- Implement fallback: if OFF returns no result, try FatSecret barcode search, then USDA branded foods search.
-
-### Gotcha 5: expo-barcode-scanner is Deprecated
-
-**What goes wrong:** Developers add `expo-barcode-scanner` (the standalone package) which was deprecated in Expo SDK 51. It may still install but will have bugs and eventually be removed entirely.
-
-**Prevention:** Use `expo-camera` (CameraView component) with `onBarcodeScanned` callback. This is the officially supported approach as of Expo SDK 52+. SharedKitchen already uses `expo-camera` for the food photo features (v4.0), so barcode scanning should reuse the same camera infrastructure.
+**Phase guidance:** Create a "visual effects budget" in the first phase: which effects are allowed per screen, and which are too expensive.
 
 ---
 
-## Performance Traps
+### Pitfall 7: Camera and Vision Flow Regression on Grocery Screen
 
-### Trap 1: Calculating Nutrition on Every Recipe View
+**What goes wrong:** The grocery screen (684 LOC) has extensive camera integration: `CameraSheet`, `CameraPermissionPrompt`, `CameraPermissionCard`, `VisionLoadingOverlay`, `ScanReviewScreen`, `ListExtractReviewScreen`, `BarcodeScannerScreen`, `BarcodeResultCard`. Redesigning the grocery screen's layout can break the state machine that manages the camera flow: permission prompt -> camera sheet -> vision analysis -> scan review -> add to pantry/grocery.
 
-**What goes wrong:** When a user opens a recipe detail, the app loops through all ingredients, looks up each in the food database, converts units, and calculates totals. This adds 2-5 seconds to every recipe view (even for previously viewed recipes) and makes the recipe detail screen feel sluggish compared to its current instant-load behavior.
-
-**Prevention:**
-- Calculate and cache recipe nutrition at write time (when recipe is created/edited or when ingredient-food mappings are confirmed). Store the computed totals on the recipe row itself.
-- Only recalculate when ingredients change or when the user explicitly requests a nutrition refresh.
-- Show cached nutrition immediately; if stale, refresh in background.
-
-### Trap 2: Search-as-You-Type Against External APIs
-
-**What goes wrong:** The food search feature fires an API request on every keystroke. User types "chick" -- 5 requests in 2 seconds. This burns through rate limits and creates a laggy experience.
+**Why it happens:** The camera flow is a multi-step state machine managed by many `useState` booleans (`cameraSheetOpen`, `barcodeScannerOpen`, `foodSearchOpen`, etc.) in the grocery screen. Restructuring the JSX tree or extracting components can disconnect these state variables from their corresponding conditional renders.
 
 **Prevention:**
-- Debounce search input (300-500ms minimum).
-- Use local Postgres full-text search against the cached food data as the primary search. Only hit external APIs when local search returns < 3 results.
-- Pre-populate the local food cache with USDA Foundation Foods (~7,000 common foods) so most searches never need an external API call.
+- Extract the camera flow state machine into a custom hook (e.g., `useCameraFlow`) BEFORE redesigning the grocery screen. This decouples the flow logic from the visual layout.
+- Test every camera flow path after redesigning: scan photo -> review -> add items, barcode scan -> result -> add, food search -> select -> add.
+- Do not change the camera permission flow -- it is required by Apple App Store guidelines.
 
-### Trap 3: Barcode Scanner Re-Renders Killing Performance
+**Detection:** Camera sheet not opening, scan results not appearing, barcode scanner overlay misaligned after layout changes.
 
-**What goes wrong:** The barcode scanner fires `onBarcodeScanned` continuously (every frame where a barcode is detected). Without throttling, this triggers dozens of API lookups and re-renders per second, freezing the UI.
-
-**Prevention:**
-- Set a flag after the first successful scan and ignore subsequent callbacks until the user explicitly triggers a new scan.
-- Use `barcodeScannerSettings={{ isHighlightingEnabled: false }}` and process only the first detected barcode per scan session.
-- Show a loading/result overlay immediately after first detection.
+**Phase guidance:** The grocery screen redesign should be in a dedicated phase (not combined with other screens) due to its complexity. Extract camera flow hook first.
 
 ---
 
-## UX Pitfalls
+### Pitfall 8: Incremental Redesign Creates Temporary Visual Inconsistency
 
-### UX 1: Nutrition Display Overwhelming the Recipe Experience
-
-**What goes wrong:** The recipe detail screen is currently clean and cooking-focused. Adding a full nutrition facts panel (calories, 13 vitamins, 8 minerals from USDA) buries the cooking instructions and makes the screen feel like a medical document instead of a recipe card.
+**What goes wrong:** Redesigning 14 screens incrementally (recommended over big-bang) means the app temporarily has two visual languages: old screens with the current Culinary Curator design and new screens with the Stitch-inspired design. Users navigating between tabs see jarring visual jumps. Shared components (headers, bottom sheets, FAB, tab bar) must work with BOTH old and new screens during the transition.
 
 **Prevention:**
-- Show only the "big 4" by default: calories, protein, fat, carbs (per serving).
-- Offer expandable "Full nutrition" section for users who want detail.
-- Match the existing Culinary Curator design language -- warm, inviting, not clinical.
-- Keep nutrition secondary to the cooking experience.
+- Redesign shared/global components first (or confirm they don't need changes). The design constraints say tab bar, FAB, and branding stay as-is, which eliminates the biggest source of inconsistency.
+- Group screen redesigns by user flow, not by screen: redesign Plan + Cooking Mode together (they are linked), Recipe Library + Recipe Detail together, Grocery + Pantry together.
+- Use the existing design system tokens (colors, typography, spacing from `src/theme/`) for BOTH old and new screens. The Stitch designs must adapt to these tokens, not the other way around.
+- Accept that temporary inconsistency is the price of reduced risk. A 2-week period of visual inconsistency is far better than a big-bang release that breaks 5 features.
 
-### UX 2: Barcode Scanner With No Result is a Dead End
+**Detection:** User feedback about inconsistent appearance. Side-by-side comparison of adjacent screens showing different card styles, spacing, or typography.
 
-**What goes wrong:** User excitedly scans a product barcode. The product isn't in Open Food Facts or FatSecret. The app shows "Product not found" with no next step. User feels the feature is broken.
-
-**Prevention:**
-- On "not found": offer to (1) search by product name instead, (2) manually enter basic nutrition info, (3) take a photo of the nutrition label for AI extraction using the existing Gemini vision pipeline.
-- Track "not found" barcodes to identify gaps and potentially contribute back to Open Food Facts.
-
-### UX 3: Nutrition Data Conflicts Confuse Users
-
-**What goes wrong:** A recipe imported from a website shows "350 calories" (from schema.org scraping). After food database integration, the calculated nutrition from USDA ingredient data shows "425 calories". The user sees both numbers and doesn't know which to trust.
-
-**Prevention:**
-- When calculated nutrition differs from scraped nutrition by more than 15%, show the calculated value with a note: "Calculated from ingredients (USDA data)".
-- Provide a way to toggle between "Source website nutrition" and "Calculated nutrition".
-- Default to calculated (more accurate) but be transparent about the source.
+**Phase guidance:** Phase 1 should redesign the highest-traffic screens (Plan, Recipes) to cover the most user time. Onboarding can be later since it is only seen once.
 
 ---
 
-## "Looks Done But Isn't" Checklist
+## Minor Pitfalls
 
-Items that pass a demo but fail in production.
+### Pitfall 9: Over-Animating the Redesign
 
-- [ ] **Offline mode**: USDA/OFF/FatSecret all require network. Cached data must work offline. Currently, SharedKitchen works offline for most features. Food data features must not regress this.
-- [ ] **Existing recipe backfill**: The 380K+ USDA foods are available, but existing user recipes need their ingredients mapped to food database entries. This is not automatic -- requires a migration strategy and user-facing "link your ingredients" flow.
-- [ ] **Metric/imperial consistency**: The app has a metric/imperial toggle (v2.0). Nutrition is always in metric (kcal, g). The toggle must NOT convert nutrition units (nobody says "0.88 oz of protein"). But ingredient amounts in the nutrition calculation must respect the user's unit preference.
-- [ ] **Premium gating**: Which food data features are free vs. premium? Barcode scanning? Detailed nutrition? Per-ingredient breakdown? This needs a clear decision before implementation, not after.
-- [ ] **AI feature integration**: The existing AI meal generator and recipe parser should use food database data for better suggestions. This is not "add nutrition display" -- it requires updating AI prompts and context to include structured nutrition constraints.
-- [ ] **Multi-household scope**: Food database cache should be global (not per-household). But recipe nutrition calculations are per-recipe (household-scoped). Pantry food links are per-household. RLS must reflect this.
-- [ ] **Data freshness**: USDA Branded Foods updates monthly. Open Food Facts updates continuously. Cached data needs a TTL and refresh strategy, not just "cache forever".
-- [ ] **Edge Function cold starts**: Adding USDA/OFF/FatSecret API calls to Edge Functions increases cold start time. Multiple sequential API calls (search, then fetch details) in a single function invocation can hit the Supabase Edge Function timeout (default 60s).
+**What goes wrong:** Stitch designs often include entrance animations, micro-interactions, and transitions that look polished in a mockup but cause cumulative frame drops in a real app. Adding `react-native-reanimated` animations to every card, every toggle, and every transition creates a "death by a thousand cuts" performance issue.
+
+**Prevention:**
+- Limit entrance animations to ONE element per screen (e.g., the hero card). Everything else appears instantly.
+- Use Reanimated's `useAnimatedStyle` and run animations on the UI thread -- never use `Animated` from React Native core for new animations.
+- For the budget donut ring animation: animate ONCE on mount, do not re-animate on every data change.
+- Profile with Xcode Instruments after adding any animation. Target 60fps minimum.
+
+**Detection:** Frame rate drops during screen transitions. Animations feeling sluggish on older devices (iPhone 11 and earlier).
 
 ---
 
-## Pitfall-to-Phase Mapping
+### Pitfall 10: Dark Mode Regression
 
-| Phase Topic | Likely Pitfall | Severity | Mitigation |
-|---|---|---|---|
-| Schema & data layer design | NutritionInfo type mismatch (Pitfall 1) | CRITICAL | Design canonical nutrition schema first, migrate existing data |
-| Schema & data layer design | Serving size/unit chaos (Pitfall 3) | CRITICAL | Build unit conversion module with density tables |
-| Schema & data layer design | No source attribution (Debt 2) | HIGH | Include source/confidence in schema from day one |
-| Schema & data layer design | Pantry items without food links (Debt 3) | MEDIUM | Add nullable food_id FK to pantry_items |
-| API integration (USDA) | Rate limit cascade (Pitfall 4) | CRITICAL | Cache-first architecture, batch API calls, consider local dataset import |
-| API integration (USDA) | USDA data type confusion | MEDIUM | Use Foundation Foods for generics, Branded Foods for products |
-| API integration (OFF) | Data quality variance (Gotcha 2) | HIGH | Validate completeness, sanity-check values, fallback chain |
-| API integration (OFF) | Barcode format mismatch (Gotcha 4) | MEDIUM | Normalize to EAN-13, try multiple formats |
-| API integration (FatSecret) | OAuth token management (Gotcha 3) | MEDIUM | Token caching with auto-refresh in Edge Function |
-| API integration (all) | Conflicting nutrition values (Gotcha 1) | HIGH | Establish source priority hierarchy, show source to user |
-| API integration (all) | Raw response storage (Debt 1) | HIGH | Normalize at ingestion, canonical schema |
-| Ingredient matching | Name mismatch (Pitfall 2) | CRITICAL | AI-assisted matching, curated mapping table, user confirmation |
-| Barcode scanning | expo-barcode-scanner deprecated (Gotcha 5) | MEDIUM | Use expo-camera CameraView, reuse existing camera infra |
-| Barcode scanning | Scanner re-renders (Trap 3) | MEDIUM | Throttle to one scan per session |
-| Barcode scanning | No-result dead end (UX 2) | MEDIUM | Fallback to name search, manual entry, or photo OCR |
-| Nutrition display | Overwhelming recipe screen (UX 1) | MEDIUM | Big-4 default, expandable detail |
-| Nutrition display | Scraped vs calculated conflict (UX 3) | MEDIUM | Show calculated with source attribution |
-| Performance | Nutrition calc on every view (Trap 1) | HIGH | Calculate at write time, cache on recipe row |
-| Performance | Search-as-you-type rate burn (Trap 2) | HIGH | Debounce + local-first search |
-| Integration testing | Offline regression | HIGH | Ensure cached data works without network |
-| Integration testing | Existing recipe backfill | HIGH | Migration strategy + user-facing linking flow |
+**What goes wrong:** The app already supports dark mode via the theme system. New components added during redesign may hardcode colors (e.g., `backgroundColor: '#FFFFFF'` instead of `colors.surface`) or use Stitch's color values instead of the SharedKitchen theme tokens. Result: new components look wrong in dark mode.
+
+**Prevention:**
+- Every new component MUST use colors from `src/theme/colors.ts`, typography from `src/theme/typography.ts`, and spacing from `src/theme/spacing.ts`.
+- Test every redesigned screen in BOTH light and dark mode before marking it complete.
+- No hardcoded color values in any new component -- enforce via code review.
+
+**Detection:** Visual inspection in dark mode. Grep for hex color literals in new component files.
+
+---
+
+### Pitfall 11: Missing Skeleton/Loading State Parity
+
+**What goes wrong:** Current screens use `<Skeleton />` components for loading states. New designs may not specify loading states, so developers implement the "loaded" state and forget to maintain skeleton parity. Users see a blank screen or layout shift when data loads.
+
+**Prevention:**
+- For every redesigned screen, implement the loading state FIRST, then the loaded state.
+- Reuse the existing `<Skeleton />` component from `src/components/ui/Skeleton`.
+- Test with artificial delays (add 2-second sleep to fetch calls) to verify loading states look correct.
+
+**Detection:** Flash of empty content on screen mount. Layout shift when data arrives.
+
+---
+
+### Pitfall 12: Import Path Breakage from Component Reorganization
+
+**What goes wrong:** Moving, renaming, or splitting components during redesign breaks import paths across the codebase. With 255+ source files using relative imports (e.g., `../../../src/components/grocery/GrocerySection`), moving a component means updating every file that imports it.
+
+**Prevention:**
+- Use TypeScript's path aliases (already available via `tsconfig.json`) to avoid deep relative imports.
+- If components must move, use IDE "rename symbol" / "move file" features that auto-update imports.
+- Do not rename component files unless the component's responsibility fundamentally changes.
+
+**Detection:** TypeScript compilation errors after file moves.
+
+---
+
+## Phase-Specific Warnings
+
+| Phase Topic | Likely Pitfall | Mitigation |
+|-------------|---------------|------------|
+| Plan screen redesign (date strip, hero card, day/week toggle) | Real-time social feed subscription teardown (#1); nested ScrollView with FlatList (#4) | Keep social hooks at screen level; use FlatList ListHeaderComponent for date strip |
+| Recipe library redesign (filter chips, 2-column grid) | FlatList re-render from filter state changes (#4, #5) | Memoize renderItem; keep filter chip state local, not in recipeStore |
+| Grocery screen redesign (progress bar, enhanced rows) | Camera flow regression (#7); presence/sync teardown (#1); bottom sheet conflicts (#3) | Extract useCameraFlow hook first; dedicated phase for grocery alone |
+| Budget dashboard (donut ring, insights) | Over-animation (#9); SVG performance for donut (#6) | Use Reanimated + react-native-svg, animate once on mount only |
+| Profile redesign (cooking insights, grouped settings) | Store bloat from dashboard state (#5); dark mode regression (#10) | All insight calculations derived, not stored; theme token enforcement |
+| Onboarding redesign (6 screens) | Lowest risk -- isolated flow, no real-time features | Test with fresh account; verify navigation sequence |
+| Cooking mode redesign (step photos, timers) | Timer state regression -- existing timers use countdown logic tied to component lifecycle | Do not restructure timer hook; redesign visual layer only |
+| Social feed redesign (hero photos, avatar strip) | FlatList performance with large images (#4, #6); infinite scroll regression | Keep existing cursor pagination; use expo-image with caching |
+| Premium upgrade screen | Lowest risk -- mostly static layout | Verify Stripe checkout link still works after redesign |
+| Maestro test maintenance | Test breakage from changed IDs (#2) | Update tests per-screen, not in bulk; preserve all testID values |
+
+---
+
+## Risk Matrix: Incremental vs Big-Bang for SharedKitchen
+
+**Recommendation: Incremental (screen-by-screen), grouped by user flow.**
+
+| Factor | Incremental | Big-Bang |
+|--------|-------------|----------|
+| Regression risk | LOW -- one screen at a time, easy to isolate bugs | VERY HIGH -- 14 screens changed simultaneously, impossible to isolate |
+| Maestro test maintenance | MEDIUM -- fix 2-3 flows per phase | VERY HIGH -- all 25+ flows break at once |
+| Real-time feature safety | HIGH -- test sync per screen | LOW -- too many moving parts to verify |
+| Visual consistency during transition | MEDIUM -- temporary inconsistency between old/new screens | HIGH -- everything updates at once |
+| Time to first visible progress | FAST -- ship first redesigned screen in days | SLOW -- nothing ships until everything is done |
+| Rollback capability | EASY -- revert one screen | IMPOSSIBLE -- all or nothing |
+
+Big-bang is only justified when shared components change so fundamentally that old screens cannot function. The design constraints for v7.0 explicitly preserve the tab bar, FAB, and design system tokens -- which means incremental is both viable and strongly preferred.
 
 ---
 
 ## Sources
 
-- [USDA FoodData Central API Guide](https://fdc.nal.usda.gov/api-guide/) -- rate limits, data types, API structure
-- [USDA FoodData Central FAQ](https://fdc.nal.usda.gov/faq/) -- data type differences, SR Legacy deprecation
-- [USDA Data Documentation](https://fdc.nal.usda.gov/data-documentation/) -- Foundation vs Branded vs SR Legacy
-- [Open Food Facts API Tutorial](https://openfoodfacts.github.io/openfoodfacts-server/api/tutorial-off-api/) -- usage policy, rate limits
-- [Open Food Facts Data & API](https://world.openfoodfacts.org/data) -- barcode format, data fields
-- [FatSecret Platform API Docs](https://platform.fatsecret.com/docs/guides) -- OAuth, rate limits
-- [FatSecret Unit Mismatch Issue](https://groups.google.com/g/fatsecret-platform-api/c/UD-zRYNQFDE) -- recipe vs food unit discrepancy
-- [Nutrition API Accuracy Testing](https://dev.to/raviteja_nekkalapu_/i-tested-8-nutrition-apis-with-the-same-query-only-2-returned-correct-data-4kfg) -- only 2/8 APIs returned correct data
-- [expo-barcode-scanner to expo-camera Migration](https://github.com/expo/fyi/blob/main/barcode-scanner-to-expo-camera.md) -- deprecated library migration
-- [Expo Camera Docs](https://docs.expo.dev/versions/latest/sdk/camera/) -- CameraView barcode scanning API
-- [Expo Camera Barcode iOS Issues](https://github.com/expo/expo/issues/26764) -- SDK 50 iOS barcode bugs
-- SharedKitchen codebase: `src/types/database.ts` (existing NutritionInfo interface, pantry_items schema), `src/lib/jsonld.ts` (existing schema.org nutrition extraction), `supabase/migrations/00014_add_recipe_nutrition_and_timers.sql` (existing nutrition column)
+- [React Native FlatList vs ScrollView (2025)](https://bilalshafqat.com/react-native-flatlist-vs-scrollview/)
+- [Nested ScrollViews in React Native](https://dev.to/swarnaliroy94/nested-scrollviews-can-be-tricky-in-react-native-how-to-solve-4f5a)
+- [React Native Nested Virtualization Anti-pattern](https://medium.com/@anisurrahmanbup/react-native-nested-virtualization-anti-pattern-performance-optimization-958e98d4ea79)
+- [Box Shadows in React Native - LogRocket](https://blog.logrocket.com/applying-box-shadows-in-react-native/)
+- [Zustand State Management Guide](https://dev.to/james_mugambi_494c7da2b07/mastering-state-management-in-react-native-with-zustand-a-modern-guide-1bfd)
+- [Supabase Realtime Reliability Discussion](https://github.com/orgs/supabase/discussions/5641)
+- [Reanimated Arc for Donut Charts](https://github.com/jayu/reanimated-arc)
+- [React Native Reanimated 3 Guide (2025)](https://dev.to/erenelagz/react-native-reanimated-3-the-ultimate-guide-to-high-performance-animations-in-2025-4ae4)
+- [Maestro React Native Support](https://docs.maestro.dev/platform-support/react-native)
+- [Maestro E2E Testing Experience with React Native](https://addjam.com/blog/2026-02-18/our-experience-adding-e2e-testing-react-native-maestro/)
+- [Incremental vs Big-Bang Redesigns](https://expdyn.medium.com/incremental-vs-big-bang-redesigns-evaluating-design-changes-for-users-2cb15dea05a4)
+- [Strangler Fig Pattern for Mobile Apps - Martin Fowler](https://martinfowler.com/articles/strangler-fig-mobile-apps.html)
+- [7 Biggest React Native Mistakes in 2025](https://nameisjayant1.medium.com/the-7-biggest-mistakes-react-native-developers-still-make-in-2025-1bcf73e48a8b)
+- SharedKitchen codebase analysis: `app/(app)/(tabs)/grocery.tsx` (684 LOC, 7+ bottom sheets, camera flow), `app/(app)/(tabs)/plan.tsx` (408 LOC, real-time hooks), `.maestro/*.yaml` (25+ E2E flows with testID selectors), `src/stores/*.ts` (13 Zustand stores), `src/theme/*.ts` (design system tokens)
