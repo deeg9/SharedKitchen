@@ -1,5 +1,18 @@
 # Milestones
 
+## v6.0 Food Data Integration (Shipped: 2026-04-09)
+
+**Phases completed:** 4 phases, 8 plans, 13 tasks
+
+**Key accomplishments:**
+
+- Client-side food search with debounced query, macro pill result rows, and inline nutrition detail expansion via bottom sheet on Kitchen tab
+- BarcodeResultCard (`src/components/barcode/BarcodeResultCard.tsx`):
+- 1. [Rule 3 - Blocking] Updated test fixtures for new required fields
+- Commit:
+
+---
+
 ## v5.0 Social Feed (Shipped: 2026-04-07)
 
 **Phases completed:** 5 phases, 12 plans, 25 tasks

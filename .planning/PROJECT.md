@@ -2,7 +2,7 @@
 
 ## What This Is
 
-SharedKitchen is a collaborative dinner planning mobile app for couples, roommates, and families. It combines a shared weekly meal calendar, AI-powered recipe library with web/video extraction and meal generation, auto-generated grocery lists with real-time sync and live presence, AI vision features (fridge scanning, food photo recipe discovery, photo meal logging), a Venmo-style social feed where kitchens follow each other and share what they're eating, push notifications, Stripe-powered premium subscriptions, fullscreen cooking mode with step-by-step timers, and budget tracking — all in one warm, inviting interface. Built with React Native + Expo for iOS, backed by Supabase.
+SharedKitchen is a collaborative dinner planning mobile app for couples, roommates, and families. It combines a shared weekly meal calendar, AI-powered recipe library with web/video extraction and meal generation, auto-generated grocery lists with real-time sync and live presence, AI vision features (fridge scanning, food photo recipe discovery, photo meal logging), a Venmo-style social feed where kitchens follow each other and share what they're eating, comprehensive food data integration (USDA + Open Food Facts + FatSecret) with nutrition tracking, barcode scanning, and AI-powered ingredient matching, push notifications, Stripe-powered premium subscriptions, fullscreen cooking mode with step-by-step timers, and budget tracking — all in one warm, inviting interface. Built with React Native + Expo for iOS, backed by Supabase.
 
 ## Core Value
 
@@ -10,9 +10,9 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 
 ## Current State
 
-**Shipped:** v5.0 Social Feed (2026-04-07)
-**Codebase:** ~32,000 LOC across 240+ source files (TypeScript, SQL, YAML)
-**Tech stack:** React Native + Expo (iOS), Supabase (Postgres, Auth, Realtime, Storage, Edge Functions), Gemini 2.5 Flash (vision + text), Supadata, Serper.dev, Stripe, expo-share-intent, expo-image-manipulator, expo-image, expo-notifications, Maestro E2E
+**Shipped:** v6.0 Food Data Integration (2026-04-09)
+**Codebase:** ~35,800 LOC across 255+ source files (TypeScript, SQL, YAML)
+**Tech stack:** React Native + Expo (iOS), Supabase (Postgres, Auth, Realtime, Storage, Edge Functions), Gemini 2.5 Flash (vision + text + ingredient matching), USDA FoodData Central, Open Food Facts, FatSecret, Supadata, Serper.dev, Stripe, expo-share-intent, expo-image-manipulator, expo-image, expo-camera, expo-notifications, Maestro E2E
 
 ## Requirements
 
@@ -111,28 +111,33 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 - ✓ Server-side push notifications for follows, likes, comments via Edge Function — v5.0
 - ✓ Social notifications toggle (separate from household notifications) — v5.0
 
+- ✓ Canonical numeric nutrition types (NutritionData) with per-100g normalization — v6.0
+- ✓ Food-specific unit conversion module with 35-ingredient density tables — v6.0
+- ✓ Postgres food_items cache with trigram GIN index and 30-day TTL — v6.0
+- ✓ Unified food search Edge Function (USDA FoodData Central + FatSecret) with cache-first lookup — v6.0
+- ✓ FoodSearchSheet bottom sheet with 300ms debounced search, macro pills, inline nutrition expand — v6.0
+- ✓ Barcode scanner using expo-camera with Open Food Facts + FatSecret lookup — v6.0
+- ✓ Scan-to-pantry and scan-to-grocery one-tap add flows with duplicate detection — v6.0
+- ✓ AI-assisted ingredient matching via Gemini 2.5 Flash (match-ingredients Edge Function) — v6.0
+- ✓ Per-recipe nutrition computation cached in computed_nutrition column — v6.0
+- ✓ NutritionCard with horizontal macro bars on recipe detail screen — v6.0
+- ✓ Daily nutrition totals on Plan tab day cards with partial meal indicator — v6.0
+- ✓ 29 unit tests for nutrition-utils — v6.0
+
 ### Active
 
-- [ ] USDA FoodData Central integration for nutrition data backbone
-- [ ] Open Food Facts integration for barcode scanning of packaged foods
-- [ ] FatSecret Premier Free integration for verified branded food data
-- [ ] Searchable food/ingredient database within the app
-- [ ] Nutrition facts display on recipes and meal plan items
-- [ ] Barcode scanner for quick food lookup and pantry additions
-- [ ] Enhanced AI features using structured food data
+(None — planning next milestone)
 
-## Current Milestone: v6.0 Food Data Integration
+## Current Milestone: v6.0 Food Data Integration (SHIPPED)
 
-**Goal:** Integrate external food databases (USDA, Open Food Facts, FatSecret) to provide comprehensive nutrition data, barcode scanning, and searchable food/ingredient data that powers recipes, meal plans, and AI features.
+**Shipped:** 2026-04-09
 
-**Target features:**
-- USDA FoodData Central integration for nutrition backbone (380K+ foods)
-- Open Food Facts integration for barcode scanning of packaged foods
-- FatSecret Premier Free integration for verified branded food data
-- Searchable food/ingredient database within the app
-- Nutrition facts display on recipes and meal plan items
-- Barcode scanner for quick food lookup and pantry additions
-- Enhanced AI features using structured food data (better meal suggestions, smarter grocery lists)
+**Delivered features:**
+- Canonical food data layer with numeric nutrition types, unit conversion, and Postgres caching
+- Unified food search across USDA FoodData Central and FatSecret with cache-first architecture
+- Barcode scanning for packaged foods with Open Food Facts + FatSecret fallback
+- AI-powered recipe ingredient matching with per-recipe nutrition computation
+- Nutrition display on recipe detail and Plan tab with daily totals
 
 ### Out of Scope
 
@@ -193,10 +198,16 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 | expo-image for cached feed photo rendering | CDN-backed, built-in caching, Expo SDK compatible | ✓ Good — only new npm dependency for v5.0 |
 | Server-side push via Edge Function + pg_net webhooks | Social notifications need server-triggered delivery, not client-side | ✓ Good — decoupled from client, fires on DB inserts |
 | Moderation shipped with comments (report + block) | Research: even one harassment incident in family app causes disproportionate trust damage | ✓ Good — shipped together as designed |
+| Three-API strategy (USDA + Open Food Facts + FatSecret) | Each covers different data: USDA for nutrition backbone, OFF for barcodes, FatSecret for branded foods | ✓ Good — comprehensive coverage at zero API cost |
+| Cache-first architecture for food APIs | USDA 1K/hr global rate limit makes direct API calls unsustainable | ✓ Good — Postgres cache with 30-day TTL handles repeated queries |
+| Trigram GIN index over tsvector for food search | Food names need partial/fuzzy matching (brands, product codes), not English tokenization | ✓ Good — better match quality for food domain |
+| Single Edge Function per concern (food-search, food-barcode, match-ingredients) | Separate concerns vs overloaded functions | ✓ Good — clean, testable, independently deployable |
+| On-demand nutrition computation (not automatic) | Avoid AI costs for recipes users don't view nutrition for | ✓ Good — user-triggered "Calculate Nutrition" preserves budget |
+| Gemini 2.5 Flash for ingredient matching | Already integrated for vision, cheaper than GPT-5 for text matching | ✓ Good — single AI provider for all features |
 
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-04-09 after v6.0 milestone started*
+*Last updated: 2026-04-09 after v6.0 Food Data Integration milestone shipped*
