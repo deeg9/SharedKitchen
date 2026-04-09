@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: Stitch UI Redesign
 status: executing
-stopped_at: Completed 40-02-PLAN.md
-last_updated: "2026-04-09T21:39:33.407Z"
+stopped_at: Completed 40-03-PLAN.md
+last_updated: "2026-04-09T21:44:23.948Z"
 last_activity: 2026-04-09
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 7
-  completed_plans: 5
-  percent: 71
+  completed_plans: 6
+  percent: 86
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-09)
 ## Current Position
 
 Phase: 40 (Independent Screen Redesigns) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-04-09
 
@@ -52,6 +52,7 @@ Recent decisions affecting current work:
 - [Phase 40]: AllSet screen uses glassmorphism card (rgba bg + border) on expo-linear-gradient dark gradient
 - [Phase 40]: Used first instruction step text as recipe card description (Recipe type has no description field)
 - [Phase 40]: Difficulty badge derived from total time: under 20m=BEGINNER, 20-45m=INTERMEDIATE, over 45m=ADVANCED
+- [Phase 40]: Cooking mode uses recipe-level image for all steps (InstructionStep has no per-step image); step type badge from keyword matching; ingredient matching via substring heuristic
 
 ### Pending Todos
 
@@ -73,6 +74,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T21:39:33.405Z
-Stopped at: Completed 40-02-PLAN.md
+Last session: 2026-04-09T21:44:23.946Z
+Stopped at: Completed 40-03-PLAN.md
 Resume file: None

@@ -68,12 +68,12 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 
 ### Cooking Mode
 
-- [ ] **COOK-01**: Cooking mode shows a step photo at the top of each instruction step
-- [ ] **COOK-02**: Timer card displays prominently with step name, countdown, and Start button
-- [ ] **COOK-03**: Step type badge (MARINATING, PREP, COOKING) appears above the instruction text
-- [ ] **COOK-04**: Chef's Tip callout card appears when a tip is available for the current step
-- [ ] **COOK-05**: Ingredient chips for the current step are listed below the instruction text
-- [ ] **COOK-06**: Previous/Next Step navigation buttons replace horizontal swipe for step advancement
+- [x] **COOK-01**: Cooking mode shows a step photo at the top of each instruction step
+- [x] **COOK-02**: Timer card displays prominently with step name, countdown, and Start button
+- [x] **COOK-03**: Step type badge (MARINATING, PREP, COOKING) appears above the instruction text
+- [x] **COOK-04**: Chef's Tip callout card appears when a tip is available for the current step
+- [x] **COOK-05**: Ingredient chips for the current step are listed below the instruction text
+- [x] **COOK-06**: Previous/Next Step navigation buttons replace horizontal swipe for step advancement
 
 ### Social Feed
 
@@ -151,12 +151,12 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 | ONBR-04 | Phase 40 | Complete |
 | ONBR-05 | Phase 40 | Complete |
 | ONBR-06 | Phase 40 | Complete |
-| COOK-01 | Phase 40 | Pending |
-| COOK-02 | Phase 40 | Pending |
-| COOK-03 | Phase 40 | Pending |
-| COOK-04 | Phase 40 | Pending |
-| COOK-05 | Phase 40 | Pending |
-| COOK-06 | Phase 40 | Pending |
+| COOK-01 | Phase 40 | Complete |
+| COOK-02 | Phase 40 | Complete |
+| COOK-03 | Phase 40 | Complete |
+| COOK-04 | Phase 40 | Complete |
+| COOK-05 | Phase 40 | Complete |
+| COOK-06 | Phase 40 | Complete |
 | FEED-01 | Phase 43 | Pending |
 | FEED-02 | Phase 43 | Pending |
 | FEED-03 | Phase 43 | Pending |
