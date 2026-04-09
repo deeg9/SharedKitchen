@@ -35,10 +35,10 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 
 ### Grocery & Kitchen
 
-- [ ] **GROC-01**: User sees a summary card at the top showing item count, estimated cost, and presence avatars
-- [ ] **GROC-02**: User sees a shopping progress bar ("12 of 18 items checked") with animated fill
+- [x] **GROC-01**: User sees a summary card at the top showing item count, estimated cost, and presence avatars
+- [x] **GROC-02**: User sees a shopping progress bar ("12 of 18 items checked") with animated fill
 - [ ] **GROC-03**: User can tap "Sync with Plan" in the header to regenerate the grocery list from the current meal plan
-- [ ] **GROC-04**: Grocery item rows show quantity, estimated price, and source/category tags
+- [x] **GROC-04**: Grocery item rows show quantity, estimated price, and source/category tags
 - [ ] **GROC-05**: Segment control order is Shopping List (left) / On Hand/Pantry (right)
 
 ### Budget Dashboard
@@ -130,10 +130,10 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 | RCPE-02 | Phase 40 | Complete |
 | RCPE-03 | Phase 40 | Complete |
 | RCPE-04 | Phase 40 | Complete |
-| GROC-01 | Phase 42 | Pending |
-| GROC-02 | Phase 42 | Pending |
+| GROC-01 | Phase 42 | Complete |
+| GROC-02 | Phase 42 | Complete |
 | GROC-03 | Phase 42 | Pending |
-| GROC-04 | Phase 42 | Pending |
+| GROC-04 | Phase 42 | Complete |
 | GROC-05 | Phase 42 | Pending |
 | BUDG-01 | Phase 43 | Pending |
 | BUDG-02 | Phase 43 | Pending |
