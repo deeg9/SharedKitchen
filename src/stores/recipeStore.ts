@@ -8,6 +8,8 @@ import {
   RecipeRating,
   RecipeNote,
 } from '../types/database';
+import { NutritionData } from '../types/food';
+import { matchIngredients } from '../lib/food-api';
 import { getErrorMessage } from '../lib/errors';
 
 interface RecipeState {
@@ -26,6 +28,10 @@ interface RecipeState {
   filteredRecipes: () => Recipe[];
   hasActiveFilters: () => boolean;
 
+  // Nutrition
+  nutritionLoading: boolean;
+  nutritionError: string | null;
+
   // Actions
   fetchRecipes: (householdId: string) => Promise<void>;
   createRecipe: (recipe: RecipeInsert) => Promise<Recipe | null>;
@@ -41,6 +47,7 @@ interface RecipeState {
   rateRecipe: (recipeId: string, userId: string, rating: number) => Promise<void>;
   addNote: (recipeId: string, userId: string, content: string) => Promise<void>;
   fetchNotes: (recipeId: string) => Promise<void>;
+  computeNutrition: (recipeId: string) => Promise<void>;
   clear: () => void;
 }
 
@@ -65,6 +72,8 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
   selectedRecipe: null,
   ratings: [],
   notes: [],
+  nutritionLoading: false,
+  nutritionError: null,
 
   filteredRecipes: () => {
     const { recipes, searchQuery, activeCategory, costRange, maxPrepTime } = get();
@@ -329,7 +338,54 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
     }
   },
 
-  clear: () => set({ recipes: [], loading: false, error: null, searchQuery: '', activeCategory: null, costRange: null, maxPrepTime: null, selectedRecipe: null, ratings: [], notes: [] }),
+  computeNutrition: async (recipeId: string) => {
+    const { recipes, selectedRecipe } = get();
+    const recipe = selectedRecipe?.id === recipeId
+      ? selectedRecipe
+      : recipes.find((r) => r.id === recipeId);
+
+    if (!recipe) return;
+
+    // Skip if already cached
+    if (recipe.computed_nutrition != null) {
+      return;
+    }
+
+    set({ nutritionLoading: true, nutritionError: null });
+    try {
+      const ingredients = (recipe.ingredients ?? []) as Ingredient[];
+      if (ingredients.length === 0) {
+        set({ nutritionLoading: false, nutritionError: 'No ingredients to analyze' });
+        return;
+      }
+
+      const response = await matchIngredients(
+        recipeId,
+        ingredients.map((ing) => ({ amount: ing.amount, unit: ing.unit, name: ing.name })),
+        recipe.servings ?? 1
+      );
+
+      const updates = {
+        computed_nutrition: response.per_serving_nutrition as unknown as Record<string, unknown>,
+        ingredient_matches: response.matches as unknown as Record<string, unknown>[],
+      };
+
+      set((state) => ({
+        recipes: state.recipes.map((r) =>
+          r.id === recipeId ? { ...r, ...updates } as Recipe : r
+        ),
+        selectedRecipe:
+          state.selectedRecipe?.id === recipeId
+            ? { ...state.selectedRecipe, ...updates } as Recipe
+            : state.selectedRecipe,
+        nutritionLoading: false,
+      }));
+    } catch (error: unknown) {
+      set({ nutritionLoading: false, nutritionError: getErrorMessage(error) });
+    }
+  },
+
+  clear: () => set({ recipes: [], loading: false, error: null, searchQuery: '', activeCategory: null, costRange: null, maxPrepTime: null, selectedRecipe: null, ratings: [], notes: [], nutritionLoading: false, nutritionError: null }),
 
   fetchNotes: async (recipeId: string) => {
     try {

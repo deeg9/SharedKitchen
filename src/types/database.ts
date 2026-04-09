@@ -39,6 +39,8 @@ export interface Ingredient {
   unit: string;
   name: string;
   section?: string;
+  food_id?: string;
+  matched_confidence?: number;
 }
 
 /** Single instruction step within a recipe's JSONB instructions array */
@@ -145,6 +147,8 @@ export interface Database {
           source_url: string | null;
           nutrition_info: NutritionInfo | null;
           source_image_url: string | null;
+          computed_nutrition: Record<string, unknown> | null;
+          ingredient_matches: Record<string, unknown>[] | null;
           created_by: string | null;
           created_at: string;
           updated_at: string;
@@ -165,6 +169,8 @@ export interface Database {
           source_url?: string | null;
           nutrition_info?: NutritionInfo | null;
           source_image_url?: string | null;
+          computed_nutrition?: Record<string, unknown> | null;
+          ingredient_matches?: Record<string, unknown>[] | null;
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -185,6 +191,8 @@ export interface Database {
           source_url?: string | null;
           nutrition_info?: NutritionInfo | null;
           source_image_url?: string | null;
+          computed_nutrition?: Record<string, unknown> | null;
+          ingredient_matches?: Record<string, unknown>[] | null;
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;

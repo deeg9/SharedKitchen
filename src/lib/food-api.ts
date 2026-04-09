@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { FoodSearchResult, FoodItem } from '../types/food';
+import { FoodSearchResult, FoodItem, NutritionData } from '../types/food';
 
 /**
  * Custom error for search rate limit exceeded.
@@ -113,4 +113,90 @@ export async function getFoodDetail(foodId: string): Promise<FoodItem | null> {
   }
 
   return data as FoodItem | null;
+}
+
+/**
+ * A single ingredient-to-food match result from the AI matching pipeline.
+ */
+export interface IngredientMatch {
+  ingredient_index: number;
+  ingredient_name: string;
+  food_id: string | null;
+  food_name: string | null;
+  confidence: number;
+  amount_grams: number | null;
+}
+
+/**
+ * Response from the match-ingredients Edge Function.
+ */
+export interface MatchIngredientsResponse {
+  matches: IngredientMatch[];
+  total_nutrition: NutritionData;
+  per_serving_nutrition: NutritionData;
+  matched_count: number;
+  total_count: number;
+}
+
+/**
+ * Custom error for ingredient matching rate limit exceeded.
+ */
+export class MatchLimitError extends Error {
+  limit: number;
+  used: number;
+  constructor(message: string, limit: number, used: number) {
+    super(message);
+    this.name = 'MatchLimitError';
+    this.limit = limit;
+    this.used = used;
+  }
+}
+
+/**
+ * Match recipe ingredients to food database items via AI.
+ * Calls the match-ingredients Edge Function which uses Gemini 2.5 Flash
+ * to match ingredient text to food_items, computes nutrition, and caches on recipe.
+ */
+export async function matchIngredients(
+  recipeId: string,
+  ingredients: Array<{ amount: number; unit: string; name: string }>,
+  servings: number
+): Promise<MatchIngredientsResponse> {
+  const { data, error } = await supabase.functions.invoke('match-ingredients', {
+    body: { recipe_id: recipeId, ingredients, servings },
+  });
+
+  if (error) {
+    // Try to read the response body for specific error types
+    try {
+      const ctx = (error as any).context;
+      if (ctx && !ctx.bodyUsed) {
+        const body = await ctx.json();
+        if (body.type === 'match_limit_exceeded') {
+          throw new MatchLimitError(
+            body.error ?? 'Monthly ingredient matching limit reached',
+            body.limit ?? 20,
+            body.used ?? 0
+          );
+        }
+        throw new Error(body?.error ?? 'Ingredient matching failed');
+      }
+    } catch (readErr: any) {
+      if (readErr instanceof MatchLimitError) {
+        throw readErr;
+      }
+      if (readErr.message && readErr.message !== error.message) {
+        throw readErr;
+      }
+    }
+    throw new Error(error.message ?? 'Ingredient matching failed');
+  }
+
+  return {
+    matches: data?.matches ?? [],
+    total_nutrition: data?.total_nutrition ?? { calories: 0, protein_g: 0, total_fat_g: 0, sodium_mg: 0, total_carbs_g: 0 },
+    per_serving_nutrition: data?.per_serving_nutrition ?? { calories: 0, protein_g: 0, total_fat_g: 0, sodium_mg: 0, total_carbs_g: 0 },
+    matched_count: data?.matched_count ?? 0,
+    total_count: data?.total_count ?? 0,
+  };
 }
