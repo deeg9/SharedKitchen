@@ -7,6 +7,15 @@ import { spacing, borderRadius } from '../../theme/spacing';
 import { GroceryItem as GroceryItemType } from '../../types/database';
 import { GroceryItem } from './GroceryItem';
 
+const SECTION_ICONS: Record<string, string> = {
+  'Proteins': 'food-steak',
+  'Produce': 'leaf',
+  'Dairy & Eggs': 'egg-outline',
+  'Pantry': 'cupboard-outline',
+  'Other': 'package-variant',
+  'Completed': 'check-circle-outline',
+};
+
 interface GrocerySectionProps {
   title: string;
   items: GroceryItemType[];
@@ -35,10 +44,21 @@ export function GrocerySection({
         onPress={() => setCollapsed(!collapsed)}
       >
         <View style={styles.headerLeft}>
-          <Text style={styles.title}>{title}</Text>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{items.length}</Text>
-          </View>
+          <MaterialCommunityIcons
+            name={(SECTION_ICONS[title] || 'tag-outline') as any}
+            size={22}
+            color={colors.onSurfaceVariant}
+          />
+          {title === 'Completed' ? (
+            <Text style={styles.title}>Completed ({items.length})</Text>
+          ) : (
+            <>
+              <Text style={styles.title}>{title}</Text>
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{items.length}</Text>
+              </View>
+            </>
+          )}
         </View>
         <MaterialCommunityIcons
           name={collapsed ? 'chevron-down' : 'chevron-up'}

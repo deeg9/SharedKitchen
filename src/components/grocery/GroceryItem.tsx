@@ -9,6 +9,7 @@ import { GroceryItem as GroceryItemType } from '../../types/database';
 import { useGroceryStore } from '../../stores/groceryStore';
 import { useHouseholdStore } from '../../stores/householdStore';
 import { useBudgetStore } from '../../stores/budgetStore';
+import { usePantryStore } from '../../stores/pantryStore';
 
 interface GroceryItemProps {
   item: GroceryItemType;
@@ -22,10 +23,21 @@ export function GroceryItem({ item, userId, onEdit }: GroceryItemProps) {
   const removeItem = useGroceryStore((s) => s.removeItem);
   const members = useHouseholdStore((s) => s.members);
   const activeHouseholdId = useHouseholdStore((s) => s.activeHouseholdId);
+  const pantryItems = usePantryStore((s) => s.items);
 
   const checkerProfile = item.checked_by
     ? members.find((m) => m.user_id === item.checked_by)?.profiles
     : null;
+
+  const inPantry = pantryItems.some(
+    (p) => p.name.toLowerCase() === item.name.toLowerCase()
+  );
+
+  // Build subtitle line: "quantity . ~$price"
+  const subtitleParts: string[] = [];
+  if (item.quantity) subtitleParts.push(item.quantity);
+  if (item.estimated_price != null) subtitleParts.push(`~$${item.estimated_price.toFixed(2)}`);
+  const subtitle = subtitleParts.join(' \u00B7 ');
 
   const handleToggle = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -73,11 +85,6 @@ export function GroceryItem({ item, userId, onEdit }: GroceryItemProps) {
     );
   };
 
-  const handleDelete = async () => {
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    removeItem(item.id);
-  };
-
   return (
     <Pressable
       style={styles.container}
@@ -107,20 +114,27 @@ export function GroceryItem({ item, userId, onEdit }: GroceryItemProps) {
         >
           {item.name}
         </Text>
-        {item.quantity ? (
-          <Text style={[styles.quantity, item.is_checked && styles.textMuted]}>
-            {item.quantity}
+        {subtitle ? (
+          <Text
+            style={[
+              styles.subtitle,
+              item.is_checked && styles.subtitleChecked,
+            ]}
+          >
+            {subtitle}
           </Text>
         ) : null}
       </View>
 
-      {/* Price + checker avatar */}
+      {/* Pantry tag */}
+      {inPantry && (
+        <View style={styles.pantryTag}>
+          <Text style={styles.pantryTagText}>Pantry</Text>
+        </View>
+      )}
+
+      {/* Trailing: checker avatar + 3-dot menu */}
       <View style={styles.trailing}>
-        {item.estimated_price != null && (
-          <Text style={[styles.price, item.is_checked && styles.textMuted]}>
-            ${item.estimated_price.toFixed(2)}
-          </Text>
-        )}
         {item.is_checked && checkerProfile?.avatar_url ? (
           <Image
             source={{ uri: checkerProfile.avatar_url }}
@@ -136,19 +150,12 @@ export function GroceryItem({ item, userId, onEdit }: GroceryItemProps) {
         {onEdit && (
           <Pressable
             onPress={() => onEdit(item)}
-            style={styles.editBtn}
+            style={styles.menuBtn}
             hitSlop={8}
           >
-            <MaterialCommunityIcons name="pencil-outline" size={16} color={colors.onSurfaceVariant} />
+            <MaterialCommunityIcons name="dots-vertical" size={20} color={colors.onSurfaceVariant} />
           </Pressable>
         )}
-        <Pressable
-          onPress={handleDelete}
-          style={styles.deleteBtn}
-          hitSlop={8}
-        >
-          <MaterialCommunityIcons name="close" size={16} color={colors.outlineVariant} />
-        </Pressable>
       </View>
     </Pressable>
   );
@@ -187,22 +194,31 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through',
     color: colors.onSurfaceVariant,
   },
-  quantity: {
+  subtitle: {
     ...typography.bodySm,
     color: colors.onSurfaceVariant,
     marginTop: 2,
   },
-  textMuted: {
+  subtitleChecked: {
+    textDecorationLine: 'line-through',
     color: colors.outline,
+  },
+  pantryTag: {
+    backgroundColor: colors.primaryContainer,
+    borderRadius: borderRadius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    marginRight: spacing.sm,
+  },
+  pantryTagText: {
+    ...typography.labelSm,
+    color: colors.onPrimaryContainer,
+    textTransform: 'none',
   },
   trailing: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-  },
-  price: {
-    ...typography.labelMd,
-    color: colors.onSurfaceVariant,
   },
   avatar: {
     width: 22,
@@ -222,14 +238,7 @@ const styles = StyleSheet.create({
     color: colors.onPrimaryContainer,
     fontSize: 10,
   },
-  editBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: borderRadius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  deleteBtn: {
+  menuBtn: {
     width: 28,
     height: 28,
     borderRadius: borderRadius.full,
