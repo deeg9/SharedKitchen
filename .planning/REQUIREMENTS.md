@@ -28,10 +28,10 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 
 ### Recipe Library
 
-- [ ] **RCPE-01**: User sees a horizontal filter chip row (All, Quick Meals, Favorites) above the recipe list
-- [ ] **RCPE-02**: Recipe cards display as full-width cards with description text, cook time pill, difficulty badge, and rating star
-- [ ] **RCPE-03**: User sees an "Import New Recipe" CTA card at the bottom of the recipe list
-- [ ] **RCPE-04**: Search bar is visible at the top of the recipes screen
+- [x] **RCPE-01**: User sees a horizontal filter chip row (All, Quick Meals, Favorites) above the recipe list
+- [x] **RCPE-02**: Recipe cards display as full-width cards with description text, cook time pill, difficulty badge, and rating star
+- [x] **RCPE-03**: User sees an "Import New Recipe" CTA card at the bottom of the recipe list
+- [x] **RCPE-04**: Search bar is visible at the top of the recipes screen
 
 ### Grocery & Kitchen
 
@@ -126,10 +126,10 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 | PLAN-05 | Phase 41 | Pending |
 | PLAN-06 | Phase 41 | Pending |
 | PLAN-07 | Phase 41 | Pending |
-| RCPE-01 | Phase 40 | Pending |
-| RCPE-02 | Phase 40 | Pending |
-| RCPE-03 | Phase 40 | Pending |
-| RCPE-04 | Phase 40 | Pending |
+| RCPE-01 | Phase 40 | Complete |
+| RCPE-02 | Phase 40 | Complete |
+| RCPE-03 | Phase 40 | Complete |
+| RCPE-04 | Phase 40 | Complete |
 | GROC-01 | Phase 42 | Pending |
 | GROC-02 | Phase 42 | Pending |
 | GROC-03 | Phase 42 | Pending |

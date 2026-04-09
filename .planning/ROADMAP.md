@@ -160,7 +160,7 @@ Plans:
 **Plans**: 4 plans
 Plans:
 - [x] 40-01-PLAN.md — Redesign all 6 onboarding screens (Welcome through All Set)
-- [ ] 40-02-PLAN.md — Redesign Recipe Library with FilterChips and full-width cards
+- [x] 40-02-PLAN.md — Redesign Recipe Library with FilterChips and full-width cards
 - [ ] 40-03-PLAN.md — Redesign Cooking Mode with step photos, badges, tips, and Previous/Next buttons
 - [ ] 40-04-PLAN.md — Redesign Premium Upgrade screen with hero photo, comparison table, and pricing tiers
 **UI hint**: yes
@@ -177,7 +177,7 @@ Plans:
   5. Grocery shortcut card appears at screen bottom showing current week item count and linking to Kitchen tab
 **Plans**: 4 plans
 Plans:
-- [ ] 40-01-PLAN.md — Redesign all 6 onboarding screens (Welcome through All Set)
+- [x] 40-01-PLAN.md — Redesign all 6 onboarding screens (Welcome through All Set)
 - [ ] 40-02-PLAN.md — Redesign Recipe Library with FilterChips and full-width cards
 - [ ] 40-03-PLAN.md — Redesign Cooking Mode with step photos, badges, tips, and Previous/Next buttons
 - [ ] 40-04-PLAN.md — Redesign Premium Upgrade screen with hero photo, comparison table, and pricing tiers
@@ -264,7 +264,7 @@ Plans:
 | 37. Barcode Scanning | v6.0 | 2/2 | Complete | 2026-04-09 |
 | 38. Recipe Nutrition | v6.0 | 2/2 | Complete | 2026-04-09 |
 | 39. Shared Components & Dependencies | v7.0 | 3/3 | Complete    | 2026-04-09 |
-| 40. Independent Screen Redesigns | v7.0 | 1/4 | In Progress|  |
+| 40. Independent Screen Redesigns | v7.0 | 2/4 | In Progress|  |
 | 41. Plan Tab Redesign | v7.0 | 0/0 | Not started | - |
 | 42. Grocery List Redesign | v7.0 | 0/0 | Not started | - |
 | 43. Budget, Profile & Social Feed | v7.0 | 0/0 | Not started | - |
