@@ -113,7 +113,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 - [x] **Phase 35: Data Foundation** - Postgres schema, TypeScript types, unit conversion, and nutrition normalization layer (completed 2026-04-09)
 - [x] **Phase 36: Food Search** - Edge Functions for USDA/FatSecret search, client store, and searchable food interface (completed 2026-04-09)
-- [ ] **Phase 37: Barcode Scanning** - Camera barcode scanner, Open Food Facts/FatSecret lookup, and add-to-pantry/grocery flows
+- [x] **Phase 37: Barcode Scanning** - Camera barcode scanner, Open Food Facts/FatSecret lookup, and add-to-pantry/grocery flows (completed 2026-04-09)
 - [ ] **Phase 38: Recipe Nutrition** - AI-assisted ingredient matching, per-recipe nutrition computation, and nutrition display on recipes and meal plans
 
 ## Phase Details
@@ -159,8 +159,8 @@ Plans:
   5. When a barcode is not found, the app gracefully falls back to name-based food search
 **Plans**: 2 plans
 Plans:
-- [ ] 37-01-PLAN.md — food-barcode Edge Function (OFF + FatSecret lookup), client API, foodStore barcode state, BarcodeScannerScreen
-- [ ] 37-02-PLAN.md — BarcodeResultCard with add-to-pantry/grocery, Kitchen tab scanner integration
+- [x] 37-01-PLAN.md — food-barcode Edge Function (OFF + FatSecret lookup), client API, foodStore barcode state, BarcodeScannerScreen
+- [x] 37-02-PLAN.md — BarcodeResultCard with add-to-pantry/grocery, Kitchen tab scanner integration
 **UI hint**: yes
 
 ### Phase 38: Recipe Nutrition
@@ -174,8 +174,8 @@ Plans:
   4. Plan tab shows aggregated daily and weekly nutrition totals for all planned meals
 **Plans**: 2 plans
 Plans:
-- [ ] 37-01-PLAN.md — food-barcode Edge Function (OFF + FatSecret lookup), client API, foodStore barcode state, BarcodeScannerScreen
-- [ ] 37-02-PLAN.md — BarcodeResultCard with add-to-pantry/grocery, Kitchen tab scanner integration
+- [x] 37-01-PLAN.md — food-barcode Edge Function (OFF + FatSecret lookup), client API, foodStore barcode state, BarcodeScannerScreen
+- [x] 37-02-PLAN.md — BarcodeResultCard with add-to-pantry/grocery, Kitchen tab scanner integration
 **UI hint**: yes
 
 ## Progress
@@ -220,7 +220,7 @@ Plans:
 | 34. Social Push Notifications | v5.0 | 2/2 | Complete | 2026-04-07 |
 | 35. Data Foundation | v6.0 | 2/2 | Complete    | 2026-04-09 |
 | 36. Food Search | v6.0 | 2/2 | Complete    | 2026-04-09 |
-| 37. Barcode Scanning | v6.0 | 0/2 | Planning    | - |
+| 37. Barcode Scanning | v6.0 | 2/2 | Complete    | 2026-04-09 |
 | 38. Recipe Nutrition | v6.0 | 0/0 | Not started | - |
 
 ---
