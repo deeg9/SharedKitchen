@@ -112,7 +112,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 **Milestone Goal:** Integrate external food databases (USDA, Open Food Facts, FatSecret) to provide comprehensive nutrition data, barcode scanning, and searchable food/ingredient data that powers recipes, meal plans, and AI features.
 
 - [x] **Phase 35: Data Foundation** - Postgres schema, TypeScript types, unit conversion, and nutrition normalization layer (completed 2026-04-09)
-- [ ] **Phase 36: Food Search** - Edge Functions for USDA/FatSecret search, client store, and searchable food interface
+- [x] **Phase 36: Food Search** - Edge Functions for USDA/FatSecret search, client store, and searchable food interface (completed 2026-04-09)
 - [ ] **Phase 37: Barcode Scanning** - Camera barcode scanner, Open Food Facts/FatSecret lookup, and add-to-pantry/grocery flows
 - [ ] **Phase 38: Recipe Nutrition** - AI-assisted ingredient matching, per-recipe nutrition computation, and nutrition display on recipes and meal plans
 
@@ -143,8 +143,8 @@ Plans:
   4. Search results are cached in Postgres so repeated queries do not hit external APIs
 **Plans**: 2 plans
 Plans:
-- [ ] 36-01-PLAN.md — food-search Edge Function (USDA + FatSecret with cache-first lookup, normalization, rate limiting)
-- [ ] 36-02-PLAN.md — Client store, API wrapper, and FoodSearchSheet UI (search, macro pills, inline nutrition detail)
+- [x] 36-01-PLAN.md — food-search Edge Function (USDA + FatSecret with cache-first lookup, normalization, rate limiting)
+- [x] 36-02-PLAN.md — Client store, API wrapper, and FoodSearchSheet UI (search, macro pills, inline nutrition detail)
 **UI hint**: yes
 
 ### Phase 37: Barcode Scanning
@@ -213,7 +213,7 @@ Plans:
 | 33. Social Interactions & Moderation | v5.0 | 3/3 | Complete | 2026-04-07 |
 | 34. Social Push Notifications | v5.0 | 2/2 | Complete | 2026-04-07 |
 | 35. Data Foundation | v6.0 | 2/2 | Complete    | 2026-04-09 |
-| 36. Food Search | v6.0 | 0/2 | Planning complete | - |
+| 36. Food Search | v6.0 | 2/2 | Complete    | 2026-04-09 |
 | 37. Barcode Scanning | v6.0 | 0/0 | Not started | - |
 | 38. Recipe Nutrition | v6.0 | 0/0 | Not started | - |
 
