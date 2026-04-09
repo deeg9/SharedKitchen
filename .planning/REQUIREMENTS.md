@@ -18,13 +18,13 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 
 ### Meal Planner
 
-- [ ] **PLAN-01**: User sees a Day/Week toggle in the plan header, defaulting to Day view
-- [ ] **PLAN-02**: User can swipe or tap the horizontal date strip to navigate between days in Day view
+- [x] **PLAN-01**: User sees a Day/Week toggle in the plan header, defaulting to Day view
+- [x] **PLAN-02**: User can swipe or tap the horizontal date strip to navigate between days in Day view
 - [x] **PLAN-03**: User sees today's dinner as a hero card with large recipe photo, description, presence indicator, and "Start Cooking" CTA
 - [x] **PLAN-04**: Empty meal slots show soft illustrated placeholders with inviting prompts ("What's for breakfast?", "Lunch time?")
-- [ ] **PLAN-05**: User can toggle to Week view to see all 7 days with breakfast/lunch/dinner slots (existing layout, refined)
+- [x] **PLAN-05**: User can toggle to Week view to see all 7 days with breakfast/lunch/dinner slots (existing layout, refined)
 - [x] **PLAN-06**: User sees a grocery shortcut card at the bottom showing item count for the current week, linking to Kitchen tab
-- [ ] **PLAN-07**: Week navigation (prev/next arrows, Today button) works in both Day and Week views
+- [x] **PLAN-07**: Week navigation (prev/next arrows, Today button) works in both Day and Week views
 
 ### Recipe Library
 
@@ -119,13 +119,13 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 | COMP-04 | Phase 39 | Complete |
 | COMP-05 | Phase 39 | Complete |
 | COMP-06 | Phase 39 | Complete |
-| PLAN-01 | Phase 41 | Pending |
-| PLAN-02 | Phase 41 | Pending |
+| PLAN-01 | Phase 41 | Complete |
+| PLAN-02 | Phase 41 | Complete |
 | PLAN-03 | Phase 41 | Complete |
 | PLAN-04 | Phase 41 | Complete |
-| PLAN-05 | Phase 41 | Pending |
+| PLAN-05 | Phase 41 | Complete |
 | PLAN-06 | Phase 41 | Complete |
-| PLAN-07 | Phase 41 | Pending |
+| PLAN-07 | Phase 41 | Complete |
 | RCPE-01 | Phase 40 | Complete |
 | RCPE-02 | Phase 40 | Complete |
 | RCPE-03 | Phase 40 | Complete |
