@@ -17,6 +17,8 @@ import * as Haptics from 'expo-haptics';
 import { BottomSheet } from '../../../src/components/ui/BottomSheet';
 import { Skeleton } from '../../../src/components/ui/Skeleton';
 import { useRecipeStore, scaleIngredients } from '../../../src/stores/recipeStore';
+import { NutritionCard } from '../../../src/components/food/NutritionCard';
+import { NutritionData } from '../../../src/types/food';
 import { useHouseholdStore } from '../../../src/stores/householdStore';
 import { usePlanStore } from '../../../src/stores/planStore';
 import { colors } from '../../../src/theme/colors';
@@ -45,6 +47,9 @@ export default function RecipeDetailScreen() {
     toggleFavorite,
     rateRecipe,
     addNote,
+    nutritionLoading,
+    nutritionError,
+    computeNutrition,
   } = useRecipeStore();
   const { activeHouseholdId } = useHouseholdStore();
   const householdMembers = useHouseholdStore((s) => s.members);
@@ -118,6 +123,10 @@ export default function RecipeDetailScreen() {
     if (!userId || !id || !noteText.trim()) return;
     await addNote(id, userId, noteText.trim());
     setNoteText('');
+  };
+
+  const handleComputeNutrition = () => {
+    if (id) computeNutrition(id);
   };
 
   const toggleIngredient = (index: number) => {
@@ -298,6 +307,17 @@ export default function RecipeDetailScreen() {
               </Pressable>
             );
           })}
+        </View>
+
+        {/* ── Nutrition Card ── */}
+        <View style={{ marginHorizontal: spacing.md, marginTop: spacing.lg }}>
+          <NutritionCard
+            nutrition={recipe.computed_nutrition as NutritionData | null}
+            servings={recipe.servings ?? 1}
+            loading={nutritionLoading}
+            error={nutritionError}
+            onCalculate={handleComputeNutrition}
+          />
         </View>
 
         {/* ── Method (Instructions) ── */}
