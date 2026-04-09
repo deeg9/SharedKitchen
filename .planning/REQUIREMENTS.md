@@ -59,12 +59,12 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 
 ### Onboarding
 
-- [ ] **ONBR-01**: Welcome screen (Step 1/6) shows hero kitchen photo, tagline, Get Started/Sign In CTAs, and feature highlights
-- [ ] **ONBR-02**: Create Household screen (Step 2/6) shows illustration, "Name your kitchen" prompt with input field
-- [ ] **ONBR-03**: Invite Members screen (Step 3/6) shows invite code with copy/share actions and share-via icons
-- [ ] **ONBR-04**: Add First Recipes screen (Step 4/6) shows progress counter (0 of 3), starter recipe cards, and "Import from URL" option
-- [ ] **ONBR-05**: Plan Your Week screen (Step 5/6) shows day-by-day meal slot pickers with saved recipes list
-- [ ] **ONBR-06**: All Set screen (Step 6/6) shows celebration glassmorphism card with "Go to my kitchen" CTA
+- [x] **ONBR-01**: Welcome screen (Step 1/6) shows hero kitchen photo, tagline, Get Started/Sign In CTAs, and feature highlights
+- [x] **ONBR-02**: Create Household screen (Step 2/6) shows illustration, "Name your kitchen" prompt with input field
+- [x] **ONBR-03**: Invite Members screen (Step 3/6) shows invite code with copy/share actions and share-via icons
+- [x] **ONBR-04**: Add First Recipes screen (Step 4/6) shows progress counter (0 of 3), starter recipe cards, and "Import from URL" option
+- [x] **ONBR-05**: Plan Your Week screen (Step 5/6) shows day-by-day meal slot pickers with saved recipes list
+- [x] **ONBR-06**: All Set screen (Step 6/6) shows celebration glassmorphism card with "Go to my kitchen" CTA
 
 ### Cooking Mode
 
@@ -145,12 +145,12 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 | PROF-03 | Phase 43 | Pending |
 | PROF-04 | Phase 43 | Pending |
 | PROF-05 | Phase 43 | Pending |
-| ONBR-01 | Phase 40 | Pending |
-| ONBR-02 | Phase 40 | Pending |
-| ONBR-03 | Phase 40 | Pending |
-| ONBR-04 | Phase 40 | Pending |
-| ONBR-05 | Phase 40 | Pending |
-| ONBR-06 | Phase 40 | Pending |
+| ONBR-01 | Phase 40 | Complete |
+| ONBR-02 | Phase 40 | Complete |
+| ONBR-03 | Phase 40 | Complete |
+| ONBR-04 | Phase 40 | Complete |
+| ONBR-05 | Phase 40 | Complete |
+| ONBR-06 | Phase 40 | Complete |
 | COOK-01 | Phase 40 | Pending |
 | COOK-02 | Phase 40 | Pending |
 | COOK-03 | Phase 40 | Pending |
