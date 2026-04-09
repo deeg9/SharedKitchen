@@ -177,7 +177,7 @@ Plans:
   5. Grocery shortcut card appears at screen bottom showing current week item count and linking to Kitchen tab
 **Plans**: 2 plans
 Plans:
-- [ ] 41-01-PLAN.md — Build HeroDinnerCard, DayViewMealSlot, and GroceryShortcutCard components
+- [x] 41-01-PLAN.md — Build HeroDinnerCard, DayViewMealSlot, and GroceryShortcutCard components
 - [ ] 41-02-PLAN.md — Wire Day/Week toggle, DateStrip, and new components into plan.tsx
 **UI hint**: yes
 
@@ -253,7 +253,7 @@ Plans:
 | 38. Recipe Nutrition | v6.0 | 2/2 | Complete | 2026-04-09 |
 | 39. Shared Components & Dependencies | v7.0 | 3/3 | Complete    | 2026-04-09 |
 | 40. Independent Screen Redesigns | v7.0 | 4/4 | Complete    | 2026-04-09 |
-| 41. Plan Tab Redesign | v7.0 | 0/2 | Planning | - |
+| 41. Plan Tab Redesign | v7.0 | 1/2 | In Progress|  |
 | 42. Grocery List Redesign | v7.0 | 0/0 | Not started | - |
 | 43. Budget, Profile & Social Feed | v7.0 | 0/0 | Not started | - |
 
