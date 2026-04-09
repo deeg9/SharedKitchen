@@ -19,7 +19,7 @@ export default function CookScreen() {
     return (
       <View style={s.loading}>
         <StatusBar hidden />
-        <ActivityIndicator size="large" color={colors.inversePrimary} />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -35,7 +35,7 @@ export default function CookScreen() {
 const s = StyleSheet.create({
   loading: {
     flex: 1,
-    backgroundColor: colors.inverseSurface,
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },

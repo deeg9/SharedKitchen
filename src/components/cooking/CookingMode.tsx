@@ -1,12 +1,10 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
-  FlatList,
+  ScrollView,
   Pressable,
   StyleSheet,
-  Dimensions,
-  ViewToken,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -14,7 +12,7 @@ import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors } from '../../theme/colors';
 import { spacing, borderRadius } from '../../theme/spacing';
-import { fontFamily } from '../../theme/typography';
+import { typography } from '../../theme/typography';
 import { Recipe, InstructionStep, Ingredient } from '../../types/database';
 import { UnitSystem } from '../../lib/unit-conversion';
 import { CookingProgress } from './CookingProgress';
@@ -22,7 +20,6 @@ import { StepCard } from './StepCard';
 import { UnitToggle } from './UnitToggle';
 import { IngredientSidebar } from './IngredientSidebar';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const UNIT_PREF_KEY = 'unit_preference';
 
 interface CookingModeProps {
@@ -36,7 +33,6 @@ export function CookingMode({ recipe, onClose }: CookingModeProps) {
   const [unitSystem, setUnitSystem] = useState<UnitSystem>('imperial');
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [scale] = useState(1);
-  const flatListRef = useRef<FlatList>(null);
 
   const instructions = recipe.instructions as InstructionStep[];
   const ingredients = recipe.ingredients as Ingredient[];
@@ -57,20 +53,10 @@ export function CookingMode({ recipe, onClose }: CookingModeProps) {
     AsyncStorage.setItem(UNIT_PREF_KEY, system);
   }, []);
 
-  const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 50 }).current;
-
-  const onViewableItemsChanged = useRef(
-    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
-      if (viewableItems.length > 0 && viewableItems[0].index != null) {
-        setCurrentStep(viewableItems[0].index);
-        Haptics.selectionAsync();
-      }
-    }
-  ).current;
-
   const goToStep = useCallback((index: number) => {
     if (index >= 0 && index < totalSteps) {
-      flatListRef.current?.scrollToIndex({ index, animated: true });
+      setCurrentStep(index);
+      Haptics.selectionAsync();
     }
   }, [totalSteps]);
 
@@ -89,6 +75,23 @@ export function CookingMode({ recipe, onClose }: CookingModeProps) {
     }
   }, [currentStep, totalSteps, goToStep, onClose]);
 
+  // Ingredient matching: scan instruction text for ingredient names
+  const getStepIngredients = useCallback((stepIndex: number): Ingredient[] => {
+    if (!ingredients || ingredients.length === 0) return [];
+    const text = instructions[stepIndex]?.text?.toLowerCase() || '';
+    return ingredients.filter((ing) => {
+      const name = ing.name?.toLowerCase() || '';
+      // Match if the ingredient name (or a significant word in it) appears in the instruction
+      if (name.length < 3) return false;
+      return text.includes(name);
+    });
+  }, [ingredients, instructions]);
+
+  const stepIngredients = useMemo(
+    () => getStepIngredients(currentStep),
+    [currentStep, getStepIngredients]
+  );
+
   const isLastStep = currentStep === totalSteps - 1;
 
   return (
@@ -101,95 +104,91 @@ export function CookingMode({ recipe, onClose }: CookingModeProps) {
           accessibilityRole="button"
           accessibilityLabel="Close cooking mode"
         >
-          <MaterialCommunityIcons name="close" size={24} color="rgba(242,240,237,0.6)" />
+          <MaterialCommunityIcons name="close" size={24} color={colors.onSurfaceVariant} />
         </Pressable>
         <UnitToggle value={unitSystem} onChange={handleUnitChange} />
       </View>
 
       {/* Progress */}
-      <CookingProgress currentStep={currentStep} totalSteps={totalSteps} />
+      <CookingProgress
+        currentStep={currentStep}
+        totalSteps={totalSteps}
+        recipeName={recipe.name}
+      />
 
       {/* Step content */}
-      <FlatList
-        ref={flatListRef}
-        data={instructions}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onViewableItemsChanged={onViewableItemsChanged}
-        viewabilityConfig={viewabilityConfig}
-        keyExtractor={(_, i) => `step-${i}`}
-        renderItem={({ item, index }) => (
-          <StepCard
-            step={item}
-            stepIndex={index}
-            totalSteps={totalSteps}
-            unitSystem={unitSystem}
-            width={SCREEN_WIDTH}
-          />
-        )}
-        getItemLayout={(_, index) => ({
-          length: SCREEN_WIDTH,
-          offset: SCREEN_WIDTH * index,
-          index,
-        })}
-        style={s.flatList}
-      />
+      <ScrollView
+        style={s.scrollView}
+        contentContainerStyle={s.scrollContent}
+        showsVerticalScrollIndicator={false}
+        key={`step-${currentStep}`}
+      >
+        <StepCard
+          step={instructions[currentStep]}
+          stepIndex={currentStep}
+          totalSteps={totalSteps}
+          unitSystem={unitSystem}
+          recipeImageUrl={recipe.image_url}
+          recipeCategory={recipe.category}
+          recipeId={recipe.id}
+          ingredients={stepIngredients}
+        />
+      </ScrollView>
 
       {/* Bottom navigation */}
       <View style={[s.bottomNav, { paddingBottom: insets.bottom + spacing.md }]}>
+        {/* Previous button */}
+        <Pressable
+          onPress={handlePrev}
+          style={[s.prevBtn, currentStep === 0 && s.btnDisabled]}
+          disabled={currentStep === 0}
+          accessibilityRole="button"
+          accessibilityLabel="Previous step"
+          testID="cooking-prev-step"
+        >
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={20}
+            color={colors.onSurfaceVariant}
+          />
+          <Text style={s.prevBtnText}>Previous</Text>
+        </Pressable>
+
+        {/* Ingredients pill */}
         <Pressable
           onPress={() => setSidebarVisible(true)}
           style={s.ingredientPill}
           accessibilityRole="button"
           accessibilityLabel="Show ingredients"
         >
-          <MaterialCommunityIcons name="food-variant" size={18} color={colors.inverseOnSurface} />
+          <MaterialCommunityIcons name="food-variant" size={18} color={colors.onSurfaceVariant} />
           <Text style={s.ingredientPillText}>Ingredients</Text>
         </Pressable>
 
-        <View style={s.navArrows}>
+        {/* Next / Done button */}
+        {isLastStep ? (
           <Pressable
-            onPress={handlePrev}
-            style={[s.navBtn, currentStep === 0 && s.navBtnDisabled]}
-            disabled={currentStep === 0}
+            onPress={onClose}
+            style={s.nextBtn}
             accessibilityRole="button"
-            accessibilityLabel="Previous step"
-            testID="cooking-prev-step"
+            accessibilityLabel="Done cooking"
+            testID="cooking-done-button"
           >
-            <MaterialCommunityIcons
-              name="chevron-left"
-              size={32}
-              color={colors.inverseOnSurface}
-            />
+            <Text style={s.nextBtnText}>Done Cooking</Text>
+            <MaterialCommunityIcons name="check" size={20} color={colors.onPrimary} />
           </Pressable>
-
-          {isLastStep ? (
-            <Pressable
-              onPress={onClose}
-              style={s.doneBtn}
-              accessibilityRole="button"
-              accessibilityLabel="Done cooking"
-              testID="cooking-done-button"
-            >
-              <Text style={s.doneBtnText}>Done Cooking</Text>
-            </Pressable>
-          ) : (
-            <Pressable
-              onPress={handleNext}
-              style={s.navBtn}
-              accessibilityRole="button"
-              accessibilityLabel="Next step"
-              testID="cooking-next-step"
-            >
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={32}
-                color={colors.inverseOnSurface}
-              />
-            </Pressable>
-          )}
-        </View>
+        ) : (
+          <Pressable
+            onPress={handleNext}
+            style={s.nextBtn}
+            accessibilityRole="button"
+            accessibilityLabel="Next step"
+            testID="cooking-next-step"
+          >
+            <Text style={s.nextBtnText}>Next Step</Text>
+            <MaterialCommunityIcons name="arrow-right" size={20} color={colors.onPrimary} />
+          </Pressable>
+        )}
       </View>
 
       {/* Ingredient sidebar */}
@@ -207,7 +206,7 @@ export function CookingMode({ recipe, onClose }: CookingModeProps) {
 const s = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.inverseSurface,
+    backgroundColor: colors.surface,
   },
   header: {
     flexDirection: 'row',
@@ -223,15 +222,30 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  flatList: {
+  scrollView: {
     flex: 1,
   },
+  scrollContent: {
+    paddingBottom: spacing.md,
+  },
   bottomNav: {
-    height: 80,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+  },
+  prevBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  prevBtnText: {
+    ...typography.titleMd,
+    color: colors.onSurfaceVariant,
+  },
+  btnDisabled: {
+    opacity: 0.3,
   },
   ingredientPill: {
     flexDirection: 'row',
@@ -240,39 +254,23 @@ const s = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.full,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.surfaceContainerLow,
   },
   ingredientPillText: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: colors.inverseOnSurface,
+    ...typography.bodyMd,
+    color: colors.onSurfaceVariant,
   },
-  navArrows: {
+  nextBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
-  },
-  navBtn: {
-    width: 56,
-    height: 56,
+    gap: spacing.xs,
+    backgroundColor: colors.primary,
     borderRadius: borderRadius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-    opacity: 0.6,
-  },
-  navBtnDisabled: {
-    opacity: 0.2,
-  },
-  doneBtn: {
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.inversePrimary,
   },
-  doneBtnText: {
-    fontFamily: fontFamily.headlineBold,
-    fontWeight: '700',
-    fontSize: 14,
-    color: colors.inverseSurface,
+  nextBtnText: {
+    ...typography.titleMd,
+    color: colors.onPrimary,
   },
 });

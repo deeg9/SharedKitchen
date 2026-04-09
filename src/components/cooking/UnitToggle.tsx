@@ -35,7 +35,7 @@ export function UnitToggle({ value, onChange }: UnitToggleProps) {
 const s = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.surfaceContainerLow,
     borderRadius: borderRadius.sm,
     padding: 2,
   },
@@ -46,14 +46,14 @@ const s = StyleSheet.create({
     alignItems: 'center',
   },
   segmentActive: {
-    backgroundColor: colors.inversePrimary,
+    backgroundColor: colors.primaryFixed,
   },
   label: {
     fontSize: 14,
     fontWeight: '400',
-    color: colors.outlineVariant,
+    color: colors.onSurfaceVariant,
   },
   labelActive: {
-    color: colors.inverseSurface,
+    color: colors.primary,
   },
 });
