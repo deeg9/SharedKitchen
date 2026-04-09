@@ -62,26 +62,26 @@ Requirements for Food Data Integration milestone. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DATA-01 | — | Pending |
-| DATA-02 | — | Pending |
-| DATA-03 | — | Pending |
-| SRCH-01 | — | Pending |
-| SRCH-02 | — | Pending |
-| SRCH-03 | — | Pending |
-| SCAN-01 | — | Pending |
-| SCAN-02 | — | Pending |
-| SCAN-03 | — | Pending |
-| SCAN-04 | — | Pending |
-| NUTR-01 | — | Pending |
-| NUTR-02 | — | Pending |
-| NUTR-03 | — | Pending |
-| NUTR-04 | — | Pending |
+| DATA-01 | Phase 35 | Pending |
+| DATA-02 | Phase 35 | Pending |
+| DATA-03 | Phase 35 | Pending |
+| SRCH-01 | Phase 36 | Pending |
+| SRCH-02 | Phase 36 | Pending |
+| SRCH-03 | Phase 36 | Pending |
+| SCAN-01 | Phase 37 | Pending |
+| SCAN-02 | Phase 37 | Pending |
+| SCAN-03 | Phase 37 | Pending |
+| SCAN-04 | Phase 37 | Pending |
+| NUTR-01 | Phase 38 | Pending |
+| NUTR-02 | Phase 38 | Pending |
+| NUTR-03 | Phase 38 | Pending |
+| NUTR-04 | Phase 38 | Pending |
 
 **Coverage:**
 - v6.0 requirements: 14 total
-- Mapped to phases: 0
-- Unmapped: 14
+- Mapped to phases: 14
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-09*
-*Last updated: 2026-04-09 after initial definition*
+*Last updated: 2026-04-09 after roadmap phase mapping*

@@ -2,7 +2,7 @@
 
 ## Overview
 
-SharedKitchen delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP. v2.0 (Phases 5-9) added Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and E2E testing. v2.1 (Phases 10-12) added recipe discovery filters, Stripe test mode E2E, and code quality polish. v2.2 (Phases 13-15) fixes layout bugs, polishes the sign-in screen, repairs the meal generator edge function, and cleans up profile/settings. v2.3 (Phases 16-17) adds multi-kitchen switching so users can belong to multiple kitchens and have all app data scoped to the active one. v2.4 (Phases 18-22) systematically tests and validates every feature area to ensure production readiness. v3.0 (Phases 23-25) adds video recipe import from TikTok, Instagram, YouTube, and any video URL via paste or share sheet, with transcript-based AI extraction, freemium rate limiting, and a unified Kitchen tab with pantry tracking. v4.0 (Phases 26-29) adds AI vision features: camera-based fridge/pantry scanning to bulk-add inventory, food photo identification for recipe discovery, and meal plan logging from photos. v5.0 (Phases 30-34) adds a Venmo-style social feed layer: kitchen profiles, follow/unfollow, auto-posted meals from the plan, feed with likes, comments, recipe saving, and push notifications for social interactions.
+SharedKitchen delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP. v2.0 (Phases 5-9) added Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and E2E testing. v2.1 (Phases 10-12) added recipe discovery filters, Stripe test mode E2E, and code quality polish. v2.2 (Phases 13-15) fixes layout bugs, polishes the sign-in screen, repairs the meal generator edge function, and cleans up profile/settings. v2.3 (Phases 16-17) adds multi-kitchen switching so users can belong to multiple kitchens and have all app data scoped to the active one. v2.4 (Phases 18-22) systematically tests and validates every feature area to ensure production readiness. v3.0 (Phases 23-25) adds video recipe import from TikTok, Instagram, YouTube, and any video URL via paste or share sheet, with transcript-based AI extraction, freemium rate limiting, and a unified Kitchen tab with pantry tracking. v4.0 (Phases 26-29) adds AI vision features: camera-based fridge/pantry scanning to bulk-add inventory, food photo identification for recipe discovery, and meal plan logging from photos. v5.0 (Phases 30-34) adds a Venmo-style social feed layer: kitchen profiles, follow/unfollow, auto-posted meals from the plan, feed with likes, comments, recipe saving, and push notifications for social interactions. v6.0 (Phases 35-38) integrates external food databases (USDA, Open Food Facts, FatSecret) to provide searchable food data, barcode scanning for packaged foods, and per-recipe/per-day nutrition display powered by AI-assisted ingredient matching.
 
 ## Milestones
 
@@ -15,6 +15,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - **v3.0 Video Recipe Import & Kitchen Tab** — Phases 23-25 (shipped 2026-03-29) — [Archive](milestones/v3.0-ROADMAP.md)
 - ✅ **v4.0 AI Vision — Scan, Snap & Add** — Phases 26-29 (shipped 2026-03-30) — [Archive](milestones/v4.0-ROADMAP.md)
 - ✅ **v5.0 Social Feed** — Phases 30-34 (shipped 2026-04-07) — [Archive](milestones/v5.0-ROADMAP.md)
+- **v6.0 Food Data Integration** — Phases 35-38 (in progress)
 
 ## Phases
 
@@ -96,7 +97,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 </details>
 
 <details>
-<summary>✅ v5.0 Social Feed (Phases 30-34) — SHIPPED 2026-04-07</summary>
+<summary>v5.0 Social Feed (Phases 30-34) — SHIPPED 2026-04-07</summary>
 
 - [x] Phase 30: Social Database & Kitchen Profiles (3/3 plans) — DB foundation, kitchen profiles, search, invite links
 - [x] Phase 31: Follow System (2/2 plans) — Follow/unfollow, follower/following lists
@@ -106,9 +107,68 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 </details>
 
+### v6.0 Food Data Integration (In Progress)
+
+**Milestone Goal:** Integrate external food databases (USDA, Open Food Facts, FatSecret) to provide comprehensive nutrition data, barcode scanning, and searchable food/ingredient data that powers recipes, meal plans, and AI features.
+
+- [ ] **Phase 35: Data Foundation** - Postgres schema, TypeScript types, unit conversion, and nutrition normalization layer
+- [ ] **Phase 36: Food Search** - Edge Functions for USDA/FatSecret search, client store, and searchable food interface
+- [ ] **Phase 37: Barcode Scanning** - Camera barcode scanner, Open Food Facts/FatSecret lookup, and add-to-pantry/grocery flows
+- [ ] **Phase 38: Recipe Nutrition** - AI-assisted ingredient matching, per-recipe nutrition computation, and nutrition display on recipes and meal plans
+
+## Phase Details
+
+### Phase 35: Data Foundation
+**Goal**: App has a canonical food data layer with numeric nutrition storage, unit conversion, and caching infrastructure ready for external API integration
+**Depends on**: Phase 34 (v5.0 complete)
+**Requirements**: DATA-01, DATA-02, DATA-03
+**Success Criteria** (what must be TRUE):
+  1. Nutrition data is stored as canonical numeric values (calories, protein, carbs, fat, fiber, sodium) per serving and per 100g in Postgres
+  2. App can convert between common cooking units (cups, tbsp, oz, ml, g) using food-specific density tables
+  3. Food data cache table exists with full-text search (tsvector + GIN index) and 30-day TTL cleanup
+  4. TypeScript types (FoodItem, NutritionData) are defined and shared between client and Edge Functions
+**Plans**: TBD
+
+### Phase 36: Food Search
+**Goal**: Users can search for any food by name and see nutrition information from a unified database
+**Depends on**: Phase 35
+**Requirements**: SRCH-01, SRCH-02, SRCH-03
+**Success Criteria** (what must be TRUE):
+  1. User can open a food search interface and type a food name to get results from USDA and FatSecret combined
+  2. Each search result displays the food name, brand (if applicable), and key macros (calories, protein, carbs, fat)
+  3. User can tap a search result to see a detailed nutrition breakdown with all tracked nutrients
+  4. Search results are cached in Postgres so repeated queries do not hit external APIs
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 37: Barcode Scanning
+**Goal**: Users can scan any packaged food barcode to instantly look up the product and add it to their pantry or grocery list
+**Depends on**: Phase 36
+**Requirements**: SCAN-01, SCAN-02, SCAN-03, SCAN-04
+**Success Criteria** (what must be TRUE):
+  1. User can point the device camera at a product barcode and the app reads it automatically
+  2. Scanned barcode resolves to a product with name and nutrition data via Open Food Facts or FatSecret fallback
+  3. User can add a scanned product directly to their pantry/fridge inventory with nutrition data attached
+  4. User can add a scanned product to their grocery list with product details preserved
+  5. When a barcode is not found, the app gracefully falls back to name-based food search
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 38: Recipe Nutrition
+**Goal**: Users see accurate nutrition information on every recipe and across their weekly meal plan, powered by AI-assisted ingredient matching
+**Depends on**: Phase 37
+**Requirements**: NUTR-01, NUTR-02, NUTR-03, NUTR-04
+**Success Criteria** (what must be TRUE):
+  1. App matches recipe ingredient text to food database entries using AI-assisted matching with user confirmation for low-confidence matches
+  2. Per-recipe nutrition totals (calories, protein, carbs, fat per serving) are computed from matched ingredient data and cached on the recipe
+  3. Recipe detail screen displays a nutrition card showing calories, protein, carbs, and fat per serving
+  4. Plan tab shows aggregated daily and weekly nutrition totals for all planned meals
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
 
-**Execution Order:** Phases execute in numeric order: 30 -> 31 -> 32 -> 33 -> 34
+**Execution Order:** Phases execute in numeric order: 35 -> 36 -> 37 -> 38
 
 | Phase | Milestone | Plans | Status | Completed |
 |-------|-----------|-------|--------|-----------|
@@ -141,11 +201,15 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 | 27. Fridge/Pantry Photo Scan | v4.0 | 1/2 | Complete | 2026-03-30 |
 | 28. Food Photo to Recipe Discovery | v4.0 | 2/2 | Complete | 2026-03-30 |
 | 29. Food Photo to Meal Logging | v4.0 | 2/2 | Complete | 2026-03-30 |
-| 30. Social Database & Kitchen Profiles | v5.0 | 3/3 | Complete   | 2026-04-07 |
-| 31. Follow System | v5.0 | 2/2 | Complete   | 2026-04-07 |
-| 32. Feed & Auto-Post | v5.0 | 2/2 | Complete   | 2026-04-07 |
-| 33. Social Interactions & Moderation | v5.0 | 3/3 | Complete   | 2026-04-07 |
-| 34. Social Push Notifications | v5.0 | 2/2 | Complete   | 2026-04-07 |
+| 30. Social Database & Kitchen Profiles | v5.0 | 3/3 | Complete | 2026-04-07 |
+| 31. Follow System | v5.0 | 2/2 | Complete | 2026-04-07 |
+| 32. Feed & Auto-Post | v5.0 | 2/2 | Complete | 2026-04-07 |
+| 33. Social Interactions & Moderation | v5.0 | 3/3 | Complete | 2026-04-07 |
+| 34. Social Push Notifications | v5.0 | 2/2 | Complete | 2026-04-07 |
+| 35. Data Foundation | v6.0 | 0/0 | Not started | - |
+| 36. Food Search | v6.0 | 0/0 | Not started | - |
+| 37. Barcode Scanning | v6.0 | 0/0 | Not started | - |
+| 38. Recipe Nutrition | v6.0 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-04-07 after v5.0 milestone shipped*
+*Last updated: 2026-04-09 after v6.0 roadmap created*

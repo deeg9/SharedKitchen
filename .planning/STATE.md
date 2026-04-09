@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Food Data Integration
-status: defining-requirements
+status: ready-to-plan
 stopped_at: null
 last_updated: "2026-04-09"
 last_activity: 2026-04-09
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,14 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-09)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Defining requirements for v6.0 Food Data Integration
+**Current focus:** v6.0 Food Data Integration — Phase 35 ready to plan
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 35 of 38 (Data Foundation)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-04-09 — Milestone v6.0 started
+Status: Ready to plan
+Last activity: 2026-04-09 — Roadmap created for v6.0
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Accumulated Context
 
@@ -37,11 +39,10 @@ Last activity: 2026-04-09 — Milestone v6.0 started
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [v5.0 research]: Kitchen-to-kitchen follow model (not user-to-user) to maintain household-first identity
-- [v5.0 research]: Fan-out-on-read with denormalized feed_posts table (snapshots, not live JOINs to household tables)
-- [v5.0 research]: Share toggle defaults to OFF (privacy-first, opt-in sharing)
-- [v5.0 research]: Moderation (report/block) must ship WITH comments, not after
-- [v5.0 research]: expo-image for cached feed photo rendering (only new npm dependency)
+- [v6.0 roadmap]: Data foundation (schema, types, unit conversion) must precede all API work to avoid type mismatch corruption
+- [v6.0 roadmap]: Cache-first architecture mandatory due to USDA 1K/hr rate limit shared across all users
+- [v6.0 roadmap]: Ingredient-to-food matching uses Gemini 2.5 Flash with curated top-200 mapping table
+- [v6.0 roadmap]: Nutrition is informational context on existing data, not a new tracking workflow
 
 ### Pending Todos
 
@@ -51,6 +52,8 @@ None yet.
 
 - Apple External Purchase Entitlement must be applied for before Stripe checkout ships
 - Manual recipe creation does not set category field -- filters won't work for manually-added recipes
+- FatSecret Premier Free tier requires registration/approval -- if delayed, treat as fallback-only
+- Premium gating decision needed: which food data features are free vs premium (barcode scans, detailed nutrition)
 
 ### Quick Tasks Completed
 
@@ -61,5 +64,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-04-09
-Stopped at: Milestone v6.0 initialized
+Stopped at: v6.0 roadmap created with 4 phases (35-38)
 Resume file: None
