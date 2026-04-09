@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Alert, ActivityIndicator, Pressable } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
@@ -18,15 +18,34 @@ const PREMIUM_PERKS = [
   'Priority Support',
 ];
 
-const FREE_VS_PREMIUM: { feature: string; free: boolean; premium: boolean }[] = [
-  { feature: 'Basic Meal Planning', free: true, premium: true },
-  { feature: 'Grocery Lists', free: true, premium: true },
-  { feature: 'Budget Tracking', free: true, premium: true },
-  { feature: 'Advanced Analytics', free: false, premium: true },
-  { feature: 'AI Suggestions', free: false, premium: true },
-  { feature: 'Unlimited Recipes', free: false, premium: true },
-  { feature: 'Export Lists', free: false, premium: true },
+const FREE_VS_PREMIUM: { feature: string; icon: string; free: string; premium: string }[] = [
+  { feature: 'Collaborative Planning', icon: 'calendar-check', free: 'check', premium: 'check' },
+  { feature: 'Basic Grocery Lists', icon: 'format-list-checks', free: 'check', premium: 'check' },
+  { feature: 'AI Recipe Import', icon: 'robot', free: '3/mo', premium: 'Unlimited' },
+  { feature: 'Budget Analytics', icon: 'chart-line', free: 'dash', premium: 'check' },
+  { feature: 'Social Feed Access', icon: 'account-group', free: 'dash', premium: 'check' },
+  { feature: 'Advanced Leftover Tracker', icon: 'food-variant', free: 'dash', premium: 'check' },
 ];
+
+function renderCellValue(value: string, isPremiumCol: boolean) {
+  if (value === 'check') {
+    return (
+      <MaterialCommunityIcons
+        name="check-circle"
+        size={18}
+        color={isPremiumCol ? colors.primary : colors.primary}
+      />
+    );
+  }
+  if (value === 'dash') {
+    return <Text style={styles.dashText}>{'\u2014'}</Text>;
+  }
+  // Text values like "3/mo" or "Unlimited"
+  if (value === 'Unlimited') {
+    return <Text style={styles.unlimitedText}>{value}</Text>;
+  }
+  return <Text style={styles.cellText}>{value}</Text>;
+}
 
 export function SubscriptionSheet() {
   const { status, currentPeriodEnd, cancelAtPeriodEnd, loading } = useSubscriptionStore();
@@ -59,6 +78,10 @@ export function SubscriptionSheet() {
     } finally {
       setCheckoutLoading(false);
     }
+  };
+
+  const handleYearlyUpgrade = () => {
+    Alert.alert('Coming Soon', 'Yearly pricing will be available soon.');
   };
 
   if (isPremium()) {
@@ -132,67 +155,105 @@ export function SubscriptionSheet() {
     );
   }
 
-  // Free tier view
+  // Free tier view -- redesigned with comparison table and pricing tiers
   return (
     <View style={styles.container}>
-      {/* Free Plan Card */}
-      <Card variant="filled" style={styles.planCard}>
-        <View style={styles.planHeader}>
-          <Text style={styles.planTitle}>Free Plan</Text>
-        </View>
-        <Text style={styles.planSubtitle}>
-          Upgrade to unlock all premium features
+      {/* Compare Plans Section */}
+      <View style={styles.comparePlansSection}>
+        <Text style={styles.comparePlansTitle}>Compare Plans</Text>
+        <Text style={styles.comparePlansSubtitle}>
+          Simple, transparent, and built for your kitchen.
         </Text>
-      </Card>
-
-      {/* Feature Comparison */}
-      <View style={styles.comparisonSection}>
-        <Text style={styles.comparisonTitle}>Compare Plans</Text>
 
         {/* Column Headers */}
         <View style={styles.comparisonHeaderRow}>
-          <Text style={[styles.comparisonFeature, styles.comparisonHeaderText]}>Feature</Text>
-          <Text style={[styles.comparisonCol, styles.comparisonHeaderText]}>Free</Text>
-          <Text style={[styles.comparisonCol, styles.comparisonHeaderText]}>Premium</Text>
+          <Text style={styles.headerFeatureLabel}>Features</Text>
+          <View style={styles.headerFreeCol}>
+            <Text style={styles.headerColLabel}>Free</Text>
+          </View>
+          <View style={styles.headerPremiumCol}>
+            <Text style={styles.headerPremiumLabel}>Premium</Text>
+          </View>
         </View>
 
+        {/* Feature Rows */}
         {FREE_VS_PREMIUM.map((row) => (
-          <View key={row.feature} style={styles.comparisonRow}>
-            <Text style={styles.comparisonFeature}>{row.feature}</Text>
-            <View style={styles.comparisonCol}>
+          <View key={row.feature} style={styles.featureRow}>
+            <View style={styles.featureNameCol}>
               <MaterialCommunityIcons
-                name={row.free ? 'check' : 'close'}
-                size={18}
-                color={row.free ? colors.primary : colors.outlineVariant}
+                name={row.icon as any}
+                size={16}
+                color={colors.onSurfaceVariant}
               />
+              <Text style={styles.featureName}>{row.feature}</Text>
             </View>
-            <View style={styles.comparisonCol}>
-              <MaterialCommunityIcons
-                name={row.premium ? 'check' : 'close'}
-                size={18}
-                color={row.premium ? colors.primary : colors.outlineVariant}
-              />
+            <View style={styles.freeValueCol}>
+              {renderCellValue(row.free, false)}
+            </View>
+            <View style={styles.premiumValueCol}>
+              {renderCellValue(row.premium, true)}
             </View>
           </View>
         ))}
       </View>
 
-      {/* Price + Upgrade */}
-      <View style={styles.upgradeSection}>
-        <Text style={styles.priceTag}>$9.99</Text>
-        <Text style={styles.pricePeriod}>/month</Text>
+      {/* Monthly Pricing Tier */}
+      <View style={styles.monthlyCard}>
+        <Text style={styles.tierLabel}>Monthly</Text>
+        <View style={styles.priceRow}>
+          <Text style={styles.priceAmount}>$4.99</Text>
+          <Text style={styles.pricePeriod}>/mo</Text>
+        </View>
+        <Text style={styles.tierSubtitle}>Flexible planning for individual creators.</Text>
+        <Pressable
+          style={styles.monthlyButton}
+          onPress={handleUpgrade}
+          disabled={checkoutLoading}
+          testID="subscription-upgrade-monthly"
+        >
+          {checkoutLoading ? (
+            <ActivityIndicator size={18} color={colors.primary} />
+          ) : (
+            <Text style={styles.monthlyButtonText}>Get Monthly</Text>
+          )}
+        </Pressable>
       </View>
 
-      <Button
-        variant="secondary"
-        size="lg"
-        onPress={handleUpgrade}
-        disabled={checkoutLoading}
-        style={styles.upgradeButton}
-        testID="subscription-upgrade-button"
-      >
-        {checkoutLoading ? <ActivityIndicator size={18} color="#ffffff" /> : 'Upgrade to Premium'}
-      </Button>
+      {/* BEST VALUE Badge */}
+      <View style={styles.bestValueBadge}>
+        <Text style={styles.bestValueText}>BEST VALUE</Text>
+      </View>
+
+      {/* Yearly Pricing Tier */}
+      <View style={styles.yearlyCard}>
+        <Text style={styles.yearlyTierLabel}>Yearly</Text>
+        <View style={styles.priceRow}>
+          <Text style={styles.yearlyPriceAmount}>$39.99</Text>
+          <Text style={styles.yearlyPricePeriod}>/yr</Text>
+        </View>
+        <Text style={styles.yearlySaveText}>Save 33% annually</Text>
+        <Text style={styles.yearlySubtitle}>Full access for the dedicated home chef.</Text>
+        <Pressable
+          style={styles.yearlyButton}
+          onPress={handleYearlyUpgrade}
+          testID="subscription-upgrade-yearly"
+        >
+          <Text style={styles.yearlyButtonText}>Upgrade to Premium</Text>
+        </Pressable>
+      </View>
+
+      {/* Secure checkout note */}
+      <View style={styles.secureNote}>
+        <View style={styles.secureRow}>
+          <MaterialCommunityIcons name="lock-outline" size={14} color={colors.onSurfaceVariant} />
+          <Text style={styles.secureText}>Secure checkout via App Store</Text>
+        </View>
+        <Text style={styles.disclaimerText}>
+          Subscription automatically renews unless canceled 24 hours before the end of the period. Manage in Account Settings.
+        </Text>
+      </View>
+
+      {/* Checkout loading indicator */}
       {checkoutLoading && (
         <Text style={styles.checkoutLoadingText}>Preparing secure checkout...</Text>
       )}
@@ -213,7 +274,9 @@ export function SubscriptionSheet() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingHorizontal: spacing.lg,
   },
+  // Premium view styles
   planCard: {
     marginBottom: spacing.lg,
   },
@@ -231,10 +294,6 @@ const styles = StyleSheet.create({
   planTitle: {
     ...typography.titleLg,
     color: colors.onSurface,
-  },
-  planSubtitle: {
-    ...typography.bodyMd,
-    color: colors.onSurfaceVariant,
   },
   memberSince: {
     ...typography.bodyMd,
@@ -258,59 +317,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: spacing.md,
   },
-  comparisonSection: {
-    marginBottom: spacing.lg,
-  },
-  comparisonTitle: {
-    ...typography.titleMd,
-    color: colors.onSurface,
-    marginBottom: spacing.md,
-  },
-  comparisonHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.outlineVariant,
-  },
-  comparisonHeaderText: {
-    fontFamily: fontFamily.bodySemiBold,
-    color: colors.onSurfaceVariant,
-  },
-  comparisonRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.sm + 2,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.surfaceContainerHigh,
-  },
-  comparisonFeature: {
-    ...typography.bodyMd,
-    color: colors.onSurface,
-    flex: 1,
-  },
-  comparisonCol: {
-    width: 60,
-    alignItems: 'center',
-  },
-  upgradeSection: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    justifyContent: 'center',
-    marginBottom: spacing.md,
-  },
-  priceTag: {
-    fontFamily: fontFamily.headlineBold,
-    fontSize: 32,
-    color: colors.onSurface,
-  },
-  pricePeriod: {
-    ...typography.bodyLg,
-    color: colors.onSurfaceVariant,
-  },
-  upgradeButton: {
-    marginBottom: spacing.lg,
-  },
   warningBanner: {
     flexDirection: 'row',
     backgroundColor: '#ffdad6',
@@ -329,6 +335,221 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   canceledText: { ...typography.bodyMd, color: colors.onSurface },
+
+  // Compare Plans section
+  comparePlansSection: {
+    marginTop: spacing.xl,
+    marginBottom: spacing.lg,
+  },
+  comparePlansTitle: {
+    ...typography.headlineMd,
+    color: colors.onSurface,
+    textAlign: 'center',
+  },
+  comparePlansSubtitle: {
+    ...typography.bodyMd,
+    color: colors.onSurfaceVariant,
+    textAlign: 'center',
+    marginTop: spacing.xs,
+    marginBottom: spacing.lg,
+  },
+  comparisonHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.outlineVariant,
+  },
+  headerFeatureLabel: {
+    ...typography.labelSm,
+    color: colors.onSurfaceVariant,
+    flex: 1,
+  },
+  headerFreeCol: {
+    width: 60,
+    alignItems: 'center',
+  },
+  headerColLabel: {
+    ...typography.labelSm,
+    color: colors.onSurfaceVariant,
+  },
+  headerPremiumCol: {
+    width: 70,
+    alignItems: 'center',
+  },
+  headerPremiumLabel: {
+    ...typography.labelSm,
+    color: colors.secondary,
+    fontStyle: 'italic',
+  },
+  featureRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.sm + 4,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.surfaceContainerHigh,
+  },
+  featureNameCol: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: spacing.sm,
+  },
+  featureName: {
+    ...typography.bodyMd,
+    color: colors.onSurface,
+    flex: 1,
+  },
+  freeValueCol: {
+    width: 60,
+    alignItems: 'center',
+  },
+  premiumValueCol: {
+    width: 70,
+    alignItems: 'center',
+  },
+  dashText: {
+    ...typography.bodyMd,
+    color: colors.outlineVariant,
+  },
+  unlimitedText: {
+    ...typography.bodySm,
+    color: colors.secondary,
+    fontStyle: 'italic',
+  },
+  cellText: {
+    ...typography.bodySm,
+    color: colors.onSurfaceVariant,
+  },
+
+  // Monthly pricing tier
+  monthlyCard: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.outlineVariant,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    marginTop: spacing.xl,
+    alignItems: 'center',
+  },
+  tierLabel: {
+    ...typography.titleMd,
+    color: colors.onSurface,
+  },
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    marginTop: spacing.xs,
+  },
+  priceAmount: {
+    ...typography.headlineLg,
+    color: colors.onSurface,
+  },
+  pricePeriod: {
+    ...typography.bodyMd,
+    color: colors.onSurfaceVariant,
+  },
+  tierSubtitle: {
+    ...typography.bodySm,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xs,
+  },
+  monthlyButton: {
+    borderWidth: 1.5,
+    borderColor: colors.primary,
+    borderRadius: borderRadius.full,
+    paddingVertical: spacing.sm + 2,
+    paddingHorizontal: spacing.lg,
+    marginTop: spacing.md,
+  },
+  monthlyButtonText: {
+    ...typography.titleMd,
+    color: colors.primary,
+  },
+
+  // BEST VALUE badge
+  bestValueBadge: {
+    backgroundColor: colors.primaryFixed,
+    borderRadius: borderRadius.full,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    alignSelf: 'center',
+    marginBottom: -spacing.sm,
+    marginTop: spacing.lg,
+    zIndex: 1,
+  },
+  bestValueText: {
+    ...typography.labelSm,
+    color: colors.primary,
+    fontWeight: '700',
+  },
+
+  // Yearly pricing tier
+  yearlyCard: {
+    backgroundColor: colors.secondaryContainer,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    alignItems: 'center',
+  },
+  yearlyTierLabel: {
+    ...typography.titleMd,
+    color: colors.onSecondary,
+  },
+  yearlyPriceAmount: {
+    ...typography.headlineLg,
+    color: colors.onSecondary,
+  },
+  yearlyPricePeriod: {
+    ...typography.bodyMd,
+    color: colors.onSecondary,
+  },
+  yearlySaveText: {
+    ...typography.bodySm,
+    color: colors.onSecondary,
+    fontStyle: 'italic',
+    textDecorationLine: 'underline',
+    marginTop: spacing.xs,
+  },
+  yearlySubtitle: {
+    ...typography.bodySm,
+    color: colors.onSecondary,
+    marginTop: spacing.xs,
+  },
+  yearlyButton: {
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.full,
+    paddingVertical: spacing.sm + 4,
+    paddingHorizontal: spacing.xl,
+    marginTop: spacing.md,
+  },
+  yearlyButtonText: {
+    ...typography.titleMd,
+    color: colors.onPrimary,
+  },
+
+  // Secure checkout note
+  secureNote: {
+    marginTop: spacing.lg,
+    alignItems: 'center',
+  },
+  secureRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  secureText: {
+    ...typography.bodySm,
+    color: colors.onSurfaceVariant,
+  },
+  disclaimerText: {
+    ...typography.bodySm,
+    fontSize: 10,
+    color: colors.outlineVariant,
+    textAlign: 'center',
+    marginTop: spacing.xs,
+  },
+
+  // Checkout states
   checkoutLoadingText: {
     ...typography.bodySm,
     color: colors.onSurfaceVariant,
