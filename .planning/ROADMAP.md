@@ -157,7 +157,10 @@ Plans:
   3. User can add a scanned product directly to their pantry/fridge inventory with nutrition data attached
   4. User can add a scanned product to their grocery list with product details preserved
   5. When a barcode is not found, the app gracefully falls back to name-based food search
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 37-01-PLAN.md — food-barcode Edge Function (OFF + FatSecret lookup), client API, foodStore barcode state, BarcodeScannerScreen
+- [ ] 37-02-PLAN.md — BarcodeResultCard with add-to-pantry/grocery, Kitchen tab scanner integration
 **UI hint**: yes
 
 ### Phase 38: Recipe Nutrition
@@ -169,7 +172,10 @@ Plans:
   2. Per-recipe nutrition totals (calories, protein, carbs, fat per serving) are computed from matched ingredient data and cached on the recipe
   3. Recipe detail screen displays a nutrition card showing calories, protein, carbs, and fat per serving
   4. Plan tab shows aggregated daily and weekly nutrition totals for all planned meals
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 37-01-PLAN.md — food-barcode Edge Function (OFF + FatSecret lookup), client API, foodStore barcode state, BarcodeScannerScreen
+- [ ] 37-02-PLAN.md — BarcodeResultCard with add-to-pantry/grocery, Kitchen tab scanner integration
 **UI hint**: yes
 
 ## Progress
@@ -214,7 +220,7 @@ Plans:
 | 34. Social Push Notifications | v5.0 | 2/2 | Complete | 2026-04-07 |
 | 35. Data Foundation | v6.0 | 2/2 | Complete    | 2026-04-09 |
 | 36. Food Search | v6.0 | 2/2 | Complete    | 2026-04-09 |
-| 37. Barcode Scanning | v6.0 | 0/0 | Not started | - |
+| 37. Barcode Scanning | v6.0 | 0/2 | Planning    | - |
 | 38. Recipe Nutrition | v6.0 | 0/0 | Not started | - |
 
 ---
