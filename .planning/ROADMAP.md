@@ -126,7 +126,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - [x] **Phase 40: Independent Screen Redesigns** - Onboarding (6 screens), Recipe Library, Cooking Mode, and Premium Upgrade — screens requiring no store changes (completed 2026-04-09)
 - [x] **Phase 41: Plan Tab Redesign** - Flagship day-focused meal planner with hero card, date strip, day/week toggle, and grocery shortcut (completed 2026-04-09)
 - [x] **Phase 42: Grocery List Redesign** - High-risk grocery screen with shopping progress, sync-with-plan, and enhanced item rows while preserving 4 real-time hooks (completed 2026-04-10)
-- [ ] **Phase 43: Budget, Profile & Social Feed** - Store-enhanced screens (budget insights, cooking stats) plus social feed redesign and cross-app Maestro test updates
+- [x] **Phase 43: Budget, Profile & Social Feed** - Store-enhanced screens (budget insights, cooking stats) plus social feed redesign and cross-app Maestro test updates (completed 2026-04-10)
 
 ## Phase Details
 
@@ -211,7 +211,7 @@ Plans:
 Plans:
 - [x] 43-01-PLAN.md — Budget dashboard redesign (DonutChart, MonthPicker, insights, category bars, weekly charts)
 - [x] 43-02-PLAN.md — Social feed redesign (FollowingStrip, hero photos, Try this recipe CTAs)
-- [ ] 43-03-PLAN.md — Profile redesign (CookingInsights, HouseholdDistribution, grouped settings)
+- [x] 43-03-PLAN.md — Profile redesign (CookingInsights, HouseholdDistribution, grouped settings)
 **UI hint**: yes
 
 ## Progress
@@ -262,7 +262,7 @@ Plans:
 | 40. Independent Screen Redesigns | v7.0 | 4/4 | Complete    | 2026-04-09 |
 | 41. Plan Tab Redesign | v7.0 | 2/2 | Complete    | 2026-04-09 |
 | 42. Grocery List Redesign | v7.0 | 2/2 | Complete    | 2026-04-10 |
-| 43. Budget, Profile & Social Feed | v7.0 | 2/3 | In Progress|  |
+| 43. Budget, Profile & Social Feed | v7.0 | 3/3 | Complete   | 2026-04-10 |
 
 ---
 *Last updated: 2026-04-07 after v7.0 roadmap creation*

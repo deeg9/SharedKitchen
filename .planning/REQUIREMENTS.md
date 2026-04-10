@@ -51,11 +51,11 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 
 ### Profile & Settings
 
-- [ ] **PROF-01**: User sees a Cooking Insights section with streak counter and plan completion percentage ring
-- [ ] **PROF-02**: User sees their most-cooked recipe with photo and frequency badge
-- [ ] **PROF-03**: User sees a household distribution chart showing cooking contribution per member
-- [ ] **PROF-04**: Preferences (Dietary, Default Servings, Notifications) display as grouped navigation rows that push to detail screens
-- [ ] **PROF-05**: Account & Subscription section (Manage Subscription, Dark Mode toggle, Data Export) displays as grouped navigation rows
+- [x] **PROF-01**: User sees a Cooking Insights section with streak counter and plan completion percentage ring
+- [x] **PROF-02**: User sees their most-cooked recipe with photo and frequency badge
+- [x] **PROF-03**: User sees a household distribution chart showing cooking contribution per member
+- [x] **PROF-04**: Preferences (Dietary, Default Servings, Notifications) display as grouped navigation rows that push to detail screens
+- [x] **PROF-05**: Account & Subscription section (Manage Subscription, Dark Mode toggle, Data Export) displays as grouped navigation rows
 
 ### Onboarding
 
@@ -140,11 +140,11 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 | BUDG-03 | Phase 43 | Complete |
 | BUDG-04 | Phase 43 | Complete |
 | BUDG-05 | Phase 43 | Complete |
-| PROF-01 | Phase 43 | Pending |
-| PROF-02 | Phase 43 | Pending |
-| PROF-03 | Phase 43 | Pending |
-| PROF-04 | Phase 43 | Pending |
-| PROF-05 | Phase 43 | Pending |
+| PROF-01 | Phase 43 | Complete |
+| PROF-02 | Phase 43 | Complete |
+| PROF-03 | Phase 43 | Complete |
+| PROF-04 | Phase 43 | Complete |
+| PROF-05 | Phase 43 | Complete |
 | ONBR-01 | Phase 40 | Complete |
 | ONBR-02 | Phase 40 | Complete |
 | ONBR-03 | Phase 40 | Complete |
