@@ -4,8 +4,7 @@ name: "Budget Dashboard View"
 # Budget Dashboard View
 # Opens budget tab and verifies categories are visible.
 
-- launchApp:
-    clearState: true
+- launchApp
 - runFlow: "helpers/login.yaml"
 
 # Navigate to Budget tab

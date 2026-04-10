@@ -104,17 +104,17 @@ export function CookingTimer({ durationSeconds, label, onComplete }: CookingTime
 
 const s = StyleSheet.create({
   container: {
-    backgroundColor: colors.surfaceContainerLow,
-    borderRadius: borderRadius.lg,
-    padding: spacing.md,
+    backgroundColor: colors.primaryFixed,
+    borderRadius: borderRadius.xl,
+    padding: spacing.lg,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: spacing.md,
+    marginTop: spacing.lg,
   },
   iconCircle: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     borderRadius: borderRadius.full,
     backgroundColor: colors.secondaryContainer,
     alignItems: 'center',
@@ -125,14 +125,19 @@ const s = StyleSheet.create({
     marginLeft: spacing.md,
   },
   label: {
-    ...typography.labelSm,
-    color: colors.onSurfaceVariant,
+    fontFamily: fontFamily.bodySemiBold,
+    fontSize: 9,
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+    color: colors.primary,
+    marginBottom: 2,
   },
   digits: {
-    fontFamily: fontFamily.headlineBold,
-    fontSize: 32,
+    fontFamily: fontFamily.headlineExtraBold,
+    fontSize: 40,
     color: colors.onSurface,
     fontVariant: ['tabular-nums'],
+    letterSpacing: -1,
   },
   actionBtn: {
     backgroundColor: colors.primary,

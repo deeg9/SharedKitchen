@@ -4,8 +4,7 @@ name: "Grocery Item Check-Off"
 # Grocery item check-off flow
 # Assumes user is logged in with an existing grocery list
 
-- launchApp:
-    clearState: true
+- launchApp
 - runFlow: "helpers/login.yaml"
 
 # Navigate to Grocery tab

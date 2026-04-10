@@ -5,8 +5,7 @@ appId: com.sharedkitchen.app
 # Assumes the user is logged in and at least one day has a meal assigned.
 # Best run after meal-plan-add-edit.yaml to ensure a meal exists.
 
-- launchApp:
-    clearState: true
+- launchApp
 - runFlow: "helpers/login.yaml"
 
 # Navigate to Plan tab

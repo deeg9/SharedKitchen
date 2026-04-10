@@ -5,11 +5,11 @@ import { useRouter } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Input } from '../ui/Input';
 import { Skeleton } from '../ui/Skeleton';
-import { RecipeCard } from './RecipeCard';
+import { EditorialRecipeCard } from './EditorialRecipeCard';
 import { FilterBar } from './FilterBar';
 import { useRecipeStore } from '../../stores/recipeStore';
 import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
+import { typography, fontFamily } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
 import { Recipe, RecipeRating } from '../../types/database';
 
@@ -35,7 +35,6 @@ export function RecipeGrid({ favorites, ratings }: RecipeGridProps) {
   const allRecipes = filteredRecipes();
   const favMap = favorites ?? new Map();
 
-  // Apply filter chip logic on top of store filters
   const recipes = selectedFilter === 'Favorites'
     ? allRecipes.filter((r) => favMap.get(r.id))
     : allRecipes;
@@ -50,7 +49,6 @@ export function RecipeGrid({ favorites, ratings }: RecipeGridProps) {
       resetFilters();
       setMaxPrepTime(30);
     }
-    // 'Favorites' uses client-side filtering above
   }, [resetFilters, setMaxPrepTime]);
 
   const getRating = useCallback((recipeId: string): number | undefined => {
@@ -60,12 +58,19 @@ export function RecipeGrid({ favorites, ratings }: RecipeGridProps) {
   }, [ratings]);
 
   const renderRecipeCard = useCallback(({ item }: { item: Recipe }) => (
-    <RecipeCard
+    <EditorialRecipeCard
       recipe={item}
       isFavorite={favMap.get(item.id) ?? false}
       rating={getRating(item.id)}
     />
   ), [favMap, getRating]);
+
+  const renderHeader = useCallback(() => (
+    <View style={styles.sectionHeader}>
+      <Text style={styles.sectionTitle}>Your Collection</Text>
+      <Text style={styles.sectionCount}>{recipes.length} recipes</Text>
+    </View>
+  ), [recipes.length]);
 
   const renderFooter = useCallback(() => (
     <Pressable
@@ -89,7 +94,7 @@ export function RecipeGrid({ favorites, ratings }: RecipeGridProps) {
         <View style={styles.skeletonGrid}>
           {[1, 2, 3].map((i) => (
             <View key={i} style={styles.skeletonCard}>
-              <Skeleton.Card />
+              <Skeleton.Card style={{ height: 200, borderRadius: borderRadius.xl }} />
               <Skeleton.Text width="80%" style={{ marginTop: spacing.sm }} />
               <Skeleton.Text width="50%" style={{ marginTop: spacing.xs }} />
             </View>
@@ -130,10 +135,11 @@ export function RecipeGrid({ favorites, ratings }: RecipeGridProps) {
         <FlashList
           data={recipes}
           renderItem={renderRecipeCard}
-          estimatedItemSize={320}
+          estimatedItemSize={290}
           keyExtractor={(item: Recipe) => item.id}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          ListHeaderComponent={renderHeader}
           ListFooterComponent={renderFooter}
         />
       )}
@@ -146,7 +152,26 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   listContent: {
-    paddingBottom: spacing.xxl,
+    paddingBottom: spacing.xxl + spacing.xl,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    marginBottom: spacing.lg,
+    marginTop: spacing.xs,
+  },
+  sectionTitle: {
+    fontFamily: fontFamily.headlineBold,
+    fontSize: 22,
+    letterSpacing: -0.25,
+    color: colors.onSurface,
+  },
+  sectionCount: {
+    fontFamily: fontFamily.label,
+    fontSize: 12,
+    letterSpacing: 0.5,
+    color: colors.onSurfaceVariant,
   },
   skeletonGrid: {
     gap: spacing.md,

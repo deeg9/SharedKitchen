@@ -6,8 +6,7 @@ name: "Negative Path: Failed/Cancelled Payment"
 # Since Stripe checkout opens a webview that cannot be fully controlled in Maestro,
 # this flow navigates to checkout, dismisses it, and verifies user remains on free tier
 
-- launchApp:
-    clearState: true
+- launchApp
 - runFlow: "helpers/login.yaml"
 
 # Navigate to Profile tab

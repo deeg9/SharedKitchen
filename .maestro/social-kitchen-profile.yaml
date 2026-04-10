@@ -2,27 +2,39 @@ appId: com.sharedkitchen.app
 name: "Kitchen Profile View"
 ---
 # Kitchen Profile View
-# Navigates to the user's own kitchen profile and verifies profile card elements.
+# Opens kitchen search, searches for own kitchen, taps result to view profile.
 
-- launchApp:
-    clearState: true
+- launchApp
 - runFlow: "helpers/login.yaml"
 
-# Navigate to Profile tab
+# Navigate to Plan tab
 - tapOn:
-    id: "profile-tab"
+    id: "plan-tab"
 
-# Wait for profile to load
+# Open kitchen search
+- tapOn:
+    id: "plan-search-icon"
+
+# Wait for search input
 - extendedWaitUntil:
     visible:
-      text: "Your Kitchens"
+      id: "kitchen-search-input"
+    timeout: 3000
+
+# Search for own kitchen
+- tapOn:
+    id: "kitchen-search-input"
+- inputText: "Test Kitchen"
+
+# Wait for search results and tap the first result
+- extendedWaitUntil:
+    visible:
+      text: "Test Kitchen"
     timeout: 5000
 
-# Tap on the first kitchen row to open its profile
 - tapOn:
-    text: ".*"
+    text: "Test Kitchen"
     index: 0
-    retryTapIfNoChange: false
 
 # Wait for kitchen profile screen to load
 - extendedWaitUntil:

@@ -8,8 +8,8 @@ import { GroceryItem as GroceryItemType } from '../../types/database';
 import { GroceryItem } from './GroceryItem';
 
 const SECTION_ICONS: Record<string, string> = {
-  'Proteins': 'food-steak',
-  'Produce': 'leaf',
+  'Proteins': 'food-drumstick',
+  'Produce': 'fruit-cherries',
   'Dairy & Eggs': 'egg-outline',
   'Pantry': 'cupboard-outline',
   'Other': 'package-variant',
@@ -44,11 +44,13 @@ export function GrocerySection({
         onPress={() => setCollapsed(!collapsed)}
       >
         <View style={styles.headerLeft}>
-          <MaterialCommunityIcons
-            name={(SECTION_ICONS[title] || 'tag-outline') as any}
-            size={22}
-            color={colors.onSurfaceVariant}
-          />
+          <View style={styles.iconCircle}>
+            <MaterialCommunityIcons
+              name={(SECTION_ICONS[title] || 'tag-outline') as any}
+              size={18}
+              color={colors.primary}
+            />
+          </View>
           {title === 'Completed' ? (
             <Text style={styles.title}>Completed ({items.length})</Text>
           ) : (
@@ -95,6 +97,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
+  },
+  iconCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.primaryFixed,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
     ...typography.titleMd,

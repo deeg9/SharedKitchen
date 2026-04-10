@@ -5,8 +5,7 @@ appId: com.sharedkitchen.app
 # After dish identification (manual step), verifies both action buttons
 # and meal slot picker.
 
-- launchApp:
-    clearState: true
+- launchApp
 - runFlow: "helpers/login.yaml"
 
 # Wait for app to fully load

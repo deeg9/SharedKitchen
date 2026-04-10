@@ -1,0 +1,5 @@
+appId: com.sharedkitchen.app
+---
+# Dismiss the notification permission prompt by tapping "Not Now"
+- tapOn:
+    text: "Not Now"

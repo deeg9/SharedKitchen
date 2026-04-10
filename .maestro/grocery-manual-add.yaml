@@ -4,8 +4,7 @@ name: "Grocery Manual Item Add"
 # Manual grocery item add flow
 # Assumes user is logged in with an existing grocery list
 
-- launchApp:
-    clearState: true
+- launchApp
 - runFlow: "helpers/login.yaml"
 
 # Navigate to Grocery tab

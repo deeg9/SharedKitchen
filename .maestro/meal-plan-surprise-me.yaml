@@ -4,8 +4,7 @@ appId: com.sharedkitchen.app
 # Triggers Surprise Me, views the suggestion, and accepts it.
 # Assumes the user is logged in and at least one recipe exists in the library.
 
-- launchApp:
-    clearState: true
+- launchApp
 - runFlow: "helpers/login.yaml"
 
 # Navigate to Plan tab

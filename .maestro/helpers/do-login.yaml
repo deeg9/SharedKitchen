@@ -1,21 +1,29 @@
 appId: com.sharedkitchen.app
 ---
-# Actual sign-in steps. Called conditionally from login.yaml.
+# Actual sign-in steps. Called from login.yaml.
 
 - tapOn:
     id: "sign-in-email-input"
-- inputText: "testuser@example.com"
+- inputText: "seller@example.com"
 - tapOn:
     id: "sign-in-password-input"
 - inputText: "***REMOVED***"
 - tapOn:
     id: "sign-in-submit-button"
+
+# Wait for main app OR notification prompt to appear
 - extendedWaitUntil:
     visible:
-      text: ".*Plan.*|.*Recipes.*|.*Welcome.*"
-    timeout: 10000
+      text: ".*Plan.*|.*Recipes.*|.*Not Now.*|.*Welcome.*"
+    timeout: 15000
 
-# Dismiss notification prompt if it appears after login
+# Dismiss notification prompt if present
 - tapOn:
     text: "Not Now"
     optional: true
+
+# Wait for tabs to be ready
+- extendedWaitUntil:
+    visible:
+      id: "plan-tab"
+    timeout: 10000

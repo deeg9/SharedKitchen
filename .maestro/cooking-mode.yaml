@@ -6,8 +6,7 @@ appId: com.sharedkitchen.app
 # Covers: RMGMT-04 (Start Cooking), COOK-01 (step display/navigation), COOK-03 (unit toggle),
 #          COOK-04 (ingredient sidebar), COOK-05 (Done Cooking)
 
-- launchApp:
-    clearState: true
+- launchApp
 - runFlow: "helpers/login.yaml"
 
 # Navigate to Recipes tab

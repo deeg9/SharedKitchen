@@ -1,24 +1,10 @@
 appId: com.sharedkitchen.app
 ---
-# Reusable login sub-flow. Include via: - runFlow: "helpers/login.yaml"
-# Handles three cases:
-#   1. Notification prompt is showing → dismiss it
-#   2. Already logged in → skip login
-#   3. Sign-in screen → enter credentials
+# Reusable login sub-flow.
+# Just waits for the app to be ready (tabs visible).
+# Assumes user is already logged in (no clearState).
 
-# Dismiss notification prompt if present
-- tapOn:
-    text: "Not Now"
-    optional: true
-
-# Wait for either Sign In screen or main app tabs
 - extendedWaitUntil:
     visible:
-      text: ".*Sign In.*|.*Plan.*|.*Recipes.*"
+      id: "plan-tab"
     timeout: 15000
-
-# If Sign In is visible, perform login; otherwise already authenticated
-- runFlow:
-    when:
-      visible: "Sign In"
-    file: "helpers/do-login.yaml"

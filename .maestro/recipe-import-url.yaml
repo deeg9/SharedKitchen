@@ -4,8 +4,7 @@ appId: com.sharedkitchen.app
 # Tests AI-powered recipe import from a URL.
 # Assumes the user is already logged in (no clearState).
 
-- launchApp:
-    clearState: true
+- launchApp
 - runFlow: "helpers/login.yaml"
 
 # Navigate to Recipes tab

@@ -13,20 +13,20 @@ import {
 } from 'react-native';
 import { Link } from 'expo-router';
 import * as Crypto from 'expo-crypto';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-
 import { supabase } from '../../src/lib/supabase';
 import { colors } from '../../src/theme/colors';
 import { AppLogo } from '../../src/components/ui/AppLogo';
 
-// Configure Google Sign-In (safe to call even without client IDs)
+// Lazy-import Google Sign-In to avoid crash in Expo Go (native module not available)
+let GoogleSignin: any = null;
 try {
+  GoogleSignin = require('@react-native-google-signin/google-signin').GoogleSignin;
   GoogleSignin.configure({
     webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
   });
 } catch {
-  // Google Sign-In not available in this environment
+  // Google Sign-In not available in this environment (Expo Go)
 }
 
 export default function SignInScreen() {

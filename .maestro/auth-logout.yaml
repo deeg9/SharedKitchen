@@ -1,7 +1,6 @@
 appId: com.sharedkitchen.app
 ---
-- launchApp:
-    clearState: true
+- launchApp
 - runFlow: "helpers/login.yaml"
 - tapOn:
     id: "profile-tab"

@@ -4,8 +4,7 @@ appId: com.sharedkitchen.app
 # Tests: Shopping List segment camera flow triggers identify intent.
 # Verifies FAB and camera sheet on Shopping List.
 
-- launchApp:
-    clearState: true
+- launchApp
 - runFlow: "helpers/login.yaml"
 
 # Wait for app to fully load

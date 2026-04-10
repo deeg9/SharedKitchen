@@ -4,8 +4,7 @@ name: "Kitchen Search"
 # Kitchen Search Flow
 # Opens the search overlay from Plan tab, types a query, closes search.
 
-- launchApp:
-    clearState: true
+- launchApp
 - runFlow: "helpers/login.yaml"
 
 # Navigate to Plan tab

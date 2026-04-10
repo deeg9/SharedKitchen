@@ -4,8 +4,7 @@ name: "Social Feed View"
 # Social Feed View
 # Navigates to Plan tab, switches to Feed segment, verifies feed loads.
 
-- launchApp:
-    clearState: true
+- launchApp
 - runFlow: "helpers/login.yaml"
 
 # Navigate to Plan tab

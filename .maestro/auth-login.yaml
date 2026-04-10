@@ -5,7 +5,7 @@ appId: com.sharedkitchen.app
 - assertVisible: "Sign In"
 - tapOn:
     id: "sign-in-email-input"
-- inputText: "testuser@example.com"
+- inputText: "seller@example.com"
 - tapOn:
     id: "sign-in-password-input"
 - inputText: "***REMOVED***"

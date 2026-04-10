@@ -4,8 +4,7 @@ name: "Negative Path: AI Recipe Import Error"
 # AI timeout/error negative path
 # Tests that importing from an invalid URL shows an error gracefully
 
-- launchApp:
-    clearState: true
+- launchApp
 - runFlow: "helpers/login.yaml"
 
 # Navigate to Recipes tab

@@ -6,8 +6,7 @@ name: "Negative Path: Notification Permissions Denied"
 # Note: Maestro cannot control iOS system permission dialogs
 # This flow tests the contextual pre-prompt (PermissionPrompt) dismiss path
 
-- launchApp:
-    clearState: true
+- launchApp
 - runFlow: "helpers/login.yaml"
 
 # Navigate to Profile tab

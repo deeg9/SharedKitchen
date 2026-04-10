@@ -4,8 +4,7 @@ appId: com.sharedkitchen.app
 # Creates a recipe via the manual form with name, category, ingredients, and instructions.
 # Assumes the user is already logged in (no clearState).
 
-- launchApp:
-    clearState: true
+- launchApp
 - runFlow: "helpers/login.yaml"
 
 # Navigate to Recipes tab

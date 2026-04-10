@@ -5,8 +5,7 @@ name: "Premium Subscription Checkout"
 # Tests navigation to subscription screen and checkout UI
 # Note: Stripe checkout cannot be fully completed in E2E -- verifies up to payment UI
 
-- launchApp:
-    clearState: true
+- launchApp
 - runFlow: "helpers/login.yaml"
 
 # Navigate to Profile tab

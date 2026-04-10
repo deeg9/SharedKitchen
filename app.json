@@ -69,7 +69,8 @@
         {
           "cameraPermission": "SharedKitchen uses your camera to scan food and identify dishes."
         }
-      ]
+      ],
+      "expo-image"
     ],
     "extra": {
       "router": {},
