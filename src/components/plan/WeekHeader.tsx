@@ -11,8 +11,6 @@ interface WeekHeaderProps {
   onPrevWeek: () => void;
   onNextWeek: () => void;
   onToday: () => void;
-  viewMode?: 'day' | 'week';
-  onViewModeChange?: (mode: 'day' | 'week') => void;
 }
 
 export function WeekHeader({
@@ -21,8 +19,6 @@ export function WeekHeader({
   onPrevWeek,
   onNextWeek,
   onToday,
-  viewMode,
-  onViewModeChange,
 }: WeekHeaderProps) {
   const isCurrentWeek = weekOffset === 0;
 
@@ -52,41 +48,6 @@ export function WeekHeader({
           color={colors.onSurface}
         />
       </Pressable>
-
-      {viewMode != null && onViewModeChange != null && (
-        <View style={styles.toggleRow}>
-          <Pressable
-            onPress={() => onViewModeChange('day')}
-            style={[
-              styles.toggleIcon,
-              viewMode === 'day' && styles.toggleIconActive,
-            ]}
-            hitSlop={8}
-            testID="week-header-day-toggle"
-          >
-            <MaterialCommunityIcons
-              name="calendar-today"
-              size={20}
-              color={viewMode === 'day' ? colors.primary : colors.onSurfaceVariant}
-            />
-          </Pressable>
-          <Pressable
-            onPress={() => onViewModeChange('week')}
-            style={[
-              styles.toggleIcon,
-              viewMode === 'week' && styles.toggleIconActive,
-            ]}
-            hitSlop={8}
-            testID="week-header-week-toggle"
-          >
-            <MaterialCommunityIcons
-              name="calendar-week"
-              size={20}
-              color={viewMode === 'week' ? colors.primary : colors.onSurfaceVariant}
-            />
-          </Pressable>
-        </View>
-      )}
     </View>
   );
 }
@@ -120,21 +81,5 @@ const styles = StyleSheet.create({
   todayText: {
     ...typography.labelMd,
     color: colors.onPrimaryContainer,
-  },
-  toggleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-    marginLeft: spacing.xs,
-  },
-  toggleIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  toggleIconActive: {
-    backgroundColor: colors.primaryContainer,
   },
 });

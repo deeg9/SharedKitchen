@@ -189,31 +189,10 @@ interface DaySectionProps {
   meals: Partial<Record<MealType, MealPlanWithRecipe | undefined>>;
   isToday: boolean;
   onMealPress: (mealType: MealType) => void;
-  collapsed?: boolean;
 }
 
-export function DaySection({ date, meals, isToday, onMealPress, collapsed }: DaySectionProps) {
+export function DaySection({ date, meals, isToday, onMealPress }: DaySectionProps) {
   const label = formatDayLabel(date);
-
-  // Collapsed single-line row for past days
-  if (collapsed) {
-    const mealCount = MEAL_TYPES.filter((mt) => meals[mt] != null).length;
-    return (
-      <Pressable
-        onPress={() => onMealPress('dinner')}
-        style={sectionStyles.collapsedRow}
-        testID={`plan-day-${label.weekday}-collapsed`}
-      >
-        <Text style={sectionStyles.collapsedDate}>
-          {label.month} {label.day} {label.weekday}
-        </Text>
-        <Text style={sectionStyles.collapsedMeals}>
-          {mealCount > 0 ? `${mealCount} meal${mealCount > 1 ? 's' : ''}` : 'empty'}
-        </Text>
-      </Pressable>
-    );
-  }
-
   const dayNutrition = computeDayNutrition(meals);
 
   return (
@@ -333,25 +312,6 @@ const sectionStyles = StyleSheet.create({
     fontWeight: '500',
     color: colors.outline,
     fontStyle: 'italic',
-  },
-  collapsedRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    height: 36,
-  },
-  collapsedDate: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: colors.outline,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  collapsedMeals: {
-    ...typography.labelSm,
-    color: colors.onSurfaceVariant,
   },
 });
 
