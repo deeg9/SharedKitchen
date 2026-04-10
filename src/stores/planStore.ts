@@ -17,6 +17,12 @@ export interface MealPlanWithRecipe extends MealPlan {
   recipes: Recipe | null;
 }
 
+export interface CookingStats {
+  streak: number;
+  completionPercent: number;
+  mostCookedRecipe: { name: string; imageUrl: string | null; count: number } | null;
+}
+
 interface PlanState {
   weekOffset: number;
   mealPlan: Map<string, MealPlanWithRecipe>;
@@ -43,6 +49,7 @@ interface PlanState {
   clearMeal: (householdId: string, date: string, mealType: MealType) => Promise<void>;
   getRandomSuggestion: (householdId: string) => Promise<Recipe | null>;
   clear: () => void;
+  fetchCookingStats: (householdId: string) => Promise<CookingStats>;
 }
 
 /**
@@ -273,6 +280,79 @@ export const usePlanStore = create<PlanState>((set, get) => ({
   },
 
   clear: () => set({ mealPlan: new Map(), loading: false, error: null, weekOffset: 0 }),
+
+  fetchCookingStats: async (householdId: string): Promise<CookingStats> => {
+    try {
+      const now = new Date();
+      const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const startDate = toDateString(firstOfMonth);
+      const endDate = toDateString(now);
+
+      const { data, error } = await supabase
+        .from('meal_plans')
+        .select('*, recipes(name, image_url)')
+        .eq('household_id', householdId)
+        .gte('plan_date', startDate)
+        .lte('plan_date', endDate);
+
+      if (error) throw error;
+
+      const entries = data ?? [];
+
+      // Streak: count consecutive days with at least 1 meal, starting from today backwards
+      let streak = 0;
+      if (entries.length > 0) {
+        const datesWithMeals = new Set(entries.map((e) => e.plan_date));
+        const check = new Date(now);
+        // If today has no meal, streak is 0
+        if (datesWithMeals.has(toDateString(check))) {
+          while (datesWithMeals.has(toDateString(check))) {
+            streak++;
+            check.setDate(check.getDate() - 1);
+          }
+        }
+      }
+
+      // Completion percent: unique dates with meals / days elapsed in month
+      const uniqueDatesWithMeals = new Set(entries.map((e) => e.plan_date)).size;
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const daysElapsed = Math.min(now.getDate(), daysInMonth);
+      const completionPercent = daysElapsed > 0
+        ? Math.round((uniqueDatesWithMeals / daysElapsed) * 100)
+        : 0;
+
+      // Most cooked: count recipe_id occurrences, find max
+      let mostCookedRecipe: CookingStats['mostCookedRecipe'] = null;
+      const recipeCounts = new Map<string, { name: string; imageUrl: string | null; count: number }>();
+      for (const entry of entries) {
+        if (entry.recipe_id && entry.recipes) {
+          const existing = recipeCounts.get(entry.recipe_id);
+          const recipe = entry.recipes as unknown as { name: string; image_url: string | null };
+          if (existing) {
+            existing.count++;
+          } else {
+            recipeCounts.set(entry.recipe_id, {
+              name: recipe.name,
+              imageUrl: recipe.image_url,
+              count: 1,
+            });
+          }
+        }
+      }
+      let maxCount = 0;
+      for (const info of recipeCounts.values()) {
+        if (info.count > maxCount) {
+          maxCount = info.count;
+          mostCookedRecipe = info;
+        }
+      }
+
+      return { streak, completionPercent, mostCookedRecipe };
+    } catch (error: unknown) {
+      set({ error: getErrorMessage(error) });
+      return { streak: 0, completionPercent: 0, mostCookedRecipe: null };
+    }
+  },
 
   getRandomSuggestion: async (householdId: string) => {
     try {
