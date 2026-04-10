@@ -262,7 +262,7 @@ Plans:
 | 40. Independent Screen Redesigns | v7.0 | 4/4 | Complete    | 2026-04-09 |
 | 41. Plan Tab Redesign | v7.0 | 2/2 | Complete    | 2026-04-09 |
 | 42. Grocery List Redesign | v7.0 | 2/2 | Complete    | 2026-04-10 |
-| 43. Budget, Profile & Social Feed | v7.0 | 3/3 | Complete   | 2026-04-10 |
+| 43. Budget, Profile & Social Feed | v7.0 | 3/3 | Complete    | 2026-04-10 |
 
 ---
 *Last updated: 2026-04-07 after v7.0 roadmap creation*
