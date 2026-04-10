@@ -207,7 +207,11 @@ Plans:
   3. Social feed displays a horizontal following avatar strip at top, hero-sized meal photos with overlay text, "Try this recipe" CTA buttons, quoted descriptions, and "View Full Recipe" actions
   4. All existing functionality (expense logging, settings changes, feed likes/comments/save) works without regression on redesigned screens
   5. Maestro E2E flows for budget, profile, and social feed screens pass with updated testID references
-**Plans**: 0 plans
+**Plans**: 3 plans
+Plans:
+- [ ] 43-01-PLAN.md — Budget dashboard redesign (DonutChart, MonthPicker, insights, category bars, weekly charts)
+- [ ] 43-02-PLAN.md — Social feed redesign (FollowingStrip, hero photos, Try this recipe CTAs)
+- [ ] 43-03-PLAN.md — Profile redesign (CookingInsights, HouseholdDistribution, grouped settings)
 **UI hint**: yes
 
 ## Progress
@@ -258,7 +262,7 @@ Plans:
 | 40. Independent Screen Redesigns | v7.0 | 4/4 | Complete    | 2026-04-09 |
 | 41. Plan Tab Redesign | v7.0 | 2/2 | Complete    | 2026-04-09 |
 | 42. Grocery List Redesign | v7.0 | 2/2 | Complete    | 2026-04-10 |
-| 43. Budget, Profile & Social Feed | v7.0 | 0/0 | Not started | - |
+| 43. Budget, Profile & Social Feed | v7.0 | 0/3 | In progress | - |
 
 ---
 *Last updated: 2026-04-07 after v7.0 roadmap creation*
