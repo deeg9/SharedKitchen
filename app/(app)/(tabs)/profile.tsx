@@ -1,17 +1,20 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, ScrollView, StyleSheet, Pressable, Alert, Platform } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Pressable, Alert, Platform, Switch } from 'react-native';
 import { useRouter, Href } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuthStore } from '../../../src/stores/authStore';
 import { useHouseholdStore, HouseholdMemberWithProfile } from '../../../src/stores/householdStore';
-import { usePlanStore } from '../../../src/stores/planStore';
+import { usePlanStore, CookingStats } from '../../../src/stores/planStore';
 import { useSubscriptionStore } from '../../../src/stores/subscriptionStore';
 import { PremiumBadge } from '../../../src/components/premium/PremiumBadge';
 import { Avatar } from '../../../src/components/ui/Avatar';
 import { Button } from '../../../src/components/ui/Button';
 import { Card } from '../../../src/components/ui/Card';
 import { Skeleton } from '../../../src/components/ui/Skeleton';
+import { CookingInsights } from '../../../src/components/profile/CookingInsights';
+import { HouseholdDistribution } from '../../../src/components/profile/HouseholdDistribution';
+import { SettingsSection } from '../../../src/components/profile/SettingsSection';
 
 import { SearchableSelect, DIETARY_OPTIONS } from '../../../src/components/ui/SearchableSelect';
 import SocialNotificationToggle from '../../../src/components/social/SocialNotificationToggle';
@@ -21,6 +24,8 @@ import { typography } from '../../../src/theme/typography';
 import { spacing, borderRadius } from '../../../src/theme/spacing';
 import { TAB_BAR_HEIGHT } from '../../../src/lib/constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+const MEMBER_COLORS = [colors.primary, colors.secondary, '#A0A0A0'];
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
@@ -40,9 +45,11 @@ export default function ProfileScreen() {
   const subscription = useSubscriptionStore();
 
   const [signingOut, setSigningOut] = useState(false);
-  const [cookingCount, setCookingCount] = useState(0);
+  const [cookingStats, setCookingStats] = useState<CookingStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(false);
   const [dietaryPrefs, setDietaryPrefs] = useState<string[]>([]);
   const [defaultServings, setDefaultServings] = useState(4);
+  const [darkModeEnabled, setDarkModeEnabled] = useState(false);
 
   useEffect(() => {
     initialize();
@@ -57,19 +64,27 @@ export default function ProfileScreen() {
     AsyncStorage.getItem('default_servings').then((val) => {
       if (val) setDefaultServings(parseInt(val, 10));
     });
+
+    // Load dark mode preference
+    AsyncStorage.getItem('dark_mode').then((val) => {
+      if (val === 'true') setDarkModeEnabled(true);
+    });
   }, []);
 
-  // Compute cooking count from meal plan data
+  // Fetch cooking stats when household changes
   useEffect(() => {
-    const now = new Date();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    let count = 0;
-    mealPlan.forEach((entry) => {
-      const date = new Date(entry.plan_date + 'T00:00:00');
-      if (date >= monthStart && date <= now) count++;
-    });
-    setCookingCount(count);
-  }, [mealPlan]);
+    if (activeHouseholdId) {
+      setStatsLoading(true);
+      usePlanStore
+        .getState()
+        .fetchCookingStats(activeHouseholdId)
+        .then((stats) => {
+          setCookingStats(stats);
+          setStatsLoading(false);
+        })
+        .catch(() => setStatsLoading(false));
+    }
+  }, [activeHouseholdId]);
 
   const updateServings = useCallback((delta: number) => {
     setDefaultServings((prev) => {
@@ -77,6 +92,11 @@ export default function ProfileScreen() {
       AsyncStorage.setItem('default_servings', String(next));
       return next;
     });
+  }, []);
+
+  const handleDarkModeToggle = useCallback((value: boolean) => {
+    setDarkModeEnabled(value);
+    AsyncStorage.setItem('dark_mode', String(value));
   }, []);
 
   const currentHousehold = activeHousehold();
@@ -120,10 +140,101 @@ export default function ProfileScreen() {
     }
   };
 
+  const handleServingsPress = () => {
+    Alert.alert(
+      'Default Servings',
+      `Current: ${defaultServings} People`,
+      [
+        { text: '-', onPress: () => updateServings(-1) },
+        { text: '+', onPress: () => updateServings(1) },
+        { text: 'Done', style: 'cancel' },
+      ]
+    );
+  };
+
+  const handleDietaryPress = () => {
+    // Navigate to dietary detail or show inline
+    Alert.alert(
+      'Dietary Restrictions',
+      'Manage your dietary preferences in the section below.',
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleNotificationsPress = () => {
+    Alert.alert(
+      'Notification Settings',
+      'Toggle social notifications for your feed activity.',
+      [{ text: 'OK' }]
+    );
+  };
+
+  // Compute household distribution data from mealPlan
+  const householdDistributionData = React.useMemo(() => {
+    const memberCounts = new Map<string, number>();
+    mealPlan.forEach((entry) => {
+      const creator = entry.created_by;
+      if (creator) {
+        memberCounts.set(creator, (memberCounts.get(creator) ?? 0) + 1);
+      }
+    });
+
+    return members
+      .map((member, index) => ({
+        id: member.id,
+        displayName: member.profiles?.display_name ?? 'Member',
+        count: memberCounts.get(member.profiles?.id ?? member.id) ?? 0,
+        color: MEMBER_COLORS[index % MEMBER_COLORS.length],
+      }))
+      .filter((m) => m.count > 0);
+  }, [mealPlan, members]);
+
   const isLoading = authLoading || householdLoading;
 
+  // Settings rows
+  const preferencesRows = [
+    {
+      icon: 'food-variant',
+      label: 'Dietary Restrictions',
+      onPress: handleDietaryPress,
+    },
+    {
+      icon: 'account-group',
+      label: 'Default Servings',
+      value: `${defaultServings} People`,
+      onPress: handleServingsPress,
+    },
+    {
+      icon: 'bell-outline',
+      label: 'Notification Settings',
+      onPress: handleNotificationsPress,
+    },
+  ];
+
+  const accountRows = [
+    {
+      icon: 'shield-crown-outline',
+      label: 'Manage Subscription',
+      onPress: () => router.push('/(app)/subscription' as Href),
+    },
+    {
+      icon: 'moon-waning-crescent',
+      label: 'Dark Mode',
+      toggle: {
+        value: darkModeEnabled,
+        onToggle: handleDarkModeToggle,
+      },
+    },
+    {
+      icon: 'download',
+      label: 'Data Export',
+      onPress: () =>
+        Alert.alert('Coming Soon', 'Data export will be available in a future update.'),
+    },
+  ];
+
   return (
-    <View style={styles.screen}>
+    <View style={styles.screen} testID="profile-screen">
       <ScrollView
         contentContainerStyle={[
           styles.content,
@@ -359,96 +470,33 @@ export default function ProfileScreen() {
           )}
         </View>
 
-        {/* Cooking Stats */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Cooking Stats</Text>
-          <Card variant="filled">
-            <View style={styles.statsRow}>
-              <MaterialCommunityIcons name="chef-hat" size={24} color={colors.primary} />
-              <Text style={styles.statsText}>
-                You've cooked {cookingCount} {cookingCount === 1 ? 'time' : 'times'} this month
-              </Text>
-            </View>
-          </Card>
-        </View>
+        {/* Cooking Insights */}
+        <CookingInsights stats={cookingStats} loading={statsLoading} />
 
-        {/* Subscription */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Subscription</Text>
-          <Pressable onPress={() => router.push('/(app)/subscription' as Href)} testID="profile-subscription-link">
-            <Card variant="filled" style={styles.subscriptionCard}>
-              <View style={styles.subscriptionRow}>
-                <MaterialCommunityIcons
-                  name={subscription.isPremium() ? 'crown' : 'star-outline'}
-                  size={22}
-                  color={subscription.isPremium() ? colors.secondary : colors.onSurfaceVariant}
-                />
-                <Text style={styles.subscriptionLabel}>
-                  {subscription.isPremium() ? 'Premium' : 'Free Plan'}
-                </Text>
-                <MaterialCommunityIcons name="chevron-right" size={20} color={colors.onSurfaceVariant} />
-              </View>
-            </Card>
-          </Pressable>
-        </View>
+        {/* Household Distribution */}
+        <HouseholdDistribution members={householdDistributionData} />
 
-        {/* Dietary Preferences */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Dietary Restrictions</Text>
-          <SearchableSelect
-            options={DIETARY_OPTIONS}
-            selected={dietaryPrefs}
-            onSelectionChange={(next) => {
-              setDietaryPrefs(next);
-              AsyncStorage.setItem('dietary_preferences', JSON.stringify(next));
-            }}
-            placeholder="Search dietary restrictions..."
-            testID="dietary-search"
-          />
+        {/* Preferences */}
+        <SettingsSection title="PREFERENCES" rows={preferencesRows} />
 
-          <View style={styles.servingsRow}>
-            <Text style={styles.servingsLabel}>Default Servings</Text>
-            <View style={styles.servingsStepper}>
-              <Pressable
-                style={styles.servingsButton}
-                onPress={() => updateServings(-1)}
-              >
-                <MaterialCommunityIcons name="minus" size={18} color={colors.onSurfaceVariant} />
-              </Pressable>
-              <Text style={styles.servingsCount}>{defaultServings}</Text>
-              <Pressable
-                style={styles.servingsButton}
-                onPress={() => updateServings(1)}
-              >
-                <MaterialCommunityIcons name="plus" size={18} color={colors.onSurfaceVariant} />
-              </Pressable>
-            </View>
-          </View>
-        </View>
-
-        {/* Notifications */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Notifications</Text>
-          <Card variant="filled">
-            <SocialNotificationToggle />
-          </Card>
-        </View>
+        {/* Account & Subscription */}
+        <SettingsSection title="ACCOUNT & SUBSCRIPTION" rows={accountRows} />
 
         {/* Sign Out */}
-        <View style={styles.signOutSection}>
-          <Button
-            variant="ghost"
-            size="md"
-            loading={signingOut}
-            onPress={handleSignOut}
-            style={styles.signOutButton}
-            testID="profile-sign-out-button"
-          >
-            <Text style={styles.signOutText}>Sign Out</Text>
-          </Button>
-        </View>
-      </ScrollView>
+        <Pressable
+          onPress={handleSignOut}
+          disabled={signingOut}
+          testID="profile-sign-out-button"
+          style={styles.signOutSection}
+        >
+          <Text style={styles.signOutText}>
+            {signingOut ? 'Signing Out...' : 'SIGN OUT'}
+          </Text>
+        </Pressable>
 
+        {/* Version */}
+        <Text style={styles.versionText}>SharedKitchen v7.0</Text>
+      </ScrollView>
     </View>
   );
 }
@@ -596,17 +644,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: spacing.md,
   },
-  signOutSection: {
-    marginTop: spacing.lg,
-    alignItems: 'center',
-  },
-  signOutButton: {
-    // Ghost button styling handled by Button component
-  },
-  signOutText: {
-    ...typography.labelLg,
-    color: colors.error,
-  },
   actionRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -622,57 +659,19 @@ const styles = StyleSheet.create({
     color: colors.primary,
     flex: 1,
   },
-  subscriptionCard: {
-    // Card defaults are sufficient
-  },
-  subscriptionRow: {
-    flexDirection: 'row',
+  signOutSection: {
     alignItems: 'center',
-    gap: spacing.sm + 4,
+    paddingVertical: spacing.lg,
   },
-  subscriptionLabel: {
-    ...typography.bodyLg,
-    color: colors.onSurface,
-    flex: 1,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  statsText: {
-    ...typography.bodyLg,
-    color: colors.onSurface,
-    flex: 1,
-  },
-  servingsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: spacing.sm,
-    marginTop: spacing.sm,
-  },
-  servingsLabel: {
-    ...typography.bodyMd,
-    color: colors.onSurface,
-  },
-  servingsStepper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  servingsButton: {
-    width: 32,
-    height: 32,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.surfaceContainerHigh,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  servingsCount: {
+  signOutText: {
     ...typography.labelLg,
-    color: colors.onSurface,
-    minWidth: 20,
+    color: colors.error,
     textAlign: 'center',
+  },
+  versionText: {
+    ...typography.bodySm,
+    color: colors.onSurfaceVariant,
+    textAlign: 'center',
+    marginBottom: spacing.md,
   },
 });
