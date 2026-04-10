@@ -25,11 +25,13 @@ interface BudgetState {
   loading: boolean;
   error: string | null;
   selectedMonth: Date;
+  _prevMonthCache: { key: string; total: number } | null;
 
   // Computed
   monthlyTotal: () => number;
   categoryTotals: () => Record<ExpenseCategory, CategoryTotal>;
   weeklyBreakdown: () => WeekBucket[];
+  categoryBudgets: () => Record<ExpenseCategory, number>;
 
   // Actions
   fetchExpenses: (householdId: string, month: Date) => Promise<void>;
@@ -45,6 +47,7 @@ interface BudgetState {
   fetchBudgetTarget: (householdId: string) => Promise<void>;
   setBudgetTarget: (householdId: string, amount: number) => Promise<void>;
   setSelectedMonth: (date: Date) => void;
+  previousMonthTotal: (householdId: string) => Promise<number>;
   clear: () => void;
 }
 
@@ -108,6 +111,7 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
   loading: false,
   error: null,
   selectedMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+  _prevMonthCache: null,
 
   monthlyTotal: () => {
     const { expenses } = get();
@@ -280,9 +284,46 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
     }
   },
 
+  categoryBudgets: () => {
+    const { budgetTarget } = get();
+    return {
+      Groceries: budgetTarget * 0.6,
+      'Dining Out': budgetTarget * 0.25,
+      Takeout: budgetTarget * 0.15,
+    };
+  },
+
   setSelectedMonth: (date) => {
     set({ selectedMonth: date });
   },
 
-  clear: () => set({ expenses: [], budgetTarget: 600, loading: false, error: null, selectedMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1) }),
+  previousMonthTotal: async (householdId: string) => {
+    const { selectedMonth, _prevMonthCache } = get();
+    const prevMonth = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() - 1, 1);
+    const cacheKey = `${householdId}-${prevMonth.getFullYear()}-${prevMonth.getMonth()}`;
+
+    if (_prevMonthCache && _prevMonthCache.key === cacheKey) {
+      return _prevMonthCache.total;
+    }
+
+    try {
+      const { start, end } = getMonthRange(prevMonth);
+      const { data, error } = await supabase
+        .from('expenses')
+        .select('amount')
+        .eq('household_id', householdId)
+        .gte('expense_date', start)
+        .lt('expense_date', end);
+
+      if (error) throw error;
+
+      const total = (data ?? []).reduce((sum, e) => sum + Number(e.amount), 0);
+      set({ _prevMonthCache: { key: cacheKey, total } });
+      return total;
+    } catch (error: unknown) {
+      return 0;
+    }
+  },
+
+  clear: () => set({ expenses: [], budgetTarget: 600, loading: false, error: null, selectedMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1), _prevMonthCache: null }),
 }));
