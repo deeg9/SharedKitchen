@@ -210,7 +210,7 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [x] 43-01-PLAN.md — Budget dashboard redesign (DonutChart, MonthPicker, insights, category bars, weekly charts)
-- [ ] 43-02-PLAN.md — Social feed redesign (FollowingStrip, hero photos, Try this recipe CTAs)
+- [x] 43-02-PLAN.md — Social feed redesign (FollowingStrip, hero photos, Try this recipe CTAs)
 - [ ] 43-03-PLAN.md — Profile redesign (CookingInsights, HouseholdDistribution, grouped settings)
 **UI hint**: yes
 
@@ -262,7 +262,7 @@ Plans:
 | 40. Independent Screen Redesigns | v7.0 | 4/4 | Complete    | 2026-04-09 |
 | 41. Plan Tab Redesign | v7.0 | 2/2 | Complete    | 2026-04-09 |
 | 42. Grocery List Redesign | v7.0 | 2/2 | Complete    | 2026-04-10 |
-| 43. Budget, Profile & Social Feed | v7.0 | 1/3 | In Progress|  |
+| 43. Budget, Profile & Social Feed | v7.0 | 2/3 | In Progress|  |
 
 ---
 *Last updated: 2026-04-07 after v7.0 roadmap creation*

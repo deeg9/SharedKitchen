@@ -77,11 +77,11 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 
 ### Social Feed
 
-- [ ] **FEED-01**: Feed shows a horizontal following avatar strip at the top with kitchen photos
-- [ ] **FEED-02**: Feed cards display hero-sized meal photos with overlay text for meal name
-- [ ] **FEED-03**: Feed cards include a "Try this recipe" CTA button
-- [ ] **FEED-04**: Feed cards show quoted description text and "View Full Recipe" action
-- [ ] **FEED-05**: Feed header shows "Feed" title with consistent navigation
+- [x] **FEED-01**: Feed shows a horizontal following avatar strip at the top with kitchen photos
+- [x] **FEED-02**: Feed cards display hero-sized meal photos with overlay text for meal name
+- [x] **FEED-03**: Feed cards include a "Try this recipe" CTA button
+- [x] **FEED-04**: Feed cards show quoted description text and "View Full Recipe" action
+- [x] **FEED-05**: Feed header shows "Feed" title with consistent navigation
 
 ### Premium Upgrade
 
@@ -157,11 +157,11 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 | COOK-04 | Phase 40 | Complete |
 | COOK-05 | Phase 40 | Complete |
 | COOK-06 | Phase 40 | Complete |
-| FEED-01 | Phase 43 | Pending |
-| FEED-02 | Phase 43 | Pending |
-| FEED-03 | Phase 43 | Pending |
-| FEED-04 | Phase 43 | Pending |
-| FEED-05 | Phase 43 | Pending |
+| FEED-01 | Phase 43 | Complete |
+| FEED-02 | Phase 43 | Complete |
+| FEED-03 | Phase 43 | Complete |
+| FEED-04 | Phase 43 | Complete |
+| FEED-05 | Phase 43 | Complete |
 | PREM-01 | Phase 40 | Complete |
 | PREM-02 | Phase 40 | Complete |
 | PREM-03 | Phase 40 | Complete |
