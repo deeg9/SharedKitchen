@@ -43,11 +43,11 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 
 ### Budget Dashboard
 
-- [ ] **BUDG-01**: User sees a donut ring chart hero showing total spent vs budget with percentage
-- [ ] **BUDG-02**: User can navigate between months using left/right arrow month picker
-- [ ] **BUDG-03**: User sees a Budget Insights section with contextual cards (e.g., "You spent 15% less on dining out this month")
-- [ ] **BUDG-04**: Spending categories show inline progress bars (spent vs budget per category)
-- [ ] **BUDG-05**: Weekly breakdown section shows mini bar charts per week
+- [x] **BUDG-01**: User sees a donut ring chart hero showing total spent vs budget with percentage
+- [x] **BUDG-02**: User can navigate between months using left/right arrow month picker
+- [x] **BUDG-03**: User sees a Budget Insights section with contextual cards (e.g., "You spent 15% less on dining out this month")
+- [x] **BUDG-04**: Spending categories show inline progress bars (spent vs budget per category)
+- [x] **BUDG-05**: Weekly breakdown section shows mini bar charts per week
 
 ### Profile & Settings
 
@@ -135,11 +135,11 @@ Requirements for Stitch UI Redesign milestone. Each maps to roadmap phases.
 | GROC-03 | Phase 42 | Pending |
 | GROC-04 | Phase 42 | Complete |
 | GROC-05 | Phase 42 | Pending |
-| BUDG-01 | Phase 43 | Pending |
-| BUDG-02 | Phase 43 | Pending |
-| BUDG-03 | Phase 43 | Pending |
-| BUDG-04 | Phase 43 | Pending |
-| BUDG-05 | Phase 43 | Pending |
+| BUDG-01 | Phase 43 | Complete |
+| BUDG-02 | Phase 43 | Complete |
+| BUDG-03 | Phase 43 | Complete |
+| BUDG-04 | Phase 43 | Complete |
+| BUDG-05 | Phase 43 | Complete |
 | PROF-01 | Phase 43 | Pending |
 | PROF-02 | Phase 43 | Pending |
 | PROF-03 | Phase 43 | Pending |
