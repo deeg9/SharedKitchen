@@ -7,12 +7,14 @@ import { usePlanStore } from '../../stores/planStore';
 import { supabase } from '../../lib/supabase';
 import { uploadMealPhoto } from '../../lib/feedHelpers';
 import { FeedCard } from './FeedCard';
+import { FollowingStrip } from './FollowingStrip';
 import { CommentSheet } from './CommentSheet';
 import { MealSlotPickerSheet } from '../meal-logging/MealSlotPickerSheet';
 import { EmptyState } from '../ui/EmptyState';
 import { CameraSheet } from '../camera/CameraSheet';
 import { FeedPost, MealType } from '../../types/database';
 import { colors } from '../../theme/colors';
+import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 import { TAB_BAR_HEIGHT } from '../../lib/constants';
 
@@ -37,6 +39,8 @@ export function FeedList({ myKitchenId }: FeedListProps) {
     fetchBlockedKitchens,
     reportContent,
     blockKitchen,
+    following,
+    fetchFollowing,
   } = useSocialStore();
 
   const { activeHouseholdId } = useHouseholdStore();
@@ -56,6 +60,13 @@ export function FeedList({ myKitchenId }: FeedListProps) {
     if (myKitchenId) {
       fetchFeedPosts(myKitchenId);
       fetchBlockedKitchens(myKitchenId);
+    }
+  }, [myKitchenId]);
+
+  // Fetch following list for the avatar strip
+  useEffect(() => {
+    if (myKitchenId && following.length === 0) {
+      fetchFollowing(myKitchenId);
     }
   }, [myKitchenId]);
 
@@ -227,12 +238,25 @@ export function FeedList({ myKitchenId }: FeedListProps) {
 
   const keyExtractor = useCallback((item: FeedPost) => item.id, []);
 
+  const listHeader = useCallback(() => (
+    <View>
+      <View style={s.feedHeaderTitle} testID="feed-header-title">
+        <Text style={s.feedTitle}>Feed</Text>
+      </View>
+      <FollowingStrip
+        following={following}
+        onKitchenPress={(kitchenId) => router.push(`/kitchen/${kitchenId}` as any)}
+      />
+    </View>
+  ), [following, router]);
+
   return (
     <View style={s.container}>
       <FlatList
         data={feedPosts}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
+        ListHeaderComponent={listHeader}
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.5}
         refreshControl={
@@ -336,5 +360,13 @@ const s = StyleSheet.create({
   },
   emptyState: {
     paddingHorizontal: spacing.lg,
+  },
+  feedHeaderTitle: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.sm,
+  },
+  feedTitle: {
+    ...typography.headlineMd,
+    color: colors.onSurface,
   },
 });
