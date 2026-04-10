@@ -74,7 +74,7 @@ export function FeedCard({
   const displayName = kitchenProfile?.display_name ?? 'Kitchen';
   const avatarUrl = kitchenProfile?.avatar_url ?? null;
   const photoUrl = post.photo_url ?? post.recipe_image_url;
-  const daySlot = `${getDayName(post.meal_date)} ${capitalizeFirst(post.meal_type)}`;
+  const mealType = capitalizeFirst(post.meal_type);
 
   // Like animation
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -97,8 +97,8 @@ export function FeedCard({
 
   return (
     <Pressable onLongPress={onLongPress} disabled={!onLongPress}>
-      <View style={s.card}>
-        {/* Header: avatar + name + timestamp */}
+      <View style={s.card} testID="feed-card">
+        {/* Header: avatar + name + subtitle */}
         <View style={s.header}>
           <Pressable onPress={onKitchenPress} style={s.headerLeft}>
             {avatarUrl ? (
@@ -113,106 +113,123 @@ export function FeedCard({
                 <Text style={s.avatarInitials}>{getInitials(displayName)}</Text>
               </View>
             )}
-            <Text style={s.kitchenName} numberOfLines={1}>
-              {displayName}
-            </Text>
+            <View style={s.headerText}>
+              <Text style={s.kitchenName} numberOfLines={1}>
+                {displayName}
+              </Text>
+              <Text style={s.headerSubtitle} numberOfLines={1}>
+                {getRelativeTime(post.created_at)}
+              </Text>
+            </View>
           </Pressable>
-          <Text style={s.timestamp}>{getRelativeTime(post.created_at)}</Text>
         </View>
 
-        {/* Content: meal context + recipe name */}
-        <Pressable onPress={onRecipePress}>
-          <Text style={s.mealContext}>{daySlot}</Text>
-          <Text style={s.recipeName} numberOfLines={2}>
-            {post.recipe_name}
-          </Text>
-        </Pressable>
-
-        {/* Photo or placeholder */}
+        {/* Hero photo with overlay recipe name */}
         <Pressable onPress={onRecipePress}>
           {photoUrl ? (
-            <Image
-              source={{ uri: photoUrl }}
-              style={s.photo}
-              contentFit="cover"
-              transition={300}
-            />
+            <View style={s.heroContainer}>
+              <Image
+                source={{ uri: photoUrl }}
+                style={s.heroPhoto}
+                contentFit="cover"
+                transition={300}
+              />
+              <View style={s.heroOverlay} />
+              <Text style={s.heroRecipeName} numberOfLines={2}>
+                {post.recipe_name}
+              </Text>
+            </View>
           ) : (
-            <View style={[s.photo, s.photoPlaceholder]}>
+            <View style={[s.heroContainer, s.heroPlaceholder]}>
               <MaterialCommunityIcons
                 name="silverware-fork-knife"
-                size={40}
+                size={48}
                 color={colors.outlineVariant}
               />
+              <Text style={s.placeholderRecipeName} numberOfLines={2}>
+                {post.recipe_name}
+              </Text>
             </View>
           )}
         </Pressable>
 
-        {/* Comment preview link */}
-        {post.comment_count > 0 && (
-          <Pressable onPress={onCommentPress}>
-            <Text style={s.commentPreview}>
-              View all {post.comment_count} comment{post.comment_count !== 1 ? 's' : ''}
-            </Text>
-          </Pressable>
-        )}
+        {/* Content section */}
+        <View style={s.content}>
+          {/* Meal context */}
+          <Text style={s.mealContext}>
+            <Text style={s.mealContextBold}>{displayName}</Text>
+            {' made '}
+            <Text style={s.mealContextBold}>{post.recipe_name}</Text>
+          </Text>
 
-        {/* Action bar */}
-        <View style={s.actionBar}>
-          <View style={s.actionGroup}>
-            <Pressable onPress={handleLikePress} hitSlop={8}>
-              <View style={s.actionItem}>
-                <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+          {/* Quoted description */}
+          <View style={s.quoteContainer}>
+            <Text style={s.quoteText}>
+              A delicious {mealType.toLowerCase()} dish
+            </Text>
+          </View>
+
+          {/* Action bar */}
+          <View style={s.actionBar}>
+            <View style={s.actionGroup}>
+              <Pressable onPress={handleLikePress} hitSlop={8}>
+                <View style={s.actionItem}>
+                  <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+                    <MaterialCommunityIcons
+                      name={isLiked ? 'heart' : 'heart-outline'}
+                      size={22}
+                      color={isLiked ? colors.error : colors.onSurfaceVariant}
+                    />
+                  </Animated.View>
+                  {post.like_count > 0 && (
+                    <Text style={s.actionCount}>{post.like_count}</Text>
+                  )}
+                </View>
+              </Pressable>
+              <Pressable onPress={onCommentPress} hitSlop={8}>
+                <View style={s.actionItem}>
                   <MaterialCommunityIcons
-                    name={isLiked ? 'heart' : 'heart-outline'}
+                    name="comment-outline"
                     size={22}
-                    color={isLiked ? colors.error : colors.onSurfaceVariant}
+                    color={colors.onSurfaceVariant}
                   />
-                </Animated.View>
-                {post.like_count > 0 && (
-                  <Text style={s.actionCount}>{post.like_count}</Text>
-                )}
-              </View>
-            </Pressable>
-            <Pressable onPress={onCommentPress} hitSlop={8}>
-              <View style={s.actionItem}>
+                  {post.comment_count > 0 && (
+                    <Text style={s.actionCount}>{post.comment_count}</Text>
+                  )}
+                </View>
+              </Pressable>
+              <Pressable onPress={onSavePress} hitSlop={8}>
                 <MaterialCommunityIcons
-                  name="comment-outline"
+                  name="bookmark-outline"
                   size={22}
                   color={colors.onSurfaceVariant}
                 />
-                {post.comment_count > 0 && (
-                  <Text style={s.actionCount}>{post.comment_count}</Text>
-                )}
-              </View>
-            </Pressable>
-            <Pressable onPress={onSavePress} hitSlop={8}>
-              <MaterialCommunityIcons
-                name="bookmark-outline"
-                size={22}
-                color={colors.onSurfaceVariant}
-              />
-            </Pressable>
+              </Pressable>
+            </View>
+
+            {/* Try this recipe button for non-own posts */}
+            {!isOwnPost && onCookThisToo && (
+              <Pressable onPress={onCookThisToo} style={s.tryRecipeBtn} hitSlop={8}>
+                <Text style={s.tryRecipeText}>Try this recipe</Text>
+              </Pressable>
+            )}
+
+            {/* Camera button for own posts without photo */}
+            {isOwnPost && !post.photo_url && onPhotoAttach && (
+              <Pressable onPress={onPhotoAttach} hitSlop={8}>
+                <MaterialCommunityIcons
+                  name="camera-plus-outline"
+                  size={22}
+                  color={colors.primary}
+                />
+              </Pressable>
+            )}
           </View>
 
-          {/* Cook This Too button for non-own posts */}
-          {!isOwnPost && onCookThisToo && (
-            <Pressable onPress={onCookThisToo} style={s.cookThisTooBtn} hitSlop={8}>
-              <MaterialCommunityIcons name="pot-steam-outline" size={18} color={colors.primary} />
-              <Text style={s.cookThisTooText}>Cook This Too</Text>
-            </Pressable>
-          )}
-
-          {/* Camera button for own posts without photo */}
-          {isOwnPost && !post.photo_url && onPhotoAttach && (
-            <Pressable onPress={onPhotoAttach} hitSlop={8}>
-              <MaterialCommunityIcons
-                name="camera-plus-outline"
-                size={22}
-                color={colors.primary}
-              />
-            </Pressable>
-          )}
+          {/* VIEW FULL RECIPE link */}
+          <Pressable onPress={onRecipePress} style={s.viewRecipeBtn}>
+            <Text style={s.viewRecipeText}>VIEW FULL RECIPE</Text>
+          </Pressable>
         </View>
       </View>
     </Pressable>
@@ -223,7 +240,7 @@ const s = StyleSheet.create({
   card: {
     backgroundColor: colors.surfaceContainerLowest,
     borderRadius: borderRadius.lg,
-    padding: spacing.md,
+    overflow: 'hidden',
     marginBottom: spacing.md,
     marginHorizontal: spacing.md,
     ...shadows.editorial,
@@ -232,18 +249,18 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: spacing.sm,
+    padding: spacing.md,
+    paddingBottom: spacing.sm,
   },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    marginRight: spacing.sm,
   },
   avatar: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
   },
   avatarPlaceholder: {
     backgroundColor: colors.primaryContainer,
@@ -251,50 +268,88 @@ const s = StyleSheet.create({
     justifyContent: 'center',
   },
   avatarInitials: {
-    fontSize: 11,
+    fontSize: 14,
     fontWeight: '700',
     color: colors.onPrimary,
+  },
+  headerText: {
+    marginLeft: spacing.sm,
+    flex: 1,
   },
   kitchenName: {
     ...typography.labelLg,
     color: colors.onSurface,
-    marginLeft: spacing.sm,
-    flex: 1,
   },
-  timestamp: {
+  headerSubtitle: {
     ...typography.bodySm,
     color: colors.onSurfaceVariant,
+    marginTop: 1,
   },
-  mealContext: {
-    ...typography.bodySm,
-    color: colors.onSurfaceVariant,
-    marginBottom: 2,
-  },
-  recipeName: {
-    ...typography.titleMd,
-    color: colors.onSurface,
-    marginBottom: spacing.sm,
-  },
-  photo: {
+  heroContainer: {
     width: '100%',
     aspectRatio: 4 / 3,
-    borderRadius: borderRadius.md,
-    marginBottom: spacing.sm,
+    position: 'relative',
   },
-  photoPlaceholder: {
+  heroPhoto: {
+    width: '100%',
+    height: '100%',
+  },
+  heroOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 80,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+  },
+  heroRecipeName: {
+    ...typography.headlineMd,
+    color: '#ffffff',
+    position: 'absolute',
+    bottom: spacing.md,
+    left: spacing.md,
+    right: spacing.md,
+  },
+  heroPlaceholder: {
     backgroundColor: colors.surfaceVariant,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  commentPreview: {
-    ...typography.bodySm,
+  placeholderRecipeName: {
+    ...typography.headlineMd,
     color: colors.onSurfaceVariant,
-    marginBottom: spacing.xs,
+    marginTop: spacing.sm,
+    textAlign: 'center',
+    paddingHorizontal: spacing.md,
+  },
+  content: {
+    padding: spacing.md,
+  },
+  mealContext: {
+    ...typography.bodyMd,
+    color: colors.onSurfaceVariant,
+    marginBottom: spacing.sm,
+  },
+  mealContextBold: {
+    ...typography.labelLg,
+    color: colors.onSurface,
+  },
+  quoteContainer: {
+    paddingLeft: spacing.md,
+    borderLeftWidth: 2,
+    borderLeftColor: colors.outlineVariant,
+    marginBottom: spacing.md,
+  },
+  quoteText: {
+    ...typography.bodyMd,
+    fontStyle: 'italic',
+    color: colors.onSurfaceVariant,
   },
   actionBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginBottom: spacing.sm,
   },
   actionGroup: {
     flexDirection: 'row',
@@ -310,13 +365,22 @@ const s = StyleSheet.create({
     ...typography.bodySm,
     color: colors.onSurfaceVariant,
   },
-  cookThisTooBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
+  tryRecipeBtn: {
+    backgroundColor: colors.primaryFixed,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs + 2,
+    borderRadius: borderRadius.full,
   },
-  cookThisTooText: {
-    ...typography.labelSm,
+  tryRecipeText: {
+    ...typography.labelMd,
     color: colors.primary,
+  },
+  viewRecipeBtn: {
+    paddingVertical: spacing.sm,
+  },
+  viewRecipeText: {
+    ...typography.labelMd,
+    color: colors.primary,
+    textTransform: 'uppercase',
   },
 });
