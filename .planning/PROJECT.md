@@ -10,9 +10,9 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 
 ## Current State
 
-**Shipped:** v6.0 Food Data Integration (2026-04-09)
-**Codebase:** ~35,800 LOC across 255+ source files (TypeScript, SQL, YAML)
-**Tech stack:** React Native + Expo (iOS), Supabase (Postgres, Auth, Realtime, Storage, Edge Functions), Gemini 2.5 Flash (vision + text + ingredient matching), USDA FoodData Central, Open Food Facts, FatSecret, Supadata, Serper.dev, Stripe, expo-share-intent, expo-image-manipulator, expo-image, expo-camera, expo-notifications, Maestro E2E
+**Shipped:** v7.0 Stitch UI Redesign (2026-04-09)
+**Codebase:** ~45,000 LOC across 280+ source files (TypeScript, SQL, YAML)
+**Tech stack:** React Native + Expo (iOS), Supabase (Postgres, Auth, Realtime, Storage, Edge Functions), Gemini 2.5 Flash (vision + text + ingredient matching), USDA FoodData Central, Open Food Facts, FatSecret, Supadata, Serper.dev, Stripe, react-native-svg, expo-linear-gradient, expo-share-intent, expo-image-manipulator, expo-image, expo-camera, expo-notifications, Maestro E2E
 
 ## Requirements
 
@@ -124,36 +124,29 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 - ✓ Daily nutrition totals on Plan tab day cards with partial meal indicator — v6.0
 - ✓ 29 unit tests for nutrition-utils — v6.0
 
+- ✓ Day-focused meal planner with hero dinner card, DateStrip, Day/Week toggle — v7.0
+- ✓ Enhanced recipe library with FilterChips, full-width cards, difficulty badges — v7.0
+- ✓ Grocery list with shopping progress bar, sync-with-plan, enhanced item rows — v7.0
+- ✓ Budget dashboard with DonutChart hero, month picker, insights, category bars — v7.0
+- ✓ Profile with cooking insights, household distribution, grouped settings — v7.0
+- ✓ 6-screen onboarding redesign (Welcome, Create Kitchen, Invite, Add Recipes, Plan Week, All Set) — v7.0
+- ✓ Cooking mode with step photos, chef tips, ingredient chips, Previous/Next nav — v7.0
+- ✓ Social feed with following strip, hero photos, Try Recipe CTAs — v7.0
+- ✓ Premium upgrade with feature comparison table, monthly/yearly pricing — v7.0
+
 ### Active
 
-- [ ] Day-focused meal planner with hero dinner card, horizontal date strip, and day/week toggle
-- [ ] Enhanced recipe library with filter chips, richer cards with descriptions and difficulty badges
-- [ ] Grocery list redesign with shopping progress bar, sync-with-plan action, and enhanced item rows
-- [ ] Budget dashboard with donut ring hero, month picker, insights section, and category progress bars
-- [ ] Profile redesign with cooking insights dashboard, household distribution, and grouped settings navigation
-- [ ] 6-screen onboarding flow redesign (welcome, create kitchen, invite, add recipes, plan week, all set)
-- [ ] Cooking mode redesign with step photos, chef tips, ingredient chips, and step-by-step navigation
-- [ ] Social feed redesign with hero-sized photos, following avatar strip, and try-recipe CTAs
-- [ ] Premium upgrade screen with feature comparison table and monthly/yearly pricing tiers
+(None — planning next milestone)
 
-## Current Milestone: v7.0 Stitch UI Redesign
+## Current Milestone: v7.0 Stitch UI Redesign (SHIPPED)
 
-**Goal:** Implement 14 Google Stitch UI designs across all major app surfaces — preserving all existing functionality while elevating the visual design to match the Stitch reference screens, constrained by the existing SharedKitchen design system (colors, typography, spacing, tab bar, FAB).
+**Shipped:** 2026-04-09
 
-**Target features:**
-- Day-focused meal planner with hero card, date strip, and day/week toggle
-- Enhanced recipe library with filter chips, richer cards, and difficulty badges
-- Grocery list with shopping progress bar, sync-with-plan, and enhanced item rows
-- Budget dashboard with donut ring, month picker, insights, and category progress bars
-- Profile redesign with cooking insights, household distribution, and grouped settings navigation
-- 6-screen onboarding redesign (welcome, create kitchen, invite, add recipes, plan week, all set)
-- Cooking mode redesign with step photos, chef tips, ingredient chips, and step-by-step nav
-- Social feed redesign with hero photos, following strip, and try-recipe CTAs
-- Premium upgrade screen with feature comparison table and monthly/yearly pricing
-
-**Stitch reference designs:** `/Users/deeg/Downloads/SharedKitchenStitchUIv2/` (14 screens with screen.png + code.html each)
-
-**Design constraints:** Existing SharedKitchen design system tokens (colors, typography, spacing, shadows) override Stitch choices. Tab bar, FAB, and branding stay as-is. See memory: `project_stitch_design_constraints.md`.
+**Delivered features:**
+- 5 reusable shared UI components (DonutChart, ProgressBar, InsightCard, FilterChips, DateStrip)
+- Day-focused meal planner with hero card and DateStrip navigation
+- 14 screens redesigned to match Google Stitch reference designs
+- All existing functionality preserved (real-time sync, presence, camera, barcode scanning)
 
 ### Out of Scope
 

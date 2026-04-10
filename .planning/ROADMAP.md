@@ -118,9 +118,10 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 </details>
 
-### v7.0 Stitch UI Redesign (In Progress)
+- ✅ **v7.0 Stitch UI Redesign** — Phases 39-43 (shipped 2026-04-09) — [Archive](milestones/v7.0-ROADMAP.md)
 
-**Milestone Goal:** Implement 14 Google Stitch UI designs across all major app surfaces — preserving all existing functionality while elevating the visual design to match the Stitch reference screens, constrained by the existing SharedKitchen design system (colors, typography, spacing, tab bar, FAB).
+<details>
+<summary>v7.0 Stitch UI Redesign (Phases 39-43) — SHIPPED 2026-04-09</summary>
 
 - [x] **Phase 39: Shared Components & Dependencies** - Reusable UI primitives (DonutChart, ProgressBar, InsightCard, FilterChips, DateStrip) and new dependency installation that unblock all subsequent phases (completed 2026-04-09)
 - [x] **Phase 40: Independent Screen Redesigns** - Onboarding (6 screens), Recipe Library, Cooking Mode, and Premium Upgrade — screens requiring no store changes (completed 2026-04-09)

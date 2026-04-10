@@ -1,5 +1,24 @@
 # Milestones
 
+## v7.0 Stitch UI Redesign (Shipped: 2026-04-09)
+
+**Phases completed:** 5 phases, 14 plans, ~30 tasks
+
+**Key accomplishments:**
+
+- 5 reusable shared UI components (DonutChart, ProgressBar, InsightCard, FilterChips, DateStrip) with animated SVG and Reanimated
+- Day-focused meal planner with hero dinner card, DateStrip navigation, Day/Week toggle, and grocery shortcut card
+- 6-screen onboarding redesign (Welcome with hero photo, Create Kitchen with illustration, Invite with code sharing, Add Recipes with progress counter, Plan Week with meal slots, All Set with glassmorphism)
+- Recipe Library with horizontal FilterChips, full-width cards with description/difficulty/rating, and Import CTA
+- Cooking Mode redesign with step photos, timer card, step type badges, Chef's Tip callouts, ingredient chips, and Previous/Next navigation
+- Premium Upgrade screen with hero kitchen photo, feature comparison table (Free vs Premium), and monthly/yearly pricing tiers
+- Grocery List with shopping progress bar, sync-with-plan, enhanced item rows with quantity/price/tags, and all 4 real-time hooks preserved
+- Budget dashboard with DonutChart hero, month picker, Budget Insights cards, category progress bars, and weekly mini bar charts
+- Profile with cooking insights (streak + completion ring), most-cooked recipe, household distribution chart, and grouped settings navigation
+- Social Feed with following avatar strip, hero-sized meal photos, Try This Recipe CTAs, and View Full Recipe actions
+
+---
+
 ## v6.0 Food Data Integration (Shipped: 2026-04-09)
 
 **Phases completed:** 4 phases, 8 plans, 13 tasks
