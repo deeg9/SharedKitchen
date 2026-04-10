@@ -5,6 +5,7 @@ import {
   Pressable,
   StyleSheet,
   Modal,
+  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { Image } from 'expo-image';
@@ -16,7 +17,6 @@ import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
 import type { FoodItem } from '../../types/food';
-import { AlertDialog } from '../ui/AlertDialog';
 
 interface BarcodeResultCardProps {
   food: FoodItem;
@@ -35,7 +35,6 @@ export function BarcodeResultCard({
 }: BarcodeResultCardProps) {
   const [addingPantry, setAddingPantry] = useState(false);
   const [addingGrocery, setAddingGrocery] = useState(false);
-  const [barcodeAlert, setBarcodeAlert] = useState<{ visible: boolean; title: string; message: string } | null>(null);
 
   const activeHouseholdId = useHouseholdStore((s) => s.activeHouseholdId);
   const pantryItems = usePantryStore((s) => s.items);
@@ -52,7 +51,7 @@ export function BarcodeResultCard({
 
   const handleAddToPantry = async () => {
     if (!activeHouseholdId) {
-      setBarcodeAlert({ visible: true, title: 'No household', message: 'Please join or create a household first.' });
+      Alert.alert('No household', 'Please join or create a household first.');
       return;
     }
     setAddingPantry(true);
@@ -61,10 +60,10 @@ export function BarcodeResultCard({
         name: food.name,
         category: food.category ?? 'Other',
       });
-      setBarcodeAlert({ visible: true, title: 'Added to Pantry', message: `${food.name} has been added to your pantry.` });
+      Alert.alert('Added to Pantry', `${food.name} has been added to your pantry.`);
       onAddedToPantry();
     } catch {
-      setBarcodeAlert({ visible: true, title: 'Error', message: 'Failed to add item to pantry. Please try again.' });
+      Alert.alert('Error', 'Failed to add item to pantry. Please try again.');
     } finally {
       setAddingPantry(false);
     }
@@ -72,7 +71,10 @@ export function BarcodeResultCard({
 
   const handleAddToGrocery = async () => {
     if (!activeListId) {
-      setBarcodeAlert({ visible: true, title: 'No active grocery list', message: 'Generate one from the Shopping List tab first.' });
+      Alert.alert(
+        'No active grocery list',
+        'Generate one from the Shopping List tab first.'
+      );
       return;
     }
     setAddingGrocery(true);
@@ -83,10 +85,10 @@ export function BarcodeResultCard({
         '1',
         food.category ?? 'Other'
       );
-      setBarcodeAlert({ visible: true, title: 'Added to Grocery List', message: `${food.name} has been added to your grocery list.` });
+      Alert.alert('Added to Grocery List', `${food.name} has been added to your grocery list.`);
       onAddedToGrocery();
     } catch {
-      setBarcodeAlert({ visible: true, title: 'Error', message: 'Failed to add item to grocery list. Please try again.' });
+      Alert.alert('Error', 'Failed to add item to grocery list. Please try again.');
     } finally {
       setAddingGrocery(false);
     }
@@ -210,16 +212,6 @@ export function BarcodeResultCard({
               )}
             </Pressable>
           </View>
-
-          {barcodeAlert && (
-            <AlertDialog
-              visible={barcodeAlert.visible}
-              onClose={() => setBarcodeAlert(null)}
-              title={barcodeAlert.title}
-              message={barcodeAlert.message}
-              actions={[{ label: 'OK', variant: 'primary', onPress: () => setBarcodeAlert(null) }]}
-            />
-          )}
         </View>
       </View>
     </Modal>

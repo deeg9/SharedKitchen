@@ -6,6 +6,7 @@ import {
   FlatList,
   Pressable,
   StyleSheet,
+  Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
@@ -18,8 +19,6 @@ import { spacing, borderRadius } from '../../theme/spacing';
 import { shadows } from '../../theme/shadows';
 import { TAB_BAR_HEIGHT } from '../../lib/constants';
 import { ScannedItem } from '../../types/scan';
-import { Select } from '../ui/Select';
-import { AlertDialog } from '../ui/AlertDialog';
 import { findDuplicates } from '../../lib/dedup';
 import { analyzePhoto, VisionRateLimitError } from '../../lib/vision';
 import { usePantryStore } from '../../stores/pantryStore';
@@ -51,9 +50,6 @@ export function ScanReviewScreen({ initialItems, onClose, onSaved }: ScanReviewS
   const [scanning, setScanning] = useState(false);
   const [saving, setSaving] = useState(false);
   const [photoCount, setPhotoCount] = useState(1);
-
-  // AlertDialog state
-  const [scanAlert, setScanAlert] = useState<{ visible: boolean; title: string; message: string } | null>(null);
 
   // "Add missed item" state
   const [addingItem, setAddingItem] = useState(false);
@@ -143,13 +139,13 @@ export function ScanReviewScreen({ initialItems, onClose, onSaved }: ScanReviewS
         setItems((prev) => [...prev, ...withDuplicates]);
         setPhotoCount((c) => c + 1);
       } else {
-        setScanAlert({ visible: true, title: 'No items found', message: 'We couldn\'t identify any food items in that photo. Try a clearer photo.' });
+        Alert.alert('No items found', 'We couldn\'t identify any food items in that photo. Try a clearer photo.');
       }
     } catch (err: unknown) {
       if (err instanceof VisionRateLimitError) {
-        setScanAlert({ visible: true, title: 'Monthly scan limit reached', message: `You've used all ${err.limit} free scans this month. Upgrade to Premium for unlimited scans.` });
+        Alert.alert('Monthly scan limit reached', `You've used all ${err.limit} free scans this month. Upgrade to Premium for unlimited scans.`);
       } else {
-        setScanAlert({ visible: true, title: 'Couldn\'t analyze that photo', message: 'Please try again with a clearer image.' });
+        Alert.alert('Couldn\'t analyze that photo', 'Please try again with a clearer image.');
       }
     } finally {
       setScanning(false);
@@ -168,15 +164,19 @@ export function ScanReviewScreen({ initialItems, onClose, onSaved }: ScanReviewS
       onSaved(addedCount);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Something went wrong';
-      setScanAlert({ visible: true, title: 'Save failed', message });
+      Alert.alert('Save failed', message);
     } finally {
       setSaving(false);
     }
   }, [activeHouseholdId, items, bulkAddPantryItems, onSaved]);
 
+  // --- Category dropdown for inline editing ---
+  const [categoryDropdownId, setCategoryDropdownId] = useState<string | null>(null);
+
   const renderItem = useCallback(({ item }: { item: ScannedItem }) => {
     const isEditing = editingId === item.id;
     const isDuplicate = item.duplicateOfId !== null;
+    const showCategoryDropdown = categoryDropdownId === item.id;
 
     return (
       <View style={[rowStyles.container, isDuplicate && rowStyles.duplicateContainer]}>
@@ -202,14 +202,44 @@ export function ScanReviewScreen({ initialItems, onClose, onSaved }: ScanReviewS
                   placeholder="Qty"
                   placeholderTextColor={colors.outlineVariant}
                 />
-                <View style={{ flex: 1 }}>
-                  <Select
-                    options={CATEGORY_OPTIONS.map((c) => ({ label: c, value: c }))}
-                    value={item.category}
-                    onValueChange={(v) => handleEditField(item.id, 'category', v)}
+                <Pressable
+                  style={rowStyles.categorySelect}
+                  onPress={() => setCategoryDropdownId(showCategoryDropdown ? null : item.id)}
+                >
+                  <Text style={rowStyles.categorySelectText}>{item.category}</Text>
+                  <MaterialCommunityIcons
+                    name={showCategoryDropdown ? 'chevron-up' : 'chevron-down'}
+                    size={16}
+                    color={colors.onSurfaceVariant}
                   />
-                </View>
+                </Pressable>
               </View>
+              {showCategoryDropdown && (
+                <View style={rowStyles.categoryDropdown}>
+                  {CATEGORY_OPTIONS.map((cat) => (
+                    <Pressable
+                      key={cat}
+                      style={[
+                        rowStyles.categoryOption,
+                        item.category === cat && rowStyles.categoryOptionActive,
+                      ]}
+                      onPress={() => {
+                        handleEditField(item.id, 'category', cat);
+                        setCategoryDropdownId(null);
+                      }}
+                    >
+                      <Text
+                        style={[
+                          rowStyles.categoryOptionText,
+                          item.category === cat && rowStyles.categoryOptionTextActive,
+                        ]}
+                      >
+                        {cat}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+              )}
             </View>
           ) : (
             <View style={rowStyles.displayContent}>
@@ -245,7 +275,7 @@ export function ScanReviewScreen({ initialItems, onClose, onSaved }: ScanReviewS
         </Pressable>
       </View>
     );
-  }, [editingId, handleEditField, handleDelete]);
+  }, [editingId, categoryDropdownId, handleEditField, handleDelete]);
 
   // --- Add missed item row ---
   const renderFooter = useCallback(() => {
@@ -396,17 +426,6 @@ export function ScanReviewScreen({ initialItems, onClose, onSaved }: ScanReviewS
         onDismiss={dismissPrePrompt}
       />
       <VisionLoadingOverlay visible={scanning} />
-
-      {/* Alert dialog */}
-      {scanAlert && (
-        <AlertDialog
-          visible={scanAlert.visible}
-          onClose={() => setScanAlert(null)}
-          title={scanAlert.title}
-          message={scanAlert.message}
-          actions={[{ label: 'OK', variant: 'primary', onPress: () => setScanAlert(null) }]}
-        />
-      )}
     </KeyboardAvoidingView>
   );
 }
@@ -628,6 +647,44 @@ const rowStyles = StyleSheet.create({
   },
   editInputSmall: {
     flex: 1,
+  },
+  categorySelect: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: borderRadius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs + 2,
+  },
+  categorySelectText: {
+    ...typography.bodyMd,
+    color: colors.onSurface,
+    fontSize: 13,
+  },
+  categoryDropdown: {
+    backgroundColor: colors.surfaceContainerLowest,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: borderRadius.sm,
+    ...shadows.float,
+  },
+  categoryOption: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  categoryOptionActive: {
+    backgroundColor: colors.primaryFixed,
+  },
+  categoryOptionText: {
+    ...typography.bodyMd,
+    color: colors.onSurface,
+    fontSize: 13,
+  },
+  categoryOptionTextActive: {
+    color: colors.primary,
+    fontWeight: '600',
   },
   deleteBtn: {
     width: 36,

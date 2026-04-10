@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
 import { Ingredient } from '../../types/database';
-import { Checkbox } from '../ui/Checkbox';
 
 interface IngredientRowProps {
   ingredient: Ingredient;
@@ -24,7 +24,11 @@ export function IngredientRow({ ingredient, multiplier = 1 }: IngredientRowProps
 
   return (
     <Pressable onPress={() => setChecked(!checked)} style={styles.container}>
-      <Checkbox checked={checked} onToggle={setChecked} size="sm" />
+      <MaterialCommunityIcons
+        name={checked ? 'checkbox-marked' : 'checkbox-blank-outline'}
+        size={22}
+        color={checked ? colors.primary : colors.outlineVariant}
+      />
       <Text style={[styles.text, checked && styles.textChecked]}>
         {scaledAmount > 0 && (
           <Text style={styles.amount}>{formatAmount(scaledAmount)} </Text>
