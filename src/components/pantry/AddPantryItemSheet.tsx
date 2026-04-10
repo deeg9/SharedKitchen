@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, ScrollView, StyleSheet, Pressable } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheet } from '../ui/BottomSheet';
+import { Select } from '../ui/Select';
 import { colors } from '../../theme/colors';
 import { typography, fontFamily } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
@@ -23,7 +24,6 @@ export function AddPantryItemSheet({ isOpen, onClose }: AddPantryItemSheetProps)
   const [qty, setQty] = useState(1);
   const [unitIdx, setUnitIdx] = useState(0);
   const [category, setCategory] = useState<string>('Other');
-  const [categoryOpen, setCategoryOpen] = useState(false);
   const [expiresAt, setExpiresAt] = useState('');
 
   const addPantryItem = usePantryStore((s) => s.addPantryItem);
@@ -36,7 +36,6 @@ export function AddPantryItemSheet({ isOpen, onClose }: AddPantryItemSheetProps)
       setQty(1);
       setUnitIdx(0);
       setCategory('Other');
-      setCategoryOpen(false);
       setExpiresAt('');
     }
   }, [isOpen]);
@@ -138,43 +137,11 @@ export function AddPantryItemSheet({ isOpen, onClose }: AddPantryItemSheetProps)
           {/* Category */}
           <View style={[styles.section, { zIndex: 20 }]}>
             <Text style={styles.fieldLabel}>Category</Text>
-            <Pressable
-              style={[styles.dropdownTrigger, categoryOpen && styles.dropdownTriggerOpen]}
-              onPress={() => setCategoryOpen(!categoryOpen)}
-            >
-              <Text style={styles.dropdownTriggerText}>{category}</Text>
-              <MaterialCommunityIcons
-                name={categoryOpen ? 'chevron-up' : 'chevron-down'}
-                size={18}
-                color={colors.onSurfaceVariant}
-              />
-            </Pressable>
-            {categoryOpen && (
-              <View style={styles.dropdownList}>
-                {CATEGORY_OPTIONS.map((cat) => (
-                  <Pressable
-                    key={cat}
-                    style={[styles.dropdownItem, category === cat && styles.dropdownItemActive]}
-                    onPress={() => {
-                      setCategory(cat);
-                      setCategoryOpen(false);
-                    }}
-                  >
-                    <Text
-                      style={[
-                        styles.dropdownItemText,
-                        category === cat && styles.dropdownItemTextActive,
-                      ]}
-                    >
-                      {cat}
-                    </Text>
-                    {category === cat && (
-                      <MaterialCommunityIcons name="check" size={16} color={colors.primary} />
-                    )}
-                  </Pressable>
-                ))}
-              </View>
-            )}
+            <Select
+              options={CATEGORY_OPTIONS.map((c) => ({ label: c, value: c }))}
+              value={category}
+              onValueChange={setCategory}
+            />
           </View>
 
           {/* Expires At */}
@@ -319,54 +286,6 @@ const styles = StyleSheet.create({
   },
   unitChipTextActive: {
     color: colors.onPrimary,
-  },
-  dropdownTrigger: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: colors.surfaceContainerLow,
-    borderRadius: borderRadius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm + 2,
-    borderWidth: 1,
-    borderColor: colors.outlineVariant,
-  },
-  dropdownTriggerOpen: {
-    borderColor: colors.primary,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
-  },
-  dropdownTriggerText: {
-    ...typography.bodyMd,
-    color: colors.onSurface,
-    fontWeight: '500',
-  },
-  dropdownList: {
-    backgroundColor: colors.surfaceContainerLowest,
-    borderWidth: 1,
-    borderTopWidth: 0,
-    borderColor: colors.primary,
-    borderBottomLeftRadius: borderRadius.md,
-    borderBottomRightRadius: borderRadius.md,
-    ...shadows.float,
-  },
-  dropdownItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm + 2,
-  },
-  dropdownItemActive: {
-    backgroundColor: colors.primaryFixed,
-  },
-  dropdownItemText: {
-    ...typography.bodyMd,
-    color: colors.onSurface,
-  },
-  dropdownItemTextActive: {
-    color: colors.primary,
-    fontWeight: '600',
   },
   expiresInput: {
     backgroundColor: colors.surfaceContainerLow,

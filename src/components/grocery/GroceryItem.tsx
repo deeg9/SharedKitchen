@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, Pressable, StyleSheet, Image, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { colors } from '../../theme/colors';
@@ -10,6 +10,8 @@ import { useGroceryStore } from '../../stores/groceryStore';
 import { useHouseholdStore } from '../../stores/householdStore';
 import { useBudgetStore } from '../../stores/budgetStore';
 import { usePantryStore } from '../../stores/pantryStore';
+import { Checkbox } from '../ui/Checkbox';
+import { AlertDialog } from '../ui/AlertDialog';
 
 interface GroceryItemProps {
   item: GroceryItemType;
@@ -24,6 +26,9 @@ export function GroceryItem({ item, userId, onEdit }: GroceryItemProps) {
   const members = useHouseholdStore((s) => s.members);
   const activeHouseholdId = useHouseholdStore((s) => s.activeHouseholdId);
   const pantryItems = usePantryStore((s) => s.items);
+
+  const [costDialogOpen, setCostDialogOpen] = useState(false);
+  const [costInput, setCostInput] = useState('');
 
   const checkerProfile = item.checked_by
     ? members.find((m) => m.user_id === item.checked_by)?.profiles
@@ -49,40 +54,30 @@ export function GroceryItem({ item, userId, onEdit }: GroceryItemProps) {
     }
 
     // When checking on, prompt for cost
-    Alert.prompt(
-      'Item Cost',
-      `How much was ${item.name}?`,
-      [
-        {
-          text: 'Skip',
-          style: 'cancel',
-          onPress: () => {
-            toggleItem(item.id, true, userId);
-          },
-        },
-        {
-          text: 'Save',
-          onPress: (value?: string) => {
-            const parsedCost = parseFloat(value || '0');
-            toggleItem(item.id, true, userId);
-            if (parsedCost > 0) {
-              updateItem(item.id, { estimated_price: parsedCost });
-              if (activeHouseholdId) {
-                useBudgetStore.getState().addExpense(activeHouseholdId, {
-                  amount: parsedCost,
-                  category: 'Groceries',
-                  description: item.name,
-                  expense_date: new Date().toISOString().split('T')[0],
-                });
-              }
-            }
-          },
-        },
-      ],
-      'plain-text',
-      item.estimated_price ? item.estimated_price.toFixed(2) : '',
-      'decimal-pad'
-    );
+    setCostInput(item.estimated_price ? item.estimated_price.toFixed(2) : '');
+    setCostDialogOpen(true);
+  };
+
+  const handleCostSkip = () => {
+    toggleItem(item.id, true, userId);
+    setCostDialogOpen(false);
+  };
+
+  const handleCostSave = () => {
+    const parsedCost = parseFloat(costInput || '0');
+    toggleItem(item.id, true, userId);
+    if (parsedCost > 0) {
+      updateItem(item.id, { estimated_price: parsedCost });
+      if (activeHouseholdId) {
+        useBudgetStore.getState().addExpense(activeHouseholdId, {
+          amount: parsedCost,
+          category: 'Groceries',
+          description: item.name,
+          expense_date: new Date().toISOString().split('T')[0],
+        });
+      }
+    }
+    setCostDialogOpen(false);
   };
 
   return (
@@ -92,15 +87,8 @@ export function GroceryItem({ item, userId, onEdit }: GroceryItemProps) {
       testID={`grocery-item-${item.id}`}
     >
       {/* Circular checkbox */}
-      <View
-        style={[
-          styles.checkbox,
-          item.is_checked && styles.checkboxChecked,
-        ]}
-      >
-        {item.is_checked && (
-          <MaterialCommunityIcons name="check" size={16} color={colors.onPrimary} />
-        )}
+      <View style={styles.checkboxWrap}>
+        <Checkbox checked={item.is_checked} onToggle={handleToggle} />
       </View>
 
       {/* Item details */}
@@ -157,6 +145,24 @@ export function GroceryItem({ item, userId, onEdit }: GroceryItemProps) {
           </Pressable>
         )}
       </View>
+
+      {/* Cost dialog */}
+      <AlertDialog
+        visible={costDialogOpen}
+        onClose={() => setCostDialogOpen(false)}
+        title="Item Cost"
+        message={`How much was ${item.name}?`}
+        input={{
+          placeholder: '0.00',
+          defaultValue: item.estimated_price?.toFixed(2) || '',
+          keyboardType: 'decimal-pad',
+          onChangeText: setCostInput,
+        }}
+        actions={[
+          { label: 'Skip', variant: 'secondary', onPress: handleCostSkip },
+          { label: 'Save', variant: 'primary', onPress: handleCostSave },
+        ]}
+      />
     </Pressable>
   );
 }
@@ -168,19 +174,8 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm + 2,
     paddingHorizontal: spacing.md,
   },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: borderRadius.full,
-    borderWidth: 2,
-    borderColor: colors.outline,
-    alignItems: 'center',
-    justifyContent: 'center',
+  checkboxWrap: {
     marginRight: spacing.sm + 4,
-  },
-  checkboxChecked: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
   },
   details: {
     flex: 1,

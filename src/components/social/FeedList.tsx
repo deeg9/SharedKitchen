@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { View, FlatList, RefreshControl, ActivityIndicator, Alert, ActionSheetIOS, Platform, StyleSheet } from 'react-native';
+import { View, FlatList, RefreshControl, ActivityIndicator, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSocialStore } from '../../stores/socialStore';
 import { useHouseholdStore } from '../../stores/householdStore';
@@ -11,18 +11,28 @@ import { FollowingStrip } from './FollowingStrip';
 import { CommentSheet } from './CommentSheet';
 import { MealSlotPickerSheet } from '../meal-logging/MealSlotPickerSheet';
 import { EmptyState } from '../ui/EmptyState';
+import { ActionMenu } from '../ui/ActionMenu';
+import { AlertDialog } from '../ui/AlertDialog';
 import { CameraSheet } from '../camera/CameraSheet';
 import { FeedPost, MealType } from '../../types/database';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
 import { TAB_BAR_HEIGHT } from '../../lib/constants';
+import { Text } from 'react-native';
 
 interface FeedListProps {
   myKitchenId: string;
 }
 
 type KitchenProfileLookup = Map<string, { display_name: string; avatar_url: string | null }>;
+
+type AlertConfig = {
+  visible: boolean;
+  title: string;
+  message: string;
+  actions: Array<{ label: string; onPress: () => void; variant?: 'primary' | 'secondary' | 'destructive' }>;
+} | null;
 
 export function FeedList({ myKitchenId }: FeedListProps) {
   const router = useRouter();
@@ -54,6 +64,10 @@ export function FeedList({ myKitchenId }: FeedListProps) {
   const [slotPickerOpen, setSlotPickerOpen] = useState(false);
   const [cookThisPost, setCookThisPost] = useState<FeedPost | null>(null);
   const profilesFetched = useRef(false);
+
+  // ActionMenu + AlertDialog state
+  const [menuPost, setMenuPost] = useState<FeedPost | null>(null);
+  const [alertConfig, setAlertConfig] = useState<AlertConfig>(null);
 
   // Load initial feed and blocked kitchens on mount
   useEffect(() => {
@@ -136,50 +150,11 @@ export function FeedList({ myKitchenId }: FeedListProps) {
 
   const householdId = activeHouseholdId ?? '';
 
-  // Long-press action sheet for report/block
+  // Long-press action menu for report/block
   const handleLongPress = useCallback((post: FeedPost) => {
     if (post.kitchen_id === myKitchenId) return; // Don't report/block own posts
-
-    const options = ['Report Post', 'Block Kitchen', 'Cancel'];
-    const cancelIndex = 2;
-
-    if (Platform.OS === 'ios') {
-      ActionSheetIOS.showActionSheetWithOptions(
-        { options, cancelButtonIndex: cancelIndex, destructiveButtonIndex: 1 },
-        (index) => {
-          if (index === 0) {
-            reportContent(myKitchenId, 'post', post.id);
-            Alert.alert('Reported', 'Thank you for reporting. We will review this content.');
-          } else if (index === 1) {
-            Alert.alert(
-              'Block Kitchen',
-              'You will no longer see posts from this kitchen. You can unblock from settings.',
-              [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                  text: 'Block',
-                  style: 'destructive',
-                  onPress: () => blockKitchen(myKitchenId, post.kitchen_id),
-                },
-              ]
-            );
-          }
-        }
-      );
-    } else {
-      // Android fallback with Alert
-      Alert.alert('Options', undefined, [
-        { text: 'Report Post', onPress: () => {
-          reportContent(myKitchenId, 'post', post.id);
-          Alert.alert('Reported', 'Thank you for reporting.');
-        }},
-        { text: 'Block Kitchen', style: 'destructive', onPress: () => {
-          blockKitchen(myKitchenId, post.kitchen_id);
-        }},
-        { text: 'Cancel', style: 'cancel' },
-      ]);
-    }
-  }, [myKitchenId, reportContent, blockKitchen]);
+    setMenuPost(post);
+  }, [myKitchenId]);
 
   // Cook This Too handlers
   const handleCookThisToo = useCallback((post: FeedPost) => {
@@ -194,13 +169,23 @@ export function FeedList({ myKitchenId }: FeedListProps) {
     // Step 1: Save recipe to library
     const savedRecipe = await saveRecipeFromPost(cookThisPost, myKitchenId, householdId);
     if (!savedRecipe) {
-      Alert.alert('Error', 'Could not save recipe.');
+      setAlertConfig({
+        visible: true,
+        title: 'Error',
+        message: 'Could not save recipe.',
+        actions: [{ label: 'OK', variant: 'primary', onPress: () => setAlertConfig(null) }],
+      });
       return;
     }
 
     // Step 2: Assign to meal plan
     await usePlanStore.getState().assignRecipe(householdId, date, mealType, savedRecipe.id);
-    Alert.alert('Added!', `"${cookThisPost.recipe_name}" saved and added to your plan.`);
+    setAlertConfig({
+      visible: true,
+      title: 'Added!',
+      message: `"${cookThisPost.recipe_name}" saved and added to your plan.`,
+      actions: [{ label: 'OK', variant: 'primary', onPress: () => setAlertConfig(null) }],
+    });
     setCookThisPost(null);
   }, [cookThisPost, myKitchenId, householdId, saveRecipeFromPost]);
 
@@ -223,9 +208,19 @@ export function FeedList({ myKitchenId }: FeedListProps) {
         onSavePress={async () => {
           const result = await saveRecipeFromPost(item, myKitchenId, householdId);
           if (result) {
-            Alert.alert('Recipe Saved', `"${item.recipe_name}" saved to your library`);
+            setAlertConfig({
+              visible: true,
+              title: 'Recipe Saved',
+              message: `"${item.recipe_name}" saved to your library`,
+              actions: [{ label: 'OK', variant: 'primary', onPress: () => setAlertConfig(null) }],
+            });
           } else {
-            Alert.alert('Error', 'Could not save recipe. It may not be available.');
+            setAlertConfig({
+              visible: true,
+              title: 'Error',
+              message: 'Could not save recipe. It may not be available.',
+              actions: [{ label: 'OK', variant: 'primary', onPress: () => setAlertConfig(null) }],
+            });
           }
         }}
         onLongPress={() => handleLongPress(item)}
@@ -335,6 +330,69 @@ export function FeedList({ myKitchenId }: FeedListProps) {
         }}
         onSelect={handleSlotSelect}
       />
+
+      {/* Cross-platform action menu */}
+      <ActionMenu
+        visible={!!menuPost}
+        onClose={() => setMenuPost(null)}
+        title="Options"
+        items={[
+          {
+            label: 'Report Post',
+            icon: 'flag-outline',
+            onPress: () => {
+              if (menuPost) {
+                reportContent(myKitchenId, 'post', menuPost.id);
+              }
+              setMenuPost(null);
+              setAlertConfig({
+                visible: true,
+                title: 'Reported',
+                message: 'Thank you for reporting. We will review this content.',
+                actions: [{ label: 'OK', variant: 'primary', onPress: () => setAlertConfig(null) }],
+              });
+            },
+          },
+          {
+            label: 'Block Kitchen',
+            icon: 'block-helper',
+            destructive: true,
+            onPress: () => {
+              const postToBlock = menuPost;
+              setMenuPost(null);
+              setAlertConfig({
+                visible: true,
+                title: 'Block Kitchen',
+                message: 'You will no longer see posts from this kitchen. You can unblock from settings.',
+                actions: [
+                  { label: 'Cancel', variant: 'secondary', onPress: () => setAlertConfig(null) },
+                  {
+                    label: 'Block',
+                    variant: 'destructive',
+                    onPress: () => {
+                      if (postToBlock) {
+                        blockKitchen(myKitchenId, postToBlock.kitchen_id);
+                      }
+                      setAlertConfig(null);
+                    },
+                  },
+                ],
+              });
+            },
+          },
+        ]}
+      />
+
+      {/* Shared alert dialog */}
+      {alertConfig && (
+        <AlertDialog
+          visible={alertConfig.visible}
+          onClose={() => setAlertConfig(null)}
+          title={alertConfig.title}
+          message={alertConfig.message}
+          actions={alertConfig.actions}
+        />
+      )}
     </View>
   );
 }

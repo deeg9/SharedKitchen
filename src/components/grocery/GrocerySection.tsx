@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
 import { GroceryItem as GroceryItemType } from '../../types/database';
 import { GroceryItem } from './GroceryItem';
+import { Collapsible } from '../ui/Collapsible';
 
 const SECTION_ICONS: Record<string, string> = {
   'Proteins': 'food-drumstick',
@@ -33,44 +34,37 @@ export function GrocerySection({
   defaultCollapsed = false,
   onEditItem,
 }: GrocerySectionProps) {
-  const [collapsed, setCollapsed] = useState(defaultCollapsed);
-
   if (items.length === 0) return null;
+
+  const headerContent = (
+    <View style={styles.headerLeft}>
+      <View style={styles.iconCircle}>
+        <MaterialCommunityIcons
+          name={(SECTION_ICONS[title] || 'tag-outline') as any}
+          size={18}
+          color={colors.primary}
+        />
+      </View>
+      {title === 'Completed' ? (
+        <Text style={styles.title}>Completed ({items.length})</Text>
+      ) : (
+        <>
+          <Text style={styles.title}>{title}</Text>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{items.length}</Text>
+          </View>
+        </>
+      )}
+    </View>
+  );
 
   return (
     <View style={styles.container} testID={`grocery-section-${title}`}>
-      <Pressable
-        style={styles.header}
-        onPress={() => setCollapsed(!collapsed)}
+      <Collapsible
+        defaultCollapsed={defaultCollapsed}
+        header={headerContent}
       >
-        <View style={styles.headerLeft}>
-          <View style={styles.iconCircle}>
-            <MaterialCommunityIcons
-              name={(SECTION_ICONS[title] || 'tag-outline') as any}
-              size={18}
-              color={colors.primary}
-            />
-          </View>
-          {title === 'Completed' ? (
-            <Text style={styles.title}>Completed ({items.length})</Text>
-          ) : (
-            <>
-              <Text style={styles.title}>{title}</Text>
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{items.length}</Text>
-              </View>
-            </>
-          )}
-        </View>
-        <MaterialCommunityIcons
-          name={collapsed ? 'chevron-down' : 'chevron-up'}
-          size={20}
-          color={colors.onSurfaceVariant}
-        />
-      </Pressable>
-
-      {!collapsed &&
-        items.map((item) => (
+        {items.map((item) => (
           <GroceryItem
             key={item.id}
             item={item}
@@ -78,6 +72,7 @@ export function GrocerySection({
             onEdit={onEditItem}
           />
         ))}
+      </Collapsible>
     </View>
   );
 }
@@ -86,17 +81,12 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: spacing.sm,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-  },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
   iconCircle: {
     width: 32,

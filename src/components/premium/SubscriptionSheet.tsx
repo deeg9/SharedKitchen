@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert, ActivityIndicator, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
+import { Checkbox } from '../ui/Checkbox';
+import { AlertDialog } from '../ui/AlertDialog';
 import { PremiumBadge } from './PremiumBadge';
 import { useSubscriptionStore } from '../../stores/subscriptionStore';
 import { openCheckout, openBillingPortal } from '../../lib/stripe';
@@ -30,11 +32,7 @@ const FREE_VS_PREMIUM: { feature: string; icon: string; free: string; premium: s
 function renderCellValue(value: string, isPremiumCol: boolean) {
   if (value === 'check') {
     return (
-      <MaterialCommunityIcons
-        name="check-circle"
-        size={18}
-        color={isPremiumCol ? colors.primary : colors.primary}
-      />
+      <Checkbox checked={true} onToggle={() => {}} disabled size="sm" />
     );
   }
   if (value === 'dash') {
@@ -53,13 +51,14 @@ export function SubscriptionSheet() {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [subAlert, setSubAlert] = useState<{ visible: boolean; title: string; message: string } | null>(null);
 
   const handleManageSubscription = async () => {
     setPortalLoading(true);
     try {
       await openBillingPortal();
     } catch (err: any) {
-      Alert.alert('Error', err.message ?? 'Could not open billing portal. Please try again later.');
+      setSubAlert({ visible: true, title: 'Error', message: err.message ?? 'Could not open billing portal. Please try again later.' });
     } finally {
       setTimeout(() => setPortalLoading(false), 1000);
     }
@@ -81,7 +80,7 @@ export function SubscriptionSheet() {
   };
 
   const handleYearlyUpgrade = () => {
-    Alert.alert('Coming Soon', 'Yearly pricing will be available soon.');
+    setSubAlert({ visible: true, title: 'Coming Soon', message: 'Yearly pricing will be available soon.' });
   };
 
   if (isPremium()) {
@@ -130,11 +129,7 @@ export function SubscriptionSheet() {
           <View style={styles.perksList}>
             {PREMIUM_PERKS.map((perk) => (
               <View key={perk} style={styles.perkRow}>
-                <MaterialCommunityIcons
-                  name="check-circle"
-                  size={18}
-                  color={colors.primary}
-                />
+                <Checkbox checked={true} onToggle={() => {}} disabled size="sm" />
                 <Text style={styles.perkText}>{perk}</Text>
               </View>
             ))}
@@ -266,6 +261,16 @@ export function SubscriptionSheet() {
           <Text style={styles.errorBody}>Your card was not charged. Please check your payment details and try again.</Text>
           <Button variant="secondary" size="md" onPress={handleUpgrade}>Retry Payment</Button>
         </View>
+      )}
+
+      {subAlert && (
+        <AlertDialog
+          visible={subAlert.visible}
+          onClose={() => setSubAlert(null)}
+          title={subAlert.title}
+          message={subAlert.message}
+          actions={[{ label: 'OK', variant: 'primary', onPress: () => setSubAlert(null) }]}
+        />
       )}
     </View>
   );

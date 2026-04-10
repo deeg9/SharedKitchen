@@ -6,7 +6,6 @@ import {
   FlatList,
   Pressable,
   StyleSheet,
-  Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
@@ -18,6 +17,8 @@ import { typography, fontFamily } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
 import { shadows } from '../../theme/shadows';
 import { ScannedItem } from '../../types/scan';
+import { Select } from '../ui/Select';
+import { AlertDialog } from '../ui/AlertDialog';
 import { findDuplicates } from '../../lib/dedup';
 import { analyzePhoto, VisionRateLimitError } from '../../lib/vision';
 import { usePantryStore } from '../../stores/pantryStore';
@@ -46,6 +47,9 @@ export function ListExtractReviewScreen({ initialItems, listId, onClose, onSaved
   const [scanning, setScanning] = useState(false);
   const [saving, setSaving] = useState(false);
   const [photoCount, setPhotoCount] = useState(1);
+
+  // AlertDialog state
+  const [extractAlert, setExtractAlert] = useState<{ visible: boolean; title: string; message: string } | null>(null);
 
   // "Add missed item" state
   const [addingItem, setAddingItem] = useState(false);
@@ -134,13 +138,13 @@ export function ListExtractReviewScreen({ initialItems, listId, onClose, onSaved
         setItems((prev) => [...prev, ...withDuplicates]);
         setPhotoCount((c) => c + 1);
       } else {
-        Alert.alert('No items found', 'We couldn\'t extract any items from that photo. Try a clearer image.');
+        setExtractAlert({ visible: true, title: 'No items found', message: 'We couldn\'t extract any items from that photo. Try a clearer image.' });
       }
     } catch (err: unknown) {
       if (err instanceof VisionRateLimitError) {
-        Alert.alert('Monthly scan limit reached', `You've used all ${err.limit} free scans this month. Upgrade to Premium for unlimited scans.`);
+        setExtractAlert({ visible: true, title: 'Monthly scan limit reached', message: `You've used all ${err.limit} free scans this month. Upgrade to Premium for unlimited scans.` });
       } else {
-        Alert.alert('Couldn\'t analyze that photo', 'Please try again with a clearer image.');
+        setExtractAlert({ visible: true, title: 'Couldn\'t analyze that photo', message: 'Please try again with a clearer image.' });
       }
     } finally {
       setScanning(false);
@@ -159,19 +163,15 @@ export function ListExtractReviewScreen({ initialItems, listId, onClose, onSaved
       onSaved(addedCount);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Something went wrong';
-      Alert.alert('Save failed', message);
+      setExtractAlert({ visible: true, title: 'Save failed', message });
     } finally {
       setSaving(false);
     }
   }, [listId, items, bulkAddGroceryItems, onSaved]);
 
-  // --- Category dropdown for inline editing ---
-  const [categoryDropdownId, setCategoryDropdownId] = useState<string | null>(null);
-
   const renderItem = useCallback(({ item }: { item: ScannedItem }) => {
     const isEditing = editingId === item.id;
     const isDuplicate = item.duplicateOfId !== null;
-    const showCategoryDropdown = categoryDropdownId === item.id;
 
     return (
       <View style={[rowStyles.container, isDuplicate && rowStyles.duplicateContainer]}>
@@ -197,44 +197,14 @@ export function ListExtractReviewScreen({ initialItems, listId, onClose, onSaved
                   placeholder="Qty"
                   placeholderTextColor={colors.outlineVariant}
                 />
-                <Pressable
-                  style={rowStyles.categorySelect}
-                  onPress={() => setCategoryDropdownId(showCategoryDropdown ? null : item.id)}
-                >
-                  <Text style={rowStyles.categorySelectText}>{item.category}</Text>
-                  <MaterialCommunityIcons
-                    name={showCategoryDropdown ? 'chevron-up' : 'chevron-down'}
-                    size={16}
-                    color={colors.onSurfaceVariant}
+                <View style={{ flex: 1 }}>
+                  <Select
+                    options={CATEGORY_OPTIONS.map((c) => ({ label: c, value: c }))}
+                    value={item.category}
+                    onValueChange={(v) => handleEditField(item.id, 'category', v)}
                   />
-                </Pressable>
-              </View>
-              {showCategoryDropdown && (
-                <View style={rowStyles.categoryDropdown}>
-                  {CATEGORY_OPTIONS.map((cat) => (
-                    <Pressable
-                      key={cat}
-                      style={[
-                        rowStyles.categoryOption,
-                        item.category === cat && rowStyles.categoryOptionActive,
-                      ]}
-                      onPress={() => {
-                        handleEditField(item.id, 'category', cat);
-                        setCategoryDropdownId(null);
-                      }}
-                    >
-                      <Text
-                        style={[
-                          rowStyles.categoryOptionText,
-                          item.category === cat && rowStyles.categoryOptionTextActive,
-                        ]}
-                      >
-                        {cat}
-                      </Text>
-                    </Pressable>
-                  ))}
                 </View>
-              )}
+              </View>
             </View>
           ) : (
             <View style={rowStyles.displayContent}>
@@ -269,7 +239,7 @@ export function ListExtractReviewScreen({ initialItems, listId, onClose, onSaved
         </Pressable>
       </View>
     );
-  }, [editingId, categoryDropdownId, handleEditField, handleDelete]);
+  }, [editingId, handleEditField, handleDelete]);
 
   // --- Add missed item row ---
   const renderFooter = useCallback(() => {
@@ -419,6 +389,17 @@ export function ListExtractReviewScreen({ initialItems, listId, onClose, onSaved
         onDismiss={dismissPrePrompt}
       />
       <VisionLoadingOverlay visible={scanning} />
+
+      {/* Alert dialog */}
+      {extractAlert && (
+        <AlertDialog
+          visible={extractAlert.visible}
+          onClose={() => setExtractAlert(null)}
+          title={extractAlert.title}
+          message={extractAlert.message}
+          actions={[{ label: 'OK', variant: 'primary', onPress: () => setExtractAlert(null) }]}
+        />
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -627,44 +608,6 @@ const rowStyles = StyleSheet.create({
   },
   editInputSmall: {
     flex: 1,
-  },
-  categorySelect: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: colors.surfaceContainerLow,
-    borderRadius: borderRadius.sm,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs + 2,
-  },
-  categorySelectText: {
-    ...typography.bodyMd,
-    color: colors.onSurface,
-    fontSize: 13,
-  },
-  categoryDropdown: {
-    backgroundColor: colors.surfaceContainerLowest,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    borderRadius: borderRadius.sm,
-    ...shadows.float,
-  },
-  categoryOption: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  categoryOptionActive: {
-    backgroundColor: colors.primaryFixed,
-  },
-  categoryOptionText: {
-    ...typography.bodyMd,
-    color: colors.onSurface,
-    fontSize: 13,
-  },
-  categoryOptionTextActive: {
-    color: colors.primary,
-    fontWeight: '600',
   },
   deleteBtn: {
     width: 36,

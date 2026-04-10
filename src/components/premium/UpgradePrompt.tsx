@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheet } from '../ui/BottomSheet';
 import { Button } from '../ui/Button';
+import { Checkbox } from '../ui/Checkbox';
+import { AlertDialog } from '../ui/AlertDialog';
 import { openCheckout } from '../../lib/stripe';
 import { colors } from '../../theme/colors';
 import { typography, fontFamily } from '../../theme/typography';
@@ -23,6 +25,7 @@ const FEATURE_LIST = [
 
 export function UpgradePrompt({ visible, onDismiss, feature }: UpgradePromptProps) {
   const [loading, setLoading] = useState(false);
+  const [errorAlert, setErrorAlert] = useState<{ visible: boolean; message: string } | null>(null);
 
   const handleUpgrade = async () => {
     setLoading(true);
@@ -32,7 +35,7 @@ export function UpgradePrompt({ visible, onDismiss, feature }: UpgradePromptProp
         onDismiss();
       }
     } catch (err: any) {
-      Alert.alert('Payment Error', err.message ?? 'Payment could not be completed');
+      setErrorAlert({ visible: true, message: err.message ?? 'Payment could not be completed' });
     } finally {
       setLoading(false);
     }
@@ -56,11 +59,7 @@ export function UpgradePrompt({ visible, onDismiss, feature }: UpgradePromptProp
         <View style={styles.featureList}>
           {FEATURE_LIST.map((item) => (
             <View key={item.label} style={styles.featureRow}>
-              <MaterialCommunityIcons
-                name="check-circle"
-                size={20}
-                color={colors.primary}
-              />
+              <Checkbox checked={true} onToggle={() => {}} disabled size="sm" />
               <Text style={styles.featureText}>{item.label}</Text>
             </View>
           ))}
@@ -86,6 +85,16 @@ export function UpgradePrompt({ visible, onDismiss, feature }: UpgradePromptProp
           <Text style={styles.laterText}>Maybe Later</Text>
         </Pressable>
       </View>
+
+      {errorAlert && (
+        <AlertDialog
+          visible={errorAlert.visible}
+          onClose={() => setErrorAlert(null)}
+          title="Payment Error"
+          message={errorAlert.message}
+          actions={[{ label: 'OK', variant: 'primary', onPress: () => setErrorAlert(null) }]}
+        />
+      )}
     </BottomSheet>
   );
 }

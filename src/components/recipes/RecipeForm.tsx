@@ -7,11 +7,11 @@ import {
   Pressable,
   Image,
   StyleSheet,
-  Alert,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Button } from '../ui/Button';
+import { AlertDialog } from '../ui/AlertDialog';
 import { colors } from '../../theme/colors';
 import { typography, fontFamily } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
@@ -62,6 +62,7 @@ export function RecipeForm({ onSubmit, loading = false, initialData }: RecipeFor
   );
   const [selectedTags, setSelectedTags] = useState<string[]>(initialData?.tags ?? []);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [permAlert, setPermAlert] = useState(false);
 
   React.useEffect(() => {
     if (initialData) {
@@ -80,7 +81,7 @@ export function RecipeForm({ onSubmit, loading = false, initialData }: RecipeFor
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permission needed', 'Please allow access to your photo library.');
+      setPermAlert(true);
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -422,6 +423,14 @@ export function RecipeForm({ onSubmit, loading = false, initialData }: RecipeFor
           </Text>
         </Pressable>
       </View>
+
+      <AlertDialog
+        visible={permAlert}
+        onClose={() => setPermAlert(false)}
+        title="Permission needed"
+        message="Please allow access to your photo library."
+        actions={[{ label: 'OK', variant: 'primary', onPress: () => setPermAlert(false) }]}
+      />
     </ScrollView>
   );
 }

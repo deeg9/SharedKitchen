@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
@@ -6,6 +6,7 @@ import { typography, fontFamily } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
 import { Skeleton } from '../ui/Skeleton';
 import { EmptyState } from '../ui/EmptyState';
+import { Collapsible } from '../ui/Collapsible';
 import { usePantryStore } from '../../stores/pantryStore';
 import { PantryItem } from '../../types/database';
 
@@ -98,28 +99,22 @@ function PantrySection({
   items: PantryItem[];
   onRemove: (id: string) => void;
 }) {
-  const [collapsed, setCollapsed] = useState(false);
+  const headerContent = (
+    <View style={sectionStyles.headerLeft}>
+      <Text style={sectionStyles.title}>{title}</Text>
+      <View style={sectionStyles.badge}>
+        <Text style={sectionStyles.badgeText}>{items.length}</Text>
+      </View>
+    </View>
+  );
 
   return (
     <View style={sectionStyles.container}>
-      <Pressable style={sectionStyles.header} onPress={() => setCollapsed(!collapsed)}>
-        <View style={sectionStyles.headerLeft}>
-          <Text style={sectionStyles.title}>{title}</Text>
-          <View style={sectionStyles.badge}>
-            <Text style={sectionStyles.badgeText}>{items.length}</Text>
-          </View>
-        </View>
-        <MaterialCommunityIcons
-          name={collapsed ? 'chevron-down' : 'chevron-up'}
-          size={20}
-          color={colors.onSurfaceVariant}
-        />
-      </Pressable>
-
-      {!collapsed &&
-        items.map((item) => (
+      <Collapsible header={headerContent}>
+        {items.map((item) => (
           <PantryItemRow key={item.id} item={item} onRemove={onRemove} />
         ))}
+      </Collapsible>
     </View>
   );
 }
@@ -184,17 +179,12 @@ const sectionStyles = StyleSheet.create({
   container: {
     marginBottom: spacing.sm,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-  },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
   title: {
     ...typography.titleMd,
