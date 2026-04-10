@@ -125,7 +125,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - [x] **Phase 39: Shared Components & Dependencies** - Reusable UI primitives (DonutChart, ProgressBar, InsightCard, FilterChips, DateStrip) and new dependency installation that unblock all subsequent phases (completed 2026-04-09)
 - [x] **Phase 40: Independent Screen Redesigns** - Onboarding (6 screens), Recipe Library, Cooking Mode, and Premium Upgrade — screens requiring no store changes (completed 2026-04-09)
 - [x] **Phase 41: Plan Tab Redesign** - Flagship day-focused meal planner with hero card, date strip, day/week toggle, and grocery shortcut (completed 2026-04-09)
-- [ ] **Phase 42: Grocery List Redesign** - High-risk grocery screen with shopping progress, sync-with-plan, and enhanced item rows while preserving 4 real-time hooks
+- [x] **Phase 42: Grocery List Redesign** - High-risk grocery screen with shopping progress, sync-with-plan, and enhanced item rows while preserving 4 real-time hooks (completed 2026-04-10)
 - [ ] **Phase 43: Budget, Profile & Social Feed** - Store-enhanced screens (budget insights, cooking stats) plus social feed redesign and cross-app Maestro test updates
 
 ## Phase Details
@@ -194,7 +194,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 42-01-PLAN.md — Redesign GrocerySummary, GroceryItem rows, and GrocerySection headers
-- [ ] 42-02-PLAN.md — Wire Sync with Plan button, swap segment order, pass presence to summary
+- [x] 42-02-PLAN.md — Wire Sync with Plan button, swap segment order, pass presence to summary
 **UI hint**: yes
 
 ### Phase 43: Budget, Profile & Social Feed
@@ -257,7 +257,7 @@ Plans:
 | 39. Shared Components & Dependencies | v7.0 | 3/3 | Complete    | 2026-04-09 |
 | 40. Independent Screen Redesigns | v7.0 | 4/4 | Complete    | 2026-04-09 |
 | 41. Plan Tab Redesign | v7.0 | 2/2 | Complete    | 2026-04-09 |
-| 42. Grocery List Redesign | v7.0 | 1/2 | In Progress|  |
+| 42. Grocery List Redesign | v7.0 | 2/2 | Complete    | 2026-04-10 |
 | 43. Budget, Profile & Social Feed | v7.0 | 0/0 | Not started | - |
 
 ---
