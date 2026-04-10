@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Pressable, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useBudgetStore } from '../../../src/stores/budgetStore';
 import { useHouseholdStore } from '../../../src/stores/householdStore';
-import { MonthlyProgress } from '../../../src/components/budget/MonthlyProgress';
+import { MonthPicker } from '../../../src/components/budget/MonthPicker';
+import { MonthlyProgress } from '../../../src/components/budget/MonthlyProgress'; // DonutChart hero via MonthlyProgress
+import { BudgetInsights } from '../../../src/components/budget/BudgetInsights';
 import { CategoryCard } from '../../../src/components/budget/CategoryCard';
 import { WeeklyBreakdown } from '../../../src/components/budget/WeeklyBreakdown';
 import { AddExpenseSheet } from '../../../src/components/budget/AddExpenseSheet';
@@ -21,18 +23,23 @@ export default function BudgetScreen() {
   const insets = useSafeAreaInsets();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+  const [previousTotal, setPreviousTotal] = useState(0);
   const subscription = useSubscriptionStore();
 
   const { activeHouseholdId } = useHouseholdStore();
   const {
     loading,
+    expenses,
     budgetTarget,
     fetchExpenses,
     fetchBudgetTarget,
     monthlyTotal,
     categoryTotals,
+    categoryBudgets,
     weeklyBreakdown,
     selectedMonth,
+    previousMonthTotal,
+    setSelectedMonth,
   } = useBudgetStore();
 
   useEffect(() => {
@@ -44,8 +51,30 @@ export default function BudgetScreen() {
     }
   }, [activeHouseholdId]);
 
+  // Fetch previous month total when selectedMonth changes
+  useEffect(() => {
+    if (activeHouseholdId) {
+      previousMonthTotal(activeHouseholdId).then(setPreviousTotal);
+    }
+  }, [activeHouseholdId, selectedMonth]);
+
+  const handlePreviousMonth = () => {
+    if (!activeHouseholdId) return;
+    const prev = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() - 1, 1);
+    setSelectedMonth(prev);
+    fetchExpenses(activeHouseholdId, prev);
+  };
+
+  const handleNextMonth = () => {
+    if (!activeHouseholdId) return;
+    const next = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 1);
+    setSelectedMonth(next);
+    fetchExpenses(activeHouseholdId, next);
+  };
+
   const spent = monthlyTotal();
   const categories = categoryTotals();
+  const budgets = categoryBudgets();
   const weeks = weeklyBreakdown();
 
   if (loading) {
@@ -68,7 +97,7 @@ export default function BudgetScreen() {
   }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top }]} testID="budget-screen">
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[
@@ -77,28 +106,53 @@ export default function BudgetScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
+        <MonthPicker
+          selectedMonth={selectedMonth}
+          onPrevious={handlePreviousMonth}
+          onNext={handleNextMonth}
+        />
+
         <MonthlyProgress spent={spent} target={budgetTarget} />
+
+        <BudgetInsights
+          currentTotal={spent}
+          previousTotal={previousTotal}
+          categoryTotals={categories}
+          categoryBudgets={budgets}
+        />
+
+        <Text style={styles.sectionTitle}>Spending Categories</Text>
 
         <CategoryCard
           icon="shopping"
           category="Groceries"
           amount={categories.Groceries.amount}
           percentage={categories.Groceries.percentage}
+          budget={budgets.Groceries}
         />
         <CategoryCard
           icon="silverware-fork-knife"
           category="Dining Out"
           amount={categories['Dining Out'].amount}
           percentage={categories['Dining Out'].percentage}
+          budget={budgets['Dining Out']}
         />
         <CategoryCard
           icon="food-takeout-box"
           category="Takeout"
           amount={categories.Takeout.amount}
           percentage={categories.Takeout.percentage}
+          budget={budgets.Takeout}
         />
 
-        <WeeklyBreakdown weeks={weeks} budgetTarget={budgetTarget} />
+        <WeeklyBreakdown
+          weeks={weeks}
+          budgetTarget={budgetTarget}
+          expenses={expenses.map((e) => ({
+            expense_date: e.expense_date,
+            amount: Number(e.amount),
+          }))}
+        />
       </ScrollView>
 
       {/* FAB */}
@@ -144,36 +198,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  trendsButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    paddingHorizontal: spacing.sm + 4,
-    paddingVertical: spacing.xs + 2,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.primaryFixed,
-  },
-  trendsText: {
-    ...typography.labelMd,
-    color: colors.primary,
-  },
-  avatar: {
-    marginRight: spacing.sm,
-  },
-  appTitle: {
-    ...typography.headlineMd,
-    color: colors.onSurface,
-  },
   scrollView: {
     flex: 1,
   },
   content: {
     paddingHorizontal: spacing.lg,
+  },
+  sectionTitle: {
+    ...typography.headlineMd,
+    color: colors.onSurface,
+    marginBottom: spacing.md,
   },
   fab: {
     position: 'absolute',
