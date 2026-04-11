@@ -265,6 +265,43 @@ export default function RecipeDetailScreen() {
             <SavedFromAttribution savedFromKitchenId={recipe.saved_from_kitchen_id} />
           )}
 
+          {/* Action row */}
+          <View style={s.actionRow}>
+            <Pressable
+              onPress={() => setShowCookLogSheet(true)}
+              style={s.actionBtn}
+              testID="recipe-detail-cook-log"
+            >
+              <MaterialCommunityIcons name="pot-steam" size={18} color={colors.onPrimary} />
+              <Text style={s.actionBtnText}>I Cooked This</Text>
+            </Pressable>
+            {recipe.instructions && (recipe.instructions as InstructionStepType[]).length > 0 && (
+              <Pressable
+                onPress={() => router.push(`/recipe/cook/${id}`)}
+                style={s.actionBtn}
+                testID="recipe-detail-cook-button"
+              >
+                <MaterialCommunityIcons name="silverware-fork-knife" size={18} color={colors.onPrimary} />
+                <Text style={s.actionBtnText}>Start Cooking</Text>
+              </Pressable>
+            )}
+            <Pressable
+              onPress={() => setShowPlanSheet(true)}
+              style={s.actionBtn}
+              testID="recipe-detail-add-to-plan"
+            >
+              <MaterialCommunityIcons name="calendar-plus" size={18} color={colors.onPrimary} />
+              <Text style={s.actionBtnText}>Add to Plan</Text>
+            </Pressable>
+            <Pressable onPress={handleFavorite} style={s.actionFavBtn} testID="recipe-detail-favorite-button">
+              <MaterialCommunityIcons
+                name={isFavorite ? 'heart' : 'heart-outline'}
+                size={24}
+                color={isFavorite ? colors.error : colors.secondary}
+              />
+            </Pressable>
+          </View>
+
           {/* Rating pill + Cook count badge */}
           <View style={s.ratingRow}>
             <View style={s.ratingPill}>
@@ -275,9 +312,6 @@ export default function RecipeDetailScreen() {
             </View>
             <CookCountBadge count={cookCount} />
           </View>
-
-          {/* I Cooked This Button */}
-          <CookLogButton onPress={() => setShowCookLogSheet(true)} />
 
           {/* Star rating */}
           <View style={s.starsRow}>
@@ -425,53 +459,6 @@ export default function RecipeDetailScreen() {
         )}
       </ScrollView>
 
-      {/* ── Bottom Action Bar ── */}
-      <View style={[s.bottomBar, { paddingBottom: insets.bottom + spacing.md }]}>
-        {recipe.instructions && (recipe.instructions as InstructionStepType[]).length > 0 && (
-          <Pressable
-            onPress={() => router.push(`/recipe/cook/${id}`)}
-            style={s.startCookingBtn}
-            testID="recipe-detail-cook-button"
-          >
-            <MaterialCommunityIcons name="pot-steam" size={22} color={colors.onSecondary} />
-            <Text style={s.startCookingText}>Start Cooking</Text>
-          </Pressable>
-        )}
-        <Pressable onPress={() => setShowPlanSheet(true)} style={s.addToPlanBtn} testID="recipe-detail-add-to-plan">
-          <MaterialCommunityIcons name="calendar-plus" size={22} color={colors.onPrimary} />
-          <Text style={s.addToPlanText}>Add to Plan</Text>
-        </Pressable>
-        <Pressable onPress={handleFavorite} style={s.favButton} testID="recipe-detail-favorite-button">
-          <MaterialCommunityIcons
-            name={isFavorite ? 'heart' : 'heart-outline'}
-            size={28}
-            color={isFavorite ? colors.error : colors.secondary}
-          />
-        </Pressable>
-        {recipe && recipe.household_id !== activeHouseholdId && !recipe.saved_from_recipe_id && (
-          <Pressable
-            onPress={async () => {
-              const { useSocialStore } = await import('../../../src/stores/socialStore');
-              const myKitchenId = useSocialStore.getState().myKitchenProfile?.id;
-              if (!myKitchenId || !activeHouseholdId || !userId) return;
-              const result = await supabase.rpc('clone_recipe_to_household', {
-                p_source_recipe_id: recipe.id,
-                p_target_household_id: activeHouseholdId,
-                p_source_kitchen_id: myKitchenId,
-                p_created_by: userId,
-              });
-              if (!result.error) {
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              }
-            }}
-            style={s.favButton}
-            hitSlop={8}
-            testID="recipe-detail-save-button"
-          >
-            <MaterialCommunityIcons name="bookmark-plus-outline" size={24} color={colors.primary} />
-          </Pressable>
-        )}
-      </View>
 
       {/* Day picker sheet */}
       <BottomSheet isOpen={showPlanSheet} onClose={() => setShowPlanSheet(false)} snapPoints={['45%']}>
@@ -536,6 +523,23 @@ const s = StyleSheet.create({
   title: {
     fontFamily: fontFamily.headlineBold, fontSize: 32, fontWeight: '800',
     color: colors.primary, letterSpacing: -0.5, lineHeight: 38, marginBottom: spacing.md,
+  },
+  actionRow: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.md,
+  },
+  actionBtn: {
+    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4,
+    backgroundColor: colors.primary, borderRadius: borderRadius.full,
+    paddingVertical: spacing.sm, paddingHorizontal: spacing.xs,
+  },
+  actionBtnText: {
+    fontSize: 11, fontWeight: '600', color: colors.onPrimary,
+  },
+  actionFavBtn: {
+    width: 44, height: 44, borderRadius: 22,
+    borderWidth: 1, borderColor: colors.outlineVariant,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: colors.surface,
   },
   ratingRow: {
     flexDirection: 'row', alignItems: 'center', gap: spacing.sm, flexWrap: 'wrap', marginBottom: spacing.sm,
