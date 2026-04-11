@@ -1,429 +1,682 @@
-# Architecture: Stitch UI Redesign Integration
+# Architecture: Social Recipe Features Integration
 
-**Project:** SharedKitchen v7.0
-**Researched:** 2026-04-07
-**Confidence:** HIGH (based on direct codebase analysis and Stitch design screenshots)
+**Domain:** Social recipe features for SharedKitchen v8.0
+**Researched:** 2026-04-10
+**Confidence:** HIGH (based on direct codebase analysis of existing tables, stores, and data flows)
 
-## Overview
+## Existing Architecture Inventory
 
-The 14 Stitch screens map onto the existing codebase as **visual replacements** of existing components with minimal store changes. The architecture is already well-structured for this: feature-organized components, Zustand stores with computed methods, and a centralized theme system. The redesign is primarily a component-layer effort with surgical store additions.
+### Current Database Tables (Relevant)
 
----
+| Table | Key Columns | Role in v8.0 |
+|-------|------------|--------------|
+| `profiles` | `id`, `display_name`, `avatar_url` | **MODIFY** -- add `handle` column |
+| `recipes` | `id`, `household_id`, `created_by`, `name`, `ingredients`, `instructions` | **MODIFY** -- add `cook_count`, `current_version` columns |
+| `recipe_ratings` | `recipe_id`, `user_id`, `rating`, `is_favorite` | Unchanged |
+| `recipe_notes` | `recipe_id`, `user_id`, `content` | Unchanged (private notes stay separate from public comments) |
+| `meal_plans` | `id`, `household_id`, `recipe_id`, `plan_date`, `assigned_cook` | Read-only trigger source for cook log |
+| `kitchen_profiles` | `id`, `household_id`, `display_name`, `follower_count` | Unchanged |
+| `feed_posts` | `id`, `kitchen_id`, `recipe_id`, `recipe_name`, `photo_url` | **MODIFY** -- add `post_type`, `cook_log_id` columns |
+| `post_comments` | `id`, `post_id`, `kitchen_id`, `content` | Existing feed comments -- unchanged |
+| `saved_recipes` | `kitchen_id`, `recipe_id`, `source_kitchen_id` | Unchanged (already handles "save to collection") |
 
-## Screen-to-Component Mapping
+### Current Zustand Stores (Relevant)
 
-### 1. Day-Focused Meal Planner (plan.tsx)
+| Store | Key State | Role in v8.0 |
+|-------|-----------|--------------|
+| `recipeStore` | `recipes`, `selectedRecipe`, `ratings`, `notes` | **EXTEND** -- add cook log, version history, recipe comments |
+| `socialStore` | `feedPosts`, `myKitchenProfile`, `comments` | **EXTEND** -- new feed post types |
+| `planStore` | `mealPlan`, `assignRecipe()` | **MODIFY** -- trigger cook log prompt after cooking |
+| `authStore` | user session | **EXTEND** -- handle management |
+| `onboardingStore` | `currentStep`, `completed` | **MODIFY** -- add handle selection step |
 
-**Current:** `WeekHeader` + vertical scroll of `DaySection` cards for 7 days, with `My Plan / Feed` segmented control.
+### Current Data Flows
 
-**Stitch:** Day/Week toggle, horizontal date strip (Mon-Fri), hero dinner card for selected day, empty slots with illustrations, grocery shortcut card.
-
-| What Changes | Type | Component |
-|---|---|---|
-| WeekHeader replaced with DateStrip + Day/Week toggle | **Replace** | `src/components/plan/WeekHeader.tsx` -> new `DateStrip.tsx` + `ViewToggle.tsx` |
-| DayCard becomes HeroDinnerCard (day view) | **New** | `src/components/plan/HeroDinnerCard.tsx` |
-| Empty meal slots with illustrations | **Modify** | `src/components/plan/DayCard.tsx` (MealSlot subcomponent) |
-| Grocery shortcut card | **New** | `src/components/plan/GroceryShortcutCard.tsx` |
-| Week view retains existing 7-day scroll | **Keep** | Existing `DaySection` rendering in plan.tsx |
-| plan.tsx screen orchestration | **Modify** | `app/(app)/(tabs)/plan.tsx` |
-
-**Store changes:**
-- `planStore` needs NO new state for Day/Week toggle. This is **local UI state** in plan.tsx. Rationale: the toggle affects only the visual rendering of the same underlying data (weekOffset + mealPlan). It does not change what data is fetched, does not need persistence across app restarts, and is not consumed by any other component. A `useState<'day' | 'week'>('day')` in plan.tsx is the correct choice.
-- `planStore` already has `weekDays()` and per-day meal lookup via `makePlanKey`. The day view just renders one day's data instead of seven.
-- Need a `selectedDate` local state (default: today) to drive the date strip highlight and hero card content.
-
-### 2. Refined Recipes Library (recipes.tsx)
-
-**Current:** `FilterBar` with dropdowns + `RecipeGrid` (2-column) of `RecipeCard` components. FAB menu for add/generate/identify.
-
-**Stitch:** Horizontal filter chips (All, Quick Meals, Favorites), full-width recipe cards with description, difficulty badge, rating star.
-
-| What Changes | Type | Component |
-|---|---|---|
-| FilterBar becomes horizontal chip row | **Replace** | `src/components/recipes/FilterBar.tsx` -> new `FilterChips.tsx` |
-| RecipeCard gets description, difficulty badge | **Modify** | `src/components/recipes/RecipeCard.tsx` |
-| RecipeGrid changes from 2-col to 1-col full-width | **Modify** | `src/components/recipes/RecipeGrid.tsx` |
-| Search bar in header | **Modify** | `app/(app)/(tabs)/recipes.tsx` |
-
-**Store changes:** None. `recipeStore` already has `filteredRecipes()` with category/cost/time filters. Difficulty can be derived from existing `prep_time_minutes` + `instructions.length` without store changes (computed in component or utility function).
-
-### 3. Refined Grocery/Kitchen List (grocery.tsx)
-
-**Current:** `GrocerySummary` card + `GrocerySection` groups + `Shopping List / On Hand` segmented control. Header has "Sync with Plan" functionality buried in menu.
-
-**Stitch:** "Sync with Plan" button prominently in header, shopping progress bar ("12 of 18 items checked"), summary card with presence avatars, enhanced item rows with quantity/price.
-
-| What Changes | Type | Component |
-|---|---|---|
-| GrocerySummary enhanced with progress bar text + presence avatars | **Modify** | `src/components/grocery/GrocerySummary.tsx` |
-| Sync with Plan button in header | **Modify** | `app/(app)/(tabs)/grocery.tsx` header area |
-| GroceryItem rows show price + category tag | **Modify** | `src/components/grocery/GroceryItem.tsx` |
-| Completed section collapsible at bottom | **Already exists** | `GrocerySection` with `defaultCollapsed` |
-
-**Store changes:** None. `groceryStore.summary()` already returns `totalItems`, `checkedItems`, `estimatedTotal`, `progressPercent`. All data needed for the Stitch design is already computed.
-
-### 4. Refined Budget Dashboard (budget.tsx)
-
-**Current:** `MonthlyProgress` (linear progress bar) + `CategoryCard` rows + `WeeklyBreakdown`. Month navigation via arrows.
-
-**Stitch:** Donut ring chart hero with "$426 of $600 spent" + percentage, Budget Insights section, category rows with inline progress bars, weekly breakdown with mini bar charts.
-
-| What Changes | Type | Component |
-|---|---|---|
-| MonthlyProgress becomes donut ring | **Replace** | `src/components/budget/MonthlyProgress.tsx` -> new `BudgetDonutHero.tsx` |
-| New Budget Insights section | **New** | `src/components/budget/BudgetInsights.tsx` |
-| CategoryCard gets inline progress bar | **Modify** | `src/components/budget/CategoryCard.tsx` |
-| WeeklyBreakdown gets mini bar charts | **Modify** | `src/components/budget/WeeklyBreakdown.tsx` |
-| Month picker in header | **Modify** | `app/(app)/(tabs)/budget.tsx` |
-
-**Store changes:**
-- `budgetStore` needs new computed methods for insights:
-  - `categoryBudgets()` -- per-category budget allocation (new data or derived from budgetTarget split)
-  - `insights()` -- compares current month to previous month to generate "You spent 15% less on dining out" style messages
-- This requires `budgetStore.fetchExpenses` to optionally fetch previous month data for comparison. Moderate addition.
-- The donut chart is purely visual -- `monthlyTotal()` and `budgetTarget` already provide the data.
-
-### 5. Refined Profile with Cooking Insights (profile.tsx)
-
-**Current:** Avatar + name + email, household card, dietary preferences, servings, notification toggles, subscription management. `cookingCount` computed from current week's `mealPlan` data.
-
-**Stitch:** Profile hero with avatar + premium badge, Household card, Cooking Insights section (cooking streak, plan completion %, most cooked recipe), Household Distribution bar, grouped settings navigation.
-
-| What Changes | Type | Component |
-|---|---|---|
-| Profile hero section | **New** | `src/components/profile/ProfileHero.tsx` |
-| Cooking Insights cards | **New** | `src/components/profile/CookingInsights.tsx` |
-| Household Distribution bar | **New** | `src/components/profile/HouseholdDistribution.tsx` |
-| Grouped settings navigation | **Modify** | `app/(app)/(tabs)/profile.tsx` restructured |
-
-**Data source for cooking insights:**
-- **Cooking streak:** Count consecutive days with at least one planned meal from `meal_plans` table. Requires a new query in `planStore` or a dedicated helper: `SELECT DISTINCT plan_date FROM meal_plans WHERE household_id = $1 ORDER BY plan_date DESC`. Then count consecutive days from today backward.
-- **Plan completion %:** Meals planned vs meals actually marked with a recipe this month. Already partially available: `mealPlan` entries where `recipe_id IS NOT NULL` vs total entries. Can be computed client-side from existing store data.
-- **Most cooked recipe:** `SELECT recipe_id, COUNT(*) FROM meal_plans WHERE household_id = $1 AND recipe_id IS NOT NULL GROUP BY recipe_id ORDER BY count DESC LIMIT 1`. New query needed.
-- **Household distribution:** Meals per member. `SELECT cook_id, COUNT(*) FROM meal_plans WHERE household_id = $1 AND cook_id IS NOT NULL GROUP BY cook_id`. New query needed.
-
-Best approach: Add a `fetchCookingStats(householdId: string)` method to `planStore` (not a new store) that fetches all four metrics in one Supabase query batch. This avoids a new store and keeps cooking data co-located with plan data.
-
-### 6. Onboarding Redesign (6 screens)
-
-**Current:** 6 step components in `src/components/onboarding/`: WelcomeStep, CreateHouseholdStep, InviteMembersStep, AddRecipesStep, PlanWeekStep, AllSetStep. Driven by `onboardingStore` with `currentStep: 0-5`.
-
-**Stitch:** Same 6 steps, new visual treatment -- hero images, step indicator pills, editorial typography, glassmorphism on AllSet screen.
-
-| What Changes | Type | Component |
-|---|---|---|
-| WelcomeStep visual overhaul | **Modify in-place** | `src/components/onboarding/WelcomeStep.tsx` |
-| CreateHouseholdStep visual overhaul | **Modify in-place** | `src/components/onboarding/CreateHouseholdStep.tsx` |
-| InviteMembersStep visual overhaul + invite code display | **Modify in-place** | `src/components/onboarding/InviteMembersStep.tsx` |
-| AddRecipesStep visual overhaul + recipe cards | **Modify in-place** | `src/components/onboarding/AddRecipesStep.tsx` |
-| PlanWeekStep visual overhaul + day-by-day layout | **Modify in-place** | `src/components/onboarding/PlanWeekStep.tsx` |
-| AllSetStep glassmorphism celebration | **Modify in-place** | `src/components/onboarding/AllSetStep.tsx` |
-| OnboardingProgress pill-style indicators | **Modify in-place** | `src/components/onboarding/OnboardingProgress.tsx` |
-
-**Store changes:** None. `onboardingStore` already has `currentStep`, `nextStep`, `prevStep`, `completeOnboarding`. The redesign is purely visual.
-
-**Recommendation: In-place update, not new components.** The 1:1 mapping is exact (same 6 steps, same data flow, same store). Creating new components would mean duplicating all the business logic wiring. Simply re-style the existing components.
-
-### 7. Cooking Mode Redesign
-
-**Current:** FlatList-based horizontal swipe through steps. `StepCard`, `CookingTimer`, `CookingProgress`, `IngredientSidebar`, `UnitToggle`.
-
-**Stitch:** Step photo at top, timer card with "START" button, step category chip ("MARINATING"), large editorial instruction text, Chef's Tip callout, ingredient chips at bottom, Previous/Next Step navigation buttons.
-
-| What Changes | Type | Component |
-|---|---|---|
-| StepCard redesigned with photo + editorial text + chef tip | **Modify** | `src/components/cooking/StepCard.tsx` |
-| CookingTimer gets prominent card treatment | **Modify** | `src/components/cooking/CookingTimer.tsx` |
-| New step category chip | **New** | Inline in StepCard (not a separate component) |
-| New Chef's Tip callout | **New** | `src/components/cooking/ChefTip.tsx` |
-| New ingredient chips for current step | **New** | `src/components/cooking/StepIngredients.tsx` |
-| Previous/Next buttons replace horizontal swipe | **Modify** | `src/components/cooking/CookingMode.tsx` navigation |
-| CookingProgress updated | **Modify** | `src/components/cooking/CookingProgress.tsx` |
-
-**Store changes:** None. Recipe data (instructions with timer durations, ingredients) already exists. Chef tips can be extracted from instruction text or added as optional fields.
-
-### 8. Social Feed Redesign
-
-**Current:** `FeedList` with `FeedCard` components. FeedCard shows kitchen avatar, name, meal description, photo, likes/comments.
-
-**Stitch:** Hero-sized photos, following avatar strip at top, "Try this recipe" CTA, view full recipe button, richer card layout with pull quotes.
-
-| What Changes | Type | Component |
-|---|---|---|
-| Following avatar strip at top of feed | **New** | `src/components/social/FollowingStrip.tsx` |
-| FeedCard hero photo + "Try this recipe" CTA | **Modify** | `src/components/social/FeedCard.tsx` |
-| "View Full Recipe" button on cards | **Modify** | `src/components/social/FeedCard.tsx` |
-| Feed header | **Modify** | Plan.tsx feed segment area |
-
-**Store changes:** None. `socialStore` already has `following`, `feedPosts`, `loadFeed`. The avatar strip uses existing `following` array data.
-
-### 9. Premium Upgrade Screen
-
-**Current:** `SubscriptionSheet.tsx` as a bottom sheet with perk list and checkout button.
-
-**Stitch:** Full-screen modal with hero kitchen image, feature comparison table (Free vs Premium), monthly/yearly pricing tiers, gradient CTA buttons.
-
-| What Changes | Type | Component |
-|---|---|---|
-| SubscriptionSheet becomes full-screen or new screen | **Replace** | `src/components/premium/SubscriptionSheet.tsx` -> new `PremiumUpgradeScreen.tsx` |
-| Feature comparison table | **New** | Inline in PremiumUpgradeScreen |
-| Monthly/Yearly pricing toggle | **New** | Inline in PremiumUpgradeScreen |
-| UpgradePrompt updated to open new screen | **Modify** | `src/components/premium/UpgradePrompt.tsx` |
-
-**Store changes:** `subscriptionStore` may need to support yearly pricing if not already. The Stitch design shows $4.99/mo and $39.99/yr. Current code only has $9.99/mo. This is a **pricing decision** not an architecture decision -- the store just needs a `selectedPlan: 'monthly' | 'yearly'` local state in the component and the Stripe checkout URL parameterized by price ID.
+1. **Meal assignment -> Feed post:** `planStore.assignRecipe()` calls `createFeedPost()` fire-and-forget via `feedHelpers.ts`
+2. **Recipe creation:** `recipeStore.createRecipe()` inserts into `recipes` table with `created_by = auth.uid()`
+3. **Feed rendering:** `socialStore.fetchFeedPosts()` does fan-out-on-read (get followed kitchen IDs, query `feed_posts` WHERE `kitchen_id` IN followed)
+4. **Recipe saving:** `socialStore.saveRecipeFromPost()` clones recipe into user's household, records in `saved_recipes`
 
 ---
 
-## New Reusable Components to Build First
+## New Tables Required
 
-These patterns appear across multiple Stitch screens and should be extracted as shared components before screen-specific work begins.
+### 1. `cook_logs` -- Core new table
 
-### 1. DonutChart (react-native-svg)
+Records every time someone cooks a recipe. Central to cook count badges, photo gallery, and feed integration.
 
-**Used by:** Budget dashboard (donut hero), Profile (plan completion ring)
+```sql
+CREATE TABLE cook_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  recipe_id UUID NOT NULL REFERENCES recipes(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  household_id UUID NOT NULL REFERENCES households(id) ON DELETE CASCADE,
+  meal_plan_id UUID REFERENCES meal_plans(id) ON DELETE SET NULL,
+  cooked_at TIMESTAMPTZ DEFAULT now(),
+  notes TEXT CHECK (char_length(notes) <= 500),
+  rating INT CHECK (rating >= 1 AND rating <= 5),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
 
-```
-src/components/ui/DonutChart.tsx
-Props: { value: number; max: number; size: number; strokeWidth: number; color: string }
-```
-
-Requires adding `react-native-svg` as a dependency (or using it if already present). This is the only new npm dependency likely needed.
-
-### 2. HorizontalDateStrip
-
-**Used by:** Meal planner day view
-
-```
-src/components/plan/DateStrip.tsx
-Props: { dates: Date[]; selectedDate: Date; onSelectDate: (date: Date) => void }
-```
-
-Horizontal ScrollView with day-of-week labels and date numbers. Highlight on selected date.
-
-### 3. FilterChips
-
-**Used by:** Recipes library
-
-```
-src/components/ui/FilterChips.tsx
-Props: { options: string[]; selected: string; onSelect: (option: string) => void }
+CREATE INDEX idx_cook_logs_recipe ON cook_logs(recipe_id);
+CREATE INDEX idx_cook_logs_user ON cook_logs(user_id);
+CREATE INDEX idx_cook_logs_household ON cook_logs(household_id);
+CREATE INDEX idx_cook_logs_cooked_at ON cook_logs(cooked_at DESC);
 ```
 
-Horizontal scroll of pill-shaped chips. Could also be used by future filter UIs.
+**RLS:** Household members can CRUD their own household's cook logs. Public read for cook count aggregation on shared recipes.
 
-### 4. ProgressBar (enhanced)
+### 2. `cook_log_photos` -- Separate from cook_logs for 1:N
 
-**Used by:** Grocery (shopping progress), Budget (category progress bars)
+```sql
+CREATE TABLE cook_log_photos (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  cook_log_id UUID NOT NULL REFERENCES cook_logs(id) ON DELETE CASCADE,
+  photo_url TEXT NOT NULL,
+  sort_order INT DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
 
-The existing progress bars in GrocerySummary and MonthlyProgress are inline StyleSheet implementations. Extract to a reusable component:
-
-```
-src/components/ui/ProgressBar.tsx
-Props: { value: number; max: number; label?: string; showText?: boolean; color?: string }
-```
-
-### 5. InsightCard
-
-**Used by:** Budget insights, Profile cooking insights
-
-```
-src/components/ui/InsightCard.tsx
-Props: { icon: string; title: string; value: string; subtitle?: string; badge?: string }
+CREATE INDEX idx_cook_log_photos_cook_log ON cook_log_photos(cook_log_id);
 ```
 
-Consistent card for stat/insight display across budget and profile.
+**Storage:** New `cook-photos` bucket in Supabase Storage (mirrors existing `meal-photos` pattern).
+
+### 3. `recipe_versions` -- Track recipe edit history
+
+```sql
+CREATE TABLE recipe_versions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  recipe_id UUID NOT NULL REFERENCES recipes(id) ON DELETE CASCADE,
+  version_number INT NOT NULL,
+  name TEXT NOT NULL,
+  ingredients JSONB NOT NULL,
+  instructions JSONB NOT NULL,
+  changed_by UUID NOT NULL REFERENCES profiles(id),
+  change_summary TEXT CHECK (char_length(change_summary) <= 300),
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(recipe_id, version_number)
+);
+
+CREATE INDEX idx_recipe_versions_recipe ON recipe_versions(recipe_id);
+```
+
+**Strategy:** Snapshot-on-write. When `recipeStore.updateRecipe()` is called, snapshot current state to `recipe_versions` BEFORE applying the update. This avoids diffing complexity.
+
+### 4. `recipe_comments` -- Distinct from `recipe_notes` and `post_comments`
+
+```sql
+CREATE TABLE recipe_comments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  recipe_id UUID NOT NULL REFERENCES recipes(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  content TEXT NOT NULL CHECK (char_length(content) <= 500),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX idx_recipe_comments_recipe ON recipe_comments(recipe_id);
+CREATE INDEX idx_recipe_comments_created ON recipe_comments(created_at);
+```
+
+**Why not reuse `recipe_notes`?** Notes are private per-user annotations ("I used less salt"). Comments are social, visible to all household members. Different visibility model = different table.
+
+**Why not reuse `post_comments`?** Post comments are on feed posts (kitchen-scoped). Recipe comments are on recipes (user-scoped, household-visible). Different entity, different RLS.
 
 ---
 
-## Screens That Can Be Redesigned Independently (No Cross-Dependencies)
+## Modified Tables
 
-These screens have **zero data flow dependencies** on each other and can be built in any order or in parallel:
+### `profiles` -- Add handle column
 
-| Screen | Why Independent |
-|---|---|
-| Recipes library | Only reads from recipeStore. No new store methods. |
-| Grocery list | Only reads from groceryStore. No new store methods. |
-| Cooking mode | Opens as a modal from recipe detail. Self-contained. |
-| Premium upgrade | Opens as a modal/sheet. Self-contained. |
-| Onboarding (all 6) | Only runs once on first launch. Fully isolated flow. |
+```sql
+ALTER TABLE profiles ADD COLUMN handle TEXT UNIQUE;
+CREATE UNIQUE INDEX idx_profiles_handle ON profiles(handle);
+-- Enforce lowercase, alphanumeric + underscores, 3-30 chars
+ALTER TABLE profiles ADD CONSTRAINT handle_format
+  CHECK (handle ~ '^[a-z0-9_]{3,30}$');
+```
 
-## Screens With Dependencies
+**Why on `profiles` not `kitchen_profiles`?** Handles are per-USER identity ("@diego"), not per-kitchen. A user in multiple households keeps one @handle. The milestone spec says "unique @handle system -- required username for every user."
 
-| Screen | Depends On | Why |
-|---|---|---|
-| Meal planner | Reusable DateStrip, ViewToggle | New components needed first |
-| Budget dashboard | DonutChart, InsightCard, budgetStore.insights() | New component + store method |
-| Profile | DonutChart, InsightCard, planStore.fetchCookingStats() | New component + store method |
-| Social feed | FollowingStrip (but this is small) | Minor new component |
+**RLS addition:** New SELECT policy allowing any authenticated user to look up profiles by handle (for @mention resolution and attribution display).
+
+### `recipes` -- Add cook_count and version
+
+```sql
+ALTER TABLE recipes ADD COLUMN cook_count INT DEFAULT 0;
+ALTER TABLE recipes ADD COLUMN current_version INT DEFAULT 1;
+```
+
+**cook_count maintenance:** Postgres trigger on `cook_logs` INSERT/DELETE increments/decrements `recipes.cook_count`. Same pattern as `like_count` on `feed_posts`.
+
+### `feed_posts` -- Add post_type and cook_log_id
+
+```sql
+ALTER TABLE feed_posts ADD COLUMN post_type TEXT DEFAULT 'meal_planned'
+  CHECK (post_type IN ('meal_planned', 'recipe_created', 'recipe_cooked'));
+ALTER TABLE feed_posts ADD COLUMN cook_log_id UUID REFERENCES cook_logs(id) ON DELETE SET NULL;
+```
+
+**New feed post types:**
+- `meal_planned` -- existing behavior (auto-posted when meal assigned to plan)
+- `recipe_created` -- auto-posted when a new recipe is created
+- `recipe_cooked` -- auto-posted when a cook log is created (with optional photos)
+
+---
+
+## New/Modified Zustand Stores
+
+### New: `cookLogStore.ts`
+
+```typescript
+interface CookLogState {
+  // For current recipe being viewed
+  cookLogs: CookLog[];
+  cookLogPhotos: Map<string, CookLogPhoto[]>; // keyed by cook_log_id
+  loading: boolean;
+  error: string | null;
+
+  // Actions
+  fetchCookLogs: (recipeId: string) => Promise<void>;
+  createCookLog: (params: {
+    recipeId: string;
+    householdId: string;
+    mealPlanId?: string;
+    notes?: string;
+    rating?: number;
+    photos?: string[]; // local URIs to upload
+  }) => Promise<CookLog | null>;
+  deleteCookLog: (id: string) => Promise<void>;
+  fetchPhotosForLogs: (logIds: string[]) => Promise<void>;
+
+  // Gallery helpers
+  allPhotosForRecipe: () => CookLogPhoto[];
+  cookCountForRecipe: (recipeId: string) => number;
+}
+```
+
+**Integration point:** After `createCookLog`, fire-and-forget call to `createFeedPost` with `post_type: 'recipe_cooked'`.
+
+### Modified: `recipeStore` -- Add version history + recipe comments + edit permissions
+
+```typescript
+// New state additions
+recipeComments: RecipeComment[];
+recipeCommentsLoading: boolean;
+versionHistory: RecipeVersion[];
+versionHistoryLoading: boolean;
+
+// New actions
+fetchRecipeComments: (recipeId: string) => Promise<void>;
+addRecipeComment: (recipeId: string, content: string) => Promise<void>;
+deleteRecipeComment: (commentId: string) => Promise<void>;
+fetchVersionHistory: (recipeId: string) => Promise<void>;
+updateRecipeWithVersion: (id: string, updates: RecipeUpdate, changeSummary?: string) => Promise<void>;
+canEditRecipe: (recipe: Recipe) => boolean; // created_by === auth.uid()
+```
+
+**`updateRecipeWithVersion` flow:**
+1. Fetch current recipe state
+2. INSERT snapshot into `recipe_versions` with `version_number = current_version`
+3. UPDATE recipe with new data + `current_version = current_version + 1`
+4. Both in a single RPC call or sequential with optimistic UI
+
+### Modified: `socialStore` -- Handle profile enrichment
+
+```typescript
+// New state
+handleProfile: Profile | null; // resolved @handle -> profile
+
+// New actions
+resolveHandle: (handle: string) => Promise<Profile | null>;
+```
+
+### Modified: `authStore` -- Handle management
+
+```typescript
+// New state
+handle: string | null;
+handleAvailable: boolean | null;
+
+// New actions
+checkHandleAvailability: (handle: string) => Promise<boolean>;
+setHandle: (handle: string) => Promise<void>;
+```
+
+### Modified: `onboardingStore` -- Handle selection step
+
+Insert new step between Welcome (step 0) and Create Kitchen (step 1). Total steps becomes 7 (0-6).
+
+---
+
+## Component Boundaries
+
+### New Components
+
+| Component | Responsibility | Consumes |
+|-----------|---------------|----------|
+| `HandleSetupScreen` | Onboarding handle selection with availability check | authStore |
+| `HandleInput` | Reusable @handle text input with validation + debounced availability | authStore |
+| `CookLogSheet` | Bottom sheet prompted after cooking mode or manual "I cooked this" | cookLogStore, recipeStore |
+| `CookLogPhotoUploader` | Multi-photo capture/select for cook log | cookLogStore, Supabase Storage |
+| `RecipeCommentSection` | Comment list + input on recipe detail | recipeStore |
+| `CookCountBadge` | "Cooked N times" badge on recipe cards and detail | recipeStore |
+| `CookPhotoGallery` | Horizontal photo gallery from past cooks on recipe detail | cookLogStore |
+| `RecipeAttribution` | "Created by @username" with avatar, tappable to profile | recipeStore, socialStore |
+| `VersionHistorySheet` | Bottom sheet showing edit history timeline | recipeStore |
+| `CreatorEditGuard` | Wraps edit button, shows "Only creator can edit" for non-creators | recipeStore, authStore |
+
+### Modified Components
+
+| Component | Change | Why |
+|-----------|--------|-----|
+| `RecipeDetailScreen` | Add attribution, cook count badge, photo gallery, comments section, version history button | Central hub for all social recipe features |
+| `RecipeCard` | Add cook count badge, creator avatar | Recipe grid needs social context |
+| `CookingModeScreen` | Add "Log this cook" CTA at end of cooking flow | Natural trigger point for cook log |
+| `FeedCard` | Handle new post_type variants (recipe_created, recipe_cooked) | Feed shows richer content |
+| `OnboardingFlow` | Insert handle selection step | Required for all new users |
+| `ProfileScreen` | Display @handle, edit handle option | User identity |
+| `RecipeEditScreen` | Gate behind creator check, show "you can't edit" for non-creators | Permission enforcement |
+
+---
+
+## Data Flow Diagrams
+
+### Flow 1: Cook Log Creation (Primary New Flow)
+
+```
+User finishes cooking mode
+  |
+  v
+CookingModeScreen shows "Log this cook?" prompt
+  |
+  v
+CookLogSheet opens
+  - Optional: add photos (CookLogPhotoUploader)
+  - Optional: add notes
+  - Optional: rate this cook
+  |
+  v
+cookLogStore.createCookLog()
+  |
+  +---> INSERT cook_logs (recipe_id, user_id, household_id, meal_plan_id?)
+  |       |
+  |       +---> Postgres trigger: UPDATE recipes SET cook_count = cook_count + 1
+  |
+  +---> Upload photos to 'cook-photos' bucket
+  |       |
+  |       +---> INSERT cook_log_photos (cook_log_id, photo_url)
+  |
+  +---> createFeedPost({ post_type: 'recipe_cooked', cook_log_id, recipe_id })
+          |
+          +---> Existing webhook: send-social-notification to followers
+```
+
+### Flow 2: Recipe Edit with Version History
+
+```
+Creator taps Edit on recipe detail
+  |
+  v
+recipeStore.canEditRecipe(recipe) === true (created_by === auth.uid())
+  |
+  v
+RecipeEditScreen loads
+  |
+  v
+User saves changes
+  |
+  v
+recipeStore.updateRecipeWithVersion(id, updates, changeSummary)
+  |
+  +---> Fetch current recipe snapshot
+  +---> INSERT recipe_versions (recipe_id, version_number, name, ingredients, instructions, changed_by)
+  +---> UPDATE recipes SET name = ..., ingredients = ..., current_version = current_version + 1
+```
+
+### Flow 3: Handle Setup (Onboarding Integration)
+
+```
+New user signs up
+  |
+  v
+auth.users trigger -> handle_new_user() creates profiles row (NO handle yet)
+  |
+  v
+Onboarding Step 0: Welcome
+  |
+  v
+Onboarding Step 1: Choose @handle  <-- NEW STEP
+  |
+  +---> HandleInput: user types handle
+  +---> Debounced check: SELECT 1 FROM profiles WHERE handle = $1
+  +---> If available: authStore.setHandle() -> UPDATE profiles SET handle = $1
+  |
+  v
+Onboarding Step 2: Create Kitchen (was Step 1)
+  ... rest of onboarding continues
+```
+
+**Existing users:** On first app open after v8.0 update, intercept with a one-time HandleSetupScreen before allowing navigation. Check `profiles.handle IS NULL` on auth state change.
+
+### Flow 4: Recipe Attribution Display
+
+```
+RecipeDetailScreen loads
+  |
+  v
+recipeStore.fetchRecipeDetail(id)
+  - Returns recipe with created_by UUID
+  |
+  v
+Resolve created_by -> profile (handle, display_name, avatar_url)
+  - JOIN profiles ON profiles.id = recipe.created_by
+  - OR: separate fetch in component
+  |
+  v
+RecipeAttribution component renders:
+  "Created by @handle" with avatar
+  - Tap -> navigate to profile
+```
+
+### Flow 5: Feed Integration for Recipe Creation
+
+```
+recipeStore.createRecipe(recipe)
+  |
+  v
+Recipe inserted with created_by = auth.uid()
+  |
+  v
+After successful insert, fire-and-forget:
+  createFeedPost({
+    post_type: 'recipe_created',
+    kitchen_id: myKitchenProfile.id,
+    recipe_id: newRecipe.id,
+    recipe_name: newRecipe.name,
+    recipe_image_url: newRecipe.image_url,
+    meal_date: today,
+    meal_type: 'recipe'  // sentinel value for non-meal posts
+  })
+```
+
+---
+
+## RLS Policy Design
+
+### cook_logs
+
+```sql
+-- Household members can view their household's cook logs
+CREATE POLICY "Household members can view cook logs"
+  ON cook_logs FOR SELECT
+  USING (is_household_member(household_id, auth.uid()));
+
+-- Users can create cook logs in their household
+CREATE POLICY "Users can create cook logs"
+  ON cook_logs FOR INSERT
+  WITH CHECK (
+    auth.uid() = user_id
+    AND is_household_member(household_id, auth.uid())
+  );
+
+-- Users can delete their own cook logs
+CREATE POLICY "Users can delete own cook logs"
+  ON cook_logs FOR DELETE
+  USING (auth.uid() = user_id);
+```
+
+### recipe_comments
+
+```sql
+-- Household members can view comments on their recipes
+CREATE POLICY "Household members can view recipe comments"
+  ON recipe_comments FOR SELECT
+  USING (EXISTS (
+    SELECT 1 FROM recipes r
+    WHERE r.id = recipe_comments.recipe_id
+    AND is_household_member(r.household_id, auth.uid())
+  ));
+
+-- Users can add comments on household recipes
+CREATE POLICY "Users can add recipe comments"
+  ON recipe_comments FOR INSERT
+  WITH CHECK (
+    auth.uid() = user_id
+    AND EXISTS (
+      SELECT 1 FROM recipes r
+      WHERE r.id = recipe_comments.recipe_id
+      AND is_household_member(r.household_id, auth.uid())
+    )
+  );
+
+-- Users can delete their own comments
+CREATE POLICY "Users can delete own recipe comments"
+  ON recipe_comments FOR DELETE
+  USING (auth.uid() = user_id);
+```
+
+### recipe_versions (read-only for non-creators)
+
+```sql
+-- Household members can view version history
+CREATE POLICY "Household members can view recipe versions"
+  ON recipe_versions FOR SELECT
+  USING (EXISTS (
+    SELECT 1 FROM recipes r
+    WHERE r.id = recipe_versions.recipe_id
+    AND is_household_member(r.household_id, auth.uid())
+  ));
+
+-- Only recipe creator can insert versions
+CREATE POLICY "Creator can insert recipe versions"
+  ON recipe_versions FOR INSERT
+  WITH CHECK (
+    auth.uid() = changed_by
+    AND EXISTS (
+      SELECT 1 FROM recipes r
+      WHERE r.id = recipe_versions.recipe_id
+      AND r.created_by = auth.uid()
+    )
+  );
+```
+
+### recipes -- Restrict UPDATE to creator only
+
+```sql
+-- REPLACE existing "Users can update recipes in their household" policy:
+DROP POLICY "Users can update recipes in their household" ON recipes;
+
+CREATE POLICY "Recipe creator can update their recipes"
+  ON recipes FOR UPDATE
+  USING (
+    created_by = auth.uid()
+    AND is_household_member(household_id, auth.uid())
+  );
+```
+
+**Critical consideration:** This is a BREAKING CHANGE for existing behavior where any household member can edit any recipe. Need migration strategy -- see Pitfalls.
+
+### profiles -- Handle lookup
+
+```sql
+-- Replace existing SELECT policy to also allow handle-based lookup
+DROP POLICY "Users can read own profile" ON profiles;
+
+CREATE POLICY "Users can read profiles"
+  ON profiles FOR SELECT
+  USING (
+    auth.uid() = id
+    OR handle IS NOT NULL  -- any profile with a handle is publicly readable
+  );
+```
+
+---
+
+## Supabase Storage Changes
+
+### New Bucket: `cook-photos`
+
+```sql
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'cook-photos',
+  'cook-photos',
+  true,
+  5242880,  -- 5MB (same as meal-photos)
+  ARRAY['image/jpeg', 'image/png', 'image/webp']
+);
+```
+
+**Reuse existing pattern:** `uploadMealPhoto` in `feedHelpers.ts` already handles compress -> upload -> get public URL. Generalize for cook log photos.
+
+---
+
+## Postgres Triggers
+
+### cook_count maintenance
+
+```sql
+CREATE OR REPLACE FUNCTION update_recipe_cook_count()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF TG_OP = 'INSERT' THEN
+    UPDATE recipes SET cook_count = cook_count + 1 WHERE id = NEW.recipe_id;
+  ELSIF TG_OP = 'DELETE' THEN
+    UPDATE recipes SET cook_count = GREATEST(cook_count - 1, 0) WHERE id = OLD.recipe_id;
+  END IF;
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_recipe_cook_count
+  AFTER INSERT OR DELETE ON cook_logs
+  FOR EACH ROW EXECUTE FUNCTION update_recipe_cook_count();
+```
+
+This follows the exact pattern of `update_like_count()` and `update_follow_counts()` already in the codebase.
 
 ---
 
 ## Suggested Build Order
 
-### Phase 1: Shared Components (Foundation)
-Build reusable components that multiple screens need:
-1. `DonutChart` (budget + profile need it)
-2. `ProgressBar` (budget + grocery need it)
-3. `InsightCard` (budget + profile need it)
-4. `FilterChips` (recipes needs it)
-5. `DateStrip` + `ViewToggle` (planner needs it)
+Build order is dependency-driven. Each phase builds on the previous.
 
-### Phase 2: Independent Screen Redesigns (Parallel-Safe)
-These can all be built simultaneously with no conflicts:
-1. **Onboarding** (6 steps) -- in-place visual updates, zero store changes, fully isolated
-2. **Recipes library** -- FilterChips integration, RecipeCard enhancement, grid layout change
-3. **Grocery list** -- ProgressBar integration, summary card update, item row enhancement
-4. **Cooking mode** -- StepCard redesign, ChefTip, StepIngredients, navigation buttons
-5. **Premium upgrade** -- New full-screen component replacing bottom sheet
+### Phase 1: @Handle System + Profile Changes
+**Dependencies:** None (foundation)
+**Deliverables:**
+- `profiles.handle` column + UNIQUE index + format constraint
+- Updated profile RLS for handle lookup
+- `HandleInput` component with debounced availability check
+- `HandleSetupScreen` for onboarding (new step)
+- Existing user handle migration gate (intercept screen on app open)
+- `authStore` extensions for handle management
+- `onboardingStore` updated to 7 steps
 
-### Phase 3: Store-Enhanced Screens (Sequential)
-These need store additions completed before UI work:
-1. **Budget dashboard** -- Add `budgetStore.insights()` + `categoryBudgets()`, then build BudgetDonutHero + BudgetInsights
-2. **Profile** -- Add `planStore.fetchCookingStats()`, then build CookingInsights + HouseholdDistribution + ProfileHero
+**Why first:** Every subsequent feature references @handles for attribution. Existing users need handles before any social recipe feature makes sense.
 
-### Phase 4: Complex Screen Redesigns
-These have the most moving parts and benefit from Phase 1 components being ready:
-1. **Meal planner** -- Day/Week toggle, DateStrip, HeroDinnerCard, GroceryShortcutCard. Most complex screen with multiple new sub-components.
-2. **Social feed** -- FollowingStrip, FeedCard hero photos, Try Recipe CTAs
+### Phase 2: Creator Edit Permissions + Recipe Attribution
+**Dependencies:** Phase 1 (handles exist for attribution display)
+**Deliverables:**
+- Drop + recreate recipe UPDATE RLS policy (creator-only)
+- Data migration: backfill `created_by` for recipes where it is NULL
+- `RecipeAttribution` component ("Created by @handle")
+- `CreatorEditGuard` component
+- `recipeStore.canEditRecipe()` method
+- Updated `RecipeDetailScreen` with attribution display
+- Updated `RecipeEditScreen` with permission gate
 
----
+**Why second:** Sets the ownership model that cook log and version history depend on.
 
-## Data Flow Changes Summary
+### Phase 3: Cook Log + Photos
+**Dependencies:** Phase 2 (recipe ownership established)
+**Deliverables:**
+- `cook_logs` table + RLS
+- `cook_log_photos` table + RLS
+- `cook-photos` storage bucket
+- `recipes.cook_count` column + trigger
+- `cookLogStore.ts` (new store)
+- `CookLogSheet` component
+- `CookLogPhotoUploader` component
+- `CookCountBadge` component
+- `CookPhotoGallery` component on recipe detail
+- Updated `CookingModeScreen` with cook log prompt at end
+- Manual "I cooked this" button on recipe detail
 
-| Store | Change | Screens Affected |
-|---|---|---|
-| `planStore` | Add `fetchCookingStats(householdId)` returning streak, completion %, most cooked, distribution | Profile |
-| `budgetStore` | Add `insights()` computed method + optional previous month fetch | Budget |
-| `budgetStore` | Add `categoryBudgets()` for per-category budget allocation | Budget |
-| All others | No changes | -- |
+**Why third:** Largest feature chunk. Depends on recipe ownership but not on version history or feed changes.
 
-**Total store changes: 2 stores, 3 new methods.** Everything else is component-layer work.
+### Phase 4: Version History
+**Dependencies:** Phase 2 (creator edit permissions)
+**Deliverables:**
+- `recipe_versions` table + RLS
+- `recipes.current_version` column
+- `recipeStore.updateRecipeWithVersion()` method
+- `recipeStore.fetchVersionHistory()` method
+- `VersionHistorySheet` component
+- Updated `RecipeEditScreen` to snapshot before save
 
----
+**Why fourth:** Isolated feature, only touches recipe edit flow. Can be built in parallel with Phase 3.
 
-## New vs Modified Components Summary
+### Phase 5: Recipe Comments
+**Dependencies:** Phase 1 (handles for comment attribution display)
+**Deliverables:**
+- `recipe_comments` table + RLS
+- `recipeStore` comment methods (fetch, add, delete)
+- `RecipeCommentSection` component
+- Updated `RecipeDetailScreen` with comments section
 
-### New Components (17)
-| Component | Location | Used By |
-|---|---|---|
-| DonutChart | `src/components/ui/DonutChart.tsx` | Budget, Profile |
-| ProgressBar | `src/components/ui/ProgressBar.tsx` | Budget, Grocery |
-| InsightCard | `src/components/ui/InsightCard.tsx` | Budget, Profile |
-| FilterChips | `src/components/ui/FilterChips.tsx` | Recipes |
-| DateStrip | `src/components/plan/DateStrip.tsx` | Plan |
-| ViewToggle | `src/components/plan/ViewToggle.tsx` | Plan |
-| HeroDinnerCard | `src/components/plan/HeroDinnerCard.tsx` | Plan |
-| GroceryShortcutCard | `src/components/plan/GroceryShortcutCard.tsx` | Plan |
-| BudgetDonutHero | `src/components/budget/BudgetDonutHero.tsx` | Budget |
-| BudgetInsights | `src/components/budget/BudgetInsights.tsx` | Budget |
-| ChefTip | `src/components/cooking/ChefTip.tsx` | Cooking Mode |
-| StepIngredients | `src/components/cooking/StepIngredients.tsx` | Cooking Mode |
-| FollowingStrip | `src/components/social/FollowingStrip.tsx` | Social Feed |
-| ProfileHero | `src/components/profile/ProfileHero.tsx` | Profile |
-| CookingInsights | `src/components/profile/CookingInsights.tsx` | Profile |
-| HouseholdDistribution | `src/components/profile/HouseholdDistribution.tsx` | Profile |
-| PremiumUpgradeScreen | `src/components/premium/PremiumUpgradeScreen.tsx` | Premium |
+**Why fifth:** Simpler feature, distinct from existing `recipe_notes` (private) and `post_comments` (feed). Can be built in parallel with Phase 4.
 
-### Modified Components (14)
-| Component | What Changes |
-|---|---|
-| `plan/WeekHeader.tsx` | May be kept for week view; day view uses DateStrip instead |
-| `plan/DayCard.tsx` | MealSlot gets illustration placeholders for empty state |
-| `recipes/FilterBar.tsx` | Replaced by FilterChips (may be deleted) |
-| `recipes/RecipeCard.tsx` | Add description, difficulty badge, rating |
-| `recipes/RecipeGrid.tsx` | Switch to single-column layout |
-| `grocery/GrocerySummary.tsx` | Add progress text, presence avatars |
-| `grocery/GroceryItem.tsx` | Show price + category tag |
-| `budget/CategoryCard.tsx` | Add inline progress bar |
-| `budget/WeeklyBreakdown.tsx` | Add mini bar charts |
-| `cooking/StepCard.tsx` | Photo, editorial text, category chip |
-| `cooking/CookingTimer.tsx` | Prominent card treatment |
-| `cooking/CookingMode.tsx` | Button navigation instead of horizontal swipe |
-| `social/FeedCard.tsx` | Hero photo, Try Recipe CTA, View Full Recipe |
-| `premium/UpgradePrompt.tsx` | Point to new full-screen upgrade |
+### Phase 6: Feed Integration
+**Dependencies:** Phase 3 (cook logs exist for recipe_cooked posts)
+**Deliverables:**
+- `feed_posts.post_type` column + `cook_log_id` FK
+- Updated `createFeedPost()` in feedHelpers.ts to accept post_type
+- Updated `FeedCard` to render recipe_created and recipe_cooked variants
+- Auto-post on recipe creation (in `recipeStore.createRecipe()`)
+- Auto-post on cook log creation (in `cookLogStore.createCookLog()`)
 
-### Modified In-Place (7 onboarding components)
-| Component | What Changes |
-|---|---|
-| `onboarding/WelcomeStep.tsx` | Hero image, editorial typography, feature value props |
-| `onboarding/CreateHouseholdStep.tsx` | Door illustration, step pills, editorial heading |
-| `onboarding/InviteMembersStep.tsx` | Group photo, invite code card, share options |
-| `onboarding/AddRecipesStep.tsx` | Progress counter, recipe cards with photos |
-| `onboarding/PlanWeekStep.tsx` | Day-by-day meal slot layout, saved recipes sidebar |
-| `onboarding/AllSetStep.tsx` | Glassmorphism card, blurred background |
-| `onboarding/OnboardingProgress.tsx` | Pill-style step indicators |
-
-### Modified Screens (5 tab screens)
-| Screen | Scope of Change |
-|---|---|
-| `app/(app)/(tabs)/plan.tsx` | Day/Week toggle state, DateStrip, conditional rendering |
-| `app/(app)/(tabs)/recipes.tsx` | FilterChips, search bar, layout |
-| `app/(app)/(tabs)/grocery.tsx` | Sync with Plan button, header layout |
-| `app/(app)/(tabs)/budget.tsx` | Month picker, DonutHero, Insights section |
-| `app/(app)/(tabs)/profile.tsx` | ProfileHero, CookingInsights, HouseholdDistribution, grouped settings |
-
-### Modified Stores (2)
-| Store | Methods Added |
-|---|---|
-| `planStore.ts` | `fetchCookingStats(householdId)` |
-| `budgetStore.ts` | `insights()`, `categoryBudgets()` |
+**Why last:** Depends on cook logs being functional. Feed is the display layer for all the data created in earlier phases.
 
 ---
 
-## New Dependencies
+## Anti-Patterns to Avoid
 
-| Package | Purpose | Confidence |
-|---|---|---|
-| `react-native-svg` | DonutChart, mini bar charts | HIGH -- standard RN package, widely used |
+### 1. Putting handle on kitchen_profiles
+**Why bad:** Handles are per-user, not per-household. A user in 3 households has ONE handle.
+**Instead:** Handle goes on `profiles` table.
 
-No other new npm dependencies expected. All other UI patterns (gradient buttons, glassmorphism on AllSet) can be achieved with existing `expo-linear-gradient` (if installed) or `react-native-reanimated` + existing theme tokens.
+### 2. Storing full recipe diffs in version history
+**Why bad:** Complex diff/merge logic, hard to render, fragile across schema changes.
+**Instead:** Snapshot-on-write. Store complete state at each version.
 
----
+### 3. Using recipe_notes for public comments
+**Why bad:** `recipe_notes` has private-per-user RLS. Changing visibility breaks existing privacy expectations.
+**Instead:** New `recipe_comments` table with household-visible RLS.
 
-## Architecture Anti-Patterns to Avoid
+### 4. Eager cook_count computation via COUNT(*)
+**Why bad:** Counting cook_logs on every recipe card render is N+1 queries.
+**Instead:** Denormalized `cook_count` on recipes, maintained by trigger.
 
-### 1. Do NOT create a "Stitch" component directory
-Keep new components in their existing feature directories (`plan/`, `budget/`, `ui/`). The Stitch redesign is not a separate feature -- it is a visual upgrade of existing features.
-
-### 2. Do NOT add view mode to planStore
-The Day/Week toggle is local UI state. Putting it in the store would over-engineer the data flow and couple unrelated components. `useState` in plan.tsx is correct.
-
-### 3. Do NOT create new screens for redesigned tabs
-The 5 tab screens stay in their existing files. The redesign happens by swapping out child components, not by creating new route files.
-
-### 4. Do NOT duplicate onboarding logic
-In-place update the 6 existing step components. They already wire into `onboardingStore` correctly. Creating parallel components means maintaining two sets of business logic.
-
-### 5. Do NOT fetch cooking stats on every profile render
-The `fetchCookingStats` method should be called once on profile mount with results cached in the store. Cooking streak and most-cooked-recipe are not real-time metrics.
+### 5. Breaking existing recipe edit permissions without migration
+**Why bad:** Users currently expect any household member can edit any recipe. Suddenly restricting this causes confusion and errors for recipes with NULL `created_by`.
+**Instead:** Phase 2 must include a data migration that backfills `created_by` for existing recipes (assign to household creator or oldest member). Show clear UI messaging: "Only @creator can edit this recipe."
 
 ---
 
-## Key Decision Answers
+## Scalability Notes
 
-### Q1: Day/Week toggle -- planStore or local state?
-**Answer: Local state.** The toggle does not affect data fetching (both views use the same `weekOffset` + `mealPlan`), does not need cross-component access, and does not need persistence. `useState<'day' | 'week'>('day')` in plan.tsx.
-
-### Q2: Budget donut chart and insights -- does budgetStore need new methods?
-**Answer: Yes, two new computed methods.** `insights()` compares current month to previous month (requires fetching two months of expenses). `categoryBudgets()` splits the budget target across categories (could be a fixed 60/25/15 split or user-configurable later). The donut chart itself uses existing `monthlyTotal()` and `budgetTarget`.
-
-### Q3: Profile cooking insights -- where does data come from?
-**Answer: New `planStore.fetchCookingStats()` method.** It runs 3-4 Supabase queries (streak, most cooked, distribution) against the existing `meal_plans` table. Results cached in planStore state. No new tables, no new Edge Functions.
-
-### Q4: Onboarding -- in-place update or new components?
-**Answer: In-place update.** Same 6 steps, same `onboardingStore`, same data flow. Only the JSX/styles change. Creating new components would duplicate business logic for zero architectural benefit.
-
-### Q5: Which screens can be redesigned independently?
-**Answer: Recipes, Grocery, Cooking Mode, Premium, Onboarding.** These five have no cross-dependencies and no new store methods needed.
-
-### Q6: Which screens share new patterns needing shared components first?
-**Answer: Budget + Profile share DonutChart and InsightCard. Budget + Grocery share ProgressBar. Plan needs DateStrip + ViewToggle.** Building these 5 reusable components first unblocks all dependent screens.
-
----
+| Concern | Current Scale | v8.0 Impact | Approach |
+|---------|--------------|-------------|----------|
+| Cook log photos | 0 | ~5-20 per recipe over time | Paginate gallery, lazy load |
+| Version history | 0 | ~2-10 versions per recipe | Fetch on demand, not on recipe load |
+| Recipe comments | 0 | ~5-50 per recipe | Paginate if >20. Fetch separately from recipe detail |
+| Handle uniqueness checks | 0 | Burst during onboarding migration | Single index lookup, debounced 300ms client-side |
+| Feed post types | 1 type | 3 types | No query change needed. post_type is display-layer |
+| Cook count updates | 0 | 1 trigger per cook log | Negligible, same as existing like_count pattern |
 
 ## Sources
 
-- Direct codebase analysis of all 13 Zustand stores, 5 tab screens, 22 component directories
-- 14 Stitch design screenshots from `/Users/deeg/Downloads/SharedKitchenStitchUIv2/`
-- Design constraints from `project_stitch_design_constraints.md` memory file
-- DESIGN.md ("Culinary Curator" design system) from Stitch reference directory
+- Direct codebase analysis: all migration files (00001-00024), all 14 Zustand stores, feedHelpers.ts, database types
+- Existing architectural patterns: trigger-based count maintenance, fire-and-forget feed posts, RLS via is_household_member/is_kitchen_member helpers
+- Supabase Storage bucket pattern from 00008_create_storage_buckets.sql and 00019_create_meal_photos_bucket.sql
