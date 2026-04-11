@@ -134,7 +134,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 **Milestone Goal:** Make recipes social objects — owned by users with unique @handles, commentable, with cooking history, photo galleries, and feed integration.
 
-- [ ] **Phase 44: Handle System & Identity Foundation** - Per-user @handle usernames with onboarding enforcement and existing-user migration
+- [x] **Phase 44: Handle System & Identity Foundation** - Per-user @handle usernames with onboarding enforcement and existing-user migration (completed 2026-04-11)
 - [ ] **Phase 45: Recipe Attribution & Creator Permissions** - Creator identity on recipes with ownership-based edit permissions and @handle search
 - [ ] **Phase 46: Cook Log with Photos** - Cook logging from recipe detail, cooking mode, and meal plan with photo gallery and count badges
 - [ ] **Phase 47: Recipe Comments** - Threaded recipe comments with visibility scoping and moderation
@@ -156,7 +156,7 @@ Plans:
 - [x] 44-00-PLAN.md — Wave 0 test stubs for HandleInput, HandleSetupStep, HandleSetupInterstitial, FeedCard
 - [x] 44-01-PLAN.md — DB migration, handle-utils, authStore handle state (TDD)
 - [x] 44-02-PLAN.md — HandleInput component, onboarding step, blocking interstitial
-- [ ] 44-03-PLAN.md — Display @handle across feed, profile, and recipe detail
+- [x] 44-03-PLAN.md — Display @handle across feed, profile, and recipe detail
 - [ ] 44-04-PLAN.md — Handle change with 30-day cooldown in Edit Profile
 **UI hint**: yes
 
@@ -259,7 +259,7 @@ Plans:
 | 41. Plan Tab Redesign | v7.0 | 2/2 | Complete | 2026-04-09 |
 | 42. Grocery List Redesign | v7.0 | 2/2 | Complete | 2026-04-10 |
 | 43. Budget, Profile & Social Feed | v7.0 | 3/3 | Complete | 2026-04-10 |
-| 44. Handle System & Identity Foundation | v8.0 | 3/4 | In Progress|  |
+| 44. Handle System & Identity Foundation | v8.0 | 4/4 | Complete   | 2026-04-11 |
 | 45. Recipe Attribution & Creator Permissions | v8.0 | 0/TBD | Not started | - |
 | 46. Cook Log with Photos | v8.0 | 0/TBD | Not started | - |
 | 47. Recipe Comments | v8.0 | 0/TBD | Not started | - |
