@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v7.0
-milestone_name: Stitch UI Redesign
-status: executing
-stopped_at: Completed 43-03-PLAN.md
-last_updated: "2026-04-10T01:32:18.592Z"
+milestone: v8.0
+milestone_name: Social Recipes
+status: defining_requirements
+stopped_at: null
+last_updated: "2026-04-10T23:45:00.000Z"
 last_activity: 2026-04-10
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 14
-  completed_plans: 14
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-09)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Phase 43 — Budget, Profile & Social Feed
+**Current focus:** v8.0 Social Recipes — Defining requirements
 
 ## Current Position
 
-Phase: 43
-Plan: Not started
-Status: Executing
-Last activity: 2026-04-10 - Completed quick task 260410-k7a: Redesign DayViewMealSlot as rich meal cards
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-10 — Milestone v8.0 started
 
 ## Accumulated Context
 
