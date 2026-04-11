@@ -276,6 +276,9 @@ export default function RecipeDetailScreen() {
             <CookCountBadge count={cookCount} />
           </View>
 
+          {/* I Cooked This Button */}
+          <CookLogButton onPress={() => setShowCookLogSheet(true)} />
+
           {/* Star rating */}
           <View style={s.starsRow}>
             {[1, 2, 3, 4, 5].map((star) => (
@@ -420,8 +423,6 @@ export default function RecipeDetailScreen() {
             ))}
           </View>
         )}
-        {/* ── I Cooked This Button ── */}
-        <CookLogButton onPress={() => setShowCookLogSheet(true)} />
       </ScrollView>
 
       {/* ── Bottom Action Bar ── */}

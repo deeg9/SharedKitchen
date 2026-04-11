@@ -9,6 +9,7 @@ import {
   Alert,
   StyleSheet,
 } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheet } from '../ui/BottomSheet';
 import { CameraSheet } from '../camera/CameraSheet';
 import { useCookLogStore } from '../../stores/cookLogStore';
@@ -97,7 +98,6 @@ export function CookLogSheet({
     <>
       <BottomSheet isOpen={isOpen} onClose={handleClose} snapPoints={['55%']}>
         <View style={styles.container}>
-          <Text style={styles.heading}>Log this cook</Text>
           {contextMessage ? (
             <Text style={styles.contextMessage}>{contextMessage}</Text>
           ) : null}
@@ -116,24 +116,21 @@ export function CookLogSheet({
                   <Text style={styles.removePhotoX}>X</Text>
                 </Pressable>
               </View>
-            ) : (
-              <View style={styles.photoPlaceholder} />
-            )}
+            ) : null}
             <Pressable
               onPress={() => setCameraOpen(true)}
               disabled={submitting}
               accessibilityRole="button"
-              accessibilityLabel="Add a photo"
+              accessibilityLabel="Add media"
+              style={styles.addMediaButton}
             >
-              <Text style={styles.addPhotoText}>Add Photo</Text>
+              <MaterialCommunityIcons name="camera-plus-outline" size={20} color={colors.primary} />
+              <Text style={styles.addPhotoText}>Add media</Text>
             </Pressable>
           </View>
-
-          {/* Notes */}
-          <Text style={styles.notesLabel}>Notes (optional)</Text>
           <TextInput
             style={styles.notesInput}
-            placeholder="How did it turn out?"
+            placeholder="Write a caption..."
             placeholderTextColor={colors.onSurfaceVariant}
             value={notes}
             onChangeText={setNotes}
@@ -141,7 +138,7 @@ export function CookLogSheet({
             maxLength={500}
             editable={!submitting}
             textAlignVertical="top"
-            accessibilityLabel="Notes, optional"
+            accessibilityLabel="Caption"
           />
 
           {/* Submit */}
@@ -150,12 +147,12 @@ export function CookLogSheet({
             onPress={handleSubmit}
             disabled={submitting}
             accessibilityRole="button"
-            accessibilityLabel="Log cook"
+            accessibilityLabel="Post to feed"
           >
             {submitting ? (
               <ActivityIndicator color={colors.onPrimary} />
             ) : (
-              <Text style={styles.submitText}>Log Cook</Text>
+              <Text style={styles.submitText}>Post to feed</Text>
             )}
           </Pressable>
         </View>
@@ -189,16 +186,15 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   photoSection: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: spacing.sm,
     marginBottom: spacing.md,
   },
-  photoPlaceholder: {
-    width: 80,
-    height: 80,
-    borderWidth: 2,
-    borderStyle: 'dashed',
-    borderColor: colors.outlineVariant,
-    borderRadius: borderRadius.sm,
+  addMediaButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
   },
   photoWrapper: {
     position: 'relative',
@@ -228,11 +224,6 @@ const styles = StyleSheet.create({
     ...typography.labelLg,
     color: colors.primary,
     marginTop: spacing.xs,
-  },
-  notesLabel: {
-    ...typography.labelLg,
-    color: colors.onSurface,
-    marginBottom: spacing.xs,
   },
   notesInput: {
     ...typography.bodyLg,
