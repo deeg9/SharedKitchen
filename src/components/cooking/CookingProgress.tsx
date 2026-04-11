@@ -76,6 +76,6 @@ const s = StyleSheet.create({
     borderRadius: 2,
   },
   segmentGap: {
-    marginRight: 2,
+    marginRight: spacing.xs, // 4px per UI-SPEC
   },
 });

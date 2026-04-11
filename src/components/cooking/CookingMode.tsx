@@ -164,7 +164,7 @@ export function CookingMode({ recipe, onClose, onCookComplete }: CookingModeProp
             size={20}
             color={colors.onSurfaceVariant}
           />
-          <Text style={s.prevBtnText}>Previous</Text>
+          <Text style={s.prevBtnText}>Previous Step</Text>
         </Pressable>
 
         {/* Ingredients pill */}
