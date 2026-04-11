@@ -27,7 +27,7 @@
 - [ ] **DEBT-01**: Profiles RLS SELECT policy scoped to only expose handle, display_name, avatar_url (not all columns)
 - [x] **DEBT-02**: Reserved word validation enforced in authStore.updateHandle (not just UI-only)
 - [x] **DEBT-03**: 30-day handle change cooldown enforced in authStore.updateHandle (not just UI-only)
-- [ ] **DEBT-04**: TypeScript type safety — regenerate database.ts or fix manual type definitions to eliminate `never` inference errors
+- [x] **DEBT-04**: TypeScript type safety — regenerate database.ts or fix manual type definitions to eliminate `never` inference errors
 
 ## Traceability
 
@@ -49,4 +49,4 @@
 | DEBT-01 | Phase 49 | Pending |
 | DEBT-02 | Phase 49 | Complete |
 | DEBT-03 | Phase 49 | Complete |
-| DEBT-04 | Phase 49 | Pending |
+| DEBT-04 | Phase 49 | Complete |
