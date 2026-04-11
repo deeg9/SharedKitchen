@@ -10,8 +10,18 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 
 ## Current State
 
-**Shipped:** v7.0 Stitch UI Redesign (2026-04-09)
-**Codebase:** ~45,000 LOC across 280+ source files (TypeScript, SQL, YAML)
+**Shipped:** v8.0 Social Recipes (2026-04-11)
+**Codebase:** ~50,000 LOC across 310+ source files (TypeScript, SQL, YAML)
+
+## Current Milestone: v9.0 Cooking Experience
+
+**Goal:** Redesign the cooking mode into a beautiful step-by-step experience and enhance social cooking features with photo comments and co-cook tagging.
+
+**Target features:**
+- Cooking Mode Redesign (recipe photo, step categories, per-step ingredients, Metric/Imperial toggle, progress bar)
+- Comment Photo Attachments (camera icon in comment input, thumbnail display, tap to expand)
+- Co-Cook Tagging ("Who did you cook with?" @handle mentions on cook log posts)
+- v8.0 Tech Debt Cleanup (profiles RLS scoping, reserved word validation at store level, TypeScript type fixes)
 **Tech stack:** React Native + Expo (iOS), Supabase (Postgres, Auth, Realtime, Storage, Edge Functions), Gemini 2.5 Flash (vision + text + ingredient matching), USDA FoodData Central, Open Food Facts, FatSecret, Supadata, Serper.dev, Stripe, react-native-svg, expo-linear-gradient, expo-share-intent, expo-image-manipulator, expo-image, expo-camera, expo-notifications, Maestro E2E
 
 ## Requirements
