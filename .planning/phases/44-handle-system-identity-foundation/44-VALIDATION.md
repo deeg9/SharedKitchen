@@ -2,7 +2,7 @@
 phase: 44
 slug: handle-system-identity-foundation
 status: draft
-nyquist_compliant: false
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-04-10
 ---
@@ -42,6 +42,7 @@ created: 2026-04-10
 | 44-01-02 | 01 | 1 | IDEN-01 | — | N/A | unit | `npx jest --testPathPattern="authStore"` | ✅ | ⬜ pending |
 | 44-02-01 | 02 | 2 | IDEN-02 | — | Input sanitization | component | `npx jest --testPathPattern="HandleInput"` | ❌ W0 | ⬜ pending |
 | 44-02-02 | 02 | 2 | IDEN-02 | — | N/A | integration | `npx jest --testPathPattern="HandleSetup"` | ❌ W0 | ⬜ pending |
+| 44-02-03 | 02 | 2 | IDEN-02 | — | Navigation gate | integration | `npx jest --testPathPattern="root-layout-handle"` | ❌ W0 | ⬜ pending |
 | 44-03-01 | 03 | 3 | IDEN-04 | — | N/A | snapshot | `npx jest --testPathPattern="FeedCard"` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
@@ -50,9 +51,11 @@ created: 2026-04-10
 
 ## Wave 0 Requirements
 
-- [ ] `src/components/__tests__/HandleInput.test.tsx` — stubs for IDEN-02
-- [ ] `src/components/__tests__/HandleSetupStep.test.tsx` — stubs for IDEN-02
-- [ ] `src/components/__tests__/FeedCard.test.tsx` — handle display tests for IDEN-04
+- [ ] `tests/components/HandleInput.test.tsx` — stubs for IDEN-01 validation UX
+- [ ] `tests/components/HandleSetupStep.test.tsx` — stubs for IDEN-01 onboarding integration
+- [ ] `tests/components/HandleSetupInterstitial.test.tsx` — stubs for IDEN-02 blocking behavior
+- [ ] `tests/components/FeedCard.test.tsx` — handle display tests for IDEN-04
+- [ ] `tests/screens/root-layout-handle.test.tsx` — stubs for IDEN-02 navigation gate
 
 *Existing infrastructure covers handle-utils and authStore (already have tests from 44-01).*
 
@@ -63,15 +66,15 @@ created: 2026-04-10
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
 | Blocking interstitial prevents navigation | IDEN-02 | Requires full navigation stack | Launch app as existing user without handle, verify cannot navigate past interstitial |
-| Handle appears in all display contexts | IDEN-04 | Visual regression across screens | Check FeedCard, profile, comments, cook logs for @handle display |
+| Handle appears in all display contexts | IDEN-04 | Visual regression across screens | Check FeedCard, profile, recipe detail for @handle display |
 
 ---
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
 - [ ] No watch-mode flags
 - [ ] Feedback latency < 15s
 - [ ] `nyquist_compliant: true` set in frontmatter
