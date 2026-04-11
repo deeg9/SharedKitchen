@@ -38,6 +38,7 @@ import { CookLogButton } from '../../../src/components/recipes/CookLogButton';
 import { CookCountBadge } from '../../../src/components/recipes/CookCountBadge';
 import { CookPhotoGallery } from '../../../src/components/cook-log/CookPhotoGallery';
 import { CookLogSheet } from '../../../src/components/cook-log/CookLogSheet';
+import { RecipeCommentsSection } from '../../../src/components/comments/RecipeCommentsSection';
 
 const SCALE_OPTIONS = [1, 2, 3] as const;
 
@@ -61,6 +62,7 @@ export default function RecipeDetailScreen() {
   const { activeHouseholdId } = useHouseholdStore();
   const householdMembers = useHouseholdStore((s) => s.members);
   const user = useAuthStore((s) => s.user);
+  const userHandle = useAuthStore((s) => s.handle);
   const userId = user?.id ?? null;
 
   const [creatorHandle, setCreatorHandle] = useState<string | null>(null);
@@ -392,6 +394,15 @@ export default function RecipeDetailScreen() {
             }}
           />
         )}
+
+        {/* ── Comments Section ── */}
+        <RecipeCommentsSection
+          recipeId={id ?? ''}
+          currentUserId={userId}
+          recipeCreatorId={recipe?.created_by ?? null}
+          userHandle={userHandle}
+          userAvatarUrl={memberProfile?.avatar_url ?? null}
+        />
 
         {/* ── Method (Instructions) ── */}
         <View style={s.methodSection}>
