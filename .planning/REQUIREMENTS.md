@@ -10,9 +10,9 @@
 ## Attribution
 
 - [ ] **ATTR-01**: Recipe detail page shows "Created by @handle" with creator's avatar below the recipe name
-- [ ] **ATTR-02**: Only the recipe creator can edit the recipe (name, ingredients, instructions, image)
-- [ ] **ATTR-03**: Non-creator household members can rate, comment, favorite, and save but not edit
-- [ ] **ATTR-04**: Recipes with no creator (legacy data) are assigned to the household admin during migration
+- [x] **ATTR-02**: Only the recipe creator can edit the recipe (name, ingredients, instructions, image)
+- [x] **ATTR-03**: Non-creator household members can rate, comment, favorite, and save but not edit
+- [x] **ATTR-04**: Recipes with no creator (legacy data) are assigned to the household admin during migration
 
 ## Cook Log
 
