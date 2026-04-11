@@ -33,6 +33,7 @@ describe('dedup', () => {
       brand: null,
       duplicateOfId: null,
       duplicateOfName: null,
+      duplicateQuantity: null,
       ...overrides,
     });
 

@@ -108,6 +108,7 @@ describe('cookLogStore', () => {
         userId: 'u1',
         householdId: 'h1',
         notes: 'Yummy',
+        recipeName: 'Test Recipe',
       });
 
       expect(supabase.from).toHaveBeenCalledWith('cook_logs');
@@ -138,6 +139,7 @@ describe('cookLogStore', () => {
         recipeId: 'r1',
         userId: 'u1',
         householdId: 'h1',
+        recipeName: 'Test Recipe',
       });
 
       // Should rollback to original count
