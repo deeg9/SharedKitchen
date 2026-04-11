@@ -75,7 +75,8 @@ export function FeedCard({
   const handleText = kitchenProfile?.handle ? `@${kitchenProfile.handle}` : null;
   const avatarUrl = kitchenProfile?.avatar_url ?? null;
   const photoUrl = post.photo_url ?? post.recipe_image_url;
-  const mealType = capitalizeFirst(post.meal_type);
+  const isCookLog = post.post_type === 'cook_log';
+  const mealType = post.meal_type ? capitalizeFirst(post.meal_type) : '';
 
   // Like animation
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -159,16 +160,22 @@ export function FeedCard({
           {/* Meal context */}
           <Text style={s.mealContext}>
             <Text style={s.mealContextBold}>{handleText ?? displayName}</Text>
-            {' made '}
+            {isCookLog ? ' cooked ' : ' made '}
             <Text style={s.mealContextBold}>{post.recipe_name}</Text>
           </Text>
 
           {/* Quoted description */}
-          <View style={s.quoteContainer}>
-            <Text style={s.quoteText}>
-              A delicious {mealType.toLowerCase()} dish
-            </Text>
-          </View>
+          {isCookLog && post.caption ? (
+            <View style={s.quoteContainer}>
+              <Text style={s.quoteText}>{post.caption}</Text>
+            </View>
+          ) : !isCookLog ? (
+            <View style={s.quoteContainer}>
+              <Text style={s.quoteText}>
+                A delicious {mealType.toLowerCase()} dish
+              </Text>
+            </View>
+          ) : null}
 
           {/* Action bar */}
           <View style={s.actionBar}>
@@ -199,13 +206,15 @@ export function FeedCard({
                   )}
                 </View>
               </Pressable>
-              <Pressable onPress={onSavePress} hitSlop={8}>
-                <MaterialCommunityIcons
-                  name="bookmark-outline"
-                  size={22}
-                  color={colors.onSurfaceVariant}
-                />
-              </Pressable>
+              {!isOwnPost && (
+                <Pressable onPress={onSavePress} hitSlop={8}>
+                  <MaterialCommunityIcons
+                    name="bookmark-outline"
+                    size={22}
+                    color={colors.onSurfaceVariant}
+                  />
+                </Pressable>
+              )}
             </View>
 
             {/* Try this recipe button for non-own posts */}
