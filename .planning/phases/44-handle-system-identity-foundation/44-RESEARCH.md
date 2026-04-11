@@ -319,17 +319,15 @@ const handleText = kitchenProfile?.handle ? `@${kitchenProfile.handle}` : null;
 | A1 | 400ms debounce is appropriate for availability check | Architecture Patterns | Minor UX issue -- too fast = too many queries, too slow = laggy feedback. Easy to tune. |
 | A2 | lodash.debounce is unnecessary, useRef+setTimeout suffices | Don't Hand-Roll | Low risk -- simple pattern, no complex cancel/flush semantics needed |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **How does the interstitial interact with deep links?**
+1. **How does the interstitial interact with deep links?** (RESOLVED)
    - What we know: Root layout gates navigation, interstitial is a blocking overlay
-   - What's unclear: If a user opens a deep link (e.g., join household invite), does the interstitial block it?
-   - Recommendation: Let the interstitial block all deep links. User must set handle first. The deep link intent can be preserved via expo-linking state.
+   - Resolution: The interstitial blocks all deep links. User must set handle first. Plan 44-02 renders the interstitial as a full-screen overlay with zIndex 9999 in root _layout.tsx, which prevents any navigation until handle is set. Deep link intent is preserved by expo-router's default behavior.
 
-2. **Where does the handle availability check query go?**
+2. **Where does the handle availability check query go?** (RESOLVED)
    - What we know: `authStore.updateHandle()` handles the claim, `authStore.checkHandle()` fetches current handle
-   - What's unclear: The availability check (does this handle exist?) is not in the store yet
-   - Recommendation: Put it directly in HandleInput as a local Supabase query since it's a transient UI state, not app-wide state. Keep it simple.
+   - Resolution: Availability check lives directly in HandleSetupInterstitial and HandleSetupStep as a local Supabase query with 400ms debounce (per Plan 44-02 Task 1). It's transient UI state, not app-wide state. Also reused in Edit Profile handle change flow (Plan 44-04).
 
 ## Sources
 
