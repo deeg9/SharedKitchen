@@ -10,11 +10,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Image } from 'expo-image';
 import { colors } from '../../theme/colors';
 import { spacing, borderRadius } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
 import { Recipe, InstructionStep, Ingredient } from '../../types/database';
 import { UnitSystem } from '../../lib/unit-conversion';
+import { getDefaultRecipeImage } from '../../lib/images';
 import { CookingProgress } from './CookingProgress';
 import { StepCard } from './StepCard';
 import { UnitToggle } from './UnitToggle';
@@ -38,6 +40,7 @@ export function CookingMode({ recipe, onClose, onCookComplete }: CookingModeProp
   const instructions = recipe.instructions as InstructionStep[];
   const ingredients = recipe.ingredients as Ingredient[];
   const totalSteps = instructions.length;
+  const imageUrl = recipe.image_url || getDefaultRecipeImage(recipe.id, recipe.category || '');
 
   // Load saved unit preference
   useEffect(() => {
@@ -114,6 +117,14 @@ export function CookingMode({ recipe, onClose, onCookComplete }: CookingModeProp
         <UnitToggle value={unitSystem} onChange={handleUnitChange} />
       </View>
 
+      {/* Fixed hero image band — NOT in ScrollView */}
+      <Image
+        source={{ uri: imageUrl }}
+        style={s.heroImage}
+        contentFit="cover"
+        transition={200}
+      />
+
       {/* Progress */}
       <CookingProgress
         currentStep={currentStep}
@@ -133,9 +144,6 @@ export function CookingMode({ recipe, onClose, onCookComplete }: CookingModeProp
           stepIndex={currentStep}
           totalSteps={totalSteps}
           unitSystem={unitSystem}
-          recipeImageUrl={recipe.image_url}
-          recipeCategory={recipe.category}
-          recipeId={recipe.id}
           ingredients={stepIngredients}
         />
       </ScrollView>
@@ -219,6 +227,10 @@ const s = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
+  },
+  heroImage: {
+    width: '100%',
+    height: 180,
   },
   closeBtn: {
     width: 40,

@@ -1,12 +1,10 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Image } from 'expo-image';
 import { colors } from '../../theme/colors';
 import { spacing, borderRadius } from '../../theme/spacing';
 import { typography, fontFamily } from '../../theme/typography';
 import { InstructionStep, Ingredient } from '../../types/database';
 import { UnitSystem, convertInstructionText, convertIngredient } from '../../lib/unit-conversion';
-import { getDefaultRecipeImage } from '../../lib/images';
 import { CookingTimer } from './CookingTimer';
 
 interface StepCardProps {
@@ -14,9 +12,6 @@ interface StepCardProps {
   stepIndex: number;
   totalSteps: number;
   unitSystem: UnitSystem;
-  recipeImageUrl?: string | null;
-  recipeCategory?: string;
-  recipeId?: string;
   ingredients?: Ingredient[];
 }
 
@@ -53,9 +48,6 @@ export function StepCard({
   stepIndex,
   totalSteps,
   unitSystem,
-  recipeImageUrl,
-  recipeCategory,
-  recipeId,
   ingredients,
 }: StepCardProps) {
   const displayText =
@@ -74,18 +66,8 @@ export function StepCard({
     );
   }, [ingredients, unitSystem]);
 
-  const imageUrl = recipeImageUrl || getDefaultRecipeImage(recipeId || '', recipeCategory || '');
-
   return (
     <View style={s.container}>
-      {/* Step photo */}
-      <Image
-        source={{ uri: imageUrl }}
-        style={s.photo}
-        contentFit="cover"
-        transition={200}
-      />
-
       {/* Timer cards */}
       {step.timers && step.timers.length > 0 &&
         step.timers.map((timer, i) => (
@@ -138,11 +120,6 @@ const s = StyleSheet.create({
   container: {
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
-  },
-  photo: {
-    width: '100%',
-    height: 240,
-    borderRadius: borderRadius.xl,
   },
   badge: {
     paddingHorizontal: spacing.sm + 2,
