@@ -40,7 +40,7 @@
 ## Save to Collection
 
 - [x] **SAVE-01**: User can save any recipe from the feed or another kitchen's profile to their own recipe library
-- [ ] **SAVE-02**: Saved recipes show "Saved from @handle's kitchen" attribution on recipe detail
+- [x] **SAVE-02**: Saved recipes show "Saved from @handle's kitchen" attribution on recipe detail
 
 ## Future Requirements (Deferred)
 

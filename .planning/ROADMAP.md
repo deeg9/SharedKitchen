@@ -138,7 +138,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - [x] **Phase 45: Recipe Attribution & Creator Permissions** - Creator identity on recipes with ownership-based edit permissions and @handle search (completed 2026-04-11)
 - [x] **Phase 46: Cook Log with Photos** - Cook logging from recipe detail, cooking mode, and meal plan with photo gallery and count badges (completed 2026-04-11)
 - [x] **Phase 47: Recipe Comments** - Threaded recipe comments with visibility scoping and moderation (completed 2026-04-11)
-- [ ] **Phase 48: Feed Integration & Save to Collection** - Auto-post cook events to feed and save recipes from feed to own library
+- [x] **Phase 48: Feed Integration & Save to Collection** - Auto-post cook events to feed and save recipes from feed to own library (completed 2026-04-11)
 
 ## Phase Details
 
@@ -222,7 +222,7 @@ Plans:
 Plans:
 - [x] 48-01-PLAN.md — Migration, types, cookLogStore feed post hook
 - [x] 48-02-PLAN.md — FeedCard cook-log rendering + saveRecipeFromPost RPC rewrite
-- [ ] 48-03-PLAN.md — SavedFromAttribution component + recipe detail integration
+- [x] 48-03-PLAN.md — SavedFromAttribution component + recipe detail integration
 **UI hint**: yes
 
 ## Progress
@@ -278,7 +278,7 @@ Plans:
 | 45. Recipe Attribution & Creator Permissions | v8.0 | 3/3 | Complete    | 2026-04-11 |
 | 46. Cook Log with Photos | v8.0 | 3/3 | Complete    | 2026-04-11 |
 | 47. Recipe Comments | v8.0 | 2/2 | Complete    | 2026-04-11 |
-| 48. Feed Integration & Save to Collection | v8.0 | 2/3 | In Progress|  |
+| 48. Feed Integration & Save to Collection | v8.0 | 3/3 | Complete   | 2026-04-11 |
 
 ---
 *Last updated: 2026-04-11 after Phase 48 planning*
