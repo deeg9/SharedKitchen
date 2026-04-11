@@ -14,6 +14,7 @@ import { CameraSheet } from '../camera/CameraSheet';
 import { useCookLogStore } from '../../stores/cookLogStore';
 import { useAuthStore } from '../../stores/authStore';
 import { useHouseholdStore } from '../../stores/householdStore';
+import { useSocialStore } from '../../stores/socialStore';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
@@ -23,6 +24,7 @@ interface CookLogSheetProps {
   onClose: () => void;
   recipeId: string;
   recipeName: string;
+  recipeImageUrl?: string | null;
   contextMessage?: string;
 }
 
@@ -31,6 +33,7 @@ export function CookLogSheet({
   onClose,
   recipeId,
   recipeName,
+  recipeImageUrl,
   contextMessage,
 }: CookLogSheetProps) {
   const [photoUri, setPhotoUri] = useState<string | null>(null);
@@ -47,12 +50,16 @@ export function CookLogSheet({
 
     setSubmitting(true);
     try {
+      const kitchenId = useSocialStore.getState().myKitchenProfile?.id ?? undefined;
       const result = await useCookLogStore.getState().createCookLog({
         recipeId,
         userId,
         householdId,
         photoUri: photoUri ?? undefined,
         notes: notes.trim() || undefined,
+        recipeName,
+        recipeImageUrl: recipeImageUrl ?? undefined,
+        kitchenId,
       });
 
       if (result) {

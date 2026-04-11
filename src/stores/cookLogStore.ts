@@ -27,6 +27,9 @@ interface CookLogState {
     householdId: string;
     photoUri?: string;
     notes?: string;
+    recipeName: string;
+    recipeImageUrl?: string;
+    kitchenId?: string;
   }) => Promise<CookLog | null>;
   fetchUnloggedMeals: (householdId: string, userId: string) => Promise<void>;
   deleteCookLog: (logId: string, photoUrl: string | null) => Promise<void>;
@@ -100,6 +103,20 @@ export const useCookLogStore = create<CookLogState>((set, get) => ({
         .single();
 
       if (error) throw error;
+
+      // Fire-and-forget feed post for social feed (FEED-01)
+      if (params.kitchenId) {
+        const { createCookLogFeedPost } = await import('../lib/feedHelpers');
+        createCookLogFeedPost({
+          kitchenId: params.kitchenId,
+          recipeId: params.recipeId,
+          recipeName: params.recipeName,
+          recipeImageUrl: photoUrl ?? params.recipeImageUrl ?? null,
+          cookLogId: (data as CookLog).id,
+          caption: params.notes ?? null,
+          photoUrl: photoUrl,
+        });
+      }
 
       return data as CookLog;
     } catch (error: unknown) {

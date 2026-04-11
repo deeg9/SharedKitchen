@@ -519,6 +519,7 @@ export default function RecipeDetailScreen() {
         }}
         recipeId={id ?? ''}
         recipeName={recipe.name}
+        recipeImageUrl={recipe.image_url}
       />
     </View>
   );

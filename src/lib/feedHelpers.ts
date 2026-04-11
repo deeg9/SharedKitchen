@@ -44,6 +44,49 @@ export async function createFeedPost(params: {
 }
 
 /**
+ * Creates a cook-log feed_post row in Supabase.
+ * Fire-and-forget: returns null on error (never throws).
+ */
+export async function createCookLogFeedPost(params: {
+  kitchenId: string;
+  recipeId: string;
+  recipeName: string;
+  recipeImageUrl: string | null;
+  cookLogId: string;
+  caption: string | null;
+  photoUrl: string | null;
+}): Promise<FeedPost | null> {
+  try {
+    const insert: FeedPostInsert = {
+      kitchen_id: params.kitchenId,
+      recipe_id: params.recipeId,
+      recipe_name: params.recipeName,
+      recipe_image_url: params.recipeImageUrl,
+      post_type: 'cook_log',
+      cook_log_id: params.cookLogId,
+      caption: params.caption,
+      photo_url: params.photoUrl,
+      // meal_date and meal_type intentionally omitted (null for cook_log posts)
+    };
+
+    const { data, error } = await supabase
+      .from('feed_posts')
+      .insert(insert)
+      .select()
+      .single();
+
+    if (error) {
+      console.warn('[feedHelpers] createCookLogFeedPost error:', error.message);
+      return null;
+    }
+    return data as FeedPost;
+  } catch (err) {
+    console.warn('[feedHelpers] createCookLogFeedPost exception:', err);
+    return null;
+  }
+}
+
+/**
  * Compresses and uploads a meal photo to Supabase Storage,
  * then updates the feed_post row with the public URL.
  * Returns the public URL or null on error.

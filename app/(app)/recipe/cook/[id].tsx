@@ -51,6 +51,7 @@ export default function CookScreen() {
         onClose={handleCookLogClose}
         recipeId={id}
         recipeName={recipe.name}
+        recipeImageUrl={recipe.image_url}
         contextMessage="You just finished cooking! Add a photo and note."
       />
     </>
