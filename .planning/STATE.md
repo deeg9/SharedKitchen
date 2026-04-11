@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v9.0
 milestone_name: Cooking Experience
-status: verifying
-stopped_at: Completed 49-03-PLAN.md
-last_updated: "2026-04-11T22:42:03.065Z"
+status: executing
+stopped_at: Completed 50-01-PLAN.md
+last_updated: "2026-04-11T23:09:17.708Z"
 last_activity: 2026-04-11
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  total_plans: 6
+  completed_plans: 5
+  percent: 83
 ---
 
 # Project State
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-11)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** Phase 49 — Tech Debt & Type Safety
+**Current focus:** Phase 50 — Cooking Mode Redesign
 
 ## Current Position
 
-Phase: 50
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 50 (Cooking Mode Redesign) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
 Last activity: 2026-04-11
 
 Progress: [░░░░░░░░░░] 0%
@@ -52,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 49 P01 | 2min | 2 tasks | 3 files |
 | Phase 49 P03 | 4min | 2 tasks | 6 files |
 | 49 | 4 | - | - |
+| Phase 50 P01 | 2min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,8 @@ Recent decisions affecting current work:
 - [v8.0]: Recipe comments use separate table from feed comments (different visibility scopes)
 - [Phase 49]: Store-level validation before DB calls: validate inputs via utility functions before supabase.from()
 - [Phase 49]: Supabase JS v2 requires Relationships: [] on every table/view definition for GenericSchema constraint
+- [Phase 50]: SIMMERING badge uses hardcoded blue (#d0e4ff/#00497e) because theme tertiaryContainer is dark green
+- [Phase 50]: Ingredient card always renders (not conditional) for layout consistency per CONTEXT.md
 
 ### Pending Todos
 
@@ -79,6 +82,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-11T22:38:27.504Z
-Stopped at: Completed 49-03-PLAN.md
+Last session: 2026-04-11T23:09:17.706Z
+Stopped at: Completed 50-01-PLAN.md
 Resume file: None

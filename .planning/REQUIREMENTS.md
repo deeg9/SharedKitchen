@@ -3,11 +3,11 @@
 ## Cooking Mode Redesign
 
 - [ ] **COOK-R01**: Cooking mode displays the recipe hero image at the top of each step
-- [ ] **COOK-R02**: Each step shows a category tag (MARINATING, GRILLING, SIMMERING, etc.) derived from step content
-- [ ] **COOK-R03**: Each step shows only the ingredients relevant to that step, not the full ingredient list
+- [x] **COOK-R02**: Each step shows a category tag (MARINATING, GRILLING, SIMMERING, etc.) derived from step content
+- [x] **COOK-R03**: Each step shows only the ingredients relevant to that step, not the full ingredient list
 - [ ] **COOK-R04**: Cooking mode has a segmented progress bar showing current step position
 - [ ] **COOK-R05**: Bottom navigation shows Previous / Ingredients / Next Step buttons
-- [ ] **COOK-R06**: Metric/Imperial toggle at the top converts ingredient amounts between measurement systems
+- [x] **COOK-R06**: Metric/Imperial toggle at the top converts ingredient amounts between measurement systems
 
 ## Comment Photo Attachments
 
@@ -34,11 +34,11 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | COOK-R01 | Phase 50 | Pending |
-| COOK-R02 | Phase 50 | Pending |
-| COOK-R03 | Phase 50 | Pending |
+| COOK-R02 | Phase 50 | Complete |
+| COOK-R03 | Phase 50 | Complete |
 | COOK-R04 | Phase 50 | Pending |
 | COOK-R05 | Phase 50 | Pending |
-| COOK-R06 | Phase 50 | Pending |
+| COOK-R06 | Phase 50 | Complete |
 | CMNT-P01 | Phase 51 | Pending |
 | CMNT-P02 | Phase 51 | Pending |
 | CMNT-P03 | Phase 51 | Pending |
