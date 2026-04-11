@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { View, FlatList, RefreshControl, ActivityIndicator, Alert, ActionSheetIOS, Platform, StyleSheet } from 'react-native';
+import { View, Text, FlatList, RefreshControl, ActivityIndicator, Alert, ActionSheetIOS, Platform, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSocialStore } from '../../stores/socialStore';
 import { useHouseholdStore } from '../../stores/householdStore';
