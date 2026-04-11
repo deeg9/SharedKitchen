@@ -32,6 +32,7 @@ import { usePresence, PresenceMember } from '../../../src/hooks/usePresence';
 import { PresenceAvatarStack } from '../../../src/components/presence/PresenceAvatarStack';
 import { useAuthStore } from '../../../src/stores/authStore';
 import { supabase } from '../../../src/lib/supabase';
+import { CreatorAttribution } from '../../../src/components/recipes/CreatorAttribution';
 
 const SCALE_OPTIONS = [1, 2, 3] as const;
 
@@ -58,6 +59,7 @@ export default function RecipeDetailScreen() {
   const userId = user?.id ?? null;
 
   const [creatorHandle, setCreatorHandle] = useState<string | null>(null);
+  const [creatorAvatarUrl, setCreatorAvatarUrl] = useState<string | null>(null);
   const [scale, setScale] = useState<1 | 2 | 3>(1);
   const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
   const [noteText, setNoteText] = useState('');
@@ -77,11 +79,12 @@ export default function RecipeDetailScreen() {
     const fetchCreatorHandle = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('handle')
+        .select('handle, avatar_url')
         .eq('id', recipe.created_by)
         .maybeSingle();
 
       setCreatorHandle(data?.handle ?? null);
+      setCreatorAvatarUrl(data?.avatar_url ?? null);
     };
 
     fetchCreatorHandle();
@@ -195,12 +198,14 @@ export default function RecipeDetailScreen() {
           >
             <MaterialCommunityIcons name="arrow-left" size={22} color={colors.primary} />
           </Pressable>
-          <Pressable
-            onPress={() => router.push(`/recipe/edit/${id}`)}
-            style={[s.headerBtn, { right: spacing.md, top: insets.top + spacing.xs }]}
-          >
-            <MaterialCommunityIcons name="pencil-outline" size={22} color={colors.primary} />
-          </Pressable>
+          {recipe?.created_by === userId && (
+            <Pressable
+              onPress={() => router.push(`/recipe/edit/${id}`)}
+              style={[s.headerBtn, { right: spacing.md, top: insets.top + spacing.xs }]}
+            >
+              <MaterialCommunityIcons name="pencil-outline" size={22} color={colors.primary} />
+            </Pressable>
+          )}
           {presenceMembers.length > 0 && (
             <View style={{ position: 'absolute', right: 60, top: insets.top + spacing.xs + 6, zIndex: 10 }}>
               <PresenceAvatarStack members={presenceMembers} />
@@ -225,8 +230,12 @@ export default function RecipeDetailScreen() {
         {/* ── Title & Rating ── */}
         <View style={s.titleSection}>
           <Text style={s.title}>{recipe.name}</Text>
-          {creatorHandle && (
-            <Text style={s.creatorAttribution}>by @{creatorHandle}</Text>
+          {creatorHandle && recipe?.created_by && (
+            <CreatorAttribution
+              handle={creatorHandle}
+              avatarUrl={creatorAvatarUrl}
+              creatorId={recipe.created_by}
+            />
           )}
 
           {/* Rating pill */}
@@ -477,12 +486,6 @@ const s = StyleSheet.create({
   title: {
     fontFamily: fontFamily.headlineBold, fontSize: 32, fontWeight: '800',
     color: colors.primary, letterSpacing: -0.5, lineHeight: 38, marginBottom: spacing.md,
-  },
-  creatorAttribution: {
-    ...typography.bodyMd,
-    color: colors.onSurfaceVariant,
-    marginTop: -spacing.sm,
-    marginBottom: spacing.md,
   },
   ratingPill: {
     flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start',
