@@ -1,5 +1,30 @@
 # Milestones
 
+## v8.0 v8.0 (Shipped: 2026-04-11)
+
+**Phases completed:** 5 phases, 15 plans, 31 tasks
+
+**Key accomplishments:**
+
+- 26 it.todo() test stubs across 5 files covering HandleInput validation, HandleSetupStep onboarding, HandleSetupInterstitial blocking, FeedCard handle display, and root layout handle gate
+- Handle column with LOWER() unique index, validation utils with 15 reserved words, and authStore handle state/actions with TDD coverage
+- HandleInput with real-time validation, blocking interstitial for existing users, and onboarding step 1 for new users with shared useHandleForm hook
+- @handle shown as primary identity on feed cards, profile screen, and recipe detail attribution with graceful display_name fallback
+- Handle change UI on Edit Profile with 30-day cooldown enforcement and handleChangedAt state in authStore
+- Creator-scoped RLS policies replacing permissive UPDATE/DELETE with backfill migration for legacy recipes
+- CreatorAttribution component with avatar + handle below recipe name, edit button gated to recipe creator only
+- People search by @handle in search overlay with Kitchens/People tabs, navigating to public profile page with avatar, handle, and 2-column recipe grid
+- cook_logs table with RLS, Zustand store for CRUD + unlogged meal detection, and 1200px/0.8 JPEG photo upload to Supabase Storage
+- 5 cook log UI components (sheet, button, badge, gallery, thumbnail) integrated into recipe detail with full logging flow
+- Post-cooking CookLogSheet prompt via onCookComplete callback and PastMealBanner for unlogged meals on Plan tab with AsyncStorage dismiss persistence
+- recipe_comments table with threaded RLS, comment_count trigger, and Zustand store with optimistic updates and single-level reply threading
+- Four threaded comment UI components with reply context banner, long-press delete, and count badge integrated into recipe detail page
+- Database migration adding post_type discriminator, cook_log FK, recipe clone RPC, and automatic feed post creation on cook log
+- FeedCard renders cook-log posts with 'cooked' context and caption quotes; saveRecipeFromPost rewritten to use clone_recipe_to_household SECURITY DEFINER RPC
+- SavedFromAttribution component showing "Saved from @handle's kitchen" on recipe detail with tappable navigation and save button for cross-household cloning
+
+---
+
 ## v7.0 Stitch UI Redesign (Shipped: 2026-04-09)
 
 **Phases completed:** 5 phases, 14 plans, ~30 tasks
