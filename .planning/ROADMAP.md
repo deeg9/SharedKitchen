@@ -179,7 +179,10 @@ Plans:
   3. Each step shows only the ingredients needed for that specific step rather than the full recipe ingredient list
   4. A segmented progress bar at the top shows the cook's position across all steps, and Previous / Ingredients / Next Step buttons provide clear navigation
   5. A Metric/Imperial toggle at the top converts all ingredient amounts between measurement systems within the cooking view
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 50-01-PLAN.md — Expand StepCard categories, fix ingredient conversion, add empty state
+- [ ] 50-02-PLAN.md — Move hero to fixed header, progress bar gap, bottom nav copy, visual verification
 **UI hint**: yes
 
 ### Phase 51: Comment Photo Attachments
@@ -260,9 +263,9 @@ Plans:
 | 47. Recipe Comments | v8.0 | 2/2 | Complete | 2026-04-11 |
 | 48. Feed Integration & Save to Collection | v8.0 | 3/3 | Complete | 2026-04-11 |
 | 49. Tech Debt & Type Safety | v9.0 | 4/4 | Complete    | 2026-04-11 |
-| 50. Cooking Mode Redesign | v9.0 | 0/0 | Not started | - |
+| 50. Cooking Mode Redesign | v9.0 | 0/2 | Planned | - |
 | 51. Comment Photo Attachments | v9.0 | 0/0 | Not started | - |
 | 52. Co-Cook Tagging | v9.0 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-04-11 after Phase 49 gap closure planning*
+*Last updated: 2026-04-11 after Phase 50 planning*
