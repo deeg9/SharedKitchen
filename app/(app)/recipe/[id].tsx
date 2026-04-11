@@ -272,7 +272,7 @@ export default function RecipeDetailScreen() {
               style={s.actionBtn}
               testID="recipe-detail-cook-log"
             >
-              <MaterialCommunityIcons name="pot-steam" size={18} color={colors.onPrimary} />
+              <MaterialCommunityIcons name="pot-steam" size={14} color={colors.onPrimary} />
               <Text style={s.actionBtnText}>I Cooked This</Text>
             </Pressable>
             {recipe.instructions && (recipe.instructions as InstructionStepType[]).length > 0 && (
@@ -281,7 +281,7 @@ export default function RecipeDetailScreen() {
                 style={s.actionBtn}
                 testID="recipe-detail-cook-button"
               >
-                <MaterialCommunityIcons name="silverware-fork-knife" size={18} color={colors.onPrimary} />
+                <MaterialCommunityIcons name="silverware-fork-knife" size={14} color={colors.onPrimary} />
                 <Text style={s.actionBtnText}>Start Cooking</Text>
               </Pressable>
             )}
@@ -290,16 +290,18 @@ export default function RecipeDetailScreen() {
               style={s.actionBtn}
               testID="recipe-detail-add-to-plan"
             >
-              <MaterialCommunityIcons name="calendar-plus" size={18} color={colors.onPrimary} />
+              <MaterialCommunityIcons name="calendar-plus" size={14} color={colors.onPrimary} />
               <Text style={s.actionBtnText}>Add to Plan</Text>
             </Pressable>
-            <Pressable onPress={handleFavorite} style={s.actionFavBtn} testID="recipe-detail-favorite-button">
-              <MaterialCommunityIcons
-                name={isFavorite ? 'heart' : 'heart-outline'}
-                size={24}
-                color={isFavorite ? colors.error : colors.secondary}
-              />
-            </Pressable>
+            {recipe?.created_by !== userId && (
+              <Pressable onPress={handleFavorite} style={s.actionFavBtn} testID="recipe-detail-favorite-button">
+                <MaterialCommunityIcons
+                  name={isFavorite ? 'heart' : 'heart-outline'}
+                  size={24}
+                  color={isFavorite ? colors.error : colors.secondary}
+                />
+              </Pressable>
+            )}
           </View>
 
           {/* Rating pill + Cook count badge */}
@@ -447,16 +449,6 @@ export default function RecipeDetailScreen() {
           userAvatarUrl={memberProfile?.avatar_url ?? null}
         />
 
-        {/* ── Tags ── */}
-        {recipe.tags && recipe.tags.length > 0 && (
-          <View style={s.tagsSection}>
-            {recipe.tags.map((tag: string) => (
-              <View key={tag} style={s.tagChip}>
-                <Text style={s.tagChipText}>#{tag}</Text>
-              </View>
-            ))}
-          </View>
-        )}
       </ScrollView>
 
 
@@ -533,7 +525,7 @@ const s = StyleSheet.create({
     paddingVertical: spacing.sm, paddingHorizontal: spacing.xs,
   },
   actionBtnText: {
-    fontSize: 11, fontWeight: '600', color: colors.onPrimary,
+    fontSize: 9, fontWeight: '600', color: colors.onPrimary,
   },
   actionFavBtn: {
     width: 44, height: 44, borderRadius: 22,
