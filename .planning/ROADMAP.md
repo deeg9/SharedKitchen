@@ -189,7 +189,7 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [x] 46-01-PLAN.md — Migration, types, cookLogStore, photo upload helper
-- [ ] 46-02-PLAN.md — Recipe detail UI: CookLogButton, CookCountBadge, CookLogSheet, CookPhotoGallery
+- [x] 46-02-PLAN.md — Recipe detail UI: CookLogButton, CookCountBadge, CookLogSheet, CookPhotoGallery
 - [ ] 46-03-PLAN.md — CookingMode post-cook prompt + Plan tab past meal banner
 **UI hint**: yes
 
@@ -269,7 +269,7 @@ Plans:
 | 43. Budget, Profile & Social Feed | v7.0 | 3/3 | Complete | 2026-04-10 |
 | 44. Handle System & Identity Foundation | v8.0 | 5/4 | Complete   | 2026-04-11 |
 | 45. Recipe Attribution & Creator Permissions | v8.0 | 3/3 | Complete    | 2026-04-11 |
-| 46. Cook Log with Photos | v8.0 | 1/3 | In Progress|  |
+| 46. Cook Log with Photos | v8.0 | 2/3 | In Progress|  |
 | 47. Recipe Comments | v8.0 | 0/TBD | Not started | - |
 | 48. Feed Integration & Save to Collection | v8.0 | 0/TBD | Not started | - |
 
