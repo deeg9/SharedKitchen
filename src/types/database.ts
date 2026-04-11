@@ -150,6 +150,8 @@ export interface Database {
           computed_nutrition: Record<string, unknown> | null;
           ingredient_matches: Record<string, unknown>[] | null;
           created_by: string | null;
+          saved_from_kitchen_id: string | null;
+          saved_from_recipe_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -172,6 +174,8 @@ export interface Database {
           computed_nutrition?: Record<string, unknown> | null;
           ingredient_matches?: Record<string, unknown>[] | null;
           created_by?: string | null;
+          saved_from_kitchen_id?: string | null;
+          saved_from_recipe_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -194,6 +198,8 @@ export interface Database {
           computed_nutrition?: Record<string, unknown> | null;
           ingredient_matches?: Record<string, unknown>[] | null;
           created_by?: string | null;
+          saved_from_kitchen_id?: string | null;
+          saved_from_recipe_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -555,8 +561,10 @@ export interface Database {
           recipe_id: string | null;
           recipe_name: string;
           recipe_image_url: string | null;
-          meal_date: string;
-          meal_type: string;
+          post_type: string;
+          cook_log_id: string | null;
+          meal_date: string | null;
+          meal_type: string | null;
           caption: string | null;
           photo_url: string | null;
           like_count: number;
@@ -570,8 +578,10 @@ export interface Database {
           recipe_id?: string | null;
           recipe_name: string;
           recipe_image_url?: string | null;
-          meal_date: string;
-          meal_type: string;
+          post_type?: string;
+          cook_log_id?: string | null;
+          meal_date?: string | null;
+          meal_type?: string | null;
           caption?: string | null;
           photo_url?: string | null;
           like_count?: number;
@@ -585,8 +595,10 @@ export interface Database {
           recipe_id?: string | null;
           recipe_name?: string;
           recipe_image_url?: string | null;
-          meal_date?: string;
-          meal_type?: string;
+          post_type?: string;
+          cook_log_id?: string | null;
+          meal_date?: string | null;
+          meal_type?: string | null;
           caption?: string | null;
           photo_url?: string | null;
           like_count?: number;
