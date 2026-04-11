@@ -128,6 +128,7 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
     }
   },
 
+  // Phase 45: created_by establishes recipe ownership for creator-only editing
   createRecipe: async (recipe: RecipeInsert) => {
     set({ loading: true, error: null });
     try {
