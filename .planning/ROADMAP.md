@@ -183,7 +183,7 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. User can tap "I Cooked This" on any recipe detail page to log a cook with an optional photo and note
   2. After completing cooking mode, user is prompted with a bottom sheet to log the cook with photo and note
-  3. After a meal plan date passes, user is prompted to confirm whether they cooked the planned recipe
+  3. After a meal plan date passes, user is prompted to log whether they cooked the planned recipe
   4. Recipe detail shows a "Cooked N times" badge reflecting the total cook count, and a scrollable photo gallery of past cooks with dates and @handles
   5. Cook log photos are compressed and stored in Supabase Storage with CDN-backed display
 **Plans**: 3 plans
@@ -203,7 +203,10 @@ Plans:
   3. Comments are visible to household members and followers of the kitchen that owns the recipe (not globally public)
   4. Comment authors can delete their own comments
   5. Recipe comments are visually distinct from existing private recipe notes (different icon, label, and section placement)
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 47-01-PLAN.md — Migration, types, recipeCommentStore with threading logic (TDD)
+- [ ] 47-02-PLAN.md — Comment UI components + recipe detail integration
 **UI hint**: yes
 
 ### Phase 48: Feed Integration & Save to Collection
@@ -269,9 +272,9 @@ Plans:
 | 43. Budget, Profile & Social Feed | v7.0 | 3/3 | Complete | 2026-04-10 |
 | 44. Handle System & Identity Foundation | v8.0 | 5/4 | Complete   | 2026-04-11 |
 | 45. Recipe Attribution & Creator Permissions | v8.0 | 3/3 | Complete    | 2026-04-11 |
-| 46. Cook Log with Photos | v8.0 | 3/3 | Complete   | 2026-04-11 |
-| 47. Recipe Comments | v8.0 | 0/TBD | Not started | - |
+| 46. Cook Log with Photos | v8.0 | 3/3 | Complete    | 2026-04-11 |
+| 47. Recipe Comments | v8.0 | 0/2 | Not started | - |
 | 48. Feed Integration & Save to Collection | v8.0 | 0/TBD | Not started | - |
 
 ---
-*Last updated: 2026-04-11 after Phase 46 planning*
+*Last updated: 2026-04-11 after Phase 47 planning*
