@@ -19,9 +19,9 @@
 - [ ] **COOK-01**: User can tap "I Cooked This" on recipe detail to log a cook with optional photo and note
 - [ ] **COOK-02**: After completing cooking mode, user is prompted with a sheet to log the cook with photo + note
 - [ ] **COOK-03**: After a meal plan date passes, user is prompted to log whether they cooked the planned recipe
-- [ ] **COOK-04**: Recipe detail shows "Cooked N times" badge with count from cook logs
-- [ ] **COOK-05**: Recipe detail shows a photo gallery of past cooks with cook date and @handle of who cooked
-- [ ] **COOK-06**: Cook log photos are stored in Supabase Storage with compression
+- [x] **COOK-04**: Recipe detail shows "Cooked N times" badge with count from cook logs
+- [x] **COOK-05**: Recipe detail shows a photo gallery of past cooks with cook date and @handle of who cooked
+- [x] **COOK-06**: Cook log photos are stored in Supabase Storage with compression
 
 ## Comments
 
