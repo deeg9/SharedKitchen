@@ -20,31 +20,27 @@ interface StepCardProps {
   ingredients?: Ingredient[];
 }
 
-type StepType = 'MARINATING' | 'PREP' | 'COOKING';
+type StepType = 'PREP' | 'GRILLING' | 'SIMMERING' | 'BAKING' | 'MIXING' | 'MARINATING' | 'COOK';
 
 function deriveStepType(text: string): StepType {
   const lower = text.toLowerCase();
   if (lower.includes('marinat')) return 'MARINATING';
-  if (
-    lower.includes('prep') ||
-    lower.includes('chop') ||
-    lower.includes('dice') ||
-    lower.includes('slice') ||
-    lower.includes('mince') ||
-    lower.includes('peel') ||
-    lower.includes('wash') ||
-    lower.includes('rinse') ||
-    lower.includes('measure')
-  ) {
-    return 'PREP';
-  }
-  return 'COOKING';
+  if (/chop|dice|mince|slice|peel|wash|rinse|measure|prep/.test(lower)) return 'PREP';
+  if (/grill|sear|char/.test(lower)) return 'GRILLING';
+  if (/simmer|boil|reduce/.test(lower)) return 'SIMMERING';
+  if (/bake|roast/.test(lower)) return 'BAKING';
+  if (/mix|combine|whisk/.test(lower)) return 'MIXING';
+  return 'COOK';
 }
 
 const BADGE_STYLES: Record<StepType, { bg: string; text: string }> = {
-  MARINATING: { bg: colors.secondaryFixed, text: colors.secondary },
-  PREP: { bg: colors.primaryFixed, text: colors.primary },
-  COOKING: { bg: colors.secondaryContainer, text: colors.onSecondary },
+  PREP:       { bg: colors.secondaryFixed, text: colors.secondary },        // amber
+  GRILLING:   { bg: colors.errorContainer, text: colors.error },            // red
+  SIMMERING:  { bg: '#d0e4ff', text: '#00497e' },                           // blue (hardcoded — theme tertiaryContainer is dark green, not blue)
+  BAKING:     { bg: colors.secondaryFixed, text: colors.secondary },        // warm orange
+  MIXING:     { bg: colors.primaryFixed, text: colors.primary },            // green
+  MARINATING: { bg: colors.secondaryFixed, text: colors.secondary },        // amber
+  COOK:       { bg: colors.outlineVariant, text: colors.onSurfaceVariant }, // gray default
 };
 
 function parseTip(text: string): string | null {
@@ -148,7 +144,7 @@ const s = StyleSheet.create({
   },
   badgeText: {
     fontFamily: fontFamily.bodySemiBold,
-    fontSize: 10,
+    fontSize: 12,
     letterSpacing: 1,
   },
   instruction: {
