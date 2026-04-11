@@ -9,6 +9,7 @@ beforeEach(() => {
     initialized: false,
     loading: false,
     handle: null,
+    handleChangedAt: null,
     handleChecked: false,
   });
 });

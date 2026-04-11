@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { validateHandle } from '../lib/handle-utils';
 
 interface AuthState {
   session: Session | null;
@@ -72,6 +73,24 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   updateHandle: async (handle: string) => {
     const userId = get().user?.id;
     if (!userId) return { success: false, error: 'Not authenticated' };
+
+    const validation = validateHandle(handle);
+    if (!validation.valid) {
+      return { success: false, error: validation.error };
+    }
+
+    const { handleChangedAt } = get();
+    if (handleChangedAt) {
+      const lastChanged = new Date(handleChangedAt);
+      const daysSince = (Date.now() - lastChanged.getTime()) / (1000 * 60 * 60 * 24);
+      if (daysSince < 30) {
+        const daysLeft = Math.ceil(30 - daysSince);
+        return {
+          success: false,
+          error: `You can change your handle again in ${daysLeft} day${daysLeft === 1 ? '' : 's'}`,
+        };
+      }
+    }
 
     const { error } = await supabase
       .from('profiles')
