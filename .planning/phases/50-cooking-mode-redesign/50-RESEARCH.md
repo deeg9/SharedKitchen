@@ -288,12 +288,11 @@ No security concerns for this UI-only phase. [VERIFIED: all changes are client-s
 | A1 | SIMMERING should use blue hardcoded hex values (#d0e4ff/#00497e) since theme has no blue tokens | Pitfall 1 / Code Examples | Badge color would look wrong; might need to add theme tokens instead |
 | A2 | `deriveStepType` can use regex `.test()` for keyword matching without performance concern | Architecture Pattern 2 | Negligible -- function runs once per step change on short strings |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **SIMMERING blue color: hardcode or add theme token?**
+1. **SIMMERING blue color: hardcode or add theme token?** RESOLVED: Hardcode hex values in BADGE_STYLES. Implemented in Plan 50-01 Task 1.
    - What we know: Theme has no blue tokens. UI-SPEC wants blue for SIMMERING. tertiaryContainer is actually dark green.
-   - What's unclear: Whether to add new color tokens to colors.ts or hardcode hex in badge styles.
-   - Recommendation: Hardcode in BADGE_STYLES for now (minimal blast radius). Adding theme tokens is a design system decision beyond this phase.
+   - Decision: Hardcode in BADGE_STYLES for now (minimal blast radius). Adding theme tokens is a design system decision beyond this phase.
 
 ## Environment Availability
 
