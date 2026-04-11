@@ -137,7 +137,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - [x] **Phase 44: Handle System & Identity Foundation** - Per-user @handle usernames with onboarding enforcement and existing-user migration (completed 2026-04-11)
 - [x] **Phase 45: Recipe Attribution & Creator Permissions** - Creator identity on recipes with ownership-based edit permissions and @handle search (completed 2026-04-11)
 - [x] **Phase 46: Cook Log with Photos** - Cook logging from recipe detail, cooking mode, and meal plan with photo gallery and count badges (completed 2026-04-11)
-- [ ] **Phase 47: Recipe Comments** - Threaded recipe comments with visibility scoping and moderation
+- [x] **Phase 47: Recipe Comments** - Threaded recipe comments with visibility scoping and moderation (completed 2026-04-11)
 - [ ] **Phase 48: Feed Integration & Save to Collection** - Auto-post cook events to feed and save recipes from feed to own library
 
 ## Phase Details
@@ -206,7 +206,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 47-01-PLAN.md — Migration, types, recipeCommentStore with threading logic (TDD)
-- [ ] 47-02-PLAN.md — Comment UI components + recipe detail integration
+- [x] 47-02-PLAN.md — Comment UI components + recipe detail integration
 **UI hint**: yes
 
 ### Phase 48: Feed Integration & Save to Collection
@@ -273,7 +273,7 @@ Plans:
 | 44. Handle System & Identity Foundation | v8.0 | 5/4 | Complete   | 2026-04-11 |
 | 45. Recipe Attribution & Creator Permissions | v8.0 | 3/3 | Complete    | 2026-04-11 |
 | 46. Cook Log with Photos | v8.0 | 3/3 | Complete    | 2026-04-11 |
-| 47. Recipe Comments | v8.0 | 1/2 | In Progress|  |
+| 47. Recipe Comments | v8.0 | 2/2 | Complete   | 2026-04-11 |
 | 48. Feed Integration & Save to Collection | v8.0 | 0/TBD | Not started | - |
 
 ---
