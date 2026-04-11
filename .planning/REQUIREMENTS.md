@@ -35,11 +35,11 @@
 
 - [x] **FEED-01**: When a user logs a cook, a feed post is automatically created with the cook photo
 - [x] **FEED-02**: Feed posts from cook logs show recipe name, cook's @handle, photo, and optional note
-- [ ] **FEED-03**: Existing feed interactions (like, comment, save recipe) work on cook log feed posts
+- [x] **FEED-03**: Existing feed interactions (like, comment, save recipe) work on cook log feed posts
 
 ## Save to Collection
 
-- [ ] **SAVE-01**: User can save any recipe from the feed or another kitchen's profile to their own recipe library
+- [x] **SAVE-01**: User can save any recipe from the feed or another kitchen's profile to their own recipe library
 - [ ] **SAVE-02**: Saved recipes show "Saved from @handle's kitchen" attribution on recipe detail
 
 ## Future Requirements (Deferred)
