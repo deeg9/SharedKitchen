@@ -157,7 +157,7 @@ Plans:
 - [x] 44-01-PLAN.md — DB migration, handle-utils, authStore handle state (TDD)
 - [x] 44-02-PLAN.md — HandleInput component, onboarding step, blocking interstitial
 - [x] 44-03-PLAN.md — Display @handle across feed, profile, and recipe detail
-- [ ] 44-04-PLAN.md — Handle change with 30-day cooldown in Edit Profile
+- [x] 44-04-PLAN.md — Handle change with 30-day cooldown in Edit Profile
 **UI hint**: yes
 
 ### Phase 45: Recipe Attribution & Creator Permissions
@@ -259,7 +259,7 @@ Plans:
 | 41. Plan Tab Redesign | v7.0 | 2/2 | Complete | 2026-04-09 |
 | 42. Grocery List Redesign | v7.0 | 2/2 | Complete | 2026-04-10 |
 | 43. Budget, Profile & Social Feed | v7.0 | 3/3 | Complete | 2026-04-10 |
-| 44. Handle System & Identity Foundation | v8.0 | 4/4 | Complete   | 2026-04-11 |
+| 44. Handle System & Identity Foundation | v8.0 | 5/4 | Complete   | 2026-04-11 |
 | 45. Recipe Attribution & Creator Permissions | v8.0 | 0/TBD | Not started | - |
 | 46. Cook Log with Photos | v8.0 | 0/TBD | Not started | - |
 | 47. Recipe Comments | v8.0 | 0/TBD | Not started | - |
