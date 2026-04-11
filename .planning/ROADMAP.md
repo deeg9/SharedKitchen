@@ -130,7 +130,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 </details>
 
-### 🚧 v8.0 Social Recipes (In Progress)
+### v8.0 Social Recipes (In Progress)
 
 **Milestone Goal:** Make recipes social objects — owned by users with unique @handles, commentable, with cooking history, photo galleries, and feed integration.
 
@@ -186,7 +186,11 @@ Plans:
   3. After a meal plan date passes, user is prompted to confirm whether they cooked the planned recipe
   4. Recipe detail shows a "Cooked N times" badge reflecting the total cook count, and a scrollable photo gallery of past cooks with dates and @handles
   5. Cook log photos are compressed and stored in Supabase Storage with CDN-backed display
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 46-01-PLAN.md — Migration, types, cookLogStore, photo upload helper
+- [ ] 46-02-PLAN.md — Recipe detail UI: CookLogButton, CookCountBadge, CookLogSheet, CookPhotoGallery
+- [ ] 46-03-PLAN.md — CookingMode post-cook prompt + Plan tab past meal banner
 **UI hint**: yes
 
 ### Phase 47: Recipe Comments
@@ -264,10 +268,10 @@ Plans:
 | 42. Grocery List Redesign | v7.0 | 2/2 | Complete | 2026-04-10 |
 | 43. Budget, Profile & Social Feed | v7.0 | 3/3 | Complete | 2026-04-10 |
 | 44. Handle System & Identity Foundation | v8.0 | 5/4 | Complete   | 2026-04-11 |
-| 45. Recipe Attribution & Creator Permissions | v8.0 | 3/3 | Complete   | 2026-04-11 |
-| 46. Cook Log with Photos | v8.0 | 0/TBD | Not started | - |
+| 45. Recipe Attribution & Creator Permissions | v8.0 | 3/3 | Complete    | 2026-04-11 |
+| 46. Cook Log with Photos | v8.0 | 0/3 | Not started | - |
 | 47. Recipe Comments | v8.0 | 0/TBD | Not started | - |
 | 48. Feed Integration & Save to Collection | v8.0 | 0/TBD | Not started | - |
 
 ---
-*Last updated: 2026-04-10 after Phase 44 plan revision*
+*Last updated: 2026-04-11 after Phase 46 planning*
