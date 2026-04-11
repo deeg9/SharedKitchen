@@ -20,6 +20,8 @@ import { useRecipeStore } from '../../../src/stores/recipeStore';
 import { useSubscriptionStore } from '../../../src/stores/subscriptionStore';
 import { useSocialStore } from '../../../src/stores/socialStore';
 import { useGroceryStore } from '../../../src/stores/groceryStore';
+import { useRsvpStore } from '../../../src/stores/rsvpStore';
+import { useAuthStore } from '../../../src/stores/authStore';
 import { UpgradePrompt } from '../../../src/components/premium/UpgradePrompt';
 import { toDateString, makePlanKey } from '../../../src/lib/dates';
 import { generateSuggestions } from '../../../src/lib/suggestions';
@@ -34,7 +36,9 @@ import { TAB_BAR_HEIGHT } from '../../../src/lib/constants';
 export default function PlanScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { activeHouseholdId, households } = useHouseholdStore();
+  const { activeHouseholdId, households, members } = useHouseholdStore();
+  const rsvpStore = useRsvpStore();
+  const currentUser = useAuthStore((s) => s.user);
   const { myKitchenProfile, getOrCreateKitchenProfile, clearFeed } = useSocialStore();
   const [activeSegment, setActiveSegment] = useState<'plan' | 'feed'>('plan');
   const [viewMode, setViewMode] = useState<'day' | 'week'>('day');
@@ -84,6 +88,17 @@ export default function PlanScreen() {
     [activeSegment, clearFeed]
   );
 
+  // Derive household member props for DayViewMealSlot
+  const householdMemberProps = useMemo(() => {
+    return members.map((m) => ({
+      id: m.profiles?.id ?? m.user_id,
+      display_name: m.profiles?.display_name ?? 'User',
+      avatar_url: m.profiles?.avatar_url ?? null,
+    }));
+  }, [members]);
+
+  const memberUserIds = useMemo(() => householdMemberProps.map((m) => m.id), [householdMemberProps]);
+
   // Fetch meal plan on mount and week change
   useEffect(() => {
     if (activeHouseholdId) {
@@ -92,6 +107,18 @@ export default function PlanScreen() {
       fetchRecipes(activeHouseholdId);
     }
   }, [activeHouseholdId, weekOffset]);
+
+  // Fetch RSVPs after meal plans load and ensure defaults for all plans
+  useEffect(() => {
+    if (mealPlan.size === 0 || memberUserIds.length === 0) return;
+    const ids = Array.from(mealPlan.values())
+      .map((p) => p.id)
+      .filter(Boolean);
+    if (ids.length === 0) return;
+
+    rsvpStore.fetchRsvps(ids);
+    ids.forEach((id) => rsvpStore.ensureDefaults(id, memberUserIds));
+  }, [mealPlan.size, memberUserIds.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Reset selectedDayDate when weekOffset changes
   useEffect(() => {
@@ -118,6 +145,10 @@ export default function PlanScreen() {
     setEditSheetOpen(false);
     setSelectedDate(null);
   }, []);
+
+  const handleViewRecipe = useCallback((recipeId: string) => {
+    router.push(`/(app)/recipe/${recipeId}` as any);
+  }, [router]);
 
   // Generate AI suggestions from cooking history
   const suggestions = useMemo(() => {
@@ -234,12 +265,20 @@ export default function PlanScreen() {
                         <DayViewMealSlot
                           mealType="breakfast"
                           plan={breakfastPlan}
-                          onPress={() => handleMealPress(selectedDayDate, 'breakfast')}
+                          onEditPress={() => handleMealPress(selectedDayDate, 'breakfast')}
+                          onViewRecipe={breakfastPlan?.recipes ? () => handleViewRecipe(breakfastPlan.recipes!.id) : undefined}
+                          householdMembers={householdMemberProps}
+                          rsvps={breakfastPlan?.id ? rsvpStore.rsvps.get(breakfastPlan.id) ?? [] : []}
+                          onToggleRsvp={breakfastPlan?.id ? (userId) => rsvpStore.toggleRsvp(breakfastPlan.id, userId) : undefined}
                         />
                         <DayViewMealSlot
                           mealType="lunch"
                           plan={lunchPlan}
-                          onPress={() => handleMealPress(selectedDayDate, 'lunch')}
+                          onEditPress={() => handleMealPress(selectedDayDate, 'lunch')}
+                          onViewRecipe={lunchPlan?.recipes ? () => handleViewRecipe(lunchPlan.recipes!.id) : undefined}
+                          householdMembers={householdMemberProps}
+                          rsvps={lunchPlan?.id ? rsvpStore.rsvps.get(lunchPlan.id) ?? [] : []}
+                          onToggleRsvp={lunchPlan?.id ? (userId) => rsvpStore.toggleRsvp(lunchPlan.id, userId) : undefined}
                         />
                         <GroceryShortcutCard
                           itemCount={groceryItems.length}
