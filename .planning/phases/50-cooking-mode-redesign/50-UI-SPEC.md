@@ -31,8 +31,8 @@ Declared values (must be multiples of 4):
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| xs | 4px | Icon gaps, inline padding, ingredient row vertical padding |
-| sm | 8px | Compact element spacing, segment gaps, header vertical padding |
+| xs | 4px | Icon gaps, inline padding, ingredient row vertical padding, badge vertical padding, progress bar segment gap |
+| sm | 8px | Compact element spacing, header vertical padding, badge horizontal padding |
 | md | 16px | Default element spacing, horizontal padding, bottom nav padding |
 | lg | 24px | Section padding, step card horizontal padding, tip/ingredient card margins |
 | xl | 32px | Not used in this phase |
@@ -48,18 +48,20 @@ Uses existing `src/theme/typography.ts` tokens. Phase-specific assignments:
 
 | Role | Token | Size | Weight | Line Height | Usage |
 |------|-------|------|--------|-------------|-------|
-| Step instruction | headlineBold custom | 22px | 700 (PlusJakartaSans_700Bold) | 30px | Main step text, the dominant readable element |
+| Step instruction | headlineSemiBold custom | 22px | 600 (Inter_600SemiBold) | 30px | Main step text, the dominant readable element |
 | Step counter | titleMd | 16px | 600 (Inter_600SemiBold) | 24px | "Step 3 of 8" label in progress area |
 | Recipe name | bodySm | 12px | 400 (Inter_400Regular) | 16px | Uppercase recipe name below step counter |
-| Category badge | labelSm custom | 10px | 600 (Inter_600SemiBold) | 14px | "PREP", "GRILLING" pill text, uppercase, letter-spacing 1 |
+| Category badge | labelSm custom | 12px | 600 (Inter_600SemiBold) | 16px | "PREP", "GRILLING" pill text, uppercase, letter-spacing 1 |
 | Ingredient chip text | bodyMd | 14px | 400 (Inter_400Regular) | 20px | "2 cups flour" in ingredient rows |
 | Navigation button (primary) | titleMd | 16px | 600 (Inter_600SemiBold) | 24px | "Next Step", "Done Cooking" labels |
-| Navigation button (secondary) | titleMd | 16px | 600 (Inter_600SemiBold) | 24px | "Previous" label |
+| Navigation button (secondary) | titleMd | 16px | 600 (Inter_600SemiBold) | 24px | "Previous Step" label |
 | Tip title | labelLg custom | 14px | 600 (Inter_600SemiBold) | 20px | "Chef's Tip:" italic |
 | Tip body | bodyMd | 14px | 400 (Inter_400Regular) | 22px | Tip description text |
 | Ingredients pill | bodyMd | 14px | 400 (Inter_400Regular) | 20px | "Ingredients" center button |
-| Unit toggle | labelMd | 12px | 500 (Inter_500Medium) | 16px | "Metric" / "Imperial" toggle labels |
+| Unit toggle | labelMd | 12px | 400 (Inter_400Regular) | 16px | "Metric" / "Imperial" toggle labels |
 | Empty ingredient note | bodyMd | 14px | 400 (Inter_400Regular) | 20px | "No ingredients for this step" |
+
+Font sizes used: 12, 14, 16, 22 (4 sizes). Font weights used: 400 (regular), 600 (semibold) (2 weights).
 
 ---
 
@@ -80,13 +82,13 @@ Derived from existing theme tokens. Each category gets a tinted pill:
 
 | Category | Background | Text Color | Source Token |
 |----------|-----------|------------|--------------|
-| PREP | `#d3e8d5` (primaryFixed) | `#334537` (primary) | Existing pattern |
-| GRILLING | `#ffdad6` (errorContainer) | `#ba1a1a` (error) | Red/heat association |
-| SIMMERING | `#d3e8d5` (primaryFixed) | `#334537` (primary) | Calm green — reuse PREP palette with distinct label |
-| BAKING | `#ffdcc3` (secondaryFixed) | `#904d00` (secondary) | Warm amber/orange |
-| MIXING | `#dde6d2` (tertiaryFixed) | `#3b4436` (tertiary) | Earthy green variation |
+| PREP | `#ffdcc3` (secondaryFixed) | `#904d00` (secondary) | Amber association per CONTEXT.md |
+| GRILLING | `#ffdad6` (errorContainer) | `#ba1a1a` (error) | Red/heat association per CONTEXT.md |
+| SIMMERING | `#d0e4ff` (tertiaryContainer) | `#00497e` (tertiary) | Blue per CONTEXT.md |
+| BAKING | `#ffdcc3` (secondaryFixed) | `#904d00` (secondary) | Warm orange per CONTEXT.md |
+| MIXING | `#d3e8d5` (primaryFixed) | `#334537` (primary) | Green per CONTEXT.md |
 | MARINATING | `#ffdcc3` (secondaryFixed) | `#904d00` (secondary) | Existing pattern from v8 |
-| COOK (default) | `#fe932c` (secondaryContainer) | `#ffffff` (onSecondary) | Existing pattern from v8 |
+| COOK (default) | `#c3c8c1` (outlineVariant) | `#43493f` (onSurfaceVariant) | Gray default per CONTEXT.md |
 
 ### Done Cooking Button
 
@@ -105,20 +107,18 @@ Note: CONTEXT.md specified green "Done Cooking" — use `primary` (#334537) whic
 ```
 +---------------------------------------+
 | [X close]          [Metric|Imperial]  |  <- Header bar (safe area top padding)
+|                                       |
+|        Recipe Hero Image (180px)      |  <- Fixed header band, does NOT scroll
+|                                       |
 |---------------------------------------|
 | Step 3 of 8                           |  <- Progress: step counter (titleMd)
 | CHICKEN TIKKA MASALA                  |  <- Progress: recipe name (bodySm, uppercase)
 | [===|===|===|---|---|---|---|---]      |  <- Progress: segmented bar (4px height)
 |---------------------------------------|
-| +-----------------------------------+ |
-| |                                   | |
-| |        Recipe Hero Image          | |  <- 240px height, borderRadius xl (24px)
-| |                                   | |
-| +-----------------------------------+ |
-|                                       |
+|                                       |  <- Scrollable content area begins
 | [GRILLING]                            |  <- Category badge pill
 |                                       |
-| Heat the grill to medium-high.        |  <- Step instruction text (22px bold)
+| Heat the grill to medium-high.        |  <- Step instruction text (22px semibold)
 | Place marinated chicken on the        |
 | grill and cook 6-8 minutes per side.  |
 |                                       |
@@ -134,7 +134,7 @@ Note: CONTEXT.md specified green "Done Cooking" — use `primary` (#334537) whic
 | +-----------------------------------+ |
 |                                       |
 |---------------------------------------|
-| [< Previous]  [Ingredients]  [Next >]|  <- Fixed bottom navigation bar
+| [< Previous Step] [Ingredients] [Next >]| <- Fixed bottom navigation bar
 +---------------------------------------+
 ```
 
@@ -142,15 +142,14 @@ Note: CONTEXT.md specified green "Done Cooking" — use `primary` (#334537) whic
 
 | Property | Value |
 |----------|-------|
-| Height | 240px |
-| Width | 100% (minus 24px horizontal padding each side) |
-| Border radius | 24px (borderRadius.xl) |
+| Height | 180px |
+| Width | 100% (full bleed within safe area) |
 | Content fit | cover |
-| Transition | 200ms fade |
+| Transition | 200ms fade on step change |
 | Fallback | getDefaultRecipeImage() — existing utility |
-| Position | Top of scrollable content area, scrolls with content |
+| Position | Fixed header band — persistent at top, does NOT scroll with content |
 
-Note: CONTEXT.md specified "fixed header band (~180px)" for the hero. After reviewing the existing implementation which uses 240px in-scroll, the redesign keeps the hero image inside the scrollable area at 240px. A fixed 180px band would reduce content space and cause layout complexity with safe areas. The hero scrolling with content provides better UX on smaller screens while still showing the image at the start of each step.
+Per CONTEXT.md locked decision: "Fixed header band (~180px) with recipe hero photo, persistent at top of each step, step content scrolls beneath."
 
 ### Progress Bar
 
@@ -158,23 +157,23 @@ Note: CONTEXT.md specified "fixed header band (~180px)" for the hero. After revi
 |----------|-------|
 | Type | Horizontal segmented bar |
 | Segment height | 4px |
-| Segment gap | 2px margin-right |
+| Segment gap | 4px (xs token) margin-right |
 | Completed color | `#334537` (primary) |
 | Current color | `#334537` (primary) — same as completed, filled up to current |
 | Remaining color | `#c3c8c1` (outlineVariant) |
 | Border radius | 2px per segment |
-| Position | Below header, above scroll content |
+| Position | Below header band, above scroll content |
 
 ### Category Badge
 
 | Property | Value |
 |----------|-------|
-| Horizontal padding | 10px (sm + 2) |
-| Vertical padding | 5px (xs + 1) |
+| Horizontal padding | 8px (sm token) |
+| Vertical padding | 4px (xs token) |
 | Border radius | 9999px (full) |
-| Text | uppercase, 10px, semibold, letter-spacing 1 |
-| Position | Below hero image, above instruction text, aligned left |
-| Margin top | 24px (lg) from hero image |
+| Text | uppercase, 12px, semibold (600), letter-spacing 1 |
+| Position | Top of scrollable area, above instruction text, aligned left |
+| Margin top | 24px (lg) from top of scroll area |
 
 ### Per-Step Ingredient Card
 
@@ -184,7 +183,7 @@ Note: CONTEXT.md specified "fixed header band (~180px)" for the hero. After revi
 | Border radius | 16px (borderRadius.lg) |
 | Padding | 16px (md) |
 | Margin top | 24px (lg) from instruction or tip |
-| Row height | Variable, 4px + 2px vertical padding per row |
+| Row height | Variable, 4px vertical padding per row |
 | Dot indicator | 8x8px circle, primaryContainer color |
 | Dot-to-text gap | 8px (sm) |
 | Empty state | Text "No ingredients for this step" in bodyMd, onSurfaceVariant color |
@@ -197,7 +196,7 @@ Note: CONTEXT.md specified "fixed header band (~180px)" for the hero. After revi
 | Layout | flexDirection row, space-between |
 | Horizontal padding | 16px (md) |
 | Vertical padding | 16px (md) top, safe area bottom + 16px bottom |
-| Previous button | Text + left arrow icon, onSurfaceVariant color, disabled at step 0 (opacity 0.3) |
+| Previous Step button | Text + left arrow icon, onSurfaceVariant color, disabled at step 0 (opacity 0.3) |
 | Ingredients button | Pill shape, surfaceContainerLow background, full border radius, 16px horizontal / 8px vertical padding |
 | Next Step button | Pill shape, primary background, onPrimary text, full border radius, 24px horizontal / 16px vertical padding |
 | Done Cooking button | Same as Next Step, replaces it on last step, checkmark icon instead of arrow |
@@ -227,9 +226,9 @@ Note: CONTEXT.md specified "fixed header band (~180px)" for the hero. After revi
 | Interaction | Behavior |
 |-------------|----------|
 | Tap "Next Step" | Advance to next step, haptic feedback (selectionAsync) |
-| Tap "Previous" | Go to previous step, haptic feedback (selectionAsync) |
+| Tap "Previous Step" | Go to previous step, haptic feedback (selectionAsync) |
 | Tap "Done Cooking" (last step) | Trigger onCookComplete callback |
-| Previous at step 0 | Button disabled, opacity 0.3 |
+| Previous Step at step 0 | Button disabled, opacity 0.3 |
 | Step transition | ScrollView re-keys on step change (key={`step-${currentStep}`}) |
 
 ### Step Categorization
@@ -267,7 +266,7 @@ Matching is case-insensitive substring search on step text.
 | Step counter | "Step {n} of {total}" |
 | Empty ingredient state | "No ingredients for this step" |
 | Ingredients pill | "Ingredients" |
-| Previous button | "Previous" |
+| Previous button | "Previous Step" |
 | Close button | Icon-only (X), accessibilityLabel "Close cooking mode" |
 | Unit toggle labels | "Metric" / "Imperial" |
 | Tip callout title | "Chef's Tip:" (italic) |
@@ -299,11 +298,11 @@ Components to create or modify for this phase:
 
 ### Key Modifications
 
-**CookingMode.tsx**: Add expanded category keyword map (GRILLING, SIMMERING, BAKING, MIXING beyond existing PREP/MARINATING/COOKING). Move `getStepIngredients` logic to render ingredient chips below step text. Ensure "Done Cooking" on last step uses primary color with checkmark icon (already partially implemented). Verify bottom nav layout matches contract.
+**CookingMode.tsx**: Restructure layout so hero image is a fixed 180px header band (not scrollable). Add expanded category keyword map (GRILLING, SIMMERING, BAKING, MIXING beyond existing PREP/MARINATING/COOKING). Move `getStepIngredients` logic to render ingredient chips below step text. Ensure "Done Cooking" on last step uses primary color with checkmark icon (already partially implemented). Verify bottom nav layout matches contract.
 
-**StepCard.tsx**: Expand `deriveStepType` with full keyword list from CONTEXT.md decisions. Add GRILLING, SIMMERING, BAKING, MIXING badge color mappings. Ensure ingredient chips render with dot + amount/unit/name format. Add empty ingredient state text. Keep existing timer and tip rendering.
+**StepCard.tsx**: Expand `deriveStepType` with full keyword list from CONTEXT.md decisions. Add GRILLING, SIMMERING, BAKING, MIXING badge color mappings. Update SIMMERING to use blue tones. Ensure ingredient chips render with dot + amount/unit/name format. Add empty ingredient state text. Keep existing timer and tip rendering.
 
-**CookingProgress.tsx**: Already implements segmented progress bar. Verify segment colors match contract (primary for completed, outlineVariant for remaining). No structural changes needed.
+**CookingProgress.tsx**: Already implements segmented progress bar. Verify segment gap is 4px (xs token). Verify segment colors match contract (primary for completed, outlineVariant for remaining). No structural changes needed.
 
 ---
 
