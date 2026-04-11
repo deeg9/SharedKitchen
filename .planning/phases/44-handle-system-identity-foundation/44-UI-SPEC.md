@@ -50,21 +50,20 @@ Source: `src/theme/spacing.ts` (existing scale)
 
 | Role | Token | Size | Weight | Line Height | Font |
 |------|-------|------|--------|-------------|------|
-| Body | bodyLg | 16px | 400 (Regular) | 24px (1.5) | Inter |
-| Body secondary | bodyMd | 14px | 400 (Regular) | 20px (1.43) | Inter |
-| Label | labelLg | 14px | 600 (SemiBold) | 20px (1.43) | Inter |
-| Heading | headlineMd | 24px | 700 (Bold) | 32px (1.33) | Plus Jakarta Sans |
-| Display | displayLg | 36px | 800 (ExtraBold) | 44px (1.22) | Plus Jakarta Sans |
+| Body small | bodySm | 12px | 400 (Regular) | 16px (1.33) | Inter |
+| Body | bodyMd | 14px | 400 (Regular) | 20px (1.43) | Inter |
+| Body large / Label | bodyLg | 16px | 400 (Regular) | 24px (1.5) | Inter |
+| Heading | headlineMd | 24px | 600 (SemiBold) | 32px (1.33) | Plus Jakarta Sans |
 
-Phase 44 uses these existing tokens only. No new typography tokens needed.
+Phase 44 uses exactly 4 sizes (12, 14, 16, 24px) and 2 weights (400 Regular, 600 SemiBold). No new typography tokens needed.
 
-- Handle display: `labelLg` (14px SemiBold) with `@` prefix rendered inline
+- Handle display: `bodyMd` (14px Regular) with `@` prefix, weight overridden to 600 (SemiBold) via `labelLg` alias
 - Handle input value: `bodyLg` (16px Regular)
-- Validation messages: `bodySm` (12px Regular, line-height 16px)
-- Interstitial heading: `headlineMd` (24px Bold)
+- Validation messages: `bodySm` (12px Regular)
+- Interstitial heading: `headlineMd` (24px SemiBold)
 - Interstitial body: `bodyLg` (16px Regular)
 
-Source: `src/theme/typography.ts` (existing scale)
+Source: `src/theme/typography.ts` (existing scale, weight constrained for Phase 44)
 
 ---
 
@@ -83,12 +82,12 @@ Accent reserved for:
 - `@handle` text in display contexts (on `onSurface` backgrounds)
 
 Additional semantic colors used:
-- `#904d00` (secondary) — suggestion chip text when tapped/selected
-- `#737872` (outline) — handle input border in default/unfocused state
-- `#434843` (onSurfaceVariant) — placeholder text, helper text
-- `#c3c8c1` (outlineVariant) — handle input border in disabled state
-- `#ffffff` (onPrimary) — CTA button text
-- `#1b1c1a` (onSurface) — input value text, heading text
+- `#904d00` (secondary) -- suggestion chip text when tapped/selected
+- `#737872` (outline) -- handle input border in default/unfocused state
+- `#434843` (onSurfaceVariant) -- placeholder text, helper text
+- `#c3c8c1` (outlineVariant) -- handle input border in disabled state
+- `#ffffff` (onPrimary) -- CTA button text
+- `#1b1c1a` (onSurface) -- input value text, heading text
 
 Source: `src/theme/colors.ts` (existing MD3 tokens)
 
@@ -149,7 +148,7 @@ Source: `src/theme/colors.ts` (existing MD3 tokens)
 - Horizontal row, `sm` (8px) gap between chips
 - Each chip: `surfaceContainerHigh` background, `borderRadius.full` (pill), height 36px
 - Chip padding: horizontal `md` (16px), vertical `sm` (8px)
-- Chip text: `labelLg` (14px SemiBold), `onSurface` color
+- Chip text: `bodyMd` (14px) weight 600 (SemiBold), `onSurface` color
 
 ### Interaction
 - Tap chip: populate HandleInput with that value, trigger availability check
@@ -160,36 +159,39 @@ Source: `src/theme/colors.ts` (existing MD3 tokens)
 
 ## HandleSetupInterstitial Specification (Existing Users)
 
+### Focal Point
+The HandleInput field is the focal point of this screen. The vertical layout centers the user's attention on entering their handle, with heading and body text above providing context, and suggestions below providing shortcuts.
+
 ### Layout
 - Full-screen overlay on `surface` background, no dismiss gesture (blocking)
 - Safe area insets respected (top + bottom)
 - Vertical layout, centered content:
   - Top: `xl` (32px) padding from safe area
-  - Heading: "Choose your handle" — `headlineMd`, `onSurface`
-  - Body: "Pick a unique @username that identifies you across SharedKitchen." — `bodyLg`, `onSurfaceVariant`, `sm` (8px) below heading
-  - HandleInput: `lg` (24px) below body text
+  - Heading: "Choose your handle" -- `headlineMd`, `onSurface`
+  - Body: "Pick a unique @username that identifies you across SharedKitchen." -- `bodyLg`, `onSurfaceVariant`, `sm` (8px) below heading
+  - HandleInput: `lg` (24px) below body text (focal point)
   - HandleSuggestions: `md` (16px) below input
   - CTA button: pinned to bottom with `xl` (32px) padding from safe area bottom
-- CTA button: "Claim @{handle}" — full width, height 48px, `primary` background, `onPrimary` text, `borderRadius.md` (12px), `labelLg` typography
+- CTA button: "Claim @{handle}" -- full width, height 48px, `primary` background, `onPrimary` text, `borderRadius.md` (12px), `bodyMd` (14px) weight 600 (SemiBold)
 - CTA disabled state: `surfaceContainerHigh` background, `onSurfaceVariant` text, when handle is empty or invalid
 
 ### Interaction
-- Cannot be dismissed — no back button, no swipe, no backdrop tap
+- Cannot be dismissed -- no back button, no swipe, no backdrop tap
 - Appears on app launch when `profiles.handle` is NULL for the authenticated user
 - After successful claim: navigate to normal app with haptic success feedback (`expo-haptics` notificationAsync success)
 - Loading state on CTA: replace text with ActivityIndicator while Supabase mutation runs
 
 ---
 
-## HandleSetupStep Specification (New Users — Onboarding)
+## HandleSetupStep Specification (New Users -- Onboarding)
 
 ### Layout
 - Identical visual treatment to HandleSetupInterstitial content area
 - Fits within existing onboarding step container
-- Heading: "Pick your handle" — `headlineMd`
-- Body: "This is your unique @username on SharedKitchen." — `bodyLg`, `onSurfaceVariant`
+- Heading: "Pick your handle" -- `headlineMd`
+- Body: "This is your unique @username on SharedKitchen." -- `bodyLg`, `onSurfaceVariant`
 - HandleInput + HandleSuggestions below
-- "Continue" button at bottom (standard onboarding CTA pattern)
+- "Continue to kitchen" button at bottom (standard onboarding CTA pattern)
 
 ### Integration
 - Inserted as onboarding step 1 (after Welcome, before CreateHousehold)
@@ -203,7 +205,7 @@ Source: `src/theme/colors.ts` (existing MD3 tokens)
 
 ### Format
 - Always rendered as `@{handle}` with the `@` character included
-- Typography: `labelLg` (14px SemiBold) for inline display
+- Typography: `bodyMd` (14px) weight 600 (SemiBold) for inline display
 - Color: `onSurfaceVariant` (#434843) in secondary contexts, `onSurface` (#1b1c1a) in primary contexts
 
 ### Display Locations (Phase 44 scope)
@@ -217,7 +219,7 @@ Source: `src/theme/colors.ts` (existing MD3 tokens)
 ### Feed Post Handle Integration
 - Replace display_name as primary label on feed post author line
 - Show display_name as secondary text in `bodySm` (12px), `onSurfaceVariant`
-- Format: `@handle` (labelLg) + line break + `Display Name` (bodySm)
+- Format: `@handle` (bodyMd SemiBold) + line break + `Display Name` (bodySm)
 
 ### Profile Screen Handle Display
 - Below avatar and display_name
@@ -231,7 +233,7 @@ Source: `src/theme/colors.ts` (existing MD3 tokens)
 | Element | Copy |
 |---------|------|
 | Primary CTA (interstitial) | "Claim @{handle}" (dynamic with entered handle) |
-| Primary CTA (onboarding) | "Continue" |
+| Primary CTA (onboarding) | "Continue to kitchen" |
 | Primary CTA disabled | "Choose a handle" |
 | Empty state heading | "Choose your handle" |
 | Empty state body | "Pick a unique @username that identifies you across SharedKitchen." |
