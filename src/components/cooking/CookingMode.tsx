@@ -25,9 +25,10 @@ const UNIT_PREF_KEY = 'unit_preference';
 interface CookingModeProps {
   recipe: Recipe;
   onClose: () => void;
+  onCookComplete?: () => void;
 }
 
-export function CookingMode({ recipe, onClose }: CookingModeProps) {
+export function CookingMode({ recipe, onClose, onCookComplete }: CookingModeProps) {
   const insets = useSafeAreaInsets();
   const [currentStep, setCurrentStep] = useState(0);
   const [unitSystem, setUnitSystem] = useState<UnitSystem>('imperial');
@@ -71,9 +72,13 @@ export function CookingMode({ recipe, onClose }: CookingModeProps) {
       goToStep(currentStep + 1);
     } else {
       // Last step -> Done Cooking
-      onClose();
+      if (onCookComplete) {
+        onCookComplete();
+      } else {
+        onClose();
+      }
     }
-  }, [currentStep, totalSteps, goToStep, onClose]);
+  }, [currentStep, totalSteps, goToStep, onClose, onCookComplete]);
 
   // Ingredient matching: scan instruction text for ingredient names
   const getStepIngredients = useCallback((stepIndex: number): Ingredient[] => {
@@ -168,7 +173,7 @@ export function CookingMode({ recipe, onClose }: CookingModeProps) {
         {/* Next / Done button */}
         {isLastStep ? (
           <Pressable
-            onPress={onClose}
+            onPress={onCookComplete ?? onClose}
             style={s.nextBtn}
             accessibilityRole="button"
             accessibilityLabel="Done cooking"
