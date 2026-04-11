@@ -33,6 +33,7 @@ import { PresenceAvatarStack } from '../../../src/components/presence/PresenceAv
 import { useAuthStore } from '../../../src/stores/authStore';
 import { supabase } from '../../../src/lib/supabase';
 import { CreatorAttribution } from '../../../src/components/recipes/CreatorAttribution';
+import { SavedFromAttribution } from '../../../src/components/recipes/SavedFromAttribution';
 import { useCookLogStore } from '../../../src/stores/cookLogStore';
 import { CookLogButton } from '../../../src/components/recipes/CookLogButton';
 import { CookCountBadge } from '../../../src/components/recipes/CookCountBadge';
@@ -259,6 +260,9 @@ export default function RecipeDetailScreen() {
               avatarUrl={creatorAvatarUrl}
               creatorId={recipe.created_by}
             />
+          )}
+          {recipe?.saved_from_kitchen_id && (
+            <SavedFromAttribution savedFromKitchenId={recipe.saved_from_kitchen_id} />
           )}
 
           {/* Rating pill + Cook count badge */}
@@ -488,6 +492,29 @@ export default function RecipeDetailScreen() {
             color={isFavorite ? colors.error : colors.secondary}
           />
         </Pressable>
+        {recipe && recipe.household_id !== activeHouseholdId && !recipe.saved_from_recipe_id && (
+          <Pressable
+            onPress={async () => {
+              const { useSocialStore } = await import('../../../src/stores/socialStore');
+              const myKitchenId = useSocialStore.getState().myKitchenProfile?.id;
+              if (!myKitchenId || !activeHouseholdId || !userId) return;
+              const result = await supabase.rpc('clone_recipe_to_household', {
+                p_source_recipe_id: recipe.id,
+                p_target_household_id: activeHouseholdId,
+                p_source_kitchen_id: myKitchenId,
+                p_created_by: userId,
+              });
+              if (!result.error) {
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              }
+            }}
+            style={s.favButton}
+            hitSlop={8}
+            testID="recipe-detail-save-button"
+          >
+            <MaterialCommunityIcons name="bookmark-plus-outline" size={24} color={colors.primary} />
+          </Pressable>
+        )}
       </View>
 
       {/* Day picker sheet */}
