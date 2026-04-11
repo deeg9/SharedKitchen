@@ -173,7 +173,7 @@ Plans:
 Plans:
 - [x] 45-01-PLAN.md — Migration: backfill legacy recipes + creator-scoped RLS policies
 - [ ] 45-02-PLAN.md — Creator attribution UI + conditional edit button on recipe detail
-- [ ] 45-03-PLAN.md — People search tab + public profile page
+- [x] 45-03-PLAN.md — People search tab + public profile page
 **UI hint**: yes
 
 ### Phase 46: Cook Log with Photos
@@ -264,7 +264,7 @@ Plans:
 | 42. Grocery List Redesign | v7.0 | 2/2 | Complete | 2026-04-10 |
 | 43. Budget, Profile & Social Feed | v7.0 | 3/3 | Complete | 2026-04-10 |
 | 44. Handle System & Identity Foundation | v8.0 | 5/4 | Complete   | 2026-04-11 |
-| 45. Recipe Attribution & Creator Permissions | v8.0 | 1/3 | In Progress|  |
+| 45. Recipe Attribution & Creator Permissions | v8.0 | 2/3 | In Progress|  |
 | 46. Cook Log with Photos | v8.0 | 0/TBD | Not started | - |
 | 47. Recipe Comments | v8.0 | 0/TBD | Not started | - |
 | 48. Feed Integration & Save to Collection | v8.0 | 0/TBD | Not started | - |

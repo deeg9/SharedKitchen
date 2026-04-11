@@ -4,7 +4,7 @@
 
 - [x] **IDEN-01**: User can set a unique @handle during signup that is validated for uniqueness and format
 - [x] **IDEN-02**: Existing users are prompted with a blocking interstitial to set their @handle on first launch after v8.0 update
-- [ ] **IDEN-03**: User can search for other users by @handle across the app
+- [x] **IDEN-03**: User can search for other users by @handle across the app
 - [x] **IDEN-04**: @handle is displayed on all user-generated content (recipes, comments, cook logs, feed posts)
 
 ## Attribution
