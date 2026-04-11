@@ -33,10 +33,10 @@ describe('onboardingStore', () => {
       expect(useOnboardingStore.getState().currentStep).toBe(2);
     });
 
-    it('should not exceed step 5', () => {
-      useOnboardingStore.setState({ currentStep: 5 });
+    it('should not exceed step 6', () => {
+      useOnboardingStore.setState({ currentStep: 6 });
       useOnboardingStore.getState().nextStep();
-      expect(useOnboardingStore.getState().currentStep).toBe(5);
+      expect(useOnboardingStore.getState().currentStep).toBe(6);
     });
   });
 

@@ -25,6 +25,7 @@ import { PermissionPrompt } from '../src/components/notifications/PermissionProm
 import { ErrorBoundary } from '../src/components/ErrorBoundary';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ShareIntentProvider } from 'expo-share-intent';
+import { HandleSetupInterstitial } from '../src/components/handle/HandleSetupInterstitial';
 
 // Prevent auto-hiding splash screen
 SplashScreen.preventAutoHideAsync();
@@ -32,10 +33,11 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const router = useRouter();
   const segments = useSegments();
-  const { session, initialized, setSession, setInitialized } = useAuthStore();
+  const { session, initialized, setSession, setInitialized, handle, handleChecked, checkHandle } = useAuthStore();
   const { completed: onboardingCompleted, initialized: onboardingInitialized, checkOnboardingStatus } = useOnboardingStore();
   const { households, fetchHouseholds } = useHouseholdStore();
   const [onboardingChecked, setOnboardingChecked] = useState(false);
+  const [showHandleInterstitial, setShowHandleInterstitial] = useState(false);
 
   // Push notification setup
   useNotificationSetup();
@@ -85,18 +87,31 @@ export default function RootLayout() {
     const check = async () => {
       await checkOnboardingStatus();
       await fetchHouseholds();
+      await checkHandle();
       setOnboardingChecked(true);
     };
 
     check();
   }, [initialized, session]);
 
+  // Show handle interstitial for existing users without a handle
+  useEffect(() => {
+    if (!initialized || !session || !onboardingChecked) return;
+    if (handleChecked && handle === null && onboardingCompleted) {
+      setShowHandleInterstitial(true);
+    } else {
+      setShowHandleInterstitial(false);
+    }
+  }, [initialized, session, onboardingChecked, handleChecked, handle, onboardingCompleted]);
+
   // Hide splash screen when ready
   useEffect(() => {
     if (fontsLoaded && initialized) {
+      // If user is logged in, wait for handle check before hiding splash
+      if (session && !handleChecked) return;
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, initialized]);
+  }, [fontsLoaded, initialized, session, handleChecked]);
 
   // Auth-gated navigation with onboarding check
   useEffect(() => {
@@ -137,6 +152,11 @@ export default function RootLayout() {
             <PermissionPrompt isOpen={showPrompt} onEnable={handleEnable} onDismiss={handleDismiss} />
           </ColorSchemeProvider>
         </StripeProvider>
+        {showHandleInterstitial && (
+          <HandleSetupInterstitial
+            onComplete={() => setShowHandleInterstitial(false)}
+          />
+        )}
       </ShareIntentProvider>
     </GestureHandlerRootView>
   );

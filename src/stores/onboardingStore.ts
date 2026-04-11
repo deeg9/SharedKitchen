@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ONBOARDING_KEY = 'mise_onboarding_completed';
 
-export type OnboardingStep = 0 | 1 | 2 | 3 | 4 | 5;
+export type OnboardingStep = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 interface OnboardingState {
   currentStep: OnboardingStep;
@@ -31,7 +31,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
 
   nextStep: () => {
     const { currentStep } = get();
-    if (currentStep < 5) {
+    if (currentStep < 6) {
       set({ currentStep: (currentStep + 1) as OnboardingStep });
     }
   },
