@@ -147,7 +147,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 **Milestone Goal:** Redesign the cooking mode into a beautiful step-by-step experience and enhance social cooking features with photo comments and co-cook tagging.
 
 - [x] **Phase 49: Tech Debt & Type Safety** - RLS scoping, store-level validation enforcement, and TypeScript type fixes from v8.0 (gap closure in progress) (completed 2026-04-11)
-- [ ] **Phase 50: Cooking Mode Redesign** - Recipe hero image, step categories, per-step ingredients, progress bar, and enhanced navigation
+- [x] **Phase 50: Cooking Mode Redesign** - Recipe hero image, step categories, per-step ingredients, progress bar, and enhanced navigation (completed 2026-04-11)
 - [ ] **Phase 51: Comment Photo Attachments** - Camera icon in comment input, thumbnail display, tap-to-expand, Supabase Storage
 - [ ] **Phase 52: Co-Cook Tagging** - "Who did you cook with?" @handle mentions on cook log posts with feed display
 
@@ -179,10 +179,10 @@ Plans:
   3. Each step shows only the ingredients needed for that specific step rather than the full recipe ingredient list
   4. A segmented progress bar at the top shows the cook's position across all steps, and Previous / Ingredients / Next Step buttons provide clear navigation
   5. A Metric/Imperial toggle at the top converts all ingredient amounts between measurement systems within the cooking view
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 50-01-PLAN.md — Expand StepCard categories, fix ingredient conversion, add empty state
-- [ ] 50-02-PLAN.md — Move hero to fixed header, progress bar gap, bottom nav copy, visual verification
+- [x] 50-02-PLAN.md — Move hero to fixed header, progress bar gap, bottom nav copy, visual verification
 **UI hint**: yes
 
 ### Phase 51: Comment Photo Attachments
@@ -263,7 +263,7 @@ Plans:
 | 47. Recipe Comments | v8.0 | 2/2 | Complete | 2026-04-11 |
 | 48. Feed Integration & Save to Collection | v8.0 | 3/3 | Complete | 2026-04-11 |
 | 49. Tech Debt & Type Safety | v9.0 | 4/4 | Complete    | 2026-04-11 |
-| 50. Cooking Mode Redesign | v9.0 | 1/2 | In Progress|  |
+| 50. Cooking Mode Redesign | v9.0 | 2/2 | Complete    | 2026-04-11 |
 | 51. Comment Photo Attachments | v9.0 | 0/0 | Not started | - |
 | 52. Co-Cook Tagging | v9.0 | 0/0 | Not started | - |
 
