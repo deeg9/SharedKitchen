@@ -220,7 +220,7 @@ Plans:
   4. Saved recipes display "Saved from @handle's kitchen" attribution on the recipe detail page
 **Plans**: 3 plans
 Plans:
-- [ ] 48-01-PLAN.md — Migration, types, cookLogStore feed post hook
+- [x] 48-01-PLAN.md — Migration, types, cookLogStore feed post hook
 - [ ] 48-02-PLAN.md — FeedCard cook-log rendering + saveRecipeFromPost RPC rewrite
 - [ ] 48-03-PLAN.md — SavedFromAttribution component + recipe detail integration
 **UI hint**: yes
@@ -278,7 +278,7 @@ Plans:
 | 45. Recipe Attribution & Creator Permissions | v8.0 | 3/3 | Complete    | 2026-04-11 |
 | 46. Cook Log with Photos | v8.0 | 3/3 | Complete    | 2026-04-11 |
 | 47. Recipe Comments | v8.0 | 2/2 | Complete    | 2026-04-11 |
-| 48. Feed Integration & Save to Collection | v8.0 | 0/3 | Not started | - |
+| 48. Feed Integration & Save to Collection | v8.0 | 1/3 | In Progress|  |
 
 ---
 *Last updated: 2026-04-11 after Phase 48 planning*

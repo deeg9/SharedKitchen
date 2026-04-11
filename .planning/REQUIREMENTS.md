@@ -33,8 +33,8 @@
 
 ## Feed Integration
 
-- [ ] **FEED-01**: When a user logs a cook, a feed post is automatically created with the cook photo
-- [ ] **FEED-02**: Feed posts from cook logs show recipe name, cook's @handle, photo, and optional note
+- [x] **FEED-01**: When a user logs a cook, a feed post is automatically created with the cook photo
+- [x] **FEED-02**: Feed posts from cook logs show recipe name, cook's @handle, photo, and optional note
 - [ ] **FEED-03**: Existing feed interactions (like, comment, save recipe) work on cook log feed posts
 
 ## Save to Collection
