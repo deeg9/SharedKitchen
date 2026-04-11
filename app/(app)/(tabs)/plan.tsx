@@ -350,7 +350,7 @@ export default function PlanScreen() {
                 )}
               </>
             )}
-          </ScrollView>}
+          </ScrollView>
 
           {/* Surprise Me FAB */}
           <Pressable
