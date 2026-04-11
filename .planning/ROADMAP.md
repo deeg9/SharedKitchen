@@ -153,8 +153,8 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
   4. @handle input validates format (lowercase alphanumeric + underscores), checks uniqueness in real time, and rejects reserved words
 **Plans**: 5 plans
 Plans:
-- [ ] 44-00-PLAN.md — Wave 0 test stubs for HandleInput, HandleSetupStep, HandleSetupInterstitial, FeedCard
-- [ ] 44-01-PLAN.md — DB migration, handle-utils, authStore handle state (TDD)
+- [x] 44-00-PLAN.md — Wave 0 test stubs for HandleInput, HandleSetupStep, HandleSetupInterstitial, FeedCard
+- [x] 44-01-PLAN.md — DB migration, handle-utils, authStore handle state (TDD)
 - [ ] 44-02-PLAN.md — HandleInput component, onboarding step, blocking interstitial
 - [ ] 44-03-PLAN.md — Display @handle across feed, profile, and recipe detail
 - [ ] 44-04-PLAN.md — Handle change with 30-day cooldown in Edit Profile
@@ -259,7 +259,7 @@ Plans:
 | 41. Plan Tab Redesign | v7.0 | 2/2 | Complete | 2026-04-09 |
 | 42. Grocery List Redesign | v7.0 | 2/2 | Complete | 2026-04-10 |
 | 43. Budget, Profile & Social Feed | v7.0 | 3/3 | Complete | 2026-04-10 |
-| 44. Handle System & Identity Foundation | v8.0 | 0/5 | Not started | - |
+| 44. Handle System & Identity Foundation | v8.0 | 2/4 | In Progress|  |
 | 45. Recipe Attribution & Creator Permissions | v8.0 | 0/TBD | Not started | - |
 | 46. Cook Log with Photos | v8.0 | 0/TBD | Not started | - |
 | 47. Recipe Comments | v8.0 | 0/TBD | Not started | - |
