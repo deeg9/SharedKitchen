@@ -902,3 +902,29 @@ export interface CookLogInsert {
 export interface CookLogWithProfile extends CookLog {
   profiles: { handle: string | null; avatar_url: string | null } | null;
 }
+
+/** Recipe comment types */
+export interface RecipeComment {
+  id: string;
+  recipe_id: string;
+  user_id: string;
+  parent_id: string | null;
+  body: string;
+  created_at: string;
+}
+
+export interface RecipeCommentInsert {
+  recipe_id: string;
+  user_id: string;
+  parent_id?: string | null;
+  body: string;
+}
+
+export interface RecipeCommentWithProfile extends RecipeComment {
+  profiles: { handle: string | null; avatar_url: string | null } | null;
+}
+
+export interface ThreadedComment {
+  comment: RecipeCommentWithProfile;
+  replies: RecipeCommentWithProfile[];
+}
