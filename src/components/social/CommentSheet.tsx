@@ -22,7 +22,7 @@ interface CommentSheetProps {
   onClose: () => void;
   postId: string;
   myKitchenId: string;
-  kitchenProfiles: Map<string, { display_name: string; avatar_url: string | null }>;
+  kitchenProfiles: Map<string, { display_name: string; avatar_url: string | null; handle?: string | null }>;
 }
 
 function getInitials(name: string): string {

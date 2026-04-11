@@ -22,7 +22,7 @@ interface FeedListProps {
   myKitchenId: string;
 }
 
-type KitchenProfileLookup = Map<string, { display_name: string; avatar_url: string | null }>;
+type KitchenProfileLookup = Map<string, { display_name: string; avatar_url: string | null; handle?: string | null }>;
 
 export function FeedList({ myKitchenId }: FeedListProps) {
   const router = useRouter();
@@ -81,19 +81,39 @@ export function FeedList({ myKitchenId }: FeedListProps) {
 
     (async () => {
       try {
-        const { data, error } = await supabase
+        // Fetch kitchen profiles with household_id for handle lookup
+        const { data: kitchens, error } = await supabase
           .from('kitchen_profiles')
-          .select('id, display_name, avatar_url')
+          .select('id, display_name, avatar_url, household_id')
           .in('id', missingIds);
 
-        if (error || !data) return;
+        if (error || !kitchens) return;
+
+        // Fetch first member's handle for each household (admin = earliest member)
+        const householdIds = kitchens.map((k) => k.household_id);
+        const { data: members } = await supabase
+          .from('household_members')
+          .select('household_id, profiles!inner(handle)')
+          .in('household_id', householdIds)
+          .order('created_at', { ascending: true });
+
+        // Build household -> handle lookup (first member = admin)
+        const handleByHousehold = new Map<string, string | null>();
+        if (members) {
+          for (const m of members) {
+            if (!handleByHousehold.has(m.household_id)) {
+              handleByHousehold.set(m.household_id, (m.profiles as any)?.handle ?? null);
+            }
+          }
+        }
 
         setKitchenProfiles((prev) => {
           const next = new Map(prev);
-          for (const profile of data) {
+          for (const profile of kitchens) {
             next.set(profile.id, {
               display_name: profile.display_name,
               avatar_url: profile.avatar_url,
+              handle: handleByHousehold.get(profile.household_id) ?? null,
             });
           }
           return next;

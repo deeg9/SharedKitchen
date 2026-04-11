@@ -30,7 +30,7 @@ const MEMBER_COLORS = [colors.primary, colors.secondary, '#A0A0A0'];
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { user, signOut, loading: authLoading } = useAuthStore();
+  const { user, signOut, loading: authLoading, handle } = useAuthStore();
   const {
     households,
     activeHouseholdId,
@@ -258,6 +258,9 @@ export default function ProfileScreen() {
                 <PremiumBadge size="large" />
               </View>
               <Text style={styles.email}>{email}</Text>
+              {handle && (
+                <Text style={styles.handle}>@{handle}</Text>
+              )}
             </>
           )}
 
@@ -525,6 +528,11 @@ const styles = StyleSheet.create({
     color: colors.onSurface,
   },
   email: {
+    ...typography.bodyMd,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xs,
+  },
+  handle: {
     ...typography.bodyMd,
     color: colors.onSurfaceVariant,
     marginTop: spacing.xs,

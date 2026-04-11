@@ -10,7 +10,7 @@ import { shadows } from '../../theme/shadows';
 
 interface FeedCardProps {
   post: FeedPost;
-  kitchenProfile?: { display_name: string; avatar_url: string | null };
+  kitchenProfile?: { display_name: string; avatar_url: string | null; handle?: string | null };
   isOwnPost: boolean;
   isLiked: boolean;
   onKitchenPress: () => void;
@@ -72,6 +72,7 @@ export function FeedCard({
   onCookThisToo,
 }: FeedCardProps) {
   const displayName = kitchenProfile?.display_name ?? 'Kitchen';
+  const handleText = kitchenProfile?.handle ? `@${kitchenProfile.handle}` : null;
   const avatarUrl = kitchenProfile?.avatar_url ?? null;
   const photoUrl = post.photo_url ?? post.recipe_image_url;
   const mealType = capitalizeFirst(post.meal_type);
@@ -115,10 +116,10 @@ export function FeedCard({
             )}
             <View style={s.headerText}>
               <Text style={s.kitchenName} numberOfLines={1}>
-                {displayName}
+                {handleText ?? displayName}
               </Text>
               <Text style={s.headerSubtitle} numberOfLines={1}>
-                {getRelativeTime(post.created_at)}
+                {handleText ? displayName : getRelativeTime(post.created_at)}
               </Text>
             </View>
           </Pressable>
@@ -157,7 +158,7 @@ export function FeedCard({
         <View style={s.content}>
           {/* Meal context */}
           <Text style={s.mealContext}>
-            <Text style={s.mealContextBold}>{displayName}</Text>
+            <Text style={s.mealContextBold}>{handleText ?? displayName}</Text>
             {' made '}
             <Text style={s.mealContextBold}>{post.recipe_name}</Text>
           </Text>
