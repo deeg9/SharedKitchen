@@ -31,6 +31,7 @@ import { format, addDays } from 'date-fns';
 import { usePresence, PresenceMember } from '../../../src/hooks/usePresence';
 import { PresenceAvatarStack } from '../../../src/components/presence/PresenceAvatarStack';
 import { useAuthStore } from '../../../src/stores/authStore';
+import { supabase } from '../../../src/lib/supabase';
 
 const SCALE_OPTIONS = [1, 2, 3] as const;
 
@@ -56,6 +57,7 @@ export default function RecipeDetailScreen() {
   const user = useAuthStore((s) => s.user);
   const userId = user?.id ?? null;
 
+  const [creatorHandle, setCreatorHandle] = useState<string | null>(null);
   const [scale, setScale] = useState<1 | 2 | 3>(1);
   const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
   const [noteText, setNoteText] = useState('');
@@ -64,6 +66,26 @@ export default function RecipeDetailScreen() {
   useEffect(() => {
     if (id) fetchRecipeDetail(id);
   }, [id]);
+
+  // Fetch creator's @handle for attribution
+  useEffect(() => {
+    if (!recipe?.created_by) {
+      setCreatorHandle(null);
+      return;
+    }
+
+    const fetchCreatorHandle = async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('handle')
+        .eq('id', recipe.created_by)
+        .maybeSingle();
+
+      setCreatorHandle(data?.handle ?? null);
+    };
+
+    fetchCreatorHandle();
+  }, [recipe?.created_by]);
 
   // AppState tracking for presence accuracy (RT-04)
   const [appActive, setAppActive] = useState(true);
@@ -203,6 +225,9 @@ export default function RecipeDetailScreen() {
         {/* ── Title & Rating ── */}
         <View style={s.titleSection}>
           <Text style={s.title}>{recipe.name}</Text>
+          {creatorHandle && (
+            <Text style={s.creatorAttribution}>by @{creatorHandle}</Text>
+          )}
 
           {/* Rating pill */}
           <View style={s.ratingPill}>
@@ -452,6 +477,12 @@ const s = StyleSheet.create({
   title: {
     fontFamily: fontFamily.headlineBold, fontSize: 32, fontWeight: '800',
     color: colors.primary, letterSpacing: -0.5, lineHeight: 38, marginBottom: spacing.md,
+  },
+  creatorAttribution: {
+    ...typography.bodyMd,
+    color: colors.onSurfaceVariant,
+    marginTop: -spacing.sm,
+    marginBottom: spacing.md,
   },
   ratingPill: {
     flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start',
