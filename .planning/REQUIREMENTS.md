@@ -59,27 +59,27 @@
 
 | Requirement | Phase | Plan |
 |-------------|-------|------|
-| IDEN-01 | — | — |
-| IDEN-02 | — | — |
-| IDEN-03 | — | — |
-| IDEN-04 | — | — |
-| ATTR-01 | — | — |
-| ATTR-02 | — | — |
-| ATTR-03 | — | — |
-| ATTR-04 | — | — |
-| COOK-01 | — | — |
-| COOK-02 | — | — |
-| COOK-03 | — | — |
-| COOK-04 | — | — |
-| COOK-05 | — | — |
-| COOK-06 | — | — |
-| CMNT-01 | — | — |
-| CMNT-02 | — | — |
-| CMNT-03 | — | — |
-| CMNT-04 | — | — |
-| CMNT-05 | — | — |
-| FEED-01 | — | — |
-| FEED-02 | — | — |
-| FEED-03 | — | — |
-| SAVE-01 | — | — |
-| SAVE-02 | — | — |
+| IDEN-01 | Phase 44 | — |
+| IDEN-02 | Phase 44 | — |
+| IDEN-03 | Phase 45 | — |
+| IDEN-04 | Phase 44 | — |
+| ATTR-01 | Phase 45 | — |
+| ATTR-02 | Phase 45 | — |
+| ATTR-03 | Phase 45 | — |
+| ATTR-04 | Phase 45 | — |
+| COOK-01 | Phase 46 | — |
+| COOK-02 | Phase 46 | — |
+| COOK-03 | Phase 46 | — |
+| COOK-04 | Phase 46 | — |
+| COOK-05 | Phase 46 | — |
+| COOK-06 | Phase 46 | — |
+| CMNT-01 | Phase 47 | — |
+| CMNT-02 | Phase 47 | — |
+| CMNT-03 | Phase 47 | — |
+| CMNT-04 | Phase 47 | — |
+| CMNT-05 | Phase 47 | — |
+| FEED-01 | Phase 48 | — |
+| FEED-02 | Phase 48 | — |
+| FEED-03 | Phase 48 | — |
+| SAVE-01 | Phase 48 | — |
+| SAVE-02 | Phase 48 | — |

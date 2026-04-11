@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v8.0
 milestone_name: Social Recipes
-status: defining_requirements
+status: ready_to_plan
 stopped_at: null
-last_updated: "2026-04-10T23:45:00.000Z"
+last_updated: "2026-04-10T24:00:00.000Z"
 last_activity: 2026-04-10
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -18,17 +18,32 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-09)
+See: .planning/PROJECT.md (updated 2026-04-10)
 
 **Core value:** Households can collaboratively plan, shop for, and cook dinners together in real-time
-**Current focus:** v8.0 Social Recipes — Defining requirements
+**Current focus:** v8.0 Social Recipes — Phase 44 ready to plan
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-04-10 — Milestone v8.0 started
+Phase: 44 of 48 (Handle System & Identity Foundation)
+Plan: 0 of TBD in current phase
+Status: Ready to plan
+Last activity: 2026-04-10 — v8.0 roadmap created (Phases 44-48)
+
+Progress: [░░░░░░░░░░] 0%
+
+## Performance Metrics
+
+**Velocity:**
+- Total plans completed: 0 (v8.0)
+- Average duration: —
+- Total execution time: 0 hours
+
+**By Phase:**
+
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| - | - | - | - |
 
 ## Accumulated Context
 
@@ -37,33 +52,12 @@ Last activity: 2026-04-10 — Milestone v8.0 started
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [v7.0]: Stitch designs are visual references only — all code hand-written in React Native
-- [v7.0]: Existing design system tokens (colors, typography, spacing, shadows) override Stitch choices
-- [v7.0]: Tab bar (5 tabs), FAB style, and branding ("SharedKitchen") stay as-is
-- [v7.0]: UI-only milestone — no new backend/API work, all existing functionality preserved
-- [v7.0]: Only 2 new dependencies: react-native-svg and expo-linear-gradient
-- [v7.0]: Grocery screen (684 LOC, 4 real-time hooks) gets dedicated phase due to regression risk
-- [v7.0]: Budget + Profile need new store methods (insights, categoryBudgets, fetchCookingStats)
-- [Phase 39]: ProgressBar uses percentage string width with useAnimatedStyle (not absolute pixel width)
-- [Phase 39]: InsightCard conditionally wraps in TouchableOpacity only when onPress provided
-- [Phase 39]: FilterChips uses marginRight for chip spacing (ScrollView gap compat)
-- [Phase 39]: Used useRef to track initial mount for 800ms vs 600ms DonutChart animation duration
-- [Phase 40]: Used View with surfaceContainerHigh bg as hero image placeholder for onboarding WelcomeStep
-- [Phase 40]: AllSet screen uses glassmorphism card (rgba bg + border) on expo-linear-gradient dark gradient
-- [Phase 40]: Used first instruction step text as recipe card description (Recipe type has no description field)
-- [Phase 40]: Difficulty badge derived from total time: under 20m=BEGINNER, 20-45m=INTERMEDIATE, over 45m=ADVANCED
-- [Phase 40]: Cooking mode uses recipe-level image for all steps (InstructionStep has no per-step image); step type badge from keyword matching; ingredient matching via substring heuristic
-- [Phase 40]: Used kitchen-cooking.jpg hero asset for premium screen instead of placeholder icon
-- [Phase 40]: Monthly price set to $4.99/mo per Stitch design (changed from $9.99/mo); yearly CTA shows Coming Soon alert
-- [Phase 41]: Used first instruction step text as recipe description (Recipe type has no description field)
-- [Phase 41]: Used titleMd instead of non-existent titleSm for DayViewMealSlot labels
-- [Phase 41]: Day/Week toggle placed between My Plan/Feed segmented control and WeekHeader, suggestions only in Week view
-- [Phase 42]: Combined quantity+price into single subtitle with middle dot separator in GroceryItem
-- [Phase 42]: Pantry tag uses case-insensitive name matching against pantryStore; removed separate delete button per Stitch design
-- [Phase 43]: Used headlineMd for section titles (headlineSm not in typography system)
-- [Phase 43]: Used semi-transparent black View for hero photo gradient overlay (no expo-linear-gradient dependency needed)
-- [Phase 43]: fetchCookingStats returns data directly without storing in global state
-- [Phase 43]: Dark Mode toggle is cosmetic only (AsyncStorage, no theme switching)
+- [v8.0]: Version history deferred to v8.1 (medium-high complexity, low initial demand)
+- [v8.0]: @handle column added as NULLABLE first, blocking interstitial for migration (never NOT NULL at DB)
+- [v8.0]: is_creator_owned flag preserves collaborative editing for legacy recipes
+- [v8.0]: Cook logs are prompt-only, never auto-created from meal plan dates
+- [v8.0]: Only auto-post cook events to feed (not recipe creation) to avoid noise
+- [v8.0]: Recipe comments use separate table from feed comments (different visibility scopes)
 
 ### Pending Todos
 
@@ -71,22 +65,11 @@ None yet.
 
 ### Blockers/Concerns
 
-- Apple External Purchase Entitlement must be applied for before Stripe checkout ships
-- Manual recipe creation does not set category field -- filters won't work for manually-added recipes
-- [Phase 43]: Budget category allocation strategy undecided (fixed split vs user-configurable)
-- [Phase 43]: Cooking streak baseline date needs clarification before fetchCookingStats
-- [Phase 40]: Yearly Stripe price_id does not exist — Premium screen shows UI but yearly tier non-functional
-
-### Quick Tasks Completed
-
-| # | Description | Date | Commit | Directory |
-|---|-------------|------|--------|-----------|
-| 260407-keu | Maestro E2E tests for social, budget, profile features (7 flows) | 2026-04-07 | 1fde15c | 260407-keu-create-maestro-e2e-tests-for-social-feed |
-| 260410-fm8 | Rework Plan tab scrolling and header layout | 2026-04-10 | 43bc5c0 | [260410-fm8-rework-plan-tab-scrolling-and-header-lay](./quick/260410-fm8-rework-plan-tab-scrolling-and-header-lay/) |
-| 260410-k7a | Redesign DayViewMealSlot as rich meal cards with hero image, RSVP, and view recipe | 2026-04-10 | ee014af | [260410-k7a-redesign-dayviewmealslot-as-rich-meal-ca](./quick/260410-k7a-redesign-dayviewmealslot-as-rich-meal-ca/) |
+- Handle migration UX for existing users needs careful design (blocking interstitial without frustrating active users)
+- Cook log photo compression targets (800px/0.5 vs 1024px/0.6) need visual validation on device
 
 ## Session Continuity
 
-Last session: 2026-04-10T01:31:49.880Z
-Stopped at: Completed 43-03-PLAN.md
+Last session: 2026-04-10
+Stopped at: v8.0 roadmap created, Phase 44 ready to plan
 Resume file: None
