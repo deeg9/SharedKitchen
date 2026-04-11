@@ -5,7 +5,7 @@ import { colors } from '../../theme/colors';
 import { spacing, borderRadius } from '../../theme/spacing';
 import { typography, fontFamily } from '../../theme/typography';
 import { InstructionStep, Ingredient } from '../../types/database';
-import { UnitSystem, convertInstructionText } from '../../lib/unit-conversion';
+import { UnitSystem, convertInstructionText, convertIngredient } from '../../lib/unit-conversion';
 import { getDefaultRecipeImage } from '../../lib/images';
 import { CookingTimer } from './CookingTimer';
 
@@ -67,6 +67,13 @@ export function StepCard({
   const badgeStyle = BADGE_STYLES[stepType];
   const tip = useMemo(() => parseTip(step.text), [step.text]);
 
+  const displayIngredients = useMemo(() => {
+    if (!ingredients || ingredients.length === 0) return [];
+    return ingredients.map((ing) =>
+      unitSystem !== 'imperial' ? convertIngredient(ing, unitSystem) : ing
+    );
+  }, [ingredients, unitSystem]);
+
   const imageUrl = recipeImageUrl || getDefaultRecipeImage(recipeId || '', recipeCategory || '');
 
   return (
@@ -108,19 +115,21 @@ export function StepCard({
         </View>
       )}
 
-      {/* Ingredient chips */}
-      {ingredients && ingredients.length > 0 && (
-        <View style={s.ingredientList}>
-          {ingredients.map((ing, i) => (
+      {/* Per-step ingredient card */}
+      <View style={s.ingredientList}>
+        {displayIngredients.length > 0 ? (
+          displayIngredients.map((ing, i) => (
             <View key={`ing-${i}`} style={s.ingredientRow}>
               <View style={s.ingredientDot} />
               <Text style={s.ingredientText}>
-                {ing.amount} {ing.unit} {ing.name}
+                {ing.amount > 0 ? `${ing.amount} ` : ''}{ing.unit ? `${ing.unit} ` : ''}{ing.name}
               </Text>
             </View>
-          ))}
-        </View>
-      )}
+          ))
+        ) : (
+          <Text style={s.emptyIngredients}>No ingredients for this step</Text>
+        )}
+      </View>
     </View>
   );
 }
@@ -183,7 +192,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    paddingVertical: spacing.xs + 2,
+    paddingVertical: spacing.xs, // 4px per UI-SPEC
   },
   ingredientDot: {
     width: 8,
@@ -194,5 +203,9 @@ const s = StyleSheet.create({
   ingredientText: {
     ...typography.bodyMd,
     color: colors.onSurface,
+  },
+  emptyIngredients: {
+    ...typography.bodyMd,
+    color: colors.onSurfaceVariant, // #43493f
   },
 });
