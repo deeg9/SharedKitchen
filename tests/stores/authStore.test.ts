@@ -8,6 +8,8 @@ beforeEach(() => {
     user: null,
     initialized: false,
     loading: false,
+    handle: null,
+    handleChecked: false,
   });
 });
 
@@ -80,6 +82,127 @@ describe('authStore', () => {
       expect(state.user).toBeNull();
       expect(state.loading).toBe(false);
       expect(supabase.auth.signOut).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('handle state', () => {
+    it('should have handle: null and handleChecked: false in initial state', () => {
+      const state = useAuthStore.getState();
+      expect(state.handle).toBeNull();
+      expect(state.handleChecked).toBe(false);
+    });
+  });
+
+  describe('checkHandle', () => {
+    it('should fetch handle from profiles and set handle + handleChecked', async () => {
+      useAuthStore.setState({
+        user: { id: 'u1' } as any,
+      });
+
+      const mockSingle = jest.fn().mockResolvedValue({
+        data: { handle: 'myhandle' },
+        error: null,
+      });
+      const mockEq = jest.fn().mockReturnValue({ single: mockSingle });
+      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
+      (supabase.from as jest.Mock).mockReturnValue({ select: mockSelect });
+
+      await useAuthStore.getState().checkHandle();
+
+      expect(supabase.from).toHaveBeenCalledWith('profiles');
+      expect(mockSelect).toHaveBeenCalledWith('handle');
+      expect(mockEq).toHaveBeenCalledWith('id', 'u1');
+
+      const state = useAuthStore.getState();
+      expect(state.handle).toBe('myhandle');
+      expect(state.handleChecked).toBe(true);
+    });
+
+    it('should set handle: null and handleChecked: true when profile has no handle', async () => {
+      useAuthStore.setState({
+        user: { id: 'u1' } as any,
+      });
+
+      const mockSingle = jest.fn().mockResolvedValue({
+        data: { handle: null },
+        error: null,
+      });
+      const mockEq = jest.fn().mockReturnValue({ single: mockSingle });
+      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
+      (supabase.from as jest.Mock).mockReturnValue({ select: mockSelect });
+
+      await useAuthStore.getState().checkHandle();
+
+      const state = useAuthStore.getState();
+      expect(state.handle).toBeNull();
+      expect(state.handleChecked).toBe(true);
+    });
+  });
+
+  describe('updateHandle', () => {
+    it('should update profiles table and set handle in store on success', async () => {
+      useAuthStore.setState({
+        user: { id: 'u1' } as any,
+      });
+
+      const mockEq = jest.fn().mockResolvedValue({ error: null });
+      const mockUpdate = jest.fn().mockReturnValue({ eq: mockEq });
+      (supabase.from as jest.Mock).mockReturnValue({ update: mockUpdate });
+
+      const result = await useAuthStore.getState().updateHandle('newhandle');
+
+      expect(result).toEqual({ success: true });
+      expect(supabase.from).toHaveBeenCalledWith('profiles');
+      expect(mockUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({ handle: 'newhandle' })
+      );
+
+      const state = useAuthStore.getState();
+      expect(state.handle).toBe('newhandle');
+    });
+
+    it('should return error for uniqueness violation (23505)', async () => {
+      useAuthStore.setState({
+        user: { id: 'u1' } as any,
+      });
+
+      const mockEq = jest.fn().mockResolvedValue({
+        error: { code: '23505', message: 'duplicate key' },
+      });
+      const mockUpdate = jest.fn().mockReturnValue({ eq: mockEq });
+      (supabase.from as jest.Mock).mockReturnValue({ update: mockUpdate });
+
+      const result = await useAuthStore.getState().updateHandle('taken');
+
+      expect(result).toEqual({ success: false, error: 'This handle was just taken' });
+    });
+
+    it('should return error when no user is authenticated', async () => {
+      useAuthStore.setState({ user: null });
+
+      const result = await useAuthStore.getState().updateHandle('newhandle');
+
+      expect(result).toEqual({ success: false, error: 'Not authenticated' });
+    });
+  });
+
+  describe('setSession resets handle state', () => {
+    it('should reset handle and handleChecked when session changes', () => {
+      useAuthStore.setState({
+        handle: 'oldhandle',
+        handleChecked: true,
+      });
+
+      const mockSession = {
+        user: { id: 'u2', email: 'new@test.com' },
+        access_token: 'tok2',
+      } as any;
+
+      useAuthStore.getState().setSession(mockSession);
+
+      const state = useAuthStore.getState();
+      expect(state.handle).toBeNull();
+      expect(state.handleChecked).toBe(false);
     });
   });
 });
