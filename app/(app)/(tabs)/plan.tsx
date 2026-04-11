@@ -198,162 +198,159 @@ export default function PlanScreen() {
 
       {activeSegment === 'plan' ? (
         <>
-          {/* Week Navigation with Day/Week icon toggle */}
-          <WeekHeader
-            weekLabel={label}
-            weekOffset={weekOffset}
-            onPrevWeek={() => setWeekOffset(weekOffset - 1)}
-            onNextWeek={() => setWeekOffset(weekOffset + 1)}
-            onToday={() => setWeekOffset(0)}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-          />
+          {/* Single ScrollView for all plan content */}
+          <ScrollView
+            style={styles.scroll}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* WeekHeader inside scroll, with viewMode toggle */}
+            <WeekHeader
+              weekLabel={label}
+              weekOffset={weekOffset}
+              onPrevWeek={() => setWeekOffset(weekOffset - 1)}
+              onNextWeek={() => setWeekOffset(weekOffset + 1)}
+              onToday={() => setWeekOffset(0)}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+            />
 
-          {viewMode === 'day' ? (
-            <>
-              {/* DateStrip for day navigation */}
-              <DateStrip
-                selectedDate={selectedDayDate}
-                onSelectDate={setSelectedDayDate}
-                startDate={days[0]}
-                endDate={days[6]}
-              />
+            {viewMode === 'day' ? (
+              <>
+                {/* DateStrip scrolls with content */}
+                <DateStrip
+                  selectedDate={selectedDayDate}
+                  onSelectDate={setSelectedDayDate}
+                  startDate={days[0]}
+                  endDate={days[6]}
+                />
 
-              {/* Day View Content */}
-              <ScrollView
-                style={styles.scroll}
-                contentContainerStyle={[styles.scrollContent, styles.dayViewContent]}
-                showsVerticalScrollIndicator={false}
-              >
+                {/* Day View Content */}
+                <View style={styles.dayViewContent}>
+                  {loading && mealPlan.size === 0 ? (
+                    <>
+                      <Skeleton width="100%" height={220} borderRadius={borderRadius.lg} />
+                      <Skeleton width="100%" height={80} borderRadius={borderRadius.lg} />
+                      <Skeleton width="100%" height={80} borderRadius={borderRadius.lg} />
+                    </>
+                  ) : (
+                    (() => {
+                      const selectedDayStr = toDateString(selectedDayDate);
+                      const dinnerPlan = mealPlan.get(makePlanKey(selectedDayStr, 'dinner'));
+                      const breakfastPlan = mealPlan.get(makePlanKey(selectedDayStr, 'breakfast'));
+                      const lunchPlan = mealPlan.get(makePlanKey(selectedDayStr, 'lunch'));
+
+                      return (
+                        <>
+                          <HeroDinnerCard
+                            plan={dinnerPlan}
+                            onPress={() => handleMealPress(selectedDayDate, 'dinner')}
+                            onStartCooking={dinnerPlan?.recipe_id ? () => router.push(`/(app)/cooking/${dinnerPlan.recipe_id}` as any) : undefined}
+                          />
+                          <DayViewMealSlot
+                            mealType="breakfast"
+                            plan={breakfastPlan}
+                            onEditPress={() => handleMealPress(selectedDayDate, 'breakfast')}
+                            onViewRecipe={breakfastPlan?.recipes ? () => handleViewRecipe(breakfastPlan.recipes!.id) : undefined}
+                            householdMembers={householdMemberProps}
+                            rsvps={breakfastPlan?.id ? rsvpStore.rsvps.get(breakfastPlan.id) ?? [] : []}
+                            onToggleRsvp={breakfastPlan?.id ? (userId) => rsvpStore.toggleRsvp(breakfastPlan.id, userId) : undefined}
+                          />
+                          <DayViewMealSlot
+                            mealType="lunch"
+                            plan={lunchPlan}
+                            onEditPress={() => handleMealPress(selectedDayDate, 'lunch')}
+                            onViewRecipe={lunchPlan?.recipes ? () => handleViewRecipe(lunchPlan.recipes!.id) : undefined}
+                            householdMembers={householdMemberProps}
+                            rsvps={lunchPlan?.id ? rsvpStore.rsvps.get(lunchPlan.id) ?? [] : []}
+                            onToggleRsvp={lunchPlan?.id ? (userId) => rsvpStore.toggleRsvp(lunchPlan.id, userId) : undefined}
+                          />
+                          <GroceryShortcutCard
+                            itemCount={groceryItems.length}
+                            onPress={() => router.push('/(app)/(tabs)/grocery' as any)}
+                          />
+                        </>
+                      );
+                    })()
+                  )}
+                </View>
+              </>
+            ) : (
+              <>
+                {/* Week View */}
                 {loading && mealPlan.size === 0 ? (
-                  // Skeleton loading state for day view
-                  <>
-                    <Skeleton width="100%" height={220} borderRadius={borderRadius.lg} />
-                    <Skeleton width="100%" height={80} borderRadius={borderRadius.lg} />
-                    <Skeleton width="100%" height={80} borderRadius={borderRadius.lg} />
-                  </>
+                  Array.from({ length: 7 }).map((_, i) => (
+                    <View key={i} style={styles.skeletonCard}>
+                      <Skeleton width={40} height={40} borderRadius={8} />
+                      <View style={styles.skeletonContent}>
+                        <Skeleton width="60%" height={16} borderRadius={4} />
+                        <Skeleton width="40%" height={12} borderRadius={4} />
+                        <Skeleton width="40%" height={12} borderRadius={4} />
+                      </View>
+                    </View>
+                  ))
                 ) : (
-                  (() => {
-                    const selectedDayStr = toDateString(selectedDayDate);
-                    const dinnerPlan = mealPlan.get(makePlanKey(selectedDayStr, 'dinner'));
-                    const breakfastPlan = mealPlan.get(makePlanKey(selectedDayStr, 'breakfast'));
-                    const lunchPlan = mealPlan.get(makePlanKey(selectedDayStr, 'lunch'));
+                  days.map((date) => {
+                    const dateStr = toDateString(date);
+                    const isToday = dateStr === todayStr;
+
+                    // Build meals record for this day
+                    const meals: Partial<Record<MealType, any>> = {};
+                    for (const mt of MEAL_TYPES) {
+                      meals[mt] = mealPlan.get(makePlanKey(dateStr, mt));
+                    }
 
                     return (
-                      <>
-                        <HeroDinnerCard
-                          plan={dinnerPlan}
-                          onPress={() => handleMealPress(selectedDayDate, 'dinner')}
-                          onStartCooking={dinnerPlan?.recipe_id ? () => router.push(`/(app)/cooking/${dinnerPlan.recipe_id}` as any) : undefined}
-                        />
-                        <DayViewMealSlot
-                          mealType="breakfast"
-                          plan={breakfastPlan}
-                          onEditPress={() => handleMealPress(selectedDayDate, 'breakfast')}
-                          onViewRecipe={breakfastPlan?.recipes ? () => handleViewRecipe(breakfastPlan.recipes!.id) : undefined}
-                          householdMembers={householdMemberProps}
-                          rsvps={breakfastPlan?.id ? rsvpStore.rsvps.get(breakfastPlan.id) ?? [] : []}
-                          onToggleRsvp={breakfastPlan?.id ? (userId) => rsvpStore.toggleRsvp(breakfastPlan.id, userId) : undefined}
-                        />
-                        <DayViewMealSlot
-                          mealType="lunch"
-                          plan={lunchPlan}
-                          onEditPress={() => handleMealPress(selectedDayDate, 'lunch')}
-                          onViewRecipe={lunchPlan?.recipes ? () => handleViewRecipe(lunchPlan.recipes!.id) : undefined}
-                          householdMembers={householdMemberProps}
-                          rsvps={lunchPlan?.id ? rsvpStore.rsvps.get(lunchPlan.id) ?? [] : []}
-                          onToggleRsvp={lunchPlan?.id ? (userId) => rsvpStore.toggleRsvp(lunchPlan.id, userId) : undefined}
-                        />
-                        <GroceryShortcutCard
-                          itemCount={groceryItems.length}
-                          onPress={() => router.push('/(app)/(tabs)/grocery' as any)}
-                        />
-                      </>
-                    );
-                  })()
-                )}
-              </ScrollView>
-            </>
-          ) : (
-            /* Week View */
-            <ScrollView
-              style={styles.scroll}
-              contentContainerStyle={styles.scrollContent}
-              showsVerticalScrollIndicator={false}
-            >
-              {loading && mealPlan.size === 0 ? (
-                // Skeleton loading state
-                Array.from({ length: 7 }).map((_, i) => (
-                  <View key={i} style={styles.skeletonCard}>
-                    <Skeleton width={40} height={40} borderRadius={8} />
-                    <View style={styles.skeletonContent}>
-                      <Skeleton width="60%" height={16} borderRadius={4} />
-                      <Skeleton width="40%" height={12} borderRadius={4} />
-                      <Skeleton width="40%" height={12} borderRadius={4} />
-                    </View>
-                  </View>
-                ))
-              ) : (
-                days.map((date) => {
-                  const dateStr = toDateString(date);
-                  const isToday = dateStr === todayStr;
-
-                  // Build meals record for this day
-                  const meals: Partial<Record<MealType, any>> = {};
-                  for (const mt of MEAL_TYPES) {
-                    meals[mt] = mealPlan.get(makePlanKey(dateStr, mt));
-                  }
-
-                  return (
-                    <DaySection
-                      key={dateStr}
-                      date={date}
-                      meals={meals}
-                      isToday={isToday}
-                      onMealPress={(mt) => handleMealPress(date, mt)}
-                    />
-                  );
-                })
-              )}
-
-              {/* AI Suggestion Cards (Week view only) */}
-              {suggestions.length > 0 && (
-                <View style={styles.suggestionsSection}>
-                  <View style={styles.suggestionsTitleRow}>
-                    <Text style={styles.suggestionsTitle}>Suggestions</Text>
-                    {!subscription.canAccess('advanced_suggestions') && (
-                      <View style={styles.proIndicator}>
-                        <Text style={styles.proIndicatorText}>PRO</Text>
-                      </View>
-                    )}
-                    <Pressable
-                      onPress={() => {
-                        if (!subscription.canAccess('advanced_suggestions')) {
-                          setShowUpgradePrompt(true);
-                        }
-                      }}
-                      style={styles.viewAllButton}
-                    >
-                      <Text style={styles.viewAllText}>View All</Text>
-                    </Pressable>
-                  </View>
-                  <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.suggestionsScroll}
-                  >
-                    {suggestions.map((s) => (
-                      <SuggestionCard
-                        key={s.recipeId}
-                        suggestion={s}
-                        onAddToPlan={handleAddSuggestionToPlan}
+                      <DaySection
+                        key={dateStr}
+                        date={date}
+                        meals={meals}
+                        isToday={isToday}
+                        onMealPress={(mt) => handleMealPress(date, mt)}
                       />
-                    ))}
-                  </ScrollView>
-                </View>
-              )}
-            </ScrollView>
-          )}
+                    );
+                  })
+                )}
+
+                {/* AI Suggestion Cards (Week view only) */}
+                {suggestions.length > 0 && (
+                  <View style={styles.suggestionsSection}>
+                    <View style={styles.suggestionsTitleRow}>
+                      <Text style={styles.suggestionsTitle}>Suggestions</Text>
+                      {!subscription.canAccess('advanced_suggestions') && (
+                        <View style={styles.proIndicator}>
+                          <Text style={styles.proIndicatorText}>PRO</Text>
+                        </View>
+                      )}
+                      <Pressable
+                        onPress={() => {
+                          if (!subscription.canAccess('advanced_suggestions')) {
+                            setShowUpgradePrompt(true);
+                          }
+                        }}
+                        style={styles.viewAllButton}
+                      >
+                        <Text style={styles.viewAllText}>View All</Text>
+                      </Pressable>
+                    </View>
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={styles.suggestionsScroll}
+                    >
+                      {suggestions.map((s) => (
+                        <SuggestionCard
+                          key={s.recipeId}
+                          suggestion={s}
+                          onAddToPlan={handleAddSuggestionToPlan}
+                        />
+                      ))}
+                    </ScrollView>
+                  </View>
+                )}
+              </>
+            )}
+          </ScrollView>}
 
           {/* Surprise Me FAB */}
           <Pressable
