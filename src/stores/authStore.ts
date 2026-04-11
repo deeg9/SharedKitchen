@@ -24,13 +24,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   handle: null,
   handleChecked: false,
 
-  setSession: (session) =>
+  setSession: (session) => {
+    const currentUserId = get().user?.id;
+    const newUserId = session?.user?.id;
+    const userChanged = currentUserId !== newUserId;
     set({
       session,
       user: session?.user ?? null,
-      handle: null,
-      handleChecked: false,
-    }),
+      ...(userChanged ? { handle: null, handleChecked: false } : {}),
+    });
+  },
 
   setInitialized: (initialized) => set({ initialized }),
 
