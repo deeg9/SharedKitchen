@@ -342,21 +342,6 @@ export default function RecipeDetailScreen() {
             <Text style={s.sectionTitle}>Ingredients</Text>
           </View>
 
-          {/* Scale pills */}
-          <View style={s.scaleRow}>
-            {SCALE_OPTIONS.map((opt) => (
-              <Pressable
-                key={opt}
-                onPress={() => setScale(opt)}
-                style={[s.scaleBtn, scale === opt && s.scaleBtnActive]}
-              >
-                <Text style={[s.scaleBtnText, scale === opt && s.scaleBtnTextActive]}>
-                  x{opt}{opt === 1 ? ' Scale' : ''}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-
           {/* Ingredient list */}
           {scaledIngredients.map((ing, i) => {
             const checked = checkedIngredients.has(i);
@@ -399,18 +384,9 @@ export default function RecipeDetailScreen() {
           />
         )}
 
-        {/* ── Comments Section ── */}
-        <RecipeCommentsSection
-          recipeId={id ?? ''}
-          currentUserId={userId}
-          recipeCreatorId={recipe?.created_by ?? null}
-          userHandle={userHandle}
-          userAvatarUrl={memberProfile?.avatar_url ?? null}
-        />
-
-        {/* ── Method (Instructions) ── */}
+        {/* ── Instructions ── */}
         <View style={s.methodSection}>
-          <Text style={s.sectionTitleLarge}>Method</Text>
+          <Text style={s.sectionTitleLarge}>Instructions</Text>
           {(recipe.instructions as InstructionStepType[]).map((step, i) => (
             <View key={i} style={s.stepRow}>
               <View style={[s.stepBadge, i === 0 ? s.stepBadgePrimary : s.stepBadgeLight]}>
@@ -425,35 +401,14 @@ export default function RecipeDetailScreen() {
           ))}
         </View>
 
-        {/* ── Household Tips (Notes) ── */}
-        <View style={s.notesSection}>
-          <Text style={s.sectionTitle}>Household Tips</Text>
-          {notes.map((note) => (
-            <View key={note.id} style={s.noteCard}>
-              <View style={s.noteAvatar}>
-                <MaterialCommunityIcons name="account" size={20} color={colors.primary} />
-              </View>
-              <View style={s.noteBody}>
-                <Text style={s.noteDate}>{format(new Date(note.created_at), 'MMM d, yyyy')}</Text>
-                <Text style={s.noteContent}>{note.content}</Text>
-              </View>
-            </View>
-          ))}
-          <View style={s.noteInputRow}>
-            <View style={s.noteInputAvatar}>
-              <MaterialCommunityIcons name="account" size={18} color={colors.outlineVariant} />
-            </View>
-            <TextInput
-              style={s.noteInput}
-              placeholder="Add your family's twist..."
-              placeholderTextColor={colors.outlineVariant}
-              value={noteText}
-              onChangeText={setNoteText}
-              onSubmitEditing={handleAddNote}
-              testID="recipe-detail-note-input"
-            />
-          </View>
-        </View>
+        {/* ── Comments Section ── */}
+        <RecipeCommentsSection
+          recipeId={id ?? ''}
+          currentUserId={userId}
+          recipeCreatorId={recipe?.created_by ?? null}
+          userHandle={userHandle}
+          userAvatarUrl={memberProfile?.avatar_url ?? null}
+        />
 
         {/* ── Tags ── */}
         {recipe.tags && recipe.tags.length > 0 && (
