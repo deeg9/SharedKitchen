@@ -198,31 +198,15 @@ export default function PlanScreen() {
 
       {activeSegment === 'plan' ? (
         <>
-          {/* Day/Week Toggle */}
-          <View style={styles.viewToggleRow} testID="plan-view-toggle">
-            <Pressable
-              onPress={() => setViewMode('day')}
-              style={[styles.viewToggleBtn, viewMode === 'day' && styles.viewToggleBtnActive]}
-              testID="plan-view-day"
-            >
-              <Text style={[styles.viewToggleText, viewMode === 'day' && styles.viewToggleTextActive]}>Day</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => setViewMode('week')}
-              style={[styles.viewToggleBtn, viewMode === 'week' && styles.viewToggleBtnActive]}
-              testID="plan-view-week"
-            >
-              <Text style={[styles.viewToggleText, viewMode === 'week' && styles.viewToggleTextActive]}>Week</Text>
-            </Pressable>
-          </View>
-
-          {/* Week Navigation */}
+          {/* Week Navigation with Day/Week icon toggle */}
           <WeekHeader
             weekLabel={label}
             weekOffset={weekOffset}
             onPrevWeek={() => setWeekOffset(weekOffset - 1)}
             onNextWeek={() => setWeekOffset(weekOffset + 1)}
             onToday={() => setWeekOffset(0)}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
           />
 
           {viewMode === 'day' ? (
@@ -545,33 +529,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  viewToggleRow: {
-    flexDirection: 'row',
-    marginHorizontal: spacing.md,
-    marginBottom: spacing.xs,
-    backgroundColor: colors.surfaceContainerLow,
-    borderRadius: borderRadius.full,
-    padding: 3,
-  },
-  viewToggleBtn: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 32,
-    borderRadius: borderRadius.full,
-  },
-  viewToggleBtnActive: {
-    backgroundColor: colors.primary,
-  },
-  viewToggleText: {
-    ...typography.labelSm,
-    color: colors.onSurfaceVariant,
-    fontWeight: '600',
-    textTransform: 'none',
-  },
-  viewToggleTextActive: {
-    color: colors.onPrimary,
   },
   dayViewContent: {
     paddingHorizontal: spacing.md,
