@@ -8,6 +8,7 @@ interface AuthState {
   initialized: boolean;
   loading: boolean;
   handle: string | null;
+  handleChangedAt: string | null;
   handleChecked: boolean;
   setSession: (session: Session | null) => void;
   setInitialized: (initialized: boolean) => void;
@@ -22,6 +23,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   initialized: false,
   loading: false,
   handle: null,
+  handleChangedAt: null,
   handleChecked: false,
 
   setSession: (session) => {
@@ -31,7 +33,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({
       session,
       user: session?.user ?? null,
-      ...(userChanged ? { handle: null, handleChecked: false } : {}),
+      ...(userChanged ? { handle: null, handleChangedAt: null, handleChecked: false } : {}),
     });
   },
 
@@ -45,6 +47,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       user: null,
       loading: false,
       handle: null,
+      handleChangedAt: null,
       handleChecked: false,
     });
   },
@@ -55,11 +58,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     const { data } = await supabase
       .from('profiles')
-      .select('handle')
+      .select('handle, handle_changed_at')
       .eq('id', userId)
       .single();
 
-    set({ handle: data?.handle ?? null, handleChecked: true });
+    set({
+      handle: data?.handle ?? null,
+      handleChangedAt: data?.handle_changed_at ?? null,
+      handleChecked: true,
+    });
   },
 
   updateHandle: async (handle: string) => {
@@ -78,7 +85,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return { success: false, error: error.message };
     }
 
-    set({ handle });
+    const now = new Date().toISOString();
+    set({ handle, handleChangedAt: now });
     return { success: true };
   },
 }));

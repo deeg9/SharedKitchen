@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { getErrorMessage } from '../../src/lib/errors';
 import {
   View,
@@ -18,13 +18,15 @@ import { supabase } from '../../src/lib/supabase';
 import { Avatar } from '../../src/components/ui/Avatar';
 import { Button } from '../../src/components/ui/Button';
 import { Input } from '../../src/components/ui/Input';
+import { HandleInput } from '../../src/components/handle/HandleInput';
+import { validateHandle } from '../../src/lib/handle-utils';
 import { colors } from '../../src/theme/colors';
 import { typography } from '../../src/theme/typography';
 import { spacing } from '../../src/theme/spacing';
 
 export default function EditProfileScreen() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, handle, handleChangedAt, updateHandle } = useAuthStore();
 
   const currentName =
     user?.user_metadata?.full_name ??
@@ -36,6 +38,73 @@ export default function EditProfileScreen() {
   const [avatarUri, setAvatarUri] = useState<string | null>(currentAvatar);
   const [saving, setSaving] = useState(false);
   const [newAvatarBase64, setNewAvatarBase64] = useState<string | null>(null);
+
+  // Handle editing state
+  const [isEditingHandle, setIsEditingHandle] = useState(false);
+  const [newHandle, setNewHandle] = useState('');
+  const [handleStatus, setHandleStatus] = useState<{ state: 'idle' | 'checking' | 'available' | 'taken' | 'error'; message: string }>({ state: 'idle', message: '' });
+  const [savingHandle, setSavingHandle] = useState(false);
+  const debounceRef = useRef<NodeJS.Timeout>();
+
+  // Cooldown computation
+  const canChangeHandle = useMemo(() => {
+    if (!handleChangedAt) return true;
+    const changedDate = new Date(handleChangedAt);
+    const cooldownEnd = new Date(changedDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+    return new Date() >= cooldownEnd;
+  }, [handleChangedAt]);
+
+  const daysUntilChange = useMemo(() => {
+    if (!handleChangedAt || canChangeHandle) return 0;
+    const changedDate = new Date(handleChangedAt);
+    const cooldownEnd = new Date(changedDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+    return Math.ceil((cooldownEnd.getTime() - Date.now()) / (24 * 60 * 60 * 1000));
+  }, [handleChangedAt, canChangeHandle]);
+
+  const handleHandleChange = (text: string) => {
+    const cleaned = text.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    setNewHandle(cleaned);
+
+    clearTimeout(debounceRef.current);
+    const validation = validateHandle(cleaned);
+    if (!validation.valid) {
+      setHandleStatus({ state: 'error', message: validation.error! });
+      return;
+    }
+    if (cleaned === handle) {
+      setHandleStatus({ state: 'error', message: 'This is your current handle' });
+      return;
+    }
+
+    setHandleStatus({ state: 'checking', message: 'Checking availability...' });
+    debounceRef.current = setTimeout(async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('handle', cleaned)
+        .maybeSingle();
+
+      setHandleStatus(data
+        ? { state: 'taken', message: 'This handle is taken' }
+        : { state: 'available', message: 'This handle is available' }
+      );
+    }, 400);
+  };
+
+  const handleSaveHandle = async () => {
+    if (handleStatus.state !== 'available') return;
+    setSavingHandle(true);
+    const result = await updateHandle(newHandle);
+    setSavingHandle(false);
+    if (result.success) {
+      setIsEditingHandle(false);
+      setNewHandle('');
+      setHandleStatus({ state: 'idle', message: '' });
+      Alert.alert('Handle Updated', `Your handle is now @${newHandle}`);
+    } else {
+      setHandleStatus({ state: 'taken', message: result.error ?? 'Failed to update handle' });
+    }
+  };
 
   const handlePickAvatar = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -148,6 +217,55 @@ export default function EditProfileScreen() {
           autoCapitalize="words"
         />
 
+        {/* Handle Section */}
+        <View style={styles.handleSection}>
+          <Text style={styles.handleSectionLabel}>Handle</Text>
+          <Text style={styles.currentHandle}>@{handle}</Text>
+
+          {canChangeHandle ? (
+            isEditingHandle ? (
+              <View style={{ marginTop: spacing.sm }}>
+                <HandleInput
+                  value={newHandle}
+                  onChangeText={handleHandleChange}
+                  status={handleStatus}
+                />
+                <View style={{ flexDirection: 'row', gap: spacing.sm, marginTop: spacing.md }}>
+                  <Button
+                    variant="tertiary"
+                    size="sm"
+                    onPress={() => { setIsEditingHandle(false); setNewHandle(''); setHandleStatus({ state: 'idle', message: '' }); }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onPress={handleSaveHandle}
+                    disabled={handleStatus.state !== 'available' || savingHandle}
+                    loading={savingHandle}
+                  >
+                    Save Handle
+                  </Button>
+                </View>
+              </View>
+            ) : (
+              <Button
+                variant="tertiary"
+                size="sm"
+                onPress={() => setIsEditingHandle(true)}
+                style={{ marginTop: spacing.sm }}
+              >
+                Change Handle
+              </Button>
+            )
+          ) : (
+            <Text style={styles.cooldownText}>
+              You can change your handle in {daysUntilChange} day{daysUntilChange !== 1 ? 's' : ''}
+            </Text>
+          )}
+        </View>
+
         {/* Save Button */}
         <Button
           variant="primary"
@@ -194,6 +312,23 @@ const styles = StyleSheet.create({
   changePhotoText: {
     ...typography.labelMd,
     color: colors.primary,
+    marginTop: spacing.sm,
+  },
+  handleSection: {
+    marginTop: spacing.lg,
+  },
+  handleSectionLabel: {
+    ...typography.labelLg,
+    color: colors.onSurface,
+    marginBottom: spacing.xs,
+  },
+  currentHandle: {
+    ...typography.bodyLg,
+    color: colors.onSurfaceVariant,
+  },
+  cooldownText: {
+    ...typography.bodySm,
+    color: colors.onSurfaceVariant,
     marginTop: spacing.sm,
   },
   saveButton: {

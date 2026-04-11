@@ -110,7 +110,7 @@ describe('authStore', () => {
       await useAuthStore.getState().checkHandle();
 
       expect(supabase.from).toHaveBeenCalledWith('profiles');
-      expect(mockSelect).toHaveBeenCalledWith('handle');
+      expect(mockSelect).toHaveBeenCalledWith('handle, handle_changed_at');
       expect(mockEq).toHaveBeenCalledWith('id', 'u1');
 
       const state = useAuthStore.getState();
