@@ -33,6 +33,11 @@ import { PresenceAvatarStack } from '../../../src/components/presence/PresenceAv
 import { useAuthStore } from '../../../src/stores/authStore';
 import { supabase } from '../../../src/lib/supabase';
 import { CreatorAttribution } from '../../../src/components/recipes/CreatorAttribution';
+import { useCookLogStore } from '../../../src/stores/cookLogStore';
+import { CookLogButton } from '../../../src/components/recipes/CookLogButton';
+import { CookCountBadge } from '../../../src/components/recipes/CookCountBadge';
+import { CookPhotoGallery } from '../../../src/components/cook-log/CookPhotoGallery';
+import { CookLogSheet } from '../../../src/components/cook-log/CookLogSheet';
 
 const SCALE_OPTIONS = [1, 2, 3] as const;
 
@@ -64,9 +69,25 @@ export default function RecipeDetailScreen() {
   const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
   const [noteText, setNoteText] = useState('');
   const [showPlanSheet, setShowPlanSheet] = useState(false);
+  const [showCookLogSheet, setShowCookLogSheet] = useState(false);
+
+  const {
+    cookLogs,
+    cookCount,
+    fetchCookCount,
+    fetchCookLogs,
+    deleteCookLog,
+  } = useCookLogStore();
 
   useEffect(() => {
     if (id) fetchRecipeDetail(id);
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      fetchCookCount(id);
+      fetchCookLogs(id);
+    }
   }, [id]);
 
   // Fetch creator's @handle for attribution
@@ -238,12 +259,15 @@ export default function RecipeDetailScreen() {
             />
           )}
 
-          {/* Rating pill */}
-          <View style={s.ratingPill}>
-            <MaterialCommunityIcons name="star" size={18} color={colors.secondary} />
-            <Text style={s.ratingValue}>{avgRating > 0 ? avgRating.toFixed(1) : '--'}</Text>
-            <View style={s.ratingDivider} />
-            <Text style={s.ratingCount}>{ratingCount} reviews</Text>
+          {/* Rating pill + Cook count badge */}
+          <View style={s.ratingRow}>
+            <View style={s.ratingPill}>
+              <MaterialCommunityIcons name="star" size={18} color={colors.secondary} />
+              <Text style={s.ratingValue}>{avgRating > 0 ? avgRating.toFixed(1) : '--'}</Text>
+              <View style={s.ratingDivider} />
+              <Text style={s.ratingCount}>{ratingCount} reviews</Text>
+            </View>
+            <CookCountBadge count={cookCount} />
           </View>
 
           {/* Star rating */}
@@ -354,6 +378,21 @@ export default function RecipeDetailScreen() {
           />
         </View>
 
+        {/* ── Cook Photo Gallery ── */}
+        {userId && (
+          <CookPhotoGallery
+            cookLogs={cookLogs}
+            currentUserId={userId}
+            onDeleteLog={async (logId, photoUrl) => {
+              await deleteCookLog(logId, photoUrl);
+              if (id) {
+                fetchCookLogs(id);
+                fetchCookCount(id);
+              }
+            }}
+          />
+        )}
+
         {/* ── Method (Instructions) ── */}
         <View style={s.methodSection}>
           <Text style={s.sectionTitleLarge}>Method</Text>
@@ -411,6 +450,8 @@ export default function RecipeDetailScreen() {
             ))}
           </View>
         )}
+        {/* ── I Cooked This Button ── */}
+        <CookLogButton onPress={() => setShowCookLogSheet(true)} />
       </ScrollView>
 
       {/* ── Bottom Action Bar ── */}
@@ -454,6 +495,20 @@ export default function RecipeDetailScreen() {
           })}
         </View>
       </BottomSheet>
+
+      {/* Cook Log Sheet */}
+      <CookLogSheet
+        isOpen={showCookLogSheet}
+        onClose={() => {
+          setShowCookLogSheet(false);
+          if (id) {
+            fetchCookLogs(id);
+            fetchCookCount(id);
+          }
+        }}
+        recipeId={id ?? ''}
+        recipeName={recipe.name}
+      />
     </View>
   );
 }
@@ -487,11 +542,14 @@ const s = StyleSheet.create({
     fontFamily: fontFamily.headlineBold, fontSize: 32, fontWeight: '800',
     color: colors.primary, letterSpacing: -0.5, lineHeight: 38, marginBottom: spacing.md,
   },
+  ratingRow: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.sm, flexWrap: 'wrap', marginBottom: spacing.sm,
+  },
   ratingPill: {
-    flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start',
+    flexDirection: 'row', alignItems: 'center',
     backgroundColor: colors.surfaceContainerLow, paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
     borderRadius: borderRadius.full, borderWidth: 1, borderColor: colors.outlineVariant,
-    gap: spacing.xs, marginBottom: spacing.sm,
+    gap: spacing.xs,
   },
   ratingValue: { fontFamily: fontFamily.headlineBold, fontWeight: '700', color: colors.primary, fontSize: 15 },
   ratingDivider: { width: 1, height: 16, backgroundColor: colors.outlineVariant, marginHorizontal: spacing.xs },
