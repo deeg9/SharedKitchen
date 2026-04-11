@@ -135,7 +135,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 **Milestone Goal:** Make recipes social objects — owned by users with unique @handles, commentable, with cooking history, photo galleries, and feed integration.
 
 - [x] **Phase 44: Handle System & Identity Foundation** - Per-user @handle usernames with onboarding enforcement and existing-user migration (completed 2026-04-11)
-- [ ] **Phase 45: Recipe Attribution & Creator Permissions** - Creator identity on recipes with ownership-based edit permissions and @handle search
+- [x] **Phase 45: Recipe Attribution & Creator Permissions** - Creator identity on recipes with ownership-based edit permissions and @handle search (completed 2026-04-11)
 - [ ] **Phase 46: Cook Log with Photos** - Cook logging from recipe detail, cooking mode, and meal plan with photo gallery and count badges
 - [ ] **Phase 47: Recipe Comments** - Threaded recipe comments with visibility scoping and moderation
 - [ ] **Phase 48: Feed Integration & Save to Collection** - Auto-post cook events to feed and save recipes from feed to own library
@@ -172,7 +172,7 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [x] 45-01-PLAN.md — Migration: backfill legacy recipes + creator-scoped RLS policies
-- [ ] 45-02-PLAN.md — Creator attribution UI + conditional edit button on recipe detail
+- [x] 45-02-PLAN.md — Creator attribution UI + conditional edit button on recipe detail
 - [x] 45-03-PLAN.md — People search tab + public profile page
 **UI hint**: yes
 
@@ -264,7 +264,7 @@ Plans:
 | 42. Grocery List Redesign | v7.0 | 2/2 | Complete | 2026-04-10 |
 | 43. Budget, Profile & Social Feed | v7.0 | 3/3 | Complete | 2026-04-10 |
 | 44. Handle System & Identity Foundation | v8.0 | 5/4 | Complete   | 2026-04-11 |
-| 45. Recipe Attribution & Creator Permissions | v8.0 | 2/3 | In Progress|  |
+| 45. Recipe Attribution & Creator Permissions | v8.0 | 3/3 | Complete   | 2026-04-11 |
 | 46. Cook Log with Photos | v8.0 | 0/TBD | Not started | - |
 | 47. Recipe Comments | v8.0 | 0/TBD | Not started | - |
 | 48. Feed Integration & Save to Collection | v8.0 | 0/TBD | Not started | - |
