@@ -95,14 +95,16 @@ export default function RootLayout() {
   }, [initialized, session]);
 
   // Show handle interstitial for existing users without a handle
+  // An existing user is one who completed onboarding OR has households (AsyncStorage may be cleared on rebuild)
+  const isExistingUser = onboardingCompleted || households.length > 0;
   useEffect(() => {
     if (!initialized || !session || !onboardingChecked) return;
-    if (handleChecked && handle === null && onboardingCompleted) {
+    if (handleChecked && handle === null && isExistingUser) {
       setShowHandleInterstitial(true);
     } else {
       setShowHandleInterstitial(false);
     }
-  }, [initialized, session, onboardingChecked, handleChecked, handle, onboardingCompleted]);
+  }, [initialized, session, onboardingChecked, handleChecked, handle, isExistingUser]);
 
   // Hide splash screen when ready
   useEffect(() => {
