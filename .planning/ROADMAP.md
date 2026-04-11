@@ -151,7 +151,11 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
   2. Existing user launching the app after the v8.0 update sees a blocking interstitial that requires them to set an @handle before proceeding
   3. @handle appears next to the user's name on recipes, comments, cook logs, and feed posts throughout the app
   4. @handle input validates format (lowercase alphanumeric + underscores), checks uniqueness in real time, and rejects reserved words
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 44-01-PLAN.md — DB migration, handle-utils, authStore handle state (TDD)
+- [ ] 44-02-PLAN.md — HandleInput component, onboarding step, blocking interstitial
+- [ ] 44-03-PLAN.md — Display @handle across feed, comments, profiles
 **UI hint**: yes
 
 ### Phase 45: Recipe Attribution & Creator Permissions
@@ -253,7 +257,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 | 41. Plan Tab Redesign | v7.0 | 2/2 | Complete | 2026-04-09 |
 | 42. Grocery List Redesign | v7.0 | 2/2 | Complete | 2026-04-10 |
 | 43. Budget, Profile & Social Feed | v7.0 | 3/3 | Complete | 2026-04-10 |
-| 44. Handle System & Identity Foundation | v8.0 | 0/TBD | Not started | - |
+| 44. Handle System & Identity Foundation | v8.0 | 0/3 | Not started | - |
 | 45. Recipe Attribution & Creator Permissions | v8.0 | 0/TBD | Not started | - |
 | 46. Cook Log with Photos | v8.0 | 0/TBD | Not started | - |
 | 47. Recipe Comments | v8.0 | 0/TBD | Not started | - |
