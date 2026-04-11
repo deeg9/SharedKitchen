@@ -1,258 +1,272 @@
-# Domain Pitfalls: v8.0 Social Recipes
+# Domain Pitfalls: Stitch UI Redesign
 
-**Domain:** Adding social recipe features to existing collaborative cooking app
-**Researched:** 2026-04-10
-**Confidence:** HIGH (based on codebase analysis + domain research)
+**Domain:** Comprehensive UI redesign of existing React Native + Expo app (14 screens)
+**Project:** SharedKitchen v7.0
+**Researched:** 2026-04-07
+**Confidence:** HIGH (verified against codebase analysis, React Native docs, and community reports)
+
+---
 
 ## Critical Pitfalls
 
-Mistakes that cause rewrites, data corruption, or broken existing features.
+Mistakes that cause regressions, rewrites, or ship-blocking issues.
 
-### Pitfall 1: @Handle Retrofit Blocks Existing Users
+### Pitfall 1: Real-Time Subscription Teardown During Component Restructuring
 
-**What goes wrong:** Adding a required `username` column to `profiles` with a UNIQUE NOT NULL constraint breaks every existing user. If the migration enforces NOT NULL immediately, existing rows fail the constraint. If you add a username gate to the app before providing a migration path, existing users get locked out on app launch.
+**What goes wrong:** Redesigning screen components (especially grocery.tsx at 684 LOC and plan.tsx at 408 LOC) often means extracting, splitting, or replacing components that host Supabase Realtime subscriptions and Presence channels. If the component tree changes, `useEffect` cleanup runs, tearing down subscriptions. The new component tree may not re-subscribe correctly, or subscriptions may briefly lapse -- causing missed real-time updates, ghost presence avatars, or stale grocery list state.
 
-**Why it happens:** The app has existing users with profiles created by `handle_new_user()` trigger (migration 00001) that only set `display_name`. There is no username field anywhere in the current schema. Forcing all users through a "pick your username" interstitial on first app open after the update is the only viable path, but getting the timing wrong (DB migration before client update, or client update before DB migration) creates a window where the app breaks.
+**Why it happens:** SharedKitchen has real-time sync hooks (`useGrocerySync`, `usePantrySync`, `usePresence`, `useActivityToast`) wired into tab screens. Redesigning these screens means the hooks' lifecycle changes. Developers focus on visual output and forget that these hooks silently manage WebSocket connections.
 
-**Consequences:** Users cannot use the app after update. If NOT NULL is enforced at DB level before all clients update, Supabase Auth trigger `handle_new_user()` also breaks for new signups (it doesn't set username).
-
-**Prevention:**
-1. Add `username` column as NULLABLE first with a UNIQUE constraint (allow NULL but enforce uniqueness for non-null values)
-2. Update `handle_new_user()` trigger to NOT set username (keep it null for new signups too)
-3. Add client-side "choose username" interstitial that appears when `profiles.username IS NULL`
-4. Only after all users have usernames (or after a grace period), consider adding NOT NULL via a separate migration
-5. Use `UNIQUE` index with `WHERE username IS NOT NULL` to allow multiple NULLs
-
-**Detection:** Test the migration against a database snapshot with existing profiles. Verify the auth trigger still works for new signups.
-
-**Phase:** Must be Phase 1 (foundation) -- everything else depends on usernames existing.
-
-### Pitfall 2: Recipe Ownership Collision with Household-Scoped RLS
-
-**What goes wrong:** Recipes currently belong to `household_id` with RLS policy `is_household_member(household_id, auth.uid())`. Adding "only creator can edit" breaks the existing model where ANY household member can edit ANY household recipe. The current UPDATE policy on recipes is: `USING (is_household_member(household_id, auth.uid()))` -- no creator check.
-
-**Why it happens:** v8.0 wants creator-only edit permissions, but the app has 7 versions of recipes being freely edited by all household members. Changing UPDATE RLS to `created_by = auth.uid()` immediately breaks the collaborative editing that households expect for their shared recipes.
-
-**Consequences:** Either (a) you break collaborative editing for existing recipes that have no meaningful `created_by` (imported recipes, AI-generated recipes, starter recipes all may have `created_by` set to whoever happened to trigger the import), or (b) you create a confusing split where some recipes are editable by all and others only by creator.
+**Consequences:** Grocery items checked off by a household member stop syncing. Presence avatars disappear or show stale users. Activity toasts stop firing. All of these are invisible during solo testing -- they only manifest when two users are active simultaneously.
 
 **Prevention:**
-1. Add `is_creator_owned BOOLEAN DEFAULT false` to recipes. Only NEW recipes created after v8.0 get `is_creator_owned = true`
-2. Existing recipes keep their current behavior (all household members can edit)
-3. Modify UPDATE RLS to: `USING (is_household_member(household_id, auth.uid()) AND (NOT is_creator_owned OR created_by = auth.uid()))`
-4. New recipes created via the social flow get creator-locked. Old recipes stay collaborative
-5. Optional: Add a "lock this recipe" action for creators who want to restrict editing
+- Identify every screen that uses real-time hooks BEFORE redesigning it. The affected screens are: grocery (`useGrocerySync`, `usePantrySync`, `usePresence`, `useActivityToast`), plan (social feed subscriptions), and recipe detail (`usePresence`).
+- Keep real-time hooks at the same component level or higher in the tree -- never push them deeper into a child that conditionally renders.
+- After each screen redesign, run a two-device manual test: open the screen on two devices, perform actions on one, verify the other receives updates.
+- Write a "real-time smoke test" checklist per screen before starting the redesign.
 
-**Detection:** Query `SELECT created_by, COUNT(*) FROM recipes GROUP BY created_by` to understand current ownership distribution. Check if any recipes have NULL `created_by`.
+**Detection:** Presence avatars not appearing, grocery items not syncing across devices, activity toasts silent during collaborative use.
 
-**Phase:** Must be Phase 1 or 2 -- RLS changes affect everything downstream.
+**Phase guidance:** Address in the earliest phase -- establish the "hooks stay at tab-screen level" rule before any component extraction begins.
 
-### Pitfall 3: Two Comment Systems Create UX Confusion
+---
 
-**What goes wrong:** The app already has `post_comments` (flat comments on feed posts, scoped to kitchen_id via `post_comments.kitchen_id`). v8.0 adds recipe comments (scoped to a recipe, visible to household members). Users see comments in the feed and comments on the recipe and cannot understand why they are different, why different people see them, or why their feed comment doesn't appear on the recipe.
+### Pitfall 2: Maestro Test Fragility from Changed Element Hierarchy
 
-**Why it happens:** Feed comments are kitchen-to-kitchen social interactions (public). Recipe comments are household-internal collaboration. They serve different purposes but look similar in the UI. A user might comment "Great recipe!" on a feed post and expect the recipe creator to see it on their recipe detail page.
+**What goes wrong:** SharedKitchen has 25+ Maestro E2E flows that rely on `testID` attributes (e.g., `grocery-tab`, `grocery-summary`, `grocery-item-.*`) and visible text patterns. Redesigning screens changes element hierarchy, removes/renames components, and shifts layouts -- silently breaking Maestro selectors. Tests that passed before the redesign start failing with "element not found" errors, but the failures cascade: a broken navigation tap early in a flow causes every subsequent assertion to fail, making it impossible to tell what actually broke.
 
-**Consequences:** Users comment in the wrong place. Creators miss feedback. Household members see recipe comments but not feed comments (and vice versa). Moderating two separate comment systems doubles complexity.
+**Why it happens:** Maestro tests are outside the TypeScript codebase (YAML in `.maestro/`), so there is no compiler warning when a `testID` is removed or a text label changes. Developers restructuring components naturally clean up or rename IDs without checking Maestro flows.
 
-**Prevention:**
-1. Make the visual distinction unmistakable: recipe comments use a "Notes" or "Kitchen Notes" label with a notebook icon, while feed comments remain "Comments" with a chat icon
-2. Consider whether recipe comments should aggregate feed comments about that recipe (read-only mirror) -- this creates a single view for the creator
-3. On recipe detail, if the recipe was shared to feed and has feed comments, show a "See X comments from followers" link that opens the feed post
-4. Do NOT try to merge the two systems into one table -- the visibility scopes are fundamentally different (household vs public)
-
-**Detection:** User testing with a prototype. Watch where users try to comment and whether they find feedback from both channels.
-
-**Phase:** Phase 3 (recipe comments) should explicitly reference this distinction in the design spec.
-
-### Pitfall 4: Version History Table Bloat and Query Performance
-
-**What goes wrong:** Naively storing full recipe snapshots on every edit creates massive table bloat. A recipe with JSONB `ingredients` (array of objects) and JSONB `instructions` (array of objects) can be 5-20KB per version. Ten edits = 50-200KB per recipe. At scale this kills query performance and storage costs.
-
-**Why it happens:** The simple approach is "copy entire row to history table on every update." With JSONB columns containing full ingredient lists and instruction sets, each version is large. The `recipes_updated_at` trigger already fires on every update, making it tempting to just add a history insert there.
-
-**Consequences:** `recipe_versions` table grows 10-50x faster than `recipes`. Queries that join version history become slow. Supabase free/pro tier storage limits hit sooner. Restoring a version requires copying large JSONB blobs back.
+**Consequences:** E2E test suite becomes red. Teams either (a) ignore the failing tests and lose the safety net, or (b) spend days fixing tests instead of shipping features. Worst case: tests are bulk-deleted "to fix later" and never restored.
 
 **Prevention:**
-1. Store only changed fields per version, not full snapshots. Use a `changes JSONB` column that records `{"field": "ingredients", "old": [...], "new": [...]}`
-2. OR: Store full snapshots but limit version count (keep last 10 versions, prune older ones via a scheduled function)
-3. Add version history via trigger on the existing `recipes_updated_at` trigger -- piggyback on what already fires
-4. Index `recipe_versions(recipe_id, created_at DESC)` for efficient "show history" queries
-5. Do NOT fetch version history by default on recipe detail -- lazy-load only when user taps "History"
+- Before redesigning a screen, grep all Maestro YAML files for any `id:` or `text:` selectors that reference that screen's elements. Document them.
+- Preserve all existing `testID` props on new components. Treat `testID` as a contract, not an implementation detail.
+- Update Maestro flows incrementally -- fix flows for each screen immediately after redesigning it, not in a batch at the end.
+- Use `extendedWaitUntil` with generous timeouts (already in use) rather than positional taps, which break when layouts shift.
 
-**Detection:** Monitor `pg_total_relation_size('recipe_versions')` after launch. Set an alert if it exceeds 2x the recipes table size.
+**Detection:** Maestro CI pipeline goes red. Individual flow runs show "element not found" for previously stable selectors.
 
-**Phase:** Phase 4 (version history) -- implement after core social features are stable. This is additive and can be deferred.
+**Phase guidance:** Each phase that redesigns a screen MUST include a task to update the corresponding Maestro flows. Never defer test fixes to a later phase.
 
-### Pitfall 5: Cook Log Auto-Creation from Meal Plan Creates Ghost Entries
+---
 
-**What goes wrong:** The spec says "auto-logged from meal plan." If a cook log entry is automatically created whenever a meal plan date passes, users get cook logs for meals they never actually cooked (plans change, dinner gets skipped, they ordered takeout). The "Cooked 47 times" badge becomes meaningless.
+### Pitfall 3: Bottom Sheet State Conflicts with New UI Interactions
 
-**Why it happens:** The meal_plans table has `plan_date` and `recipe_id`. It is tempting to create a cron job or trigger that inserts a cook_log entry when `plan_date <= now()`. But planned != cooked.
+**What goes wrong:** SharedKitchen uses bottom sheets extensively (PlanEditSheet, AddItemSheet, EditCategoriesSheet, AddPantryItemSheet, CameraSheet, FoodSearchSheet, CommentSheet, AddActionSheet). Redesigning a screen often introduces new interactive overlays (expanded sections, view toggles, filter chips) that compete with bottom sheet open/close state. The result: tapping a new UI element opens a sheet AND triggers a state change, or closing a sheet resets new UI state, or gesture conflicts between bottom sheet drag and new horizontal swipe gestures.
 
-**Consequences:** Inflated cook counts destroy trust in the feature. Users cannot distinguish "actually cooked" from "was on the plan." If cook logs feed into the social feed ("@user cooked Pad Thai!"), false auto-posts damage credibility.
+**Why it happens:** Bottom sheets in React Native consume gestures (pan, swipe). New UI elements like horizontal date strips, swipeable cards, or collapsible sections also consume gestures. Without explicit gesture arbitration, both respond to the same touch, causing visual glitches or navigation to unintended states.
+
+**Consequences:** User swipes horizontally on date strip but bottom sheet intercepts the gesture and opens/closes. Tapping a filter chip triggers the underlying list item. The app feels broken and unresponsive even though the visual redesign looks correct.
 
 **Prevention:**
-1. NEVER auto-create cook logs. Instead, PROMPT after cooking: when a user completes cooking mode, or when a planned meal date passes, show a "Did you cook this?" prompt
-2. The "I Cooked This" button on recipe detail is the primary entry point -- manual and intentional
-3. Cooking mode completion is the best auto-trigger signal (user explicitly went through steps), but still confirm
-4. Show a gentle nudge on the Plan tab for past dates: "Log your cook for last night's dinner?" with one-tap confirm
-5. Keep cook_log entries with a `source` field: 'manual', 'cooking_mode', 'prompt' -- to track how logs are created
+- Map all existing bottom sheets per screen before redesigning. The grocery screen alone has 7+ sheets/overlays.
+- Test every gesture interaction between new UI elements and existing bottom sheets.
+- Use `simultaneousHandlers` and `waitFor` from react-native-gesture-handler to explicitly define gesture priority.
+- Do not add new bottom sheets without removing or consolidating existing ones -- screen-level sheet count should not increase.
 
-**Detection:** Monitor ratio of cook_logs to meal_plans. If ratio approaches 1:1, something is auto-creating too aggressively.
+**Detection:** Gesture conflicts during manual testing. Bottom sheets opening when they should not. UI state resetting unexpectedly when sheets close.
 
-**Phase:** Phase 3 (cook log) -- get this right from the start, very hard to fix retroactively if data is polluted.
+**Phase guidance:** Define gesture interaction rules in the first phase. Document which gestures each screen's bottom sheets consume.
+
+---
+
+### Pitfall 4: Nested ScrollView / FlatList Virtualization Breakage
+
+**What goes wrong:** Stitch designs commonly produce layouts with a scrollable header area (date strip, filter chips, progress bar) above a scrollable list (meal cards, recipe grid, grocery items). Implementing this naively puts a FlatList inside a ScrollView, which disables FlatList's virtualization. All items render at once, causing memory spikes and janky scrolling -- especially on the grocery screen (potentially hundreds of items) and recipe library (large grid).
+
+**Why it happens:** Design tools output full-page layouts where everything scrolls together. In web CSS, this is trivial (the whole page scrolls). In React Native, ScrollView and FlatList are fundamentally different scroll containers that cannot be trivially nested.
+
+**Consequences:** On recipe library: all recipe cards render at once instead of being virtualized, causing 2-3 second mount delays with 50+ recipes. On grocery: checking items causes the entire list to re-render because virtualization is broken. Memory usage climbs, especially with recipe card images.
+
+**Prevention:**
+- NEVER nest a FlatList inside a ScrollView. Use FlatList's `ListHeaderComponent` for sticky headers, date strips, filter chips, and progress bars.
+- For the recipe grid (2-column layout), use FlatList with `numColumns={2}` and `ListHeaderComponent` for filters -- not a ScrollView wrapping a FlatList.
+- For grocery with section headers, use SectionList (already partially in use via `groupedItems`).
+- Set `removeClippedSubviews={true}` and tune `windowSize` (default 21 is often too large; try 5-7).
+- Memoize `renderItem` with `React.memo` and use `keyExtractor` with stable IDs.
+
+**Detection:** Scroll jank visible at 30fps. Yellow box warning: "VirtualizedLists should never be nested inside plain ScrollViews." Memory usage climbing in Xcode Instruments when scrolling lists.
+
+**Phase guidance:** Establish the "FlatList + ListHeaderComponent" pattern in the first screen redesigned, then replicate across all list screens.
+
+---
 
 ## Moderate Pitfalls
 
-### Pitfall 6: Feed Auto-Post Duplication for Recipe Events
+### Pitfall 5: Zustand Store Bloat from UI-Only State
 
-**What goes wrong:** The existing feed auto-posts when meals are added to the plan (v5.0). v8.0 adds "auto-post when recipe created or cooked." If someone creates a recipe, adds it to their plan, and then cooks it, three feed posts appear: "created a recipe," "planned Pad Thai for Tuesday," and "cooked Pad Thai." This feels spammy and floods followers' feeds.
-
-**Why it happens:** Each auto-post trigger operates independently. The existing `feed_posts` creation happens on meal plan insert. New triggers would fire on recipe insert and cook_log insert. No deduplication logic exists.
+**What goes wrong:** When adding new UI state for the redesign (view toggles like day/week, expanded sections, animation progress, selected filter chips, scroll positions), developers add these to existing Zustand stores alongside business data. This causes unnecessary re-renders: toggling a view mode in `planStore` triggers re-renders in every component that subscribes to ANY `planStore` state, including components that only need meal plan data.
 
 **Prevention:**
-1. Consolidate: When a cook log is created for a recipe that was already posted to feed (via meal plan), UPDATE the existing feed post to show "cooked" status with photo, rather than creating a new post
-2. Do NOT auto-post recipe creation. Only auto-post when cooked (the interesting social event). Recipe creation is noise; cooking is signal
-3. Add a `feed_post_type` enum to `feed_posts`: 'planned', 'cooked', 'recipe_created' -- then deduplicate by (kitchen_id, recipe_id, meal_date, type)
-4. Rate-limit feed posts per kitchen: max 3 per day to prevent spam
+- Keep UI-only state as local `useState` in the screen component or in a dedicated `useScreenUIState` hook -- NOT in Zustand stores.
+- The existing stores (planStore, groceryStore, budgetStore, etc.) should remain purely for server-synced business data.
+- Use Zustand selectors (`useStore(store, selector)`) to subscribe to specific slices, not the whole store.
+- Rule of thumb: if the state resets when you navigate away from the screen, it is local state, not store state.
 
-**Detection:** Query `SELECT kitchen_id, DATE(created_at), COUNT(*) FROM feed_posts GROUP BY 1,2 HAVING COUNT(*) > 5` to find spammy kitchens.
+**Detection:** Component profiler showing unnecessary re-renders when UI toggles change. Store files growing with `isExpanded`, `activeView`, `selectedChip` properties.
 
-**Phase:** Phase 4 (feed integration) -- must be designed alongside cook log, not bolted on after.
+**Phase guidance:** Establish the "local UI state vs store state" boundary in the first phase. Code review should enforce this throughout.
 
-### Pitfall 7: "Save to Collection" Creates Orphaned Recipe Copies
+---
 
-**What goes wrong:** The existing `saved_recipes` table stores a reference to the original `recipe_id`. But the v5.0 `saveRecipeFromPost` function actually copies the full recipe into the saver's household (creating a new row in `recipes`). If the original creator edits their recipe, saved copies are stale. If the original is deleted, the saved copy survives but attribution says "Saved from Kitchen X" pointing to nothing.
+### Pitfall 6: Design-to-Code Visual Gaps
 
-**Why it happens:** The current architecture creates full copies because recipes are household-scoped (RLS). User B cannot read User A's recipe directly -- they need their own copy. This is a fundamental tension between "recipes belong to households" and "recipes are social objects."
-
-**Consequences:** Stale copies proliferate. "Cooked 50 times" on the original doesn't count cooks of copies. Attribution links break when originals are deleted. Storage doubles for popular recipes.
-
-**Prevention:**
-1. Accept that copies are the correct model for a household-scoped app. The alternative (shared recipes readable across households) requires a massive RLS rewrite
-2. Add `source_recipe_id UUID REFERENCES recipes(id) ON DELETE SET NULL` to recipes table for provenance tracking
-3. When displaying "Saved from Kitchen X," gracefully handle NULL (original deleted): show "Originally from a kitchen" or similar
-4. Do NOT try to keep copies in sync with originals -- this creates a distributed consistency problem that is not worth solving
-5. Cook counts should be per-recipe-row, not aggregated across copies. Each household's copy has its own cook history
-
-**Detection:** Query `SELECT source_recipe_id, COUNT(*) FROM recipes WHERE source_recipe_id IS NOT NULL GROUP BY 1 ORDER BY 2 DESC` to see most-copied recipes.
-
-**Phase:** Phase 2 (recipe attribution) should establish the `source_recipe_id` pattern early.
-
-### Pitfall 8: Username Validation Edge Cases
-
-**What goes wrong:** Username validation that seems simple (@handle with alphanumeric + underscores) has edge cases: Unicode homoglyphs (Cyrillic "a" vs Latin "a"), offensive words, reserved words (admin, support, help), case sensitivity confusion (@Kitchen vs @kitchen), and squatting.
-
-**Why it happens:** Building a username system from scratch without studying how Twitter/Instagram handle these issues.
+**What goes wrong:** Stitch generates designs that use visual effects which are expensive or inconsistent in React Native:
+- **Complex shadows:** Android's `elevation` property cannot match iOS's `shadowColor/shadowOffset/shadowBlur/shadowRadius` fidelity. Even on iOS-only, applying shadows to every card in a FlatList is expensive because each shadow is a separate bitmap render. Also: `shadowRadius` in React Native is half the "blur" value from design tools like Figma/Stitch (a documented discrepancy).
+- **Blur effects:** `expo-blur` works on iOS but has performance costs. Backdrop blur behind bottom sheets or overlay cards causes frame drops during animations.
+- **Gradient overlays:** Linear gradients on images (for text readability over hero photos) require `expo-linear-gradient` and add rendering overhead per card in a list.
+- **SVG-heavy charts:** Donut rings, progress bars, and circular charts from Stitch may use complex SVG paths that are expensive to animate.
 
 **Prevention:**
-1. Lowercase-only storage and display. Case-insensitive UNIQUE constraint: `CREATE UNIQUE INDEX idx_profiles_username ON profiles(LOWER(username))`
-2. ASCII alphanumeric + underscore only (no dots, no hyphens, no Unicode). Regex: `^[a-z][a-z0-9_]{2,29}$`
-3. Minimum 3 characters, maximum 30
-4. Reserved word blocklist: admin, support, help, sharedkitchen, official, mod, moderator, system, null, undefined, etc.
-5. No profanity filter needed at SharedKitchen's scale -- handle manually via reports
-6. Must start with a letter (prevents `_hidden` or `123numeric` handles)
+- Audit each Stitch design for these effects BEFORE implementation. Flag any design that uses: blur, gradient overlays on list items, colored/inset shadows, or complex SVG animations.
+- For shadows on list items: use a single shadow style with `shadowOpacity: 0.08` -- subtle enough to look good, cheap enough to render per item. The existing `shadows` theme module should define the approved shadow styles.
+- For the budget donut ring: use `react-native-svg` with Reanimated's `createAnimatedComponent` (proven pattern). Do NOT add a heavy charting library for a single donut.
+- For gradient overlays on feed photos: apply the gradient at image load time (server-side or cached), not as a runtime overlay per card.
+- Prefer `backgroundColor` tonal layering (the existing "Tactile Sophistication" approach) over blur effects.
+- Remember: `shadowRadius` in RN = blur / 2 from Stitch/Figma designs.
 
-**Detection:** Unit test the validation regex against edge cases before shipping.
+**Detection:** Frame rate dropping below 50fps on screens with many cards. Visible shadow rendering lag when scrolling.
 
-**Phase:** Phase 1 (handle system) -- get validation right before any usernames are created.
+**Phase guidance:** Create a "visual effects budget" in the first phase: which effects are allowed per screen, and which are too expensive.
 
-### Pitfall 9: RLS Policy Performance Degradation with New Tables
+---
 
-**What goes wrong:** Every new table (cook_logs, recipe_comments, recipe_versions) needs RLS policies that join through `recipes` to check `household_id` via `is_household_member()`. The existing pattern (used in `recipe_ratings`, `recipe_notes`) does a subquery per row: `EXISTS (SELECT 1 FROM recipes r WHERE r.id = X AND is_household_member(r.household_id, auth.uid()))`. With 5+ tables doing this join, query planning degrades.
+### Pitfall 7: Camera and Vision Flow Regression on Grocery Screen
 
-**Why it happens:** `is_household_member()` is already called in RLS for recipes, recipe_ratings, recipe_notes, grocery_items, meal_plans, leftovers, expenses, AND all social tables use `is_kitchen_member()`. Each new table adds another set of per-row subqueries.
+**What goes wrong:** The grocery screen (684 LOC) has extensive camera integration: `CameraSheet`, `CameraPermissionPrompt`, `CameraPermissionCard`, `VisionLoadingOverlay`, `ScanReviewScreen`, `ListExtractReviewScreen`, `BarcodeScannerScreen`, `BarcodeResultCard`. Redesigning the grocery screen's layout can break the state machine that manages the camera flow: permission prompt -> camera sheet -> vision analysis -> scan review -> add to pantry/grocery.
 
-**Prevention:**
-1. Denormalize `household_id` onto cook_logs and recipe_comments tables directly (not just via recipe_id FK). This avoids the JOIN to recipes in RLS
-2. Use `SECURITY DEFINER` functions for complex multi-table checks to reduce repeated subquery overhead
-3. Ensure `is_household_member()` is marked `STABLE` (it already is based on similar `is_kitchen_member()`) so Postgres can cache results within a query
-4. Test RLS performance with realistic data volumes: 100 recipes, 500 cook_logs, 200 comments -- measure query times
-
-**Detection:** Use `EXPLAIN ANALYZE` on queries against new tables to verify RLS doesn't cause sequential scans.
-
-**Phase:** Phase 1 (database schema) -- design the denormalization pattern before creating tables.
-
-### Pitfall 10: Photo Storage Costs Spiral from Cook Log Gallery
-
-**What goes wrong:** Cook logs with photos ("here is my version!") mean every cook event can upload 1-3 photos. At 1MB compressed per photo, a recipe cooked 50 times with photos = 50-150MB per recipe. Supabase Pro plan includes 100GB storage; a popular household could burn through this surprisingly fast.
-
-**Why it happens:** Photo uploads are frictionless (good UX) but expensive (bad economics). The existing photo upload flow uses `expo-image-manipulator` for compression (1024px JPEG 0.6), which is good, but there is no per-user or per-household storage quota.
+**Why it happens:** The camera flow is a multi-step state machine managed by many `useState` booleans (`cameraSheetOpen`, `barcodeScannerOpen`, `foodSearchOpen`, etc.) in the grocery screen. Restructuring the JSX tree or extracting components can disconnect these state variables from their corresponding conditional renders.
 
 **Prevention:**
-1. Compress cook log photos aggressively: 800px max dimension, JPEG 0.5 quality (these are gallery thumbnails, not hero images). Target ~200KB per photo
-2. Limit photos per cook log entry: max 3 photos
-3. Consider Supabase Image Transformations for on-demand resizing rather than storing multiple sizes
-4. Add `cook-log-photos` as a separate Storage bucket with its own RLS policies (don't pollute existing buckets)
-5. Display gallery photos as thumbnails; load full resolution only on tap
-6. Future: implement storage cleanup for deleted cook logs (CASCADE in DB doesn't clean Storage)
+- Extract the camera flow state machine into a custom hook (e.g., `useCameraFlow`) BEFORE redesigning the grocery screen. This decouples the flow logic from the visual layout.
+- Test every camera flow path after redesigning: scan photo -> review -> add items, barcode scan -> result -> add, food search -> select -> add.
+- Do not change the camera permission flow -- it is required by Apple App Store guidelines.
 
-**Detection:** Monitor Supabase Storage dashboard monthly. Set budget alert at 50GB.
+**Detection:** Camera sheet not opening, scan results not appearing, barcode scanner overlay misaligned after layout changes.
 
-**Phase:** Phase 3 (cook log with photos) -- bake compression and limits in from day one.
+**Phase guidance:** The grocery screen redesign should be in a dedicated phase (not combined with other screens) due to its complexity. Extract camera flow hook first.
+
+---
+
+### Pitfall 8: Incremental Redesign Creates Temporary Visual Inconsistency
+
+**What goes wrong:** Redesigning 14 screens incrementally (recommended over big-bang) means the app temporarily has two visual languages: old screens with the current Culinary Curator design and new screens with the Stitch-inspired design. Users navigating between tabs see jarring visual jumps. Shared components (headers, bottom sheets, FAB, tab bar) must work with BOTH old and new screens during the transition.
+
+**Prevention:**
+- Redesign shared/global components first (or confirm they don't need changes). The design constraints say tab bar, FAB, and branding stay as-is, which eliminates the biggest source of inconsistency.
+- Group screen redesigns by user flow, not by screen: redesign Plan + Cooking Mode together (they are linked), Recipe Library + Recipe Detail together, Grocery + Pantry together.
+- Use the existing design system tokens (colors, typography, spacing from `src/theme/`) for BOTH old and new screens. The Stitch designs must adapt to these tokens, not the other way around.
+- Accept that temporary inconsistency is the price of reduced risk. A 2-week period of visual inconsistency is far better than a big-bang release that breaks 5 features.
+
+**Detection:** User feedback about inconsistent appearance. Side-by-side comparison of adjacent screens showing different card styles, spacing, or typography.
+
+**Phase guidance:** Phase 1 should redesign the highest-traffic screens (Plan, Recipes) to cover the most user time. Onboarding can be later since it is only seen once.
+
+---
 
 ## Minor Pitfalls
 
-### Pitfall 11: Existing `created_by` Data is Unreliable for Attribution
+### Pitfall 9: Over-Animating the Redesign
 
-**What goes wrong:** Displaying "Created by @username" on recipe detail requires `recipes.created_by` to be accurate. But for URL-imported recipes, AI-generated recipes, and starter recipes, `created_by` just records who tapped the button, not a meaningful "author." Showing "@diego created Grandma's Famous Lasagna" when Diego just imported it from a URL is misleading.
-
-**Prevention:**
-1. Distinguish `created_by` (who added it to the system) from `original_author` (recipe source). Keep `created_by` for DB purposes; display "Added by @username" not "Created by @username" for imported recipes
-2. Check `source_url` -- if present, display "Imported by @username from [source]" instead of "Created by"
-3. Only show "Created by" for recipes with no `source_url` (truly original recipes)
-
-**Phase:** Phase 2 (recipe attribution) -- simple display logic, low risk.
-
-### Pitfall 12: Version History for JSONB Fields is Hard to Diff
-
-**What goes wrong:** The `ingredients` and `instructions` columns are JSONB arrays. Showing a meaningful diff ("added 1 tsp salt to step 3") requires deep JSONB comparison, not just "ingredients changed." Raw JSONB diffs are unreadable to users.
+**What goes wrong:** Stitch designs often include entrance animations, micro-interactions, and transitions that look polished in a mockup but cause cumulative frame drops in a real app. Adding `react-native-reanimated` animations to every card, every toggle, and every transition creates a "death by a thousand cuts" performance issue.
 
 **Prevention:**
-1. For MVP version history, just show timestamps and who edited: "Edited by @diego on Apr 10" -- no detailed diff
-2. Store the full snapshot (not a diff) so users can "view this version" without reconstruction
-3. Defer detailed diffing to a future milestone -- it is a display problem, not a data problem
-4. If you must diff, compare at the array-element level: added ingredient X, removed ingredient Y, changed step 3 text
+- Limit entrance animations to ONE element per screen (e.g., the hero card). Everything else appears instantly.
+- Use Reanimated's `useAnimatedStyle` and run animations on the UI thread -- never use `Animated` from React Native core for new animations.
+- For the budget donut ring animation: animate ONCE on mount, do not re-animate on every data change.
+- Profile with Xcode Instruments after adding any animation. Target 60fps minimum.
 
-**Phase:** Phase 4 (version history) -- keep it simple. Timestamp + editor is sufficient for v8.0.
+**Detection:** Frame rate drops during screen transitions. Animations feeling sluggish on older devices (iPhone 11 and earlier).
 
-### Pitfall 13: Notification Fatigue from New Social Events
+---
 
-**What goes wrong:** v8.0 adds new notification triggers: someone commented on your recipe, someone cooked your recipe, someone saved your recipe. Combined with existing notifications (follow, like, feed comment), users get overwhelmed.
+### Pitfall 10: Dark Mode Regression
+
+**What goes wrong:** The app already supports dark mode via the theme system. New components added during redesign may hardcode colors (e.g., `backgroundColor: '#FFFFFF'` instead of `colors.surface`) or use Stitch's color values instead of the SharedKitchen theme tokens. Result: new components look wrong in dark mode.
 
 **Prevention:**
-1. Batch notifications: "3 people cooked your Pad Thai this week" instead of 3 separate pushes
-2. Add granular notification settings: recipe comments, cook notifications, save notifications (separate toggles)
-3. Default new notification types to OFF for existing users, ON for new users
-4. Rate-limit: max 5 social push notifications per day per user
+- Every new component MUST use colors from `src/theme/colors.ts`, typography from `src/theme/typography.ts`, and spacing from `src/theme/spacing.ts`.
+- Test every redesigned screen in BOTH light and dark mode before marking it complete.
+- No hardcoded color values in any new component -- enforce via code review.
 
-**Phase:** Phase 5 (notifications) -- ship as the final phase, after all features stabilize.
+**Detection:** Visual inspection in dark mode. Grep for hex color literals in new component files.
+
+---
+
+### Pitfall 11: Missing Skeleton/Loading State Parity
+
+**What goes wrong:** Current screens use `<Skeleton />` components for loading states. New designs may not specify loading states, so developers implement the "loaded" state and forget to maintain skeleton parity. Users see a blank screen or layout shift when data loads.
+
+**Prevention:**
+- For every redesigned screen, implement the loading state FIRST, then the loaded state.
+- Reuse the existing `<Skeleton />` component from `src/components/ui/Skeleton`.
+- Test with artificial delays (add 2-second sleep to fetch calls) to verify loading states look correct.
+
+**Detection:** Flash of empty content on screen mount. Layout shift when data arrives.
+
+---
+
+### Pitfall 12: Import Path Breakage from Component Reorganization
+
+**What goes wrong:** Moving, renaming, or splitting components during redesign breaks import paths across the codebase. With 255+ source files using relative imports (e.g., `../../../src/components/grocery/GrocerySection`), moving a component means updating every file that imports it.
+
+**Prevention:**
+- Use TypeScript's path aliases (already available via `tsconfig.json`) to avoid deep relative imports.
+- If components must move, use IDE "rename symbol" / "move file" features that auto-update imports.
+- Do not rename component files unless the component's responsibility fundamentally changes.
+
+**Detection:** TypeScript compilation errors after file moves.
+
+---
 
 ## Phase-Specific Warnings
 
 | Phase Topic | Likely Pitfall | Mitigation |
 |-------------|---------------|------------|
-| @Handle System | Existing users locked out (Pitfall 1) | Nullable column + interstitial migration flow |
-| @Handle System | Username validation edge cases (Pitfall 8) | Strict ASCII regex, reserved word list, case-insensitive unique |
-| Recipe Attribution | `created_by` is misleading for imports (Pitfall 11) | "Added by" vs "Created by" display logic based on `source_url` |
-| Recipe Attribution | Ownership vs household editing conflict (Pitfall 2) | `is_creator_owned` flag, preserve old behavior |
-| Recipe Comments | Confusion with feed comments (Pitfall 3) | Distinct visual treatment, "Kitchen Notes" labeling |
-| Cook Log | Ghost entries from auto-creation (Pitfall 5) | Never auto-create; prompt-based + manual "I Cooked This" |
-| Cook Log Photos | Storage cost spiral (Pitfall 10) | Aggressive compression, 3 photo limit, separate bucket |
-| Version History | Table bloat (Pitfall 4) | Limit stored versions, lazy-load only |
-| Version History | JSONB diff is hard (Pitfall 12) | MVP: timestamp + editor only, no detailed diff |
-| Feed Integration | Duplicate posts for same recipe (Pitfall 6) | Consolidate events, don't auto-post creation |
-| Save to Collection | Orphaned copies (Pitfall 7) | Accept copies model, `source_recipe_id` for provenance |
-| All New Tables | RLS performance (Pitfall 9) | Denormalize `household_id` onto new tables |
-| Notifications | Fatigue from new event types (Pitfall 13) | Batch, granular toggles, default OFF for existing users |
+| Plan screen redesign (date strip, hero card, day/week toggle) | Real-time social feed subscription teardown (#1); nested ScrollView with FlatList (#4) | Keep social hooks at screen level; use FlatList ListHeaderComponent for date strip |
+| Recipe library redesign (filter chips, 2-column grid) | FlatList re-render from filter state changes (#4, #5) | Memoize renderItem; keep filter chip state local, not in recipeStore |
+| Grocery screen redesign (progress bar, enhanced rows) | Camera flow regression (#7); presence/sync teardown (#1); bottom sheet conflicts (#3) | Extract useCameraFlow hook first; dedicated phase for grocery alone |
+| Budget dashboard (donut ring, insights) | Over-animation (#9); SVG performance for donut (#6) | Use Reanimated + react-native-svg, animate once on mount only |
+| Profile redesign (cooking insights, grouped settings) | Store bloat from dashboard state (#5); dark mode regression (#10) | All insight calculations derived, not stored; theme token enforcement |
+| Onboarding redesign (6 screens) | Lowest risk -- isolated flow, no real-time features | Test with fresh account; verify navigation sequence |
+| Cooking mode redesign (step photos, timers) | Timer state regression -- existing timers use countdown logic tied to component lifecycle | Do not restructure timer hook; redesign visual layer only |
+| Social feed redesign (hero photos, avatar strip) | FlatList performance with large images (#4, #6); infinite scroll regression | Keep existing cursor pagination; use expo-image with caching |
+| Premium upgrade screen | Lowest risk -- mostly static layout | Verify Stripe checkout link still works after redesign |
+| Maestro test maintenance | Test breakage from changed IDs (#2) | Update tests per-screen, not in bulk; preserve all testID values |
+
+---
+
+## Risk Matrix: Incremental vs Big-Bang for SharedKitchen
+
+**Recommendation: Incremental (screen-by-screen), grouped by user flow.**
+
+| Factor | Incremental | Big-Bang |
+|--------|-------------|----------|
+| Regression risk | LOW -- one screen at a time, easy to isolate bugs | VERY HIGH -- 14 screens changed simultaneously, impossible to isolate |
+| Maestro test maintenance | MEDIUM -- fix 2-3 flows per phase | VERY HIGH -- all 25+ flows break at once |
+| Real-time feature safety | HIGH -- test sync per screen | LOW -- too many moving parts to verify |
+| Visual consistency during transition | MEDIUM -- temporary inconsistency between old/new screens | HIGH -- everything updates at once |
+| Time to first visible progress | FAST -- ship first redesigned screen in days | SLOW -- nothing ships until everything is done |
+| Rollback capability | EASY -- revert one screen | IMPOSSIBLE -- all or nothing |
+
+Big-bang is only justified when shared components change so fundamentally that old screens cannot function. The design constraints for v7.0 explicitly preserve the tab bar, FAB, and design system tokens -- which means incremental is both viable and strongly preferred.
+
+---
 
 ## Sources
 
-- SharedKitchen codebase analysis: `supabase/migrations/00001_create_profiles.sql`, `00003_create_recipes.sql`, `00004_create_meal_plans.sql`, `00018_create_social_tables.sql`
-- [Supabase RLS Documentation](https://supabase.com/docs/guides/database/postgres/row-level-security) -- RLS disabled by default on SQL-created tables, deny-all without policies
-- [Supabase Storage Optimizations](https://supabase.com/docs/guides/storage/production/scaling) -- image transformation, cache-control, egress optimization
-- [Implementing System-Versioned Tables in Postgres](https://hypirion.com/musings/implementing-system-versioned-tables-in-postgres) -- concurrent update issues, GiST constraint pitfalls
-- [Store revisions of content in PostgreSQL](https://kaustavdm.in/versioning-content-postgresql/) -- trigger-based version history patterns
-- [Supabase RLS Security Scanner](https://vibeappscanner.com/supabase-row-level-security) -- 170+ apps with exposed databases due to missing RLS
-- [UX Best Practices for Recipe Platforms](https://www.sidechef.com/business/recipe-platform/ux-best-practices-for-recipe-sites) -- comment system design patterns
-- [User Migration: The Definitive Guide](https://developer.okta.com/blog/2019/02/15/user-migration-the-definitive-guide) -- forced migration and username change pitfalls
+- [React Native FlatList vs ScrollView (2025)](https://bilalshafqat.com/react-native-flatlist-vs-scrollview/)
+- [Nested ScrollViews in React Native](https://dev.to/swarnaliroy94/nested-scrollviews-can-be-tricky-in-react-native-how-to-solve-4f5a)
+- [React Native Nested Virtualization Anti-pattern](https://medium.com/@anisurrahmanbup/react-native-nested-virtualization-anti-pattern-performance-optimization-958e98d4ea79)
+- [Box Shadows in React Native - LogRocket](https://blog.logrocket.com/applying-box-shadows-in-react-native/)
+- [Zustand State Management Guide](https://dev.to/james_mugambi_494c7da2b07/mastering-state-management-in-react-native-with-zustand-a-modern-guide-1bfd)
+- [Supabase Realtime Reliability Discussion](https://github.com/orgs/supabase/discussions/5641)
+- [Reanimated Arc for Donut Charts](https://github.com/jayu/reanimated-arc)
+- [React Native Reanimated 3 Guide (2025)](https://dev.to/erenelagz/react-native-reanimated-3-the-ultimate-guide-to-high-performance-animations-in-2025-4ae4)
+- [Maestro React Native Support](https://docs.maestro.dev/platform-support/react-native)
+- [Maestro E2E Testing Experience with React Native](https://addjam.com/blog/2026-02-18/our-experience-adding-e2e-testing-react-native-maestro/)
+- [Incremental vs Big-Bang Redesigns](https://expdyn.medium.com/incremental-vs-big-bang-redesigns-evaluating-design-changes-for-users-2cb15dea05a4)
+- [Strangler Fig Pattern for Mobile Apps - Martin Fowler](https://martinfowler.com/articles/strangler-fig-mobile-apps.html)
+- [7 Biggest React Native Mistakes in 2025](https://nameisjayant1.medium.com/the-7-biggest-mistakes-react-native-developers-still-make-in-2025-1bcf73e48a8b)
+- SharedKitchen codebase analysis: `app/(app)/(tabs)/grocery.tsx` (684 LOC, 7+ bottom sheets, camera flow), `app/(app)/(tabs)/plan.tsx` (408 LOC, real-time hooks), `.maestro/*.yaml` (25+ E2E flows with testID selectors), `src/stores/*.ts` (13 Zustand stores), `src/theme/*.ts` (design system tokens)

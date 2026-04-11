@@ -138,22 +138,7 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 
 (None — planning next milestone)
 
-## Current Milestone: v8.0 Social Recipes
-
-**Goal:** Make recipes social objects — owned by users with unique @handles, commentable, with cooking history, photo galleries, and feed integration.
-
-**Target features:**
-- Unique @handle system — required username for every user, enforced during onboarding
-- Recipe attribution — "Created by @username" on recipe detail with creator avatar
-- Recipe comments — household-visible threaded comments on recipes
-- Cook log with photos — prompted after cooking, auto-logged from meal plan, manual "I cooked this" button
-- Cook count & gallery — "Cooked N times" badge, photo gallery from past cooks on recipe detail
-- Creator edit permissions — only creator can edit recipe; others can comment, rate, save
-- Version history — track recipe edits with timestamps
-- Feed integration — auto-post when recipe created or cooked
-- Save to collection — save someone else's recipe to your library
-
-## Previous Milestone: v7.0 Stitch UI Redesign (SHIPPED)
+## Current Milestone: v7.0 Stitch UI Redesign (SHIPPED)
 
 **Shipped:** 2026-04-09
 

@@ -1,154 +1,193 @@
-# Feature Landscape: v8.0 Social Recipes
+# Feature Landscape: Stitch UI Redesign
 
-**Domain:** Social recipe features for collaborative household cooking app
-**Researched:** 2026-04-10
-**Confidence:** MEDIUM-HIGH (patterns well-established across Cookpad, SideChef, Pepper, Sourbros)
+**Domain:** Meal planning app — UI-only redesign across 14 screens
+**Researched:** 2026-04-07
+**Confidence:** HIGH (visual reference screens available, existing codebase inspected, competitor patterns surveyed)
 
-## Existing Features (Already Built -- Do NOT Rebuild)
-
-These are shipped and working. New features must integrate with, not duplicate, them.
-
-| Feature | Version | Notes |
-|---------|---------|-------|
-| Recipe library with search/filters | v1.0+ | Recipes scoped to household_id, `created_by` tracks author user_id |
-| Recipe ratings (1-5 stars) | v1.0 | Per-user via recipe_ratings table |
-| Recipe notes (private per user) | v1.0 | Per-user via recipe_notes table |
-| Social feed with follows/likes/comments | v5.0 | Kitchen-to-kitchen model, flat comments on feed posts |
-| Kitchen profiles (name, avatar, bio, follower counts) | v5.0 | kitchen_profiles table, no @handle field yet |
-| Recipe saving from feed | v5.0 | saved_recipes table with source_kitchen_id provenance |
-| Cook This Too (save + add to meal plan) | v5.0 | One-tap flow already exists |
-| Report/block moderation | v5.0 | reported_content + blocked_kitchens tables |
-| Feed auto-post from meal plan | v5.0 | Fires when meal plan entry created |
-| Cooking mode with step-by-step timers | v2.0 | Fullscreen cooking mode exists, natural trigger point for cook log |
+---
 
 ## Table Stakes
 
-Features users expect from any social recipe platform. Missing = product feels incomplete.
+Features users expect in a modern meal planning app. Missing = product feels dated or incomplete.
 
-| Feature | Why Expected | Complexity | Dependencies | Notes |
-|---------|--------------|------------|--------------|-------|
-| **Unique @handle usernames** | Social identity is foundational. Cookpad uses usernames, Instagram/TikTok trained users to expect @handles. Required for attribution, mentions, and discoverability. | Medium | Onboarding flow update, migration for existing users | Add `handle` column to profiles table, unique constraint, validation (lowercase, alphanumeric + underscores, 3-20 chars). Must handle existing users who lack handles via forced setup screen on next app open. |
-| **Recipe attribution ("Created by @username")** | Every social recipe platform shows who made a recipe. Cookpad, Pepper, and all competitors display author with avatar. Without this, recipes feel anonymous and uncredited. | Low | @handle system | Display-only change on recipe detail screen. Already have `created_by` user_id on recipes table. Show avatar + @handle + "Created by" label. |
-| **Creator edit permissions** | Cookpad and all social recipe platforms restrict editing to the recipe creator. Others can save/copy/rate but not modify someone else's recipe. Standard content ownership pattern. | Low | None -- already have `created_by` on recipes | RLS policy change + UI gate (hide edit button for non-creators). Currently any household member can edit any recipe. Key decision: household admins should still be able to delete (not edit) recipes for moderation. |
-| **Cook log (basic)** | Cookpad's "Cooksnap" is their number one engagement driver -- users photograph what they cooked and attach it to the recipe. Tracking "I made this" is table stakes for any social recipe app. | Medium | Supabase Storage (already used for feed photos), new cook_logs table | Core flow: after cooking mode ends OR manual "I cooked this" button on recipe detail -> optional photo + optional note -> save. |
-| **Cook count display** | "Cooked 12 times" builds recipe credibility and user cooking identity. Cookpad shows cooksnap counts prominently on every recipe. Users expect to see social proof. | Low | cook_logs table (from cook log feature) | Aggregate count from cook_logs, displayed as badge on recipe detail. Include both household count and total public count. |
-| **Save to collection (enhanced)** | Already have basic save from feed. But saving any recipe you can see (not just from feed) is expected. Users browse recipes in other kitchens' profiles and need to save from there. | Low | Existing saved_recipes table | Extend save button to recipe detail screen (not just feed cards). Minor UI addition. |
+### Plan Tab
+
+| # | Feature | Why Expected | Complexity | Existing Dependency | Notes |
+|---|---------|--------------|------------|---------------------|-------|
+| 1 | **Day/Week toggle** | Every major planner (Mealime, Paprika, Eat This Much) offers both views. Users want to zoom in on today. | Medium | `planStore.weekOffset`, `WeekHeader`, `DayCard` | Currently week-only with prev/next arrows. Need new `viewMode` state in planStore or local state. Day view is a single-day expansion of existing DayCard data. |
+| 2 | **Horizontal date picker strip** | Standard mobile pattern (Google Calendar, Apple Health, fitness apps). Users expect tap-to-jump-to-day. | Medium | `planStore.weekDays()`, `getWeekDays()` in dates.ts | Build with FlatList horizontal or ScrollView. 5-day visible window (Mon-Fri from design), highlight today with filled circle. Can use custom component, no third-party lib needed. |
+| 3 | **Hero dinner card** with large photo | Dinner is the app's core value ("what's for dinner?"). Hero treatment matches user mental model. | Medium | `planStore.mealPlan`, `MealPlanWithRecipe`, existing `DayCard` `MealSlot` | Replace compact day-card dinner slot with full-width card. Uses existing recipe image_url. Presence indicator already exists via `PresenceAvatarStack`. |
+| 4 | **"Start Cooking" CTA on hero card** | Direct path from plan to cooking mode. Reduces tap count for primary action. | Low | `CookingMode` component, recipe data already in plan | Button that opens existing CookingMode with the hero recipe. One Pressable + router.push. |
+| 7 | **Rich recipe cards** with descriptions, difficulty badges, ratings | Industry standard (AllRecipes, NYT Cooking, Paprika). Cards without descriptions feel like lists. | Medium | `RecipeCard`, `recipeStore`, existing `FilterBar` | Current RecipeCard shows name + time pill + cost pill. Add: 2-line description, difficulty badge (Beginner/Intermediate/Advanced), star rating. Data already exists in recipe.description. Rating from existing recipe.rating field. |
+| 8 | **Shopping progress bar** ("12 of 18 items checked") | Every grocery app shows completion progress (AnyList, OurGroceries, Instacart). | Low | `groceryStore.summary()` already computes `checkedItems/totalItems` | `GrocerySummary` already has a basic progress bar. This is a visual upgrade: larger bar, "SHOPPING PROGRESS" label, "X of Y items checked" text. Minimal logic change. |
+| 10 | **Donut ring chart** for budget | Visual budget tracking is standard in finance/budget apps (Mint, YNAB, Copilot). Linear progress bars are fine but ring charts feel more polished. | Medium | `budgetStore.monthlyTotal()`, `budgetStore.categoryTotals()`, `MonthlyProgress` | Replace linear progress bar with SVG donut ring. Use `react-native-svg` (likely already installed via expo deps) or lightweight custom SVG. Center shows "$X of $Y spent" + percentage. |
+| 12 | **Month picker with arrows** for budget | Standard pattern in any monthly view (bank apps, analytics). Users need to navigate months. | Low | `budgetStore.selectedMonth`, `budgetStore.setSelectedMonth()` | Already have month selection in store. Just need `< September 2023 >` header component with prev/next arrows. |
+| 14 | **Grouped settings** with navigation rows | iOS standard pattern (Apple Settings app). Users expect categorized settings. | Low | Profile screen, existing settings scattered across screens | Pure UI reorganization. Group into sections: Household, Preferences, Account & Subscription. Each row: icon + label + optional value + chevron. No new data needed. |
+
+### Recipes Tab
+
+| # | Feature | Why Expected | Complexity | Existing Dependency | Notes |
+|---|---------|--------------|------------|---------------------|-------|
+| 6 | **Filter chips** (All, Quick Meals, Favorites) | Horizontal scrollable chips are the standard mobile filter pattern (Google Maps, DoorDash, Airbnb). | Medium | `FilterBar` with dropdown modals, `recipeStore` filter state | Current FilterBar uses dropdown buttons. Stitch design shows horizontal pill chips. Need to replace dropdown-modal approach with always-visible scrollable chips. Different UX paradigm — simpler but less filter depth. |
+
+### Grocery/Kitchen Tab
+
+| # | Feature | Why Expected | Complexity | Existing Dependency | Notes |
+|---|---------|--------------|------------|---------------------|-------|
+| 9 | **"Sync with Plan" action button** | Users need to regenerate grocery list when plan changes. Must be discoverable. | Low | `groceryStore.generateGroceryList()` already exists | Currently triggered somewhere in the flow. Stitch design puts it as a prominent top-bar button. Pure UI relocation — the action already works. |
+
+---
 
 ## Differentiators
 
-Features that set SharedKitchen apart. Not expected, but valued. These leverage SharedKitchen's unique household-first model.
+Features that set SharedKitchen apart. Not universally expected, but elevate the experience.
 
-| Feature | Value Proposition | Complexity | Dependencies | Notes |
-|---------|-------------------|------------|--------------|-------|
-| **Cook log with photos (rich)** | Goes beyond Cookpad's Cooksnap by integrating with meal plan. Auto-log when household member completes cooking mode or marks meal as done from plan. Photo prompted but optional. Creates a household cooking history, not just individual. | Medium | cook_logs table, Supabase Storage, meal plan integration | Three entry points: (1) post-cooking-mode prompt, (2) auto-log from meal plan completion, (3) manual "I cooked this" button on recipe detail. All three funnel to same cook_log creation flow. |
-| **Photo gallery from past cooks** | "Gallery" section on recipe detail showing all cook log photos across the household. Visual proof that a recipe works. No major competitor does this well at the household level. Cookpad shows individual cooksnaps but not aggregated per-recipe galleries. | Medium | cook_logs with photo_url, UI gallery component | Horizontal scrollable or grid gallery on recipe detail. Scope: household cooks only (not public). Shows who cooked it and when. |
-| **Recipe comments (household-visible, threaded)** | Distinct from existing flat feed post comments. Recipe comments are tied to the recipe itself, persist permanently, and are visible to everyone in the household. Threaded one level deep for Q&A ("How spicy is this?" / "Medium, I used 2 peppers"). Cookpad has recipe comments; SharedKitchen's household context makes them more intimate and useful. | Medium-High | New recipe_comments table (separate from post_comments), threading via parent_id | Key design decision: visibility scope. Recommend household members + recipe creator can see and post comments. One-level threading only (parent_id, not deep nesting). Extend existing report system for moderation. |
-| **Feed integration (auto-post on create/cook)** | Currently feed only auto-posts from meal plan. Extending to auto-post when a recipe is created ("Kitchen X just added Chicken Tikka Masala") or cooked ("Kitchen X just cooked Pasta Carbonara -- cooked 5 times!") enriches the feed with recipe-centric content beyond just meal planning. | Medium | Existing feed_posts infrastructure, cook_logs, recipe creation hook | Two new auto-post triggers: (1) recipe creation, (2) cook log creation with photo. Both use existing feed_posts table. Add a `post_type` column to discriminate between meal-plan posts, recipe-creation posts, and cook-log posts for different card rendering. |
-| **Version history for recipe edits** | Track what changed when recipes are edited. Useful when a recipe "stops tasting right" -- you can see the creator swapped butter for oil. No mainstream consumer cooking app does this; it is a power feature borrowed from collaborative document editing (Google Docs, GitHub). | Medium-High | New recipe_versions table (JSONB snapshot), UI for viewing history | Store full recipe snapshot on each save. Display as timeline: "Apr 5: Updated ingredients" with ability to view old version. Storage growth concern: recipe JSONB is ~2-5KB per version, manageable. |
-| **Cook count badges / milestones** | "First Cook", "5x Cook", "Weekly Warrior" (cooked 7 days straight). Gamification drives engagement per CKBK case study -- effective patterns are consistency badges, exploration badges, specialization badges. Key insight from research: personal milestones, not competitive leaderboards. | Low-Medium | cook_logs table, badge definition logic | Start simple: milestone badges on recipe ("Household favorite -- cooked 5 times!") and user profile ("50 recipes cooked this month"). Avoid leaderboards -- SharedKitchen is collaborative, not competitive. |
+| # | Feature | Value Proposition | Complexity | Existing Dependency | Notes |
+|---|---------|-------------------|------------|---------------------|-------|
+| 4a | **Soft empty states** with illustrations ("What's for breakfast?") | Emotional design that makes empty slots feel inviting, not broken. Most apps show "No meals planned" with a plus icon. SharedKitchen's warm illustration approach matches the "Tactile Sophistication" brand. | Medium | `EmptyState` component exists but is generic. `DayCard` has basic empty MealSlot | Need custom icons per meal type (breakfast, lunch). Stitch shows illustrated food icons with italic placeholder text. Use themed MaterialCommunityIcons with warm color palette. Key: inviting tone, not cold "empty" state. |
+| 5 | **Cross-feature shortcut** ("Grocery List - 12 items needed") | Reduces tab-switching friction. Shows plan-aware grocery status on Plan tab. Unique cross-pollination most competitors lack. | Medium | `groceryStore.summary()`, plan tab layout | Card at bottom of day view showing grocery status. Needs groceryStore data available on Plan tab (already loaded as global Zustand store). Pressable navigates to Groceries tab. |
+| 11 | **Budget insights cards** ("You spent 15% less on dining out") | Proactive intelligence, not just passive charts. YNAB does this well; most meal planners don't touch budget insights at all. | High | `budgetStore.categoryTotals()`, `budgetStore.weeklyBreakdown()` | Requires comparison logic: current month vs previous month per category. New computation in budgetStore or a derived selector. "SAVINGS ALERT" badge. Horizontal scrollable card carousel. This is net-new business logic, not just UI. |
+| 13 | **Cooking insights** (streak, plan completion, most-cooked recipe) | Gamification/engagement that builds habit. Few meal planners track cooking streaks. | High | `planStore.mealPlan` history, need new queries | Stitch shows: cooking streak (consecutive days with dinner planned/cooked), plan completion % (circular progress), most-cooked recipe with count. All require new Supabase queries against historical meal_plans data. Not currently computed anywhere. |
+| 15 | **Household distribution chart** | Shows who's contributing to cooking — social accountability for households. Unique to collaborative planning apps. | Medium | `planStore` data has `cook_id` field, `householdStore.members` | Horizontal stacked bar showing % of meals per household member. Needs aggregation query: count meals by cook_id for current month. New Supabase query or client-side computation from fetched plans. |
+| 16 | **Step photos** and **Chef's Tips** in cooking mode | Elevates cooking mode from text instructions to visual guidance. Serious cooking apps (NYT Cooking, Tasty) show step photos. | Medium | `CookingMode`, `StepCard`, recipe `instructions` JSON | Step photos: need `image_url` field per instruction step in instructions JSON array. Chef's Tips: new `tip` field per step. Both require recipe data schema awareness. For imported recipes, AI extraction could populate tips. Photos depend on source recipe having per-step images — graceful degradation when missing. |
+| 17 | **Following avatar strip** in feed | Instagram Stories-style horizontal avatar row creates social presence. Makes feed feel alive even with few posts. | Low | `socialStore` has follow data, kitchen profiles with avatars | Horizontal FlatList of followed kitchen avatars at top of feed. Tap navigates to kitchen profile. Data already available from socialStore. Pure UI addition — very impactful for perceived social activity. |
+| 18 | **Feature comparison table** for premium upgrade | Clear free-vs-premium comparison drives conversion. Standard SaaS pattern. | Low | `SubscriptionSheet` already has `FREE_VS_PREMIUM` array | Current SubscriptionSheet has the data as a simple list. Stitch design shows proper comparison table with checkmarks/dashes, column headers, hero kitchen photo, and monthly/yearly pricing tiers. Visual upgrade of existing data. Yearly tier needs new Stripe price_id. |
+
+---
 
 ## Anti-Features
 
-Features to explicitly NOT build in v8.0.
+Features to explicitly NOT build as part of this redesign.
 
 | Anti-Feature | Why Avoid | What to Do Instead |
 |--------------|-----------|-------------------|
-| **Recipe forking / remixing** | Adds massive complexity (provenance chains, attribution disputes, "which version is canonical?"). Cookpad has "remix" but it creates confusion about ownership. SharedKitchen's household model makes this even messier -- who owns the fork? | Use "Save to collection" which copies the recipe to your library. No formal fork chain. If users want to modify, they save and edit their own copy freely. |
-| **Deep threaded comments (Reddit-style)** | Deep nesting is terrible on mobile UX. Even Cookpad uses flat or 1-level comments. Recipe discussions are short Q&A exchanges, not multi-branch debates. | One-level threading only: top-level comment + replies. No reply-to-reply nesting. |
-| **Public recipe profiles / marketplace** | SharedKitchen is household-first, not a recipe publishing platform. Public profiles exist via kitchen_profiles, but turning recipes into a public marketplace changes the product's identity and introduces content moderation scale issues. | Keep recipe visibility scoped: household sees all, followers see what is shared via feed. No public recipe browsing outside follow graph. |
-| **@mention notifications in comments** | Adds complexity to comment parsing (regex for @handles, notification routing, edge cases with renamed handles). Low value for v8.0 scope when comments are household-scoped. | Ship plain text comments first. @mentions can be a v9.0 enhancement once handles are established and usage patterns are clear. |
-| **Recipe collaboration / co-editing** | Google Docs-style real-time collaboration on recipes is engineering-heavy (conflict resolution, OT/CRDT, real-time cursors) and very low-value for a cooking app where recipes are typically authored by one person. | Single creator owns and edits. Others comment with suggestions. Creator can incorporate feedback manually. |
-| **Competitive leaderboards** | SharedKitchen's core value is collaborative household cooking. Leaderboards create unhealthy dynamics ("I cook more than you") in family/roommate settings. Research confirms gamification in family apps should be personal, not competitive. | Personal milestones and badges only. "You cooked 50 recipes!" not "You're ranked #2 in your household." |
-| **Community recipe ratings (separate from existing)** | Adding a second rating system (community ratings vs household ratings) creates confusion. Yummly's failure to maintain rating quality is a cautionary tale. | Keep existing 1-5 star ratings per user. Cook count serves as implicit social proof signal. |
+| **Animated page transitions between Day/Week** | Over-engineering for a view toggle. Adds complexity, potential jank on lower-end devices. | Simple conditional render. Day view and Week view are different component trees, not animated transforms. |
+| **Custom illustration assets per empty state** | Art direction scope creep. Commissioning/creating 3+ unique illustrations delays shipping. | Use themed MaterialCommunityIcons or simple SVG shapes with the existing color palette. Stitch designs show simple food icons, not complex illustrations. |
+| **Real-time budget insights computation** | Budget insights comparing months requires fetching previous month data. Doing this on every render is wasteful. | Compute insights on budget tab mount or on explicit refresh. Cache the comparison result. |
+| **Interactive donut chart with segment selection** | Tap-to-expand-segment adds touch handling complexity for minimal value. Budget categories are already shown in a list below. | Static donut ring with center text. Category breakdown stays as the existing list with progress bars. |
+| **Yearly pricing tier backend work** | App uses Stripe external payments. Adding yearly tier requires new Stripe product/price creation, not just UI. | Show yearly tier in UI but flag as needing backend coordination. Can initially route to monthly checkout and add yearly once Stripe price_id is created. |
+| **Drag-and-drop meal reordering in day view** | Complex gesture handling (react-native-gesture-handler + reanimated) for a rarely-used action. | Keep existing bottom sheet for editing/reassigning meals to slots. |
+| **Per-step cooking photos from URL import** | Most recipe sites don't have per-step images in schema.org data. AI can't reliably generate them. | Show step photo slot only when data exists (graceful degradation). Don't block on having photos for every step. |
+
+---
 
 ## Feature Dependencies
 
 ```
-@handle system ──────────────────┐
-                                 v
-                          Recipe attribution ("Created by @username")
-                                 │
-                                 v
-                          Creator edit permissions (RLS: only creator can edit)
-                                 │
-cook_logs table ────────────────>│
-  │                              v
-  ├── Cook count display ──> Recipe detail UI updates
-  │                              │
-  ├── Photo gallery ────────>────┘
-  │
-  ├── Auto-log from meal plan ──> Meal plan integration
-  │
-  └── Feed auto-post on cook ──> Feed integration
-                                     ^
-Recipe creation auto-post ───────────┘
+Day/Week Toggle (1) --> Horizontal Date Strip (2)
+   (Date strip only makes sense in Day view; Week view uses existing WeekHeader)
 
-recipe_comments table ──> Recipe comments (threaded)
-                              │
-                              └── Moderation (extend existing report system)
+Hero Dinner Card (3) --> Start Cooking CTA (4)
+   (CTA lives on the hero card)
 
-recipe_versions table ──> Version history
-                              │
-                              └── Recipe edit flow changes (save snapshot before edit)
+Hero Dinner Card (3) --> Soft Empty States (4a)
+   (Empty states replace hero card when no dinner planned)
 
-Save to collection ──> Extend existing saved_recipes (minimal new work)
+Filter Chips (6) --> Rich Recipe Cards (7)
+   (Both are Recipes tab; chips filter the card list)
+
+Shopping Progress Bar (8) + Sync with Plan Button (9)
+   (Both are Grocery tab header area, co-dependent layout)
+
+Donut Ring Chart (10) --> Month Picker (12)
+   (Month picker controls which month the donut shows)
+
+Donut Ring Chart (10) --> Budget Insights (11)
+   (Insights appear below the donut, same screen)
+
+Cooking Insights (13) and Household Distribution (15)
+   (Both Profile screen sections, independent data but same layout pass)
+
+Step Photos (16) is independent (Cooking Mode)
+Following Avatar Strip (17) is independent (Feed)
+Feature Comparison Table (18) is independent (Premium screen)
+Grouped Settings (14) is independent (Profile screen)
 ```
 
-## Critical Path
-
-The dependency graph reveals a clear build order:
-
-1. **@handle system** -- foundational identity layer, everything references it
-2. **Recipe attribution + creator permissions** -- uses handles, gates editing, low complexity
-3. **cook_logs table + basic logging** -- enables count, gallery, feed integration
-4. **Recipe comments** -- independent of cook logs, can parallel with step 3
-5. **Feed integration** -- depends on cook logs and recipe creation hooks
-6. **Photo gallery + badges** -- polish layer on top of cook_logs data
-7. **Version history** -- lowest priority, highest complexity, can be deferred
+---
 
 ## MVP Recommendation
 
-**Must ship (table stakes):**
-1. @handle system with onboarding enforcement and existing-user migration
-2. Recipe attribution display ("Created by @username") on recipe detail
-3. Creator edit permissions (only creator can edit; household admin can delete)
-4. Basic cook log with optional photo (manual button + post-cooking-mode prompt)
-5. Cook count badge on recipe detail
-6. Save to collection from recipe detail (extend existing save beyond feed)
+### Phase 1: Plan Tab Redesign (highest user impact)
+1. **Day/Week toggle** (1) - Fundamental UX shift, most visible change
+2. **Horizontal date strip** (2) - Paired with day view
+3. **Hero dinner card** (3) + **Start Cooking CTA** (4) - Flagship visual upgrade
+4. **Soft empty states** (4a) - Emotional design for empty slots
+5. **Cross-feature grocery shortcut** (5) - Cross-pollination between tabs
 
-**Should ship (key differentiators):**
-7. Cook log auto-trigger from meal plan completion
-8. Photo gallery on recipe detail
-9. Recipe comments with 1-level threading
-10. Feed auto-post on recipe create and cook
+### Phase 2: Recipes + Grocery Tabs
+6. **Filter chips** (6) - Replaces dropdown FilterBar
+7. **Rich recipe cards** (7) - Description + difficulty + ratings
+8. **Shopping progress bar** (8) - Visual upgrade of existing component
+9. **Sync with Plan button** (9) - Relocation of existing action
 
-**Defer to v8.1 or v9.0:**
-11. Version history for recipe edits (Medium-High complexity, low initial user demand)
-12. Cook count badges/milestones beyond simple count (needs usage data to inform design)
-13. @mention support in comments (needs handles to be established first)
+### Phase 3: Budget + Profile
+10. **Donut ring chart** (10) - New SVG component, biggest visual change on Budget tab
+11. **Month picker** (12) - Simple navigation chrome
+12. **Budget insights** (11) - New business logic (month-over-month comparison)
+13. **Cooking insights** (13) - New Supabase queries for streak/completion/most-cooked
+14. **Household distribution** (15) - New aggregation query
+15. **Grouped settings** (14) - Pure UI reorganization
 
-## Complexity Budget
+### Phase 4: Cooking Mode + Social + Premium
+16. **Step photos + Chef's Tips** (16) - Schema evolution for instructions JSON
+17. **Following avatar strip** (17) - Quick social upgrade
+18. **Feature comparison table** (18) - Premium conversion upgrade
 
-| Feature | Estimated Effort | Risk Level |
-|---------|-----------------|------------|
-| @handle system + migration | 1 phase | Low risk, but existing-user migration needs careful UX |
-| Recipe attribution + permissions | 0.5 phase | Low risk -- RLS + UI display |
-| Cook log (all entry points) | 1 phase | Medium risk -- three trigger points, photo upload, storage |
-| Recipe comments (threaded) | 1 phase | Medium risk -- new table, threading, moderation extension |
-| Feed integration (auto-post) | 0.5 phase | Low risk -- extending existing auto-post infrastructure |
-| Photo gallery | 0.5 phase | Low risk -- UI component reading from cook_logs |
-| Save to collection (enhanced) | 0.25 phase | Low risk -- extending existing saved_recipes |
-| Version history | 1 phase | Medium-High risk -- snapshot strategy, diff UI, storage |
-| Badges/milestones | 0.5 phase | Low risk -- derived from existing data |
-| **Total** | **~6.25 phases** | **Defer version history to fit in ~5 phases** |
+### Defer:
+- **Yearly pricing tier backend**: Requires Stripe price_id creation beyond UI scope
+- **Budget insights** could ship as static summary text in Phase 3, made dynamic later
+
+---
+
+## Complexity Summary
+
+| Complexity | Count | Features |
+|------------|-------|----------|
+| **Low** | 7 | Start Cooking CTA (4), Shopping progress bar (8), Sync with Plan (9), Month picker (12), Grouped settings (14), Following avatar strip (17), Feature comparison table (18) |
+| **Medium** | 9 | Day/Week toggle (1), Date strip (2), Hero dinner card (3), Soft empty states (4a), Cross-feature shortcut (5), Filter chips (6), Rich recipe cards (7), Donut ring chart (10), Household distribution (15), Step photos/tips (16) |
+| **High** | 2 | Budget insights (11), Cooking insights (13) |
+
+The "High" items are high because they require **new business logic and Supabase queries**, not just visual changes. Everything else is UI-only work against existing data.
+
+---
+
+## Existing Store/Component Impact
+
+| Store | Changes Needed | Affected Features |
+|-------|---------------|-------------------|
+| `planStore` | Add `viewMode: 'day' \| 'week'` state, `selectedDate` for day view. Possibly new `fetchMealPlanForDay()` or reuse existing fetch with date range. | 1, 2, 3, 4, 4a, 5 |
+| `recipeStore` | Modify filter state to support chip-based filtering (may just be UI change if filter categories map to existing filters). | 6, 7 |
+| `groceryStore` | No store changes. `summary()` already provides progress data. | 8, 9 |
+| `budgetStore` | Add `fetchPreviousMonth()` for insights comparison. Add `insights()` computed selector. | 10, 11, 12 |
+| `socialStore` | No store changes. Follow data already available. | 17 |
+| `subscriptionStore` | Add yearly price_id support if implementing yearly tier. | 18 |
+| **New queries needed** | `fetchCookingStreak()`, `fetchPlanCompletion()`, `fetchMostCookedRecipe()`, `fetchHouseholdDistribution()` | 13, 15 |
+
+| Component | Action | Affected Features |
+|-----------|--------|-------------------|
+| `WeekHeader` | Keep for week view, add Day/Week segmented control above it | 1 |
+| `DayCard` | Major refactor into hero card layout for day view | 3, 4, 4a |
+| `FilterBar` | Replace with horizontal chip bar | 6 |
+| `RecipeCard` | Add description, difficulty badge, rating star | 7 |
+| `GrocerySummary` | Visual upgrade with progress bar styling | 8 |
+| `MonthlyProgress` | Replace with donut ring SVG component | 10 |
+| `CookingMode` / `StepCard` | Add step photo, chef tip, ingredient chips | 16 |
+| `FeedCard` / `FeedList` | Add avatar strip header, hero-sized photos, try-recipe CTA | 17 |
+| `SubscriptionSheet` | Full redesign into comparison table layout with pricing tiers | 18 |
+| **New components** | `DateStrip`, `HeroDinnerCard`, `MealEmptyState`, `GroceryShortcutCard`, `DonutRingChart`, `BudgetInsightCard`, `CookingInsightsSection`, `HouseholdDistributionBar`, `SettingsGroup`, `FollowingAvatarStrip`, `PremiumComparisonTable` | Various |
+
+---
 
 ## Sources
 
-- [Cookpad Cooksnap: "A Cooksnap is worth 1,000 Words"](https://blog.cookpad.com/us/a-cooksnap-is-worth-1-000-words/) -- MEDIUM confidence
-- [Cookpad Cooksnaps: Cook it! Snap it! Share it!](https://blog.cookpad.com/uk/all-about-cooksnaps-cook-it-snap-it-share-it/) -- MEDIUM confidence
-- [Cookpad recipe view statistics](https://blog.cookpad.com/in/recipe-views-statistics/) -- MEDIUM confidence
-- [Trophy: Gamification for recipe apps (CKBK case study)](https://trophy.so/blog/building-cooking-habits-gamification-ideas-for-recipe-apps) -- MEDIUM confidence, verified via full page fetch
-- [GetStream: Building social media app (comment threading patterns)](https://getstream.io/blog/build-a-social-media-app/) -- MEDIUM confidence
-- [SideChef UX best practices for recipe platforms](https://www.sidechef.com/business/recipe-platform/ux-best-practices-for-recipe-sites) -- MEDIUM confidence
-- [Cookpad: Spreading joy of cooking (Harvard case study)](https://d3.harvard.edu/platform-digit/submission/cookpad-spreading-the-joy-of-cooking-worldwide/) -- MEDIUM confidence
-- SharedKitchen existing codebase: database.ts types, socialStore.ts, recipes table schema -- HIGH confidence
+- Stitch UI reference designs: `/Users/deeg/Downloads/SharedKitchenStitchUIv2/` (14 screens reviewed)
+- SharedKitchen codebase: stores, components, theme tokens inspected
+- [Meal Planning App Development Guide](https://developerbazaar.com/guide-to-meal-planner-app-development/)
+- [Horizontal Calendar for React Native](https://dev.to/kharioki/horizontal-calendar-a-simple-date-picker-for-react-native-4h2)
+- [react-native-calendar-strip](https://github.com/BugiDev/react-native-calendar-strip)
+- [Donut Chart with React Native SVG](https://dev.to/franciscomendes10866/how-to-create-a-donut-chart-using-react-native-svg-30m9)
+- [Animated Donut Chart with Reanimated](https://dev.to/dimaportenko/react-native-animated-donut-pie-chart-reanimated-svg-32od)
+- [Empty State UX Best Practices](https://www.eleken.co/blog-posts/empty-state-ux)
+- [Progress Indicator UI Design](https://mobbin.com/glossary/progress-indicator)
+- [Best Meal Planning Apps 2026](https://ollie.ai/2025/10/21/best-meal-planning-apps-in-2025/)

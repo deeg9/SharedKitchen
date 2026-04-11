@@ -1,179 +1,169 @@
-# Technology Stack: v8.0 Social Recipes
+# Technology Stack: v7.0 Stitch UI Redesign
 
 **Project:** SharedKitchen
-**Researched:** 2026-04-10
-**Scope:** Stack additions for @handle usernames, recipe attribution, recipe comments, cook log with photos, version history, and feed integration
+**Researched:** 2026-04-07
+**Scope:** Stack additions for new UI patterns only. Existing stack (Expo SDK 55, React Native 0.83.2, Reanimated 4.2.1, Zustand, gorhom/bottom-sheet, FlashList, expo-image, etc.) is validated and unchanged.
 
-## Key Finding: No New npm Dependencies Required
+## Recommended Additions
 
-The existing stack (Expo SDK 55, Supabase JS 2.100+, Zustand 5, expo-image, expo-camera, expo-image-picker, expo-image-manipulator, @shopify/flash-list) already provides every client-side capability needed for v8.0. All new features are **Postgres schema + RLS policy** work on the backend, and **new screens/components** using existing libraries on the frontend.
+### SVG Primitives for Charts and Rings
 
-**Confidence: HIGH** -- Verified against existing codebase patterns (feed photos, social tables, camera flows).
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| react-native-svg | ~15.11 (via `npx expo install`) | Donut rings, progress bars, stacked bars, percentage rings | Part of the Expo ecosystem (bundled in Expo Go), lightweight (~200KB JS), pairs with existing Reanimated for animations. Only library needed for ALL chart patterns in the redesign. |
 
-## What Needs to Change
+**What it enables:**
+- Budget donut/ring chart: `<Circle>` with `strokeDasharray` + `strokeDashoffset` animated via Reanimated
+- Category progress bars: `<Rect>` with animated width (or plain `View` with Reanimated -- SVG optional here)
+- Cooking insights percentage ring: Same `<Circle>` ring pattern as budget donut
+- Household distribution stacked bar: Multiple `<Rect>` elements with proportional widths
+- Shopping progress bar: Animated `<Rect>` fill or plain `View` (SVG optional)
 
-### Database Schema Additions (Supabase Postgres)
+**Confidence:** HIGH -- react-native-svg is an Expo SDK package, installed via `npx expo install react-native-svg`. Verified in Expo SDK 55 docs. Pairs with Reanimated via `Animated.createAnimatedComponent(Circle)` for smooth 60fps ring animations (well-documented pattern).
 
-| Table/Column | Purpose | Why |
-|--------------|---------|-----|
-| `profiles.username` (TEXT UNIQUE NOT NULL) | @handle system | Unique constraint with `LOWER()` index enforces case-insensitive uniqueness. Added to existing `profiles` table. |
-| `profiles` broader SELECT RLS policy | @handle display on recipes, comments, attribution | Currently only own-user + co-household. Need "authenticated users can read username + avatar_url" for social contexts. |
-| `recipe_comments` (new table) | Household-visible comments on recipes | Different from `post_comments` (feed-scoped, kitchen-level). Recipe comments are user-level within household. Different RLS, different display. Separate table. |
-| `cook_logs` (new table) | Track when someone cooks a recipe with optional photos | Columns: id, recipe_id, user_id, household_id, meal_plan_id (nullable), photos (TEXT[]), notes, cooked_at, created_at. |
-| `recipe_versions` (new table) | Track recipe edit history | Columns: id, recipe_id, version_number, changed_by, changes_snapshot (JSONB), created_at. Full snapshot per version. |
-| `recipes.cook_count` (INT DEFAULT 0) | "Cooked N times" badge | Maintained by trigger on cook_logs INSERT/DELETE. Same pattern as follow_count, like_count. |
-| Storage bucket: `cook-log-photos` | Cook log photo uploads | Same pattern as existing `meal-photos` bucket. Public read, authenticated write, user-folder scoped delete. |
-| `feed_posts.type` (TEXT) | Distinguish post types in feed | New post types: `'recipe_created'`, `'cook_log'` alongside implicit existing `'meal_planned'`. Default existing rows to `'meal_planned'`. |
-| `feed_posts.recipe_id` (UUID nullable) | Link feed posts to source recipe | Enables "View Recipe" from feed cards for recipe_created and cook_log posts. |
+### Gradient Overlays for Hero Cards
 
-### RLS Policy Changes
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| expo-linear-gradient | ~55.0.12 (via `npx expo install`) | Gradient overlays on hero cards, image overlays with text | Expo SDK package, production-stable. Used for hero card text-over-image patterns with bottom-to-top dark gradient for readability. |
 
-| Table | Change | Rationale |
-|-------|--------|-----------|
-| `profiles` | Add SELECT policy: "Authenticated users can read profiles" | @handles need to be resolvable by any authenticated user for attribution display, comment author names. The profiles table contains no sensitive data (id, display_name, avatar_url, username, created_at). |
-| `recipes` | Modify UPDATE policy: restrict to `created_by = auth.uid() OR created_by IS NULL` | Creator-only editing. Currently any household member can edit. The `OR NULL` clause handles legacy recipes created before `created_by` was tracked. |
-| `recipe_comments` | Standard household-scoped policies | Same pattern as recipe_notes. Any household member can read/create; users can only delete their own. |
-| `cook_logs` | Household-scoped read, user-scoped write | Any household member can see cook history; only the cook can create/edit/delete their own entries. |
-| `recipe_versions` | Household-scoped read-only | Insert handled by trigger on recipes UPDATE. No direct user writes needed. |
+**What it enables:**
+- Hero cards with overlaid text: `<LinearGradient>` positioned absolutely over `<Image>` with `colors={['transparent', 'rgba(0,0,0,0.7)']}`
+- Onboarding screen backgrounds: Subtle gradient washes behind content
+- Premium upgrade screen: Gradient accent sections
 
-### Edge Functions
+**Why not `experimental_backgroundImage`:** React Native 0.83.2 supports `experimental_backgroundImage` with `linear-gradient()` natively, which would avoid adding a dependency. However, it remains an experimental API with potential edge cases. `expo-linear-gradient` is production-proven, part of the Expo SDK, and adds negligible bundle size. Use the stable path for a production app.
 
-No new Edge Functions required. All v8.0 operations are standard CRUD via supabase-js. The existing `social-push` Edge Function should be extended with new notification types (recipe comments, cook log activity) but doesn't need a new function.
-
-### Existing Libraries That Cover New Features
-
-| Feature | Existing Library | Existing Pattern |
-|---------|-----------------|------------------|
-| Cook log photo capture | `expo-camera` + `expo-image-picker` | `CameraSheet.tsx` from v4.0 |
-| Cook log photo compression | `expo-image-manipulator` | 1024px JPEG 0.6 compression from existing photo flows |
-| Cook log photo upload | `@supabase/supabase-js` Storage | `feedHelpers.ts` upload to `meal-photos` bucket |
-| Cook log photo display | `expo-image` | Cached CDN-backed rendering on feed cards and recipe images |
-| Photo gallery scroll | `ScrollView` horizontal or `@shopify/flash-list` | Cook logs typically have 1-5 photos; horizontal ScrollView suffices |
-| @handle input validation | Built-in regex | `/^[a-zA-Z0-9_]{3,20}$/` -- no library needed |
-| Username availability check | `supabase.from('profiles').select('id').eq('username', handle)` | Same pattern as kitchen search |
-| Recipe comments list | `@shopify/flash-list` | Same pattern as `CommentSheet.tsx` for feed post comments |
-| Version history display | `FlatList` | Simple chronological list, low item count per recipe |
-| Optimistic UI | `zustand` | Same pattern used throughout v5.0 social features |
-| Real-time comment updates | Supabase Realtime `postgres_changes` | Same subscription pattern as grocery sync, pantry sync |
-
-## Recommended Stack (Unchanged + Schema)
-
-### Core Framework (NO CHANGES)
-| Technology | Version | Purpose | Status |
-|------------|---------|---------|--------|
-| React Native | 0.83.4 | UI framework | Existing |
-| Expo SDK | 55 | Build toolchain | Existing |
-| TypeScript | 5.9.2 | Type safety | Existing |
-| expo-router | 55.0.11 | File-based routing | Existing |
-
-### Backend (SCHEMA CHANGES ONLY)
-| Technology | Version | Purpose | Status |
-|------------|---------|---------|--------|
-| Supabase Postgres | Latest | Database + RLS | Existing -- add 3 tables, modify 2 existing |
-| Supabase Storage | Latest | Photo uploads | Existing -- add 1 new bucket |
-| Supabase Realtime | Latest | Live updates | Existing -- subscribe to new tables |
-| Supabase Edge Functions | Latest | Server push | Existing -- extend for new notification types |
-
-### State Management (NO CHANGES)
-| Technology | Version | Purpose | Status |
-|------------|---------|---------|--------|
-| Zustand | 5.0.12 | Client state | Existing -- add new store slices |
-
-### Photo Pipeline (NO CHANGES)
-| Technology | Version | Purpose | Status |
-|------------|---------|---------|--------|
-| expo-camera | 55.0.15 | Photo capture | Existing |
-| expo-image-picker | 55.0.18 | Gallery selection | Existing |
-| expo-image-manipulator | 55.0.15 | Compression | Existing |
-| expo-image | 55.0.8 | Cached display | Existing |
-
-## Alternatives Considered
-
-| Need | Recommended | Alternative | Why Not |
-|------|-------------|-------------|---------|
-| Username uniqueness | Postgres UNIQUE + LOWER() index | Application-level check | Race conditions. DB constraint is authoritative. |
-| Version history storage | Full JSONB snapshot per version | Diff-only storage | Recipes are small (~2KB JSON). Full snapshots avoid complex diff reconstruction. Simpler code, negligible storage cost. |
-| Version history | Simple version table | Postgres temporal tables (pg_audit) | Overkill. Simple table with trigger-on-update is readable and sufficient. |
-| Recipe comments | New `recipe_comments` table | Reuse `post_comments` with polymorphic target | `post_comments` is kitchen-scoped; recipe comments are user-scoped within household. Different RLS, different identity model. Separate table is cleaner. |
-| Cook log photos | Supabase Storage bucket | Base64 in JSONB column | Photos are persistent records (unlike transient vision scans). Storage with CDN is correct for persistent media. |
-| @handle validation | Client regex + DB unique constraint | Dedicated Edge Function | `supabase.from('profiles').select().eq()` is sufficient for availability check. No server function needed. |
-| Photo gallery | Horizontal ScrollView + expo-image | react-native-image-gallery | Additional dependency for 1-5 photo galleries is unnecessary overhead. |
+**Confidence:** HIGH -- expo-linear-gradient is a first-party Expo SDK package.
 
 ## What NOT to Add
 
-| Library/Tool | Why Not |
-|--------------|---------|
-| `react-native-image-gallery` / `react-native-image-zoom-viewer` | Cook log galleries are small (1-5 photos). Horizontal ScrollView + expo-image + optional fullscreen modal is sufficient. |
-| `diff` / `json-diff` library | Version history uses full JSONB snapshots. Simple JS object key comparison for display. |
-| Any username/mention parsing library | @handle mentions in v8.0 are display-only text (e.g., "Created by @username"), not interactive parsed links. |
-| `pg_cron` | No TTL-based cleanup needed. Cook logs and versions are permanent records. |
-| New Zustand middleware (immer, etc.) | Existing store patterns use spread-based immutable updates throughout the app. Stay consistent. |
+### Do NOT add: @shopify/react-native-skia
 
-## Critical Implementation Notes
+**Why tempting:** Victory Native XL (the modern charting library) requires Skia as a rendering backend, and Skia enables GPU-accelerated chart rendering.
 
-### Username Migration Strategy
-The `profiles` table has no `username` column. Adding `NOT NULL` requires a staged migration:
-1. Add column as `TEXT UNIQUE` (nullable initially) with `CREATE UNIQUE INDEX idx_profiles_username_lower ON profiles(LOWER(username))`
-2. Add onboarding gate: require username setup before accessing any v8.0 social features
-3. Existing users prompted to set username on next app open (blocking modal)
-4. After adoption period, add `NOT NULL` constraint via subsequent migration
+**Why not:**
+- Adds ~6MB to iOS binary and ~41MB to Android APK
+- SharedKitchen's charts are simple (1 donut, a few progress bars, 1 stacked bar) -- not real-time data visualization with thousands of points
+- react-native-svg + Reanimated handles all these patterns at 60fps with zero additional native dependencies beyond what Expo already bundles
+- Skia Canvas objects are heavy; rendering multiple small charts in different Canvases can degrade performance -- opposite of what we want in scrollable screens
 
-### Recipe Edit Permission Change
-Currently any household member can edit any recipe (migration 00003 RLS). v8.0 restricts to creator-only. This is a **behavioral breaking change**:
-1. New UPDATE policy: `USING (created_by = auth.uid() OR created_by IS NULL)`
-2. Recipes with `created_by IS NULL` (pre-v1.0 imports) retain open editing
-3. UI hides edit button for non-creators with clear messaging
-4. Drop old "Users can update recipes in their household" UPDATE policy
+### Do NOT add: victory-native or victory-native-xl
 
-### Cook Log Photo Storage Pattern
-Follow the exact pattern from `src/lib/feedHelpers.ts`:
-```
-bucket: cook-log-photos
-path: {user_id}/{recipe_id}/{timestamp}.jpg
-compression: 1024px max dimension, JPEG quality 0.6 (via expo-image-manipulator)
-```
+**Why tempting:** Declarative charting API with built-in animations.
 
-### Feed Integration
-Extend existing `feed_posts` table with a `type` column rather than creating a new table:
-- `'meal_planned'` (default, existing behavior)
-- `'recipe_created'` (auto-post when recipe created)
-- `'cook_log'` (auto-post when cook log entry created)
-Add nullable `recipe_id` FK to link back to source recipe for "View Recipe" actions.
+**Why not:**
+- victory-native-xl requires @shopify/react-native-skia (see above)
+- Classic victory-native adds ~500KB JS bundle for chart types we don't need (line charts, scatter plots, area charts)
+- The 5 chart-like elements in the redesign are simple enough to build as custom components with react-native-svg primitives
+- Custom components match the existing SharedKitchen design system exactly, without fighting a charting library's opinionated styling
 
-## Postgres Features to Leverage
+### Do NOT add: react-native-circular-progress or react-native-progress-ring
 
-| Feature | Use Case |
-|---------|----------|
-| `CREATE UNIQUE INDEX ON profiles(LOWER(username))` | Case-insensitive username uniqueness without citext extension |
-| Trigger on `recipes` UPDATE | Auto-create recipe_versions row capturing pre-update snapshot |
-| Trigger on `cook_logs` INSERT/DELETE | Maintain `recipes.cook_count` counter (same pattern as like_count, follow_count) |
-| `TEXT[]` column for cook_log photos | Array of Storage URLs. Simple, queryable, no junction table for 1-5 photos. |
-| `GENERATED ALWAYS` or trigger | Auto-increment `version_number` per recipe in recipe_versions |
+**Why tempting:** Purpose-built for ring/donut progress indicators.
 
-## Migration Files Needed
+**Why not:**
+- Both depend on react-native-svg anyway (so you still need it)
+- They add an abstraction layer over ~30 lines of SVG code
+- Custom implementation with Circle + Reanimated gives full control over animation curves, colors, and the inner content (text, icons) that the Stitch designs require
+- Fewer dependencies = fewer upgrade headaches with future Expo SDK versions
 
-```
-00025_add_usernames.sql           -- profiles.username column + unique index + RLS broadening
-00026_create_recipe_comments.sql  -- recipe_comments table + RLS + comment_count on recipes
-00027_create_cook_logs.sql        -- cook_logs table + RLS + cook_count trigger on recipes
-00028_create_recipe_versions.sql  -- recipe_versions table + auto-create trigger on recipes UPDATE
-00029_create_cook_log_photos_bucket.sql -- Storage bucket + RLS
-00030_extend_feed_posts.sql       -- Add type column + recipe_id FK to feed_posts
-00031_recipe_creator_permissions.sql -- Restrict recipe UPDATE to creator
-```
+### Do NOT add: react-native-chart-kit
+
+**Why tempting:** Has progress rings and bar charts out of the box.
+
+**Why not:**
+- Last meaningful update was 2021, effectively unmaintained
+- Opinionated styling that conflicts with the Culinary Curator design system
+- Built on react-native-svg anyway (still need it as a dep)
+- Known issues with React Native 0.7x+ and New Architecture
+
+## Pattern-by-Pattern Stack Mapping
+
+| UI Pattern | Library Needed | Approach |
+|------------|---------------|----------|
+| 1. Horizontal date strip | NONE (existing) | `ScrollView horizontal` + `Pressable` day pills. Reanimated for selected-state animation. |
+| 2. Donut/ring chart (budget) | react-native-svg | `<Svg><Circle>` with strokeDasharray, animated via `Animated.createAnimatedComponent(Circle)` + useSharedValue |
+| 3. Category progress bars | NONE or react-native-svg | Plain `View` with Reanimated `useAnimatedStyle` for width interpolation. SVG `<Rect>` optional but overkill. |
+| 4. Cooking insights ring | react-native-svg | Same ring pattern as budget donut, smaller radius |
+| 5. Household stacked bar | react-native-svg | Multiple `<Rect>` in a row with proportional widths, or plain flex `View` children with Reanimated |
+| 6. Chef's Tip callout cards | NONE (existing) | Styled `View` with icon + text. Border-left accent via `borderLeftWidth` + `borderLeftColor`. |
+| 7. Feature comparison table | NONE (existing) | `View` rows with flex columns. Checkmark/X icons from Material Community Icons. |
+| 8. Hero cards with gradient | expo-linear-gradient | `expo-image` for background + `<LinearGradient>` overlay + absolute-positioned text |
+| 9. Following avatar strip | NONE (existing) | `ScrollView horizontal` + `expo-image` circular avatars. Already have presence avatar patterns from v2.0. |
+| 10. Shopping progress bar | NONE (existing) | Plain `View` with Reanimated animated width. Identical pattern to existing Skeleton shimmer. |
+
+**Summary:** 8 of 10 patterns need ZERO new dependencies. Only the ring/donut charts and hero card gradients need new packages.
 
 ## Installation
 
 ```bash
-# No new npm packages required.
-# All features built with existing dependencies.
+# Two new dependencies -- both Expo SDK packages
+npx expo install react-native-svg expo-linear-gradient
 ```
+
+No native rebuild required -- both packages are included in Expo Go and standard EAS builds.
+
+## Integration Notes
+
+### react-native-svg + Reanimated Pattern
+
+The app already uses Reanimated 4.2.1 extensively (Skeleton shimmer, ActivityToast, MealGeneratorSheet, AllSetStep, IngredientSidebar, FeedCard, etc.). The animated SVG pattern is:
+
+```typescript
+import Animated, { useSharedValue, useAnimatedProps, withTiming } from 'react-native-reanimated';
+import { Circle, Svg } from 'react-native-svg';
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+
+// In component:
+const progress = useSharedValue(0);
+const animatedProps = useAnimatedProps(() => ({
+  strokeDashoffset: circumference * (1 - progress.value),
+}));
+
+// Animate on mount or data change:
+progress.value = withTiming(targetValue, { duration: 800 });
+```
+
+This pattern is well-documented and battle-tested with Reanimated 3+ / 4+.
+
+### expo-linear-gradient Pattern
+
+```typescript
+import { LinearGradient } from 'expo-linear-gradient';
+import { Image } from 'expo-image';
+
+// Hero card overlay:
+<View style={{ borderRadius: 16, overflow: 'hidden' }}>
+  <Image source={recipe.imageUrl} style={{ width: '100%', height: 200 }} />
+  <LinearGradient
+    colors={['transparent', 'rgba(0,0,0,0.7)']}
+    style={StyleSheet.absoluteFill}
+  />
+  <Text style={[styles.heroTitle, { position: 'absolute', bottom: 16 }]}>
+    {recipe.title}
+  </Text>
+</View>
+```
+
+## Alternatives Considered
+
+| Category | Recommended | Alternative | Why Not |
+|----------|-------------|-------------|---------|
+| Charts/rings | react-native-svg (custom) | Victory Native XL | Skia dependency adds 6MB iOS / 41MB Android; overkill for 3 simple charts |
+| Charts/rings | react-native-svg (custom) | react-native-gifted-charts | Extra abstraction over SVG; opinionated styling fights design system |
+| Charts/rings | react-native-svg (custom) | react-native-circular-progress | Wraps same SVG Circle in ~30 lines; adds dep for no real gain |
+| Gradients | expo-linear-gradient | experimental_backgroundImage | Experimental API; production app should use stable Expo SDK package |
+| Gradients | expo-linear-gradient | react-native-linear-gradient | expo-linear-gradient IS the Expo-compatible wrapper; same thing, Expo-managed version |
+| Progress bars | Plain View + Reanimated | react-native-progress | Adds dependency for a `View` with animated width -- trivial to build |
+| Stacked bars | Plain View + flex | D3.js | Massive overkill; flex layout handles proportional widths natively |
 
 ## Sources
 
-- Existing codebase: `supabase/migrations/00001_create_profiles.sql` -- current profiles schema, no username column
-- Existing codebase: `supabase/migrations/00003_create_recipes.sql` -- recipes with created_by UUID, household-scoped RLS
-- Existing codebase: `supabase/migrations/00018_create_social_tables.sql` -- social table patterns, counter triggers
-- Existing codebase: `supabase/migrations/00019_create_meal_photos_bucket.sql` -- Storage bucket + RLS pattern
-- Existing codebase: `src/lib/feedHelpers.ts` -- photo upload/compression pattern
-- Existing codebase: `package.json` -- current dependency versions (Expo 55, Supabase 2.100+, Zustand 5.0.12)
+- [Expo SDK SVG docs](https://docs.expo.dev/versions/latest/sdk/svg/) -- confirms react-native-svg is Expo SDK package
+- [Expo LinearGradient docs](https://docs.expo.dev/versions/latest/sdk/linear-gradient/) -- confirms expo-linear-gradient ~55.0.12 for SDK 55
+- [React Native Skia bundle size](https://shopify.github.io/react-native-skia/docs/getting-started/bundle-size/) -- 6MB iOS, 41MB Android
+- [Animated donut chart with SVG + Reanimated](https://dev.to/dimaportenko/react-native-animated-donut-pie-chart-reanimated-svg-32od) -- proven pattern
+- [Animated progress ring tutorial](https://www.notjust.dev/projects/step-counter/animated-progress-ring) -- Circle + Reanimated pattern
+- [Software Mansion: You Might Not Need react-native-svg](https://blog.swmansion.com/you-might-not-need-react-native-svg-b5c65646d01f) -- confirms SVG is lightweight for simple use cases

@@ -2,7 +2,7 @@
 
 ## Overview
 
-SharedKitchen delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP. v2.0 (Phases 5-9) added Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and E2E testing. v2.1 (Phases 10-12) added recipe discovery filters, Stripe test mode E2E, and code quality polish. v2.2 (Phases 13-15) fixes layout bugs, polishes the sign-in screen, repairs the meal generator edge function, and cleans up profile/settings. v2.3 (Phases 16-17) adds multi-kitchen switching so users can belong to multiple kitchens and have all app data scoped to the active one. v2.4 (Phases 18-22) systematically tests and validates every feature area to ensure production readiness. v3.0 (Phases 23-25) adds video recipe import from TikTok, Instagram, YouTube, and any video URL via paste or share sheet, with transcript-based AI extraction, freemium rate limiting, and a unified Kitchen tab with pantry tracking. v4.0 (Phases 26-29) adds AI vision features: camera-based fridge/pantry scanning to bulk-add inventory, food photo identification for recipe discovery, and meal plan logging from photos. v5.0 (Phases 30-34) adds a Venmo-style social feed layer: kitchen profiles, follow/unfollow, auto-posted meals from the plan, feed with likes, comments, recipe saving, and push notifications for social interactions. v6.0 (Phases 35-38) integrates external food databases (USDA, Open Food Facts, FatSecret) to provide searchable food data, barcode scanning, and per-recipe/per-day nutrition display powered by AI-assisted ingredient matching. v7.0 (Phases 39-43) implements 14 Google Stitch UI designs across all major app surfaces. v8.0 (Phases 44-48) makes recipes social objects with per-user @handles, creator attribution, cook logging with photos, recipe comments, and feed integration for cooking events.
+SharedKitchen delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP. v2.0 (Phases 5-9) added Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and E2E testing. v2.1 (Phases 10-12) added recipe discovery filters, Stripe test mode E2E, and code quality polish. v2.2 (Phases 13-15) fixes layout bugs, polishes the sign-in screen, repairs the meal generator edge function, and cleans up profile/settings. v2.3 (Phases 16-17) adds multi-kitchen switching so users can belong to multiple kitchens and have all app data scoped to the active one. v2.4 (Phases 18-22) systematically tests and validates every feature area to ensure production readiness. v3.0 (Phases 23-25) adds video recipe import from TikTok, Instagram, YouTube, and any video URL via paste or share sheet, with transcript-based AI extraction, freemium rate limiting, and a unified Kitchen tab with pantry tracking. v4.0 (Phases 26-29) adds AI vision features: camera-based fridge/pantry scanning to bulk-add inventory, food photo identification for recipe discovery, and meal plan logging from photos. v5.0 (Phases 30-34) adds a Venmo-style social feed layer: kitchen profiles, follow/unfollow, auto-posted meals from the plan, feed with likes, comments, recipe saving, and push notifications for social interactions. v6.0 (Phases 35-38) integrates external food databases (USDA, Open Food Facts, FatSecret) to provide searchable food data, barcode scanning, and per-recipe/per-day nutrition display powered by AI-assisted ingredient matching. v7.0 (Phases 39-43) implements 14 Google Stitch UI designs across all major app surfaces — elevating the visual design while preserving all existing functionality, constrained by the existing design system.
 
 ## Milestones
 
@@ -16,8 +16,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - **v4.0 AI Vision — Scan, Snap & Add** — Phases 26-29 (shipped 2026-03-30) — [Archive](milestones/v4.0-ROADMAP.md)
 - **v5.0 Social Feed** — Phases 30-34 (shipped 2026-04-07) — [Archive](milestones/v5.0-ROADMAP.md)
 - **v6.0 Food Data Integration** — Phases 35-38 (shipped 2026-04-09)
-- ✅ **v7.0 Stitch UI Redesign** — Phases 39-43 (shipped 2026-04-09) — [Archive](milestones/v7.0-ROADMAP.md)
-- 🚧 **v8.0 Social Recipes** — Phases 44-48 (in progress)
+- **v7.0 Stitch UI Redesign** — Phases 39-43 (in progress)
 
 ## Phases
 
@@ -71,146 +70,154 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 <details>
 <summary>v2.4 Comprehensive QA Testing (Phases 18-22) — SHIPPED 2026-03-27</summary>
 
-- [x] Phase 18: Auth, Onboarding & Household QA (2/2 plans)
-- [x] Phase 19: Recipe Browsing & Detail QA (2/2 plans)
-- [x] Phase 20: Recipe Management & Cooking Mode QA (2/2 plans)
-- [x] Phase 21: Planning, Grocery, Budget & Leftovers QA (2/2 plans)
-- [x] Phase 22: Presence, Subscription, Notifications & Edge Cases QA (2/2 plans)
+- [x] Phase 18: Auth, Onboarding & Household QA (2/2 plans) — Test auth flows, onboarding, profile management, and household create/invite/join
+- [x] Phase 19: Recipe Browsing & Detail QA (2/2 plans) — Test recipe list, search, filters, detail display, ratings, favorites, notes, scaling
+- [x] Phase 20: Recipe Management & Cooking Mode QA (2/2 plans) — Test recipe CRUD, URL import, cooking mode navigation, timers, unit toggle
+- [x] Phase 21: Planning, Grocery, Budget & Leftovers QA (2/2 plans) — Test meal planning, grocery list sync, budget tracking, leftovers
+- [x] Phase 22: Presence, Subscription, Notifications & Edge Cases QA (2/2 plans) — Test presence avatars, Stripe flow, push notifications, offline/error states
 
 </details>
 
 <details>
 <summary>v3.0 Video Recipe Import & Kitchen Tab (Phases 23-25) — SHIPPED 2026-03-29</summary>
 
-- [x] Phase 23: Core Video Import Pipeline (3/3 plans)
-- [x] Phase 24: Share Sheet Integration (2/2 plans)
-- [x] Phase 25: Kitchen Tab (2/2 plans)
+- [x] Phase 23: Core Video Import Pipeline (3/3 plans) — Edge Function video branch, Supadata transcript extraction, Gemini parsing, paste-URL flow, rate limiting
+- [x] Phase 24: Share Sheet Integration (2/2 plans) — expo-share-intent for iOS share sheet, deep link routing to import flow
+- [x] Phase 25: Kitchen Tab (2/2 plans) — Rename Grocery to Kitchen, segmented control, On Hand pantry tracking, grocery auto-copy
 
 </details>
 
 <details>
 <summary>v4.0 AI Vision — Scan, Snap & Add (Phases 26-29) — SHIPPED 2026-03-30</summary>
 
-- [x] Phase 26: Vision Foundation (3/3 plans)
-- [x] Phase 27: Fridge/Pantry Photo Scan (2/2 plans)
-- [x] Phase 28: Food Photo to Recipe Discovery (2/2 plans)
-- [x] Phase 29: Food Photo to Meal Logging (2/2 plans)
+- [x] Phase 26: Vision Foundation (3/3 plans) — Camera capture, image compression, Edge Function with Gemini vision, rate limiting
+- [x] Phase 27: Fridge/Pantry Photo Scan (2/2 plans) — Photo scan, review screen, bulk-add, dedup, multi-photo
+- [x] Phase 28: Food Photo to Recipe Discovery (2/2 plans) — Dish identification, Serper web search, recipe import
+- [x] Phase 29: Food Photo to Meal Logging (2/2 plans) — Dual-action UX, day/slot picker, Plan tab display
 
 </details>
 
 <details>
 <summary>v5.0 Social Feed (Phases 30-34) — SHIPPED 2026-04-07</summary>
 
-- [x] Phase 30: Social Database & Kitchen Profiles (3/3 plans)
-- [x] Phase 31: Follow System (2/2 plans)
-- [x] Phase 32: Feed & Auto-Post (2/2 plans)
-- [x] Phase 33: Social Interactions & Moderation (3/3 plans)
-- [x] Phase 34: Social Push Notifications (2/2 plans)
+- [x] Phase 30: Social Database & Kitchen Profiles (3/3 plans) — DB foundation, kitchen profiles, search, invite links
+- [x] Phase 31: Follow System (2/2 plans) — Follow/unfollow, follower/following lists
+- [x] Phase 32: Feed & Auto-Post (2/2 plans) — Chronological feed on Plan tab, auto-post, photos, pagination
+- [x] Phase 33: Social Interactions & Moderation (3/3 plans) — Likes, comments, save recipe, Cook This Too, report/block
+- [x] Phase 34: Social Push Notifications (2/2 plans) — Edge Function + webhooks, social notification toggle
 
 </details>
 
 <details>
 <summary>v6.0 Food Data Integration (Phases 35-38) — SHIPPED 2026-04-09</summary>
 
-- [x] Phase 35: Data Foundation (2/2 plans)
-- [x] Phase 36: Food Search (2/2 plans)
-- [x] Phase 37: Barcode Scanning (2/2 plans)
-- [x] Phase 38: Recipe Nutrition (2/2 plans)
+- [x] Phase 35: Data Foundation (2/2 plans) — Postgres schema, TypeScript types, unit conversion, and nutrition normalization layer
+- [x] Phase 36: Food Search (2/2 plans) — Edge Functions for USDA/FatSecret search, client store, and searchable food interface
+- [x] Phase 37: Barcode Scanning (2/2 plans) — Camera barcode scanner, Open Food Facts/FatSecret lookup, and add-to-pantry/grocery flows
+- [x] Phase 38: Recipe Nutrition (2/2 plans) — AI-assisted ingredient matching, per-recipe nutrition computation, and nutrition display
 
 </details>
+
+- ✅ **v7.0 Stitch UI Redesign** — Phases 39-43 (shipped 2026-04-09) — [Archive](milestones/v7.0-ROADMAP.md)
 
 <details>
 <summary>v7.0 Stitch UI Redesign (Phases 39-43) — SHIPPED 2026-04-09</summary>
 
-- [x] Phase 39: Shared Components & Dependencies (3/3 plans)
-- [x] Phase 40: Independent Screen Redesigns (4/4 plans)
-- [x] Phase 41: Plan Tab Redesign (2/2 plans)
-- [x] Phase 42: Grocery List Redesign (2/2 plans)
-- [x] Phase 43: Budget, Profile & Social Feed (3/3 plans)
-
-</details>
-
-### 🚧 v8.0 Social Recipes (In Progress)
-
-**Milestone Goal:** Make recipes social objects — owned by users with unique @handles, commentable, with cooking history, photo galleries, and feed integration.
-
-- [ ] **Phase 44: Handle System & Identity Foundation** - Per-user @handle usernames with onboarding enforcement and existing-user migration
-- [ ] **Phase 45: Recipe Attribution & Creator Permissions** - Creator identity on recipes with ownership-based edit permissions and @handle search
-- [ ] **Phase 46: Cook Log with Photos** - Cook logging from recipe detail, cooking mode, and meal plan with photo gallery and count badges
-- [ ] **Phase 47: Recipe Comments** - Threaded recipe comments with visibility scoping and moderation
-- [ ] **Phase 48: Feed Integration & Save to Collection** - Auto-post cook events to feed and save recipes from feed to own library
+- [x] **Phase 39: Shared Components & Dependencies** - Reusable UI primitives (DonutChart, ProgressBar, InsightCard, FilterChips, DateStrip) and new dependency installation that unblock all subsequent phases (completed 2026-04-09)
+- [x] **Phase 40: Independent Screen Redesigns** - Onboarding (6 screens), Recipe Library, Cooking Mode, and Premium Upgrade — screens requiring no store changes (completed 2026-04-09)
+- [x] **Phase 41: Plan Tab Redesign** - Flagship day-focused meal planner with hero card, date strip, day/week toggle, and grocery shortcut (completed 2026-04-09)
+- [x] **Phase 42: Grocery List Redesign** - High-risk grocery screen with shopping progress, sync-with-plan, and enhanced item rows while preserving 4 real-time hooks (completed 2026-04-10)
+- [x] **Phase 43: Budget, Profile & Social Feed** - Store-enhanced screens (budget insights, cooking stats) plus social feed redesign and cross-app Maestro test updates (completed 2026-04-10)
 
 ## Phase Details
 
-### Phase 44: Handle System & Identity Foundation
-**Goal**: Every user has a unique @handle that identifies them across the app — new users set it during onboarding, existing users set it via a blocking interstitial
-**Depends on**: Phase 43 (v7.0 complete)
-**Requirements**: IDEN-01, IDEN-02, IDEN-04
+### Phase 39: Shared Components & Dependencies
+**Goal**: All reusable UI primitives needed by subsequent phases are built, tested, and importable — plus new npm dependencies are installed and verified
+**Depends on**: Phase 38 (v6.0 complete)
+**Requirements**: COMP-01, COMP-02, COMP-03, COMP-04, COMP-05, COMP-06
 **Success Criteria** (what must be TRUE):
-  1. New user signing up is required to choose a unique @handle during the onboarding flow before accessing the app
-  2. Existing user launching the app after the v8.0 update sees a blocking interstitial that requires them to set an @handle before proceeding
-  3. @handle appears next to the user's name on recipes, comments, cook logs, and feed posts throughout the app
-  4. @handle input validates format (lowercase alphanumeric + underscores), checks uniqueness in real time, and rejects reserved words
+  1. DonutChart component renders an animated SVG ring with configurable value, max, and label — verified in Budget and Profile contexts
+  2. ProgressBar component renders an animated horizontal fill bar with value/max — verified in Grocery and Budget contexts
+  3. InsightCard component displays an icon, message text, and optional badge — verified standalone
+  4. FilterChips component renders a horizontally scrollable row of selectable pills with single-select behavior
+  5. DateStrip component renders a scrollable horizontal day selector with today highlight and tap-to-select
 **Plans**: 3 plans
 Plans:
-- [ ] 44-01-PLAN.md — DB migration, handle-utils, authStore handle state (TDD)
-- [ ] 44-02-PLAN.md — HandleInput component, onboarding step, blocking interstitial
-- [ ] 44-03-PLAN.md — Display @handle across feed, comments, profiles
+- [x] 39-01-PLAN.md — Install dependencies + build ProgressBar and InsightCard
+- [x] 39-02-PLAN.md — Build FilterChips and DateStrip
+- [x] 39-03-PLAN.md — Build DonutChart (animated SVG ring)
 **UI hint**: yes
 
-### Phase 45: Recipe Attribution & Creator Permissions
-**Goal**: Users see who created each recipe and only the creator can edit it — establishing clear recipe ownership while preserving collaborative access for legacy recipes
-**Depends on**: Phase 44
-**Requirements**: ATTR-01, ATTR-02, ATTR-03, ATTR-04, IDEN-03
+### Phase 40: Independent Screen Redesigns
+**Goal**: Users experience the redesigned Onboarding, Recipe Library, Cooking Mode, and Premium Upgrade screens — all screens that need no store changes and can be built entirely from existing data
+**Depends on**: Phase 39
+**Requirements**: ONBR-01, ONBR-02, ONBR-03, ONBR-04, ONBR-05, ONBR-06, RCPE-01, RCPE-02, RCPE-03, RCPE-04, COOK-01, COOK-02, COOK-03, COOK-04, COOK-05, COOK-06, PREM-01, PREM-02, PREM-03, PREM-04
 **Success Criteria** (what must be TRUE):
-  1. Recipe detail page displays "Created by @handle" with the creator's avatar below the recipe name
-  2. Only the recipe creator sees the Edit button on recipes they created; non-creators can rate, comment, favorite, and save but cannot edit
-  3. Legacy recipes (created before v8.0) are assigned to the household admin and remain editable by all household members
-  4. User can search for other users by @handle from a search interface and navigate to their profile or recipes
-**Plans**: TBD
+  1. New user completing onboarding passes through all 6 redesigned screens (Welcome, Create Kitchen, Invite, Add Recipes, Plan Week, All Set) with progress indicators and functional CTAs
+  2. Recipe library displays full-width cards with description, cook time pill, difficulty badge, and rating — with horizontal filter chips (All, Quick Meals, Favorites) replacing the old FilterBar dropdown
+  3. Cooking mode shows step photos, step type badges (PREP/COOKING/MARINATING), chef tip callouts, ingredient chips, and Previous/Next navigation buttons
+  4. Premium upgrade screen displays hero photo, feature comparison table (Free vs Premium), and monthly/yearly pricing tiers with BEST VALUE badge
+  5. All existing Maestro E2E flows touching these screens pass with updated testID references
+**Plans**: 4 plans
+Plans:
+- [x] 40-01-PLAN.md — Redesign all 6 onboarding screens (Welcome through All Set)
+- [x] 40-02-PLAN.md — Redesign Recipe Library with FilterChips and full-width cards
+- [x] 40-03-PLAN.md — Redesign Cooking Mode with step photos, badges, tips, and Previous/Next buttons
+- [x] 40-04-PLAN.md — Redesign Premium Upgrade screen with hero photo, comparison table, and pricing tiers
 **UI hint**: yes
 
-### Phase 46: Cook Log with Photos
-**Goal**: Users can record when they cook a recipe with optional photos and notes — building a visible cooking history with count badges and photo galleries on every recipe
-**Depends on**: Phase 45
-**Requirements**: COOK-01, COOK-02, COOK-03, COOK-04, COOK-05, COOK-06
+### Phase 41: Plan Tab Redesign
+**Goal**: Users experience a day-focused meal planner as the app's flagship screen — with hero dinner card, horizontal date navigation, and day/week toggle
+**Depends on**: Phase 39
+**Requirements**: PLAN-01, PLAN-02, PLAN-03, PLAN-04, PLAN-05, PLAN-06, PLAN-07
 **Success Criteria** (what must be TRUE):
-  1. User can tap "I Cooked This" on any recipe detail page to log a cook with an optional photo and note
-  2. After completing cooking mode, user is prompted with a bottom sheet to log the cook with photo and note
-  3. After a meal plan date passes, user is prompted to confirm whether they cooked the planned recipe
-  4. Recipe detail shows a "Cooked N times" badge reflecting the total cook count, and a scrollable photo gallery of past cooks with dates and @handles
-  5. Cook log photos are compressed and stored in Supabase Storage with CDN-backed display
-**Plans**: TBD
+  1. User sees Day/Week toggle in the plan header and can switch between views, defaulting to Day view
+  2. In Day view, user can swipe or tap the date strip to navigate days, with today's dinner displayed as a hero card showing recipe photo, description, presence indicator, and "Start Cooking" CTA
+  3. Empty meal slots show soft illustrated placeholders with contextual prompts ("What's for breakfast?", "Lunch time?")
+  4. User can toggle to Week view showing all 7 days with breakfast/lunch/dinner slots, with prev/next navigation working in both views
+  5. Grocery shortcut card appears at screen bottom showing current week item count and linking to Kitchen tab
+**Plans**: 2 plans
+Plans:
+- [x] 41-01-PLAN.md — Build HeroDinnerCard, DayViewMealSlot, and GroceryShortcutCard components
+- [x] 41-02-PLAN.md — Wire Day/Week toggle, DateStrip, and new components into plan.tsx
 **UI hint**: yes
 
-### Phase 47: Recipe Comments
-**Goal**: Users can have conversations on recipes with threaded comments that are visually distinct from private recipe notes — enabling recipe discussion within households and across followed kitchens
-**Depends on**: Phase 44
-**Requirements**: CMNT-01, CMNT-02, CMNT-03, CMNT-04, CMNT-05
+### Phase 42: Grocery List Redesign
+**Goal**: Users experience a redesigned grocery list with shopping progress tracking, plan sync, and enhanced item details — without any regression in real-time sync, presence, or camera flows
+**Depends on**: Phase 39
+**Requirements**: GROC-01, GROC-02, GROC-03, GROC-04, GROC-05
 **Success Criteria** (what must be TRUE):
-  1. User can add a comment on any recipe they can view, and comments appear in a dedicated section on the recipe detail page
-  2. Comments support one level of threading — users can reply to a top-level comment and replies are visually nested underneath
-  3. Comments are visible to household members and followers of the kitchen that owns the recipe (not globally public)
-  4. Comment authors can delete their own comments
-  5. Recipe comments are visually distinct from existing private recipe notes (different icon, label, and section placement)
-**Plans**: TBD
+  1. Summary card at list top shows item count, estimated cost, and live presence avatars of other household members shopping
+  2. Shopping progress bar displays "X of Y items checked" with animated fill that updates in real time as items are checked
+  3. User can tap "Sync with Plan" to regenerate the grocery list from the current meal plan
+  4. Item rows display quantity, estimated price, and source/category tags
+  5. Segment control shows Shopping List (left) / On Hand (right) — and real-time sync, presence avatars, barcode scanning, and photo scanning all work without regression
+**Plans**: 2 plans
+Plans:
+- [x] 42-01-PLAN.md — Redesign GrocerySummary, GroceryItem rows, and GrocerySection headers
+- [x] 42-02-PLAN.md — Wire Sync with Plan button, swap segment order, pass presence to summary
 **UI hint**: yes
 
-### Phase 48: Feed Integration & Save to Collection
-**Goal**: Cooking events automatically appear in the social feed and users can save recipes from the feed or other kitchens into their own library — completing the social recipe loop
-**Depends on**: Phase 46
-**Requirements**: FEED-01, FEED-02, FEED-03, SAVE-01, SAVE-02
+### Phase 43: Budget, Profile & Social Feed
+**Goal**: Users experience redesigned Budget dashboard with insights, Profile with cooking stats, and Social Feed with hero photos — the final screens completing the Stitch UI redesign
+**Depends on**: Phase 39, Phase 41
+**Requirements**: BUDG-01, BUDG-02, BUDG-03, BUDG-04, BUDG-05, PROF-01, PROF-02, PROF-03, PROF-04, PROF-05, FEED-01, FEED-02, FEED-03, FEED-04, FEED-05
 **Success Criteria** (what must be TRUE):
-  1. When a user logs a cook, a feed post is automatically created showing the recipe name, cook's @handle, photo, and optional note
-  2. Existing feed interactions (like, comment, save recipe) work on cook-log feed posts the same as on meal-plan feed posts
-  3. User can save any recipe from the feed or another kitchen's profile to their own recipe library with one tap
-  4. Saved recipes display "Saved from @handle's kitchen" attribution on the recipe detail page
-**Plans**: TBD
+  1. Budget dashboard shows donut ring hero (spent vs budget), month picker navigation, budget insights cards with contextual messages, category progress bars, and weekly mini bar charts
+  2. Profile screen shows cooking insights (streak counter, plan completion ring), most-cooked recipe with photo, household distribution chart, and grouped settings navigation rows for Preferences and Account sections
+  3. Social feed displays a horizontal following avatar strip at top, hero-sized meal photos with overlay text, "Try this recipe" CTA buttons, quoted descriptions, and "View Full Recipe" actions
+  4. All existing functionality (expense logging, settings changes, feed likes/comments/save) works without regression on redesigned screens
+  5. Maestro E2E flows for budget, profile, and social feed screens pass with updated testID references
+**Plans**: 3 plans
+Plans:
+- [x] 43-01-PLAN.md — Budget dashboard redesign (DonutChart, MonthPicker, insights, category bars, weekly charts)
+- [x] 43-02-PLAN.md — Social feed redesign (FollowingStrip, hero photos, Try this recipe CTAs)
+- [x] 43-03-PLAN.md — Profile redesign (CookingInsights, HouseholdDistribution, grouped settings)
 **UI hint**: yes
 
 ## Progress
 
-**Execution Order:** Phases execute in numeric order: 44 -> 45 -> 46 -> 47 -> 48 (Phase 47 can run in parallel with Phase 46 after Phase 44)
+**Execution Order:** Phases execute in numeric order: 39 -> 40 -> 41 -> 42 -> 43 (Phases 41 and 42 can run in parallel after 39)
 
 | Phase | Milestone | Plans | Status | Completed |
 |-------|-----------|-------|--------|-----------|
@@ -252,16 +259,11 @@ Plans:
 | 36. Food Search | v6.0 | 2/2 | Complete | 2026-04-09 |
 | 37. Barcode Scanning | v6.0 | 2/2 | Complete | 2026-04-09 |
 | 38. Recipe Nutrition | v6.0 | 2/2 | Complete | 2026-04-09 |
-| 39. Shared Components & Dependencies | v7.0 | 3/3 | Complete | 2026-04-09 |
-| 40. Independent Screen Redesigns | v7.0 | 4/4 | Complete | 2026-04-09 |
-| 41. Plan Tab Redesign | v7.0 | 2/2 | Complete | 2026-04-09 |
-| 42. Grocery List Redesign | v7.0 | 2/2 | Complete | 2026-04-10 |
-| 43. Budget, Profile & Social Feed | v7.0 | 3/3 | Complete | 2026-04-10 |
-| 44. Handle System & Identity Foundation | v8.0 | 0/3 | Not started | - |
-| 45. Recipe Attribution & Creator Permissions | v8.0 | 0/TBD | Not started | - |
-| 46. Cook Log with Photos | v8.0 | 0/TBD | Not started | - |
-| 47. Recipe Comments | v8.0 | 0/TBD | Not started | - |
-| 48. Feed Integration & Save to Collection | v8.0 | 0/TBD | Not started | - |
+| 39. Shared Components & Dependencies | v7.0 | 3/3 | Complete    | 2026-04-09 |
+| 40. Independent Screen Redesigns | v7.0 | 4/4 | Complete    | 2026-04-09 |
+| 41. Plan Tab Redesign | v7.0 | 2/2 | Complete    | 2026-04-09 |
+| 42. Grocery List Redesign | v7.0 | 2/2 | Complete    | 2026-04-10 |
+| 43. Budget, Profile & Social Feed | v7.0 | 3/3 | Complete    | 2026-04-10 |
 
 ---
-*Last updated: 2026-04-10 after v8.0 roadmap creation*
+*Last updated: 2026-04-07 after v7.0 roadmap creation*
