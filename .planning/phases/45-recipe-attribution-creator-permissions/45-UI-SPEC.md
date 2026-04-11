@@ -46,12 +46,14 @@ Exceptions: Avatar touch targets use 44px (md size) for accessibility compliance
 
 ## Typography
 
+Font sizes (4): 14, 16, 20, 28.
+Font weights declared per family (2 per family): Inter uses 400 (body) + 600 (labels/titles). PlusJakartaSans uses 700 (headlines). Each family uses at most 2 weights.
+
 | Role | Size | Weight | Line Height | Token |
 |------|------|--------|-------------|-------|
 | Body | 14px | Inter 400 | 20px | bodyMd |
 | Body Large | 16px | Inter 400 | 24px | bodyLg |
 | Label | 14px | Inter 600 | 20px | labelLg |
-| Label Small | 10px | Inter 500 | 14px | labelSm |
 | Title | 16px | Inter 600 | 24px | titleMd |
 | Title Large | 20px | Inter 600 | 28px | titleLg |
 | Headline | 28px | PlusJakartaSans 700 | 36px | headlineLg |
@@ -169,7 +171,7 @@ Additional semantic colors used:
                               "{display_name}" (bodyMd, onSurfaceVariant)
 ```
 
-- Row: `flexDirection: 'row'`, `alignItems: 'center'`, `paddingHorizontal: spacing.md`, `paddingVertical: spacing.sm + 4` (12px, matching KitchenSearchResult)
+- Row: `flexDirection: 'row'`, `alignItems: 'center'`, `paddingHorizontal: spacing.md`, `paddingVertical: spacing.sm`
 - Tappable: entire row is a Pressable, navigates to public profile
 - Separator: 1px `outlineVariant` bottom border between results
 
@@ -211,9 +213,11 @@ Additional semantic colors used:
 | Search placeholder (Kitchens tab) | "Search kitchens..." (existing, unchanged) |
 | People search empty state heading | "No people found" |
 | People search empty state body | "Try a different @handle or name" |
+| People search error state | "Couldn't load results. Check your connection and try again." |
 | Public profile recipes heading | "Recipes" |
 | Public profile empty state heading | "No recipes yet" |
 | Public profile empty state body | "This person hasn't created any recipes" |
+| Public profile load error | "Couldn't load this profile. Check your connection and try again." |
 | Tab label: Kitchens | "Kitchens" |
 | Tab label: People | "People" |
 | Edit button hidden tooltip | (none -- button is simply absent for non-creators) |
@@ -259,9 +263,11 @@ Additional semantic colors used:
 | Recipe with no created_by (edge case) | No CreatorAttribution row, Edit button visible for all household members |
 | People search: empty query | No results shown, prompt text only |
 | People search: loading | ActivityIndicator centered (matches existing KitchenSearchBar pattern) |
+| People search: error | EmptyState: "Couldn't load results. Check your connection and try again." with retry button |
 | People search: no results | EmptyState: "No people found" / "Try a different @handle or name" |
 | People search: results found | FlatList of UserSearchResult rows |
 | Public profile: loading | Skeleton for avatar + name, skeleton grid for recipes |
+| Public profile: load error | EmptyState: "Couldn't load this profile. Check your connection and try again." with retry button |
 | Public profile: loaded, has recipes | Recipe grid displayed |
 | Public profile: loaded, no recipes | EmptyState with "No recipes yet" |
 
