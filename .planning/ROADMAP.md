@@ -205,7 +205,7 @@ Plans:
   5. Recipe comments are visually distinct from existing private recipe notes (different icon, label, and section placement)
 **Plans**: 2 plans
 Plans:
-- [ ] 47-01-PLAN.md — Migration, types, recipeCommentStore with threading logic (TDD)
+- [x] 47-01-PLAN.md — Migration, types, recipeCommentStore with threading logic (TDD)
 - [ ] 47-02-PLAN.md — Comment UI components + recipe detail integration
 **UI hint**: yes
 
@@ -273,7 +273,7 @@ Plans:
 | 44. Handle System & Identity Foundation | v8.0 | 5/4 | Complete   | 2026-04-11 |
 | 45. Recipe Attribution & Creator Permissions | v8.0 | 3/3 | Complete    | 2026-04-11 |
 | 46. Cook Log with Photos | v8.0 | 3/3 | Complete    | 2026-04-11 |
-| 47. Recipe Comments | v8.0 | 0/2 | Not started | - |
+| 47. Recipe Comments | v8.0 | 1/2 | In Progress|  |
 | 48. Feed Integration & Save to Collection | v8.0 | 0/TBD | Not started | - |
 
 ---

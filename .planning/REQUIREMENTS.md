@@ -25,10 +25,10 @@
 
 ## Comments
 
-- [ ] **CMNT-01**: User can add a comment on any recipe visible to them
-- [ ] **CMNT-02**: Recipe comments support one level of threading (replies to top-level comments)
-- [ ] **CMNT-03**: Comments are visible to household members and followers of the kitchen that owns the recipe
-- [ ] **CMNT-04**: Comment author can delete their own comment
+- [x] **CMNT-01**: User can add a comment on any recipe visible to them
+- [x] **CMNT-02**: Recipe comments support one level of threading (replies to top-level comments)
+- [x] **CMNT-03**: Comments are visible to household members and followers of the kitchen that owns the recipe
+- [x] **CMNT-04**: Comment author can delete their own comment
 - [ ] **CMNT-05**: Comments are visually distinct from existing private recipe notes
 
 ## Feed Integration
