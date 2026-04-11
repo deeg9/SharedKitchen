@@ -1,85 +1,52 @@
-# v8.0 Social Recipes — Requirements
+# v9.0 Cooking Experience — Requirements
 
-## Identity
+## Cooking Mode Redesign
 
-- [x] **IDEN-01**: User can set a unique @handle during signup that is validated for uniqueness and format
-- [x] **IDEN-02**: Existing users are prompted with a blocking interstitial to set their @handle on first launch after v8.0 update
-- [x] **IDEN-03**: User can search for other users by @handle across the app
-- [x] **IDEN-04**: @handle is displayed on all user-generated content (recipes, comments, cook logs, feed posts)
+- [ ] **COOK-R01**: Cooking mode displays the recipe hero image at the top of each step
+- [ ] **COOK-R02**: Each step shows a category tag (MARINATING, GRILLING, SIMMERING, etc.) derived from step content
+- [ ] **COOK-R03**: Each step shows only the ingredients relevant to that step, not the full ingredient list
+- [ ] **COOK-R04**: Cooking mode has a segmented progress bar showing current step position
+- [ ] **COOK-R05**: Bottom navigation shows Previous / Ingredients / Next Step buttons
+- [ ] **COOK-R06**: Metric/Imperial toggle at the top converts ingredient amounts between measurement systems
 
-## Attribution
+## Comment Photo Attachments
 
-- [x] **ATTR-01**: Recipe detail page shows "Created by @handle" with creator's avatar below the recipe name
-- [x] **ATTR-02**: Only the recipe creator can edit the recipe (name, ingredients, instructions, image)
-- [x] **ATTR-03**: Non-creator household members can rate, comment, favorite, and save but not edit
-- [x] **ATTR-04**: Recipes with no creator (legacy data) are assigned to the household admin during migration
+- [ ] **CMNT-P01**: Comment input bar includes a camera/media icon button for attaching a photo
+- [ ] **CMNT-P02**: Attached photos display as thumbnails within the comment body
+- [ ] **CMNT-P03**: Tapping a comment photo thumbnail expands it to full-size view
+- [ ] **CMNT-P04**: Comment photos are compressed and stored in Supabase Storage
 
-## Cook Log
+## Co-Cook Tagging
 
-- [x] **COOK-01**: User can tap "I Cooked This" on recipe detail to log a cook with optional photo and note
-- [x] **COOK-02**: After completing cooking mode, user is prompted with a sheet to log the cook with photo + note
-- [x] **COOK-03**: After a meal plan date passes, user is prompted to log whether they cooked the planned recipe
-- [x] **COOK-04**: Recipe detail shows "Cooked N times" badge with count from cook logs
-- [x] **COOK-05**: Recipe detail shows a photo gallery of past cooks with cook date and @handle of who cooked
-- [x] **COOK-06**: Cook log photos are stored in Supabase Storage with compression
+- [ ] **COCOOK-01**: Cook log sheet includes a "Who did you cook with?" field for tagging @handles
+- [ ] **COCOOK-02**: Tagged co-cooks appear on the cook log feed post
+- [ ] **COCOOK-03**: Co-cook tags are stored in a cook_log_participants table linking cook_logs to user profiles
 
-## Comments
+## Tech Debt Cleanup
 
-- [x] **CMNT-01**: User can add a comment on any recipe visible to them
-- [x] **CMNT-02**: Recipe comments support one level of threading (replies to top-level comments)
-- [x] **CMNT-03**: Comments are visible to household members and followers of the kitchen that owns the recipe
-- [x] **CMNT-04**: Comment author can delete their own comment
-- [x] **CMNT-05**: Comments are visually distinct from existing private recipe notes
-
-## Feed Integration
-
-- [x] **FEED-01**: When a user logs a cook, a feed post is automatically created with the cook photo
-- [x] **FEED-02**: Feed posts from cook logs show recipe name, cook's @handle, photo, and optional note
-- [x] **FEED-03**: Existing feed interactions (like, comment, save recipe) work on cook log feed posts
-
-## Save to Collection
-
-- [x] **SAVE-01**: User can save any recipe from the feed or another kitchen's profile to their own recipe library
-- [x] **SAVE-02**: Saved recipes show "Saved from @handle's kitchen" attribution on recipe detail
-
-## Future Requirements (Deferred)
-
-- Version history — track recipe edits with timestamps and diffs (v8.1)
-- Recipe forking/remixing — copy and modify someone's recipe as a linked variant (deferred indefinitely)
-
-## Out of Scope
-
-- Public recipe marketplace — recipes are shared via follow-based feed, not a public directory
-- Recipe monetization — no paid recipe access or tipping
-- DMs between kitchens — social interaction stays on recipes and feed
-- Competitive gamification (leaderboards, rankings) — badges should be personal, not competitive
-- Deep comment threading (>1 level) — poor mobile UX, flat/shallow is the sweet spot
+- [ ] **DEBT-01**: Profiles RLS SELECT policy scoped to only expose handle, display_name, avatar_url (not all columns)
+- [ ] **DEBT-02**: Reserved word validation enforced in authStore.updateHandle (not just UI-only)
+- [ ] **DEBT-03**: 30-day handle change cooldown enforced in authStore.updateHandle (not just UI-only)
+- [ ] **DEBT-04**: TypeScript type safety — regenerate database.ts or fix manual type definitions to eliminate `never` inference errors
 
 ## Traceability
 
-| Requirement | Phase | Plan |
-|-------------|-------|------|
-| IDEN-01 | Phase 44 | — |
-| IDEN-02 | Phase 44 | — |
-| IDEN-03 | Phase 45 | — |
-| IDEN-04 | Phase 44 | — |
-| ATTR-01 | Phase 45 | — |
-| ATTR-02 | Phase 45 | — |
-| ATTR-03 | Phase 45 | — |
-| ATTR-04 | Phase 45 | — |
-| COOK-01 | Phase 46 | — |
-| COOK-02 | Phase 46 | — |
-| COOK-03 | Phase 46 | — |
-| COOK-04 | Phase 46 | — |
-| COOK-05 | Phase 46 | — |
-| COOK-06 | Phase 46 | — |
-| CMNT-01 | Phase 47 | — |
-| CMNT-02 | Phase 47 | — |
-| CMNT-03 | Phase 47 | — |
-| CMNT-04 | Phase 47 | — |
-| CMNT-05 | Phase 47 | — |
-| FEED-01 | Phase 48 | — |
-| FEED-02 | Phase 48 | — |
-| FEED-03 | Phase 48 | — |
-| SAVE-01 | Phase 48 | — |
-| SAVE-02 | Phase 48 | — |
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| COOK-R01 | Phase 50 | Pending |
+| COOK-R02 | Phase 50 | Pending |
+| COOK-R03 | Phase 50 | Pending |
+| COOK-R04 | Phase 50 | Pending |
+| COOK-R05 | Phase 50 | Pending |
+| COOK-R06 | Phase 50 | Pending |
+| CMNT-P01 | Phase 51 | Pending |
+| CMNT-P02 | Phase 51 | Pending |
+| CMNT-P03 | Phase 51 | Pending |
+| CMNT-P04 | Phase 51 | Pending |
+| COCOOK-01 | Phase 52 | Pending |
+| COCOOK-02 | Phase 52 | Pending |
+| COCOOK-03 | Phase 52 | Pending |
+| DEBT-01 | Phase 49 | Pending |
+| DEBT-02 | Phase 49 | Pending |
+| DEBT-03 | Phase 49 | Pending |
+| DEBT-04 | Phase 49 | Pending |

@@ -2,7 +2,7 @@
 
 ## Overview
 
-SharedKitchen delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP. v2.0 (Phases 5-9) added Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and E2E testing. v2.1 (Phases 10-12) added recipe discovery filters, Stripe test mode E2E, and code quality polish. v2.2 (Phases 13-15) fixes layout bugs, polishes the sign-in screen, repairs the meal generator edge function, and cleans up profile/settings. v2.3 (Phases 16-17) adds multi-kitchen switching so users can belong to multiple kitchens and have all app data scoped to the active one. v2.4 (Phases 18-22) systematically tests and validates every feature area to ensure production readiness. v3.0 (Phases 23-25) adds video recipe import from TikTok, Instagram, YouTube, and any video URL via paste or share sheet, with transcript-based AI extraction, freemium rate limiting, and a unified Kitchen tab with pantry tracking. v4.0 (Phases 26-29) adds AI vision features: camera-based fridge/pantry scanning to bulk-add inventory, food photo identification for recipe discovery, and meal plan logging from photos. v5.0 (Phases 30-34) adds a Venmo-style social feed layer: kitchen profiles, follow/unfollow, auto-posted meals from the plan, feed with likes, comments, recipe saving, and push notifications for social interactions. v6.0 (Phases 35-38) integrates external food databases (USDA, Open Food Facts, FatSecret) to provide searchable food data, barcode scanning, and per-recipe/per-day nutrition display powered by AI-assisted ingredient matching. v7.0 (Phases 39-43) implements 14 Google Stitch UI designs across all major app surfaces. v8.0 (Phases 44-48) makes recipes social objects with per-user @handles, creator attribution, cook logging with photos, recipe comments, and feed integration for cooking events.
+SharedKitchen delivers a collaborative dinner planning app for households. v1.0 (Phases 1-4) shipped the full MVP. v2.0 (Phases 5-9) added Stripe payments, enhanced AI, push notifications, real-time presence, cooking mode, and E2E testing. v2.1 (Phases 10-12) added recipe discovery filters, Stripe test mode E2E, and code quality polish. v2.2 (Phases 13-15) fixes layout bugs, polishes the sign-in screen, repairs the meal generator edge function, and cleans up profile/settings. v2.3 (Phases 16-17) adds multi-kitchen switching so users can belong to multiple kitchens and have all app data scoped to the active one. v2.4 (Phases 18-22) systematically tests and validates every feature area to ensure production readiness. v3.0 (Phases 23-25) adds video recipe import from TikTok, Instagram, YouTube, and any video URL via paste or share sheet, with transcript-based AI extraction, freemium rate limiting, and a unified Kitchen tab with pantry tracking. v4.0 (Phases 26-29) adds AI vision features: camera-based fridge/pantry scanning to bulk-add inventory, food photo identification for recipe discovery, and meal plan logging from photos. v5.0 (Phases 30-34) adds a Venmo-style social feed layer: kitchen profiles, follow/unfollow, auto-posted meals from the plan, feed with likes, comments, recipe saving, and push notifications for social interactions. v6.0 (Phases 35-38) integrates external food databases (USDA, Open Food Facts, FatSecret) to provide searchable food data, barcode scanning, and per-recipe/per-day nutrition display powered by AI-assisted ingredient matching. v7.0 (Phases 39-43) implements 14 Google Stitch UI designs across all major app surfaces. v8.0 (Phases 44-48) makes recipes social objects with per-user @handles, creator attribution, cook logging with photos, recipe comments, and feed integration for cooking events. v9.0 (Phases 49-52) redesigns cooking mode into a beautiful step-by-step experience, adds photo attachments to comments, co-cook tagging on cook logs, and cleans up v8.0 tech debt.
 
 ## Milestones
 
@@ -16,8 +16,9 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - **v4.0 AI Vision — Scan, Snap & Add** — Phases 26-29 (shipped 2026-03-30) — [Archive](milestones/v4.0-ROADMAP.md)
 - **v5.0 Social Feed** — Phases 30-34 (shipped 2026-04-07) — [Archive](milestones/v5.0-ROADMAP.md)
 - **v6.0 Food Data Integration** — Phases 35-38 (shipped 2026-04-09)
-- ✅ **v7.0 Stitch UI Redesign** — Phases 39-43 (shipped 2026-04-09) — [Archive](milestones/v7.0-ROADMAP.md)
-- 🚧 **v8.0 Social Recipes** — Phases 44-48 (in progress)
+- **v7.0 Stitch UI Redesign** — Phases 39-43 (shipped 2026-04-09) — [Archive](milestones/v7.0-ROADMAP.md)
+- ✅ **v8.0 Social Recipes** — Phases 44-48 (shipped 2026-04-11)
+- 🚧 **v9.0 Cooking Experience** — Phases 49-52 (in progress)
 
 ## Phases
 
@@ -130,104 +131,78 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 </details>
 
-### v8.0 Social Recipes (In Progress)
+<details>
+<summary>v8.0 Social Recipes (Phases 44-48) — SHIPPED 2026-04-11</summary>
 
-**Milestone Goal:** Make recipes social objects — owned by users with unique @handles, commentable, with cooking history, photo galleries, and feed integration.
+- [x] Phase 44: Handle System & Identity Foundation (5/5 plans) — Per-user @handle usernames with onboarding enforcement and existing-user migration
+- [x] Phase 45: Recipe Attribution & Creator Permissions (3/3 plans) — Creator identity on recipes with ownership-based edit permissions and @handle search
+- [x] Phase 46: Cook Log with Photos (3/3 plans) — Cook logging from recipe detail, cooking mode, and meal plan with photo gallery and count badges
+- [x] Phase 47: Recipe Comments (2/2 plans) — Threaded recipe comments with visibility scoping and moderation
+- [x] Phase 48: Feed Integration & Save to Collection (3/3 plans) — Auto-post cook events to feed and save recipes from feed to own library
 
-- [x] **Phase 44: Handle System & Identity Foundation** - Per-user @handle usernames with onboarding enforcement and existing-user migration (completed 2026-04-11)
-- [x] **Phase 45: Recipe Attribution & Creator Permissions** - Creator identity on recipes with ownership-based edit permissions and @handle search (completed 2026-04-11)
-- [x] **Phase 46: Cook Log with Photos** - Cook logging from recipe detail, cooking mode, and meal plan with photo gallery and count badges (completed 2026-04-11)
-- [x] **Phase 47: Recipe Comments** - Threaded recipe comments with visibility scoping and moderation (completed 2026-04-11)
-- [x] **Phase 48: Feed Integration & Save to Collection** - Auto-post cook events to feed and save recipes from feed to own library (completed 2026-04-11)
+</details>
+
+### v9.0 Cooking Experience (In Progress)
+
+**Milestone Goal:** Redesign the cooking mode into a beautiful step-by-step experience and enhance social cooking features with photo comments and co-cook tagging.
+
+- [ ] **Phase 49: Tech Debt & Type Safety** - RLS scoping, store-level validation enforcement, and TypeScript type fixes from v8.0
+- [ ] **Phase 50: Cooking Mode Redesign** - Recipe hero image, step categories, per-step ingredients, progress bar, and enhanced navigation
+- [ ] **Phase 51: Comment Photo Attachments** - Camera icon in comment input, thumbnail display, tap-to-expand, Supabase Storage
+- [ ] **Phase 52: Co-Cook Tagging** - "Who did you cook with?" @handle mentions on cook log posts with feed display
 
 ## Phase Details
 
-### Phase 44: Handle System & Identity Foundation
-**Goal**: Every user has a unique @handle that identifies them across the app — new users set it during onboarding, existing users set it via a blocking interstitial
-**Depends on**: Phase 43 (v7.0 complete)
-**Requirements**: IDEN-01, IDEN-02, IDEN-04
+### Phase 49: Tech Debt & Type Safety
+**Goal**: The codebase is hardened against security gaps and type errors left over from v8.0 -- profiles expose only safe columns, handle validation runs server-side, and TypeScript compiles without `never` inference hacks
+**Depends on**: Phase 48 (v8.0 complete)
+**Requirements**: DEBT-01, DEBT-02, DEBT-03, DEBT-04
 **Success Criteria** (what must be TRUE):
-  1. New user signing up is required to choose a unique @handle during the onboarding flow before accessing the app
-  2. Existing user launching the app after the v8.0 update sees a blocking interstitial that requires them to set an @handle before proceeding
-  3. @handle appears next to the user's name on recipes, comments, cook logs, and feed posts throughout the app
-  4. @handle input validates format (lowercase alphanumeric + underscores), checks uniqueness in real time, and rejects reserved words
-**Plans**: 5 plans
-Plans:
-- [x] 44-00-PLAN.md — Wave 0 test stubs for HandleInput, HandleSetupStep, HandleSetupInterstitial, FeedCard
-- [x] 44-01-PLAN.md — DB migration, handle-utils, authStore handle state (TDD)
-- [x] 44-02-PLAN.md — HandleInput component, onboarding step, blocking interstitial
-- [x] 44-03-PLAN.md — Display @handle across feed, profile, and recipe detail
-- [x] 44-04-PLAN.md — Handle change with 30-day cooldown in Edit Profile
+  1. Profiles RLS SELECT policy returns only handle, display_name, and avatar_url -- querying profiles from another user's session does not expose email, phone, or other private columns
+  2. Calling authStore.updateHandle with a reserved word (e.g., "admin", "support") is rejected at the store level before any DB call
+  3. Calling authStore.updateHandle within 30 days of the last handle change is rejected at the store level with a clear cooldown message
+  4. Running `npx tsc --noEmit` produces zero errors related to `never` type inference on database type definitions
+**Plans**: TBD
+
+### Phase 50: Cooking Mode Redesign
+**Goal**: Users experience a visually rich step-by-step cooking flow with recipe imagery, categorized steps, contextual ingredients, and clear progress tracking
+**Depends on**: Phase 49
+**Requirements**: COOK-R01, COOK-R02, COOK-R03, COOK-R04, COOK-R05, COOK-R06
+**Success Criteria** (what must be TRUE):
+  1. Cooking mode displays the recipe hero photo at the top of each step, providing visual context throughout the cooking flow
+  2. Each step shows a category tag (e.g., PREP, GRILLING, SIMMERING) derived from the step's content, helping the cook understand what phase of cooking they are in
+  3. Each step shows only the ingredients needed for that specific step rather than the full recipe ingredient list
+  4. A segmented progress bar at the top shows the cook's position across all steps, and Previous / Ingredients / Next Step buttons provide clear navigation
+  5. A Metric/Imperial toggle at the top converts all ingredient amounts between measurement systems within the cooking view
+**Plans**: TBD
 **UI hint**: yes
 
-### Phase 45: Recipe Attribution & Creator Permissions
-**Goal**: Users see who created each recipe and only the creator can edit it — establishing clear recipe ownership while preserving collaborative access for legacy recipes
-**Depends on**: Phase 44
-**Requirements**: ATTR-01, ATTR-02, ATTR-03, ATTR-04, IDEN-03
+### Phase 51: Comment Photo Attachments
+**Goal**: Users can attach photos to recipe and feed comments -- showing off their cook results, asking questions about a step, or sharing modifications visually
+**Depends on**: Phase 49
+**Requirements**: CMNT-P01, CMNT-P02, CMNT-P03, CMNT-P04
 **Success Criteria** (what must be TRUE):
-  1. Recipe detail page displays "Created by @handle" with the creator's avatar below the recipe name
-  2. Only the recipe creator sees the Edit button on recipes they created; non-creators can rate, comment, favorite, and save but cannot edit
-  3. Legacy recipes (created before v8.0) are assigned to the household admin and remain editable by all household members
-  4. User can search for other users by @handle from a search interface and navigate to their profile or recipes
-**Plans**: 3 plans
-Plans:
-- [x] 45-01-PLAN.md — Migration: backfill legacy recipes + creator-scoped RLS policies
-- [x] 45-02-PLAN.md — Creator attribution UI + conditional edit button on recipe detail
-- [x] 45-03-PLAN.md — People search tab + public profile page
+  1. Comment input bar includes a camera/media icon that lets the user attach a photo before submitting the comment
+  2. Comments with photos display a thumbnail image inline within the comment body
+  3. Tapping a comment photo thumbnail opens a full-size view of the image
+  4. Comment photos are compressed client-side and stored in Supabase Storage with CDN-backed URLs
+**Plans**: TBD
 **UI hint**: yes
 
-### Phase 46: Cook Log with Photos
-**Goal**: Users can record when they cook a recipe with optional photos and notes — building a visible cooking history with count badges and photo galleries on every recipe
-**Depends on**: Phase 45
-**Requirements**: COOK-01, COOK-02, COOK-03, COOK-04, COOK-05, COOK-06
+### Phase 52: Co-Cook Tagging
+**Goal**: Users can tag who they cooked with when logging a cook -- making cooking a social activity that credits participants and appears in the feed
+**Depends on**: Phase 49
+**Requirements**: COCOOK-01, COCOOK-02, COCOOK-03
 **Success Criteria** (what must be TRUE):
-  1. User can tap "I Cooked This" on any recipe detail page to log a cook with an optional photo and note
-  2. After completing cooking mode, user is prompted with a bottom sheet to log the cook with photo and note
-  3. After a meal plan date passes, user is prompted to log whether they cooked the planned recipe
-  4. Recipe detail shows a "Cooked N times" badge reflecting the total cook count, and a scrollable photo gallery of past cooks with dates and @handles
-  5. Cook log photos are compressed and stored in Supabase Storage with CDN-backed display
-**Plans**: 3 plans
-Plans:
-- [x] 46-01-PLAN.md — Migration, types, cookLogStore, photo upload helper
-- [x] 46-02-PLAN.md — Recipe detail UI: CookLogButton, CookCountBadge, CookLogSheet, CookPhotoGallery
-- [x] 46-03-PLAN.md — CookingMode post-cook prompt + Plan tab past meal banner
-**UI hint**: yes
-
-### Phase 47: Recipe Comments
-**Goal**: Users can have conversations on recipes with threaded comments that are visually distinct from private recipe notes — enabling recipe discussion within households and across followed kitchens
-**Depends on**: Phase 44
-**Requirements**: CMNT-01, CMNT-02, CMNT-03, CMNT-04, CMNT-05
-**Success Criteria** (what must be TRUE):
-  1. User can add a comment on any recipe they can view, and comments appear in a dedicated section on the recipe detail page
-  2. Comments support one level of threading — users can reply to a top-level comment and replies are visually nested underneath
-  3. Comments are visible to household members and followers of the kitchen that owns the recipe (not globally public)
-  4. Comment authors can delete their own comments
-  5. Recipe comments are visually distinct from existing private recipe notes (different icon, label, and section placement)
-**Plans**: 2 plans
-Plans:
-- [x] 47-01-PLAN.md — Migration, types, recipeCommentStore with threading logic (TDD)
-- [x] 47-02-PLAN.md — Comment UI components + recipe detail integration
-**UI hint**: yes
-
-### Phase 48: Feed Integration & Save to Collection
-**Goal**: Cooking events automatically appear in the social feed and users can save recipes from the feed or other kitchens into their own library — completing the social recipe loop
-**Depends on**: Phase 46
-**Requirements**: FEED-01, FEED-02, FEED-03, SAVE-01, SAVE-02
-**Success Criteria** (what must be TRUE):
-  1. When a user logs a cook, a feed post is automatically created showing the recipe name, cook's @handle, photo, and optional note
-  2. Existing feed interactions (like, comment, save recipe) work on cook-log feed posts the same as on meal-plan feed posts
-  3. User can save any recipe from the feed or another kitchen's profile to their own recipe library with one tap
-  4. Saved recipes display "Saved from @handle's kitchen" attribution on the recipe detail page
-**Plans**: 3 plans
-Plans:
-- [x] 48-01-PLAN.md — Migration, types, cookLogStore feed post hook
-- [x] 48-02-PLAN.md — FeedCard cook-log rendering + saveRecipeFromPost RPC rewrite
-- [x] 48-03-PLAN.md — SavedFromAttribution component + recipe detail integration
+  1. Cook log sheet includes a "Who did you cook with?" field where the user can search and tag other users by @handle
+  2. Tagged co-cooks appear on the cook log feed post (e.g., "cooked with @alice and @bob")
+  3. Co-cook relationships are stored in a cook_log_participants table linking cook log entries to user profiles
+**Plans**: TBD
 **UI hint**: yes
 
 ## Progress
 
-**Execution Order:** Phases execute in numeric order: 44 -> 45 -> 46 -> 47 -> 48 (Phase 47 can run in parallel with Phase 46 after Phase 44)
+**Execution Order:** Phases execute in numeric order: 49 -> 50 -> 51 -> 52 (Phases 51 and 52 can run in parallel after Phase 49)
 
 | Phase | Milestone | Plans | Status | Completed |
 |-------|-----------|-------|--------|-----------|
@@ -274,11 +249,15 @@ Plans:
 | 41. Plan Tab Redesign | v7.0 | 2/2 | Complete | 2026-04-09 |
 | 42. Grocery List Redesign | v7.0 | 2/2 | Complete | 2026-04-10 |
 | 43. Budget, Profile & Social Feed | v7.0 | 3/3 | Complete | 2026-04-10 |
-| 44. Handle System & Identity Foundation | v8.0 | 5/4 | Complete   | 2026-04-11 |
-| 45. Recipe Attribution & Creator Permissions | v8.0 | 3/3 | Complete    | 2026-04-11 |
-| 46. Cook Log with Photos | v8.0 | 3/3 | Complete    | 2026-04-11 |
-| 47. Recipe Comments | v8.0 | 2/2 | Complete    | 2026-04-11 |
-| 48. Feed Integration & Save to Collection | v8.0 | 3/3 | Complete    | 2026-04-11 |
+| 44. Handle System & Identity Foundation | v8.0 | 5/5 | Complete | 2026-04-11 |
+| 45. Recipe Attribution & Creator Permissions | v8.0 | 3/3 | Complete | 2026-04-11 |
+| 46. Cook Log with Photos | v8.0 | 3/3 | Complete | 2026-04-11 |
+| 47. Recipe Comments | v8.0 | 2/2 | Complete | 2026-04-11 |
+| 48. Feed Integration & Save to Collection | v8.0 | 3/3 | Complete | 2026-04-11 |
+| 49. Tech Debt & Type Safety | v9.0 | 0/0 | Not started | - |
+| 50. Cooking Mode Redesign | v9.0 | 0/0 | Not started | - |
+| 51. Comment Photo Attachments | v9.0 | 0/0 | Not started | - |
+| 52. Co-Cook Tagging | v9.0 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-04-11 after Phase 48 planning*
+*Last updated: 2026-04-11 after v9.0 Cooking Experience roadmap creation*
