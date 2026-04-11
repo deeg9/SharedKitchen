@@ -877,3 +877,28 @@ export interface GrocerySummary {
   estimatedTotal: number;
   progressPercent: number;
 }
+
+/** Cook log types */
+export interface CookLog {
+  id: string;
+  recipe_id: string;
+  user_id: string;
+  household_id: string;
+  photo_url: string | null;
+  notes: string | null;
+  cooked_at: string;
+  created_at: string;
+}
+
+export interface CookLogInsert {
+  recipe_id: string;
+  user_id: string;
+  household_id: string;
+  photo_url?: string | null;
+  notes?: string | null;
+  cooked_at?: string;
+}
+
+export interface CookLogWithProfile extends CookLog {
+  profiles: { handle: string | null; avatar_url: string | null } | null;
+}
