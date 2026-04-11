@@ -114,7 +114,7 @@ export const useRecipeCommentStore = create<RecipeCommentState>((set, get) => ({
     const { comments: prevComments, commentCount: prevCount } = get();
 
     // Optimistic comment
-    const tempId = crypto.randomUUID();
+    const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const optimistic: RecipeCommentWithProfile = {
       id: tempId,
       recipe_id: params.recipeId,
