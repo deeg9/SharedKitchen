@@ -18,6 +18,9 @@ interface SocialState {
   // Search
   searchResults: KitchenProfile[];
   searchLoading: boolean;
+  // People search
+  peopleResults: Array<{ id: string; handle: string; display_name: string | null; avatar_url: string | null }>;
+  peopleLoading: boolean;
   // Follow state
   isFollowing: boolean;
   followLoading: boolean;
@@ -53,6 +56,8 @@ interface SocialState {
     updates: KitchenProfileUpdate
   ) => Promise<void>;
   searchKitchens: (query: string) => Promise<void>;
+  searchPeople: (query: string) => Promise<void>;
+  clearPeopleSearch: () => void;
   checkIsFollowing: (myKitchenId: string, targetKitchenId: string) => Promise<void>;
   followKitchen: (myKitchenId: string, targetKitchenId: string) => Promise<void>;
   unfollowKitchen: (myKitchenId: string, targetKitchenId: string) => Promise<void>;
@@ -85,6 +90,8 @@ export const useSocialStore = create<SocialState>((set, get) => ({
   myKitchenProfile: null,
   searchResults: [],
   searchLoading: false,
+  peopleResults: [],
+  peopleLoading: false,
   isFollowing: false,
   followLoading: false,
   followers: [],
@@ -241,6 +248,30 @@ export const useSocialStore = create<SocialState>((set, get) => ({
 
   clearSearch: () => {
     set({ searchResults: [], searchLoading: false });
+  },
+
+  searchPeople: async (query: string) => {
+    if (query.trim().length < 2) {
+      set({ peopleResults: [], peopleLoading: false });
+      return;
+    }
+    set({ peopleLoading: true });
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, handle, display_name, avatar_url')
+        .or(`handle.ilike.%${query}%,display_name.ilike.%${query}%`)
+        .not('handle', 'is', null)
+        .limit(20);
+      if (error) throw error;
+      set({ peopleResults: data ?? [], peopleLoading: false });
+    } catch (error) {
+      set({ peopleLoading: false, error: getErrorMessage(error) });
+    }
+  },
+
+  clearPeopleSearch: () => {
+    set({ peopleResults: [], peopleLoading: false });
   },
 
   checkIsFollowing: async (myKitchenId: string, targetKitchenId: string) => {
