@@ -655,94 +655,50 @@ export const useSocialStore = create<SocialState>((set, get) => ({
 
   saveRecipeFromPost: async (post: FeedPost, myKitchenId: string, myHouseholdId: string) => {
     try {
-      let recipeData: Recipe | null = null;
-
-      // Step A: Look up the recipe
-      if (post.recipe_id) {
-        const { data, error } = await supabase
-          .from('recipes')
-          .select('*')
-          .eq('id', post.recipe_id)
-          .single();
-
-        if (!error && data) {
-          recipeData = data as Recipe;
-        }
-      }
-
-      // Fallback: look up via meal_plan_id
-      if (!recipeData && post.meal_plan_id) {
-        const { data: mealPlan, error: mpError } = await supabase
-          .from('meal_plans')
-          .select('recipe_id')
-          .eq('id', post.meal_plan_id)
-          .single();
-
-        if (!mpError && mealPlan?.recipe_id) {
-          const { data, error } = await supabase
-            .from('recipes')
-            .select('*')
-            .eq('id', mealPlan.recipe_id)
-            .single();
-
-          if (!error && data) {
-            recipeData = data as Recipe;
-          }
-        }
-      }
-
-      if (!recipeData) {
-        console.warn('[socialStore] saveRecipeFromPost: could not find source recipe');
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) {
+        console.warn('[socialStore] saveRecipeFromPost: no authenticated user');
         return null;
       }
 
-      // Step B: Clone the recipe
-      // Get source kitchen display name for badge
-      const { data: sourceKitchen } = await supabase
-        .from('kitchen_profiles')
-        .select('display_name')
-        .eq('id', post.kitchen_id)
-        .single();
+      if (!post.recipe_id) {
+        console.warn('[socialStore] saveRecipeFromPost: post has no recipe_id');
+        return null;
+      }
 
-      const sourceLabel = sourceKitchen?.display_name ?? 'another kitchen';
-      const savedTag = `Saved from ${sourceLabel}`;
+      // Use SECURITY DEFINER RPC to clone recipe across household boundary (SAVE-01)
+      const { data: newRecipeId, error: rpcError } = await supabase
+        .rpc('clone_recipe_to_household', {
+          p_source_recipe_id: post.recipe_id,
+          p_target_household_id: myHouseholdId,
+          p_source_kitchen_id: post.kitchen_id,
+          p_created_by: userId,
+        });
 
-      const { data: newRecipe, error: insertError } = await supabase
-        .from('recipes')
-        .insert({
-          household_id: myHouseholdId,
-          name: recipeData.name,
-          category: recipeData.category,
-          image_url: recipeData.image_url,
-          prep_time_minutes: recipeData.prep_time_minutes,
-          cook_time_minutes: recipeData.cook_time_minutes,
-          servings: recipeData.servings,
-          estimated_cost: recipeData.estimated_cost,
-          ingredients: recipeData.ingredients,
-          instructions: recipeData.instructions,
-          tags: [...(recipeData.tags || []), savedTag],
-          source_url: recipeData.source_url,
-          nutrition_info: recipeData.nutrition_info,
-          source_image_url: recipeData.source_image_url,
-        })
-        .select()
-        .single();
+      if (rpcError) throw rpcError;
+      if (!newRecipeId) {
+        console.warn('[socialStore] saveRecipeFromPost: clone returned null');
+        return null;
+      }
 
-      if (insertError) throw insertError;
-
-      if (!newRecipe) return null;
-
-      // Step C: Record in saved_recipes
+      // Record in saved_recipes junction table
       await supabase
         .from('saved_recipes')
         .insert({
           kitchen_id: myKitchenId,
           source_kitchen_id: post.kitchen_id,
-          recipe_id: (newRecipe as Recipe).id,
+          recipe_id: newRecipeId,
           feed_post_id: post.id,
         });
 
-      return newRecipe as Recipe;
+      // Fetch the cloned recipe to return it
+      const { data: newRecipe } = await supabase
+        .from('recipes')
+        .select('*')
+        .eq('id', newRecipeId)
+        .single();
+
+      return (newRecipe as Recipe) ?? null;
     } catch (error: unknown) {
       console.warn('[socialStore] saveRecipeFromPost error:', getErrorMessage(error));
       return null;
