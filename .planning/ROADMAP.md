@@ -218,7 +218,11 @@ Plans:
   2. Existing feed interactions (like, comment, save recipe) work on cook-log feed posts the same as on meal-plan feed posts
   3. User can save any recipe from the feed or another kitchen's profile to their own recipe library with one tap
   4. Saved recipes display "Saved from @handle's kitchen" attribution on the recipe detail page
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 48-01-PLAN.md — Migration, types, cookLogStore feed post hook
+- [ ] 48-02-PLAN.md — FeedCard cook-log rendering + saveRecipeFromPost RPC rewrite
+- [ ] 48-03-PLAN.md — SavedFromAttribution component + recipe detail integration
 **UI hint**: yes
 
 ## Progress
@@ -273,8 +277,8 @@ Plans:
 | 44. Handle System & Identity Foundation | v8.0 | 5/4 | Complete   | 2026-04-11 |
 | 45. Recipe Attribution & Creator Permissions | v8.0 | 3/3 | Complete    | 2026-04-11 |
 | 46. Cook Log with Photos | v8.0 | 3/3 | Complete    | 2026-04-11 |
-| 47. Recipe Comments | v8.0 | 2/2 | Complete   | 2026-04-11 |
-| 48. Feed Integration & Save to Collection | v8.0 | 0/TBD | Not started | - |
+| 47. Recipe Comments | v8.0 | 2/2 | Complete    | 2026-04-11 |
+| 48. Feed Integration & Save to Collection | v8.0 | 0/3 | Not started | - |
 
 ---
-*Last updated: 2026-04-11 after Phase 47 planning*
+*Last updated: 2026-04-11 after Phase 48 planning*
