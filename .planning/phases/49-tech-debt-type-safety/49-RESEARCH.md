@@ -349,17 +349,15 @@ DROP POLICY IF EXISTS "Authenticated users can read any profile" ON profiles;
 | A2 | `supabase gen types typescript --project-id` works against the remote project with current auth | Architecture Patterns (DEBT-04) | Would need to run `supabase db start` locally and generate from local instead |
 | A3 | Generated types will use `Json` for JSONB columns requiring manual override | Pitfalls | JSONB column types may actually be more specific if DB comments are set -- would reduce post-gen work |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Should the View approach vs. application-level `.select()` be used for DEBT-01?**
+1. **Should the View approach vs. application-level `.select()` be used for DEBT-01?** RESOLVED: VIEW approach adopted — defense in depth, enforced at DB level. Implemented in Plan 49-02 Task 1.
    - What we know: Both work. View is enforced at DB level (defense in depth). `.select()` is simpler but relies on developers using the right select string.
-   - What's unclear: Whether the success criteria strictly requires DB-level enforcement or if application-level restriction suffices
-   - Recommendation: Use the VIEW approach -- it's defense in depth and matches the security intent
+   - Decision: Use the VIEW approach -- it's defense in depth and matches the security intent
 
-2. **Should `database.ts` be split into generated + manual files?**
+2. **Should `database.ts` be split into generated + manual files?** RESOLVED: Inline regeneration with manual types appended. Implemented in Plan 49-02 Task 1.
    - What we know: Regeneration will overwrite custom types. A split file approach prevents this.
-   - What's unclear: Whether the team prefers a single file or split
-   - Recommendation: Split into `database.generated.ts` (from CLI) and `database.ts` (imports generated + adds custom types)
+   - Decision: Regenerate inline and preserve custom types by appending after the generated Database interface
 
 ## Environment Availability
 
