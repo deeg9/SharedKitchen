@@ -278,9 +278,9 @@ const { data } = await supabase
 ```typescript
 // Source: recipe/[id].tsx existing pattern
 const isCreator = recipe.created_by === userId;
-// OR for legacy: also allow if user is household member and recipe was assigned to admin
-// But we do NOT need client-side legacy check -- RLS handles it.
-// The client just checks creator match for the button visibility.
+// The client only checks isCreator for button visibility.
+// RLS handles legacy recipe permissions transparently -- household members
+// can still edit legacy recipes via RLS even without seeing the Edit button.
 ```
 [VERIFIED: recipe.created_by and userId both available in component scope]
 
@@ -300,17 +300,17 @@ const isCreator = recipe.created_by === userId;
 | A2 | Every household has at least one admin member | Pitfall 2 | Backfill fails silently -- mitigate with COALESCE fallback to oldest member |
 | A3 | Legacy recipe = created_by was NULL before migration (no other indicator needed) | Architecture Patterns | If recipes were created with created_by set but should still be legacy, they'd be missed -- low risk given codebase audit shows all create paths set created_by |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Legacy recipe identification after migration**
+1. **Legacy recipe identification after migration** (RESOLVED)
    - What we know: After backfill, legacy recipes look identical to creator-owned recipes (both have created_by set).
-   - What's unclear: Should we add an `is_legacy` or `created_before_v8` flag for future reference?
-   - Recommendation: Not needed for v8.0. The RLS "legacy exception" checks if `created_by = household admin`, which works because only legacy recipes get assigned to admin via migration. New recipes created by the admin are legitimately theirs. If needed later, add a column.
+   - What was unclear: Should we add an `is_legacy` or `created_before_v8` flag for future reference?
+   - Resolution: Not needed for v8.0. The RLS "legacy exception" checks if `created_by = household admin`, which works because only legacy recipes get assigned to admin via migration. New recipes created by the admin are legitimately theirs. If needed later, add a column.
 
-2. **Public profile page routing**
+2. **Public profile page routing** (RESOLVED)
    - What we know: Need a new route for viewing another user's profile with their public recipes.
-   - What's unclear: Should it be `/user/[id]` or `/profile/[handle]`?
-   - Recommendation: Use `/user/[id]` (UUID-based) for simplicity and consistency with how `created_by` stores UUIDs. Handles could change; UUIDs don't.
+   - What was unclear: Should it be `/user/[id]` or `/profile/[handle]`?
+   - Resolution: Use `/user/[id]` (UUID-based) for simplicity and consistency with how `created_by` stores UUIDs. Handles could change; UUIDs don't.
 
 ## Validation Architecture
 
