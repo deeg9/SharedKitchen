@@ -93,6 +93,7 @@ export interface Database {
           cached_response?: Json | null;
           created_at?: string | null;
         };
+        Relationships: [];
       };
       blocked_kitchens: {
         Row: {
@@ -113,6 +114,7 @@ export interface Database {
           blocked_kitchen_id?: string;
           created_at?: string;
         };
+        Relationships: [];
       };
       budget_settings: {
         Row: {
@@ -133,6 +135,7 @@ export interface Database {
           monthly_target?: number;
           updated_at?: string;
         };
+        Relationships: [];
       };
       cook_logs: {
         Row: {
@@ -165,6 +168,7 @@ export interface Database {
           cooked_at?: string;
           created_at?: string | null;
         };
+        Relationships: [];
       };
       expenses: {
         Row: {
@@ -197,6 +201,7 @@ export interface Database {
           created_by?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       feed_posts: {
         Row: {
@@ -250,6 +255,7 @@ export interface Database {
           comment_count?: number;
           created_at?: string;
         };
+        Relationships: [];
       };
       follows: {
         Row: {
@@ -270,6 +276,7 @@ export interface Database {
           following_kitchen_id?: string;
           created_at?: string;
         };
+        Relationships: [];
       };
       food_items: {
         Row: {
@@ -326,6 +333,7 @@ export interface Database {
           fetched_at?: string;
           expires_at?: string;
         };
+        Relationships: [];
       };
       food_search_cache: {
         Row: {
@@ -352,6 +360,7 @@ export interface Database {
           created_at?: string;
           expires_at?: string;
         };
+        Relationships: [];
       };
       grocery_items: {
         Row: {
@@ -396,6 +405,7 @@ export interface Database {
           source_recipe_id?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       grocery_lists: {
         Row: {
@@ -419,6 +429,7 @@ export interface Database {
           created_by?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       household_members: {
         Row: {
@@ -442,6 +453,7 @@ export interface Database {
           role?: 'admin' | 'member';
           joined_at?: string;
         };
+        Relationships: [];
       };
       households: {
         Row: {
@@ -465,6 +477,7 @@ export interface Database {
           created_by?: string;
           created_at?: string;
         };
+        Relationships: [];
       };
       kitchen_profiles: {
         Row: {
@@ -509,6 +522,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       leftovers: {
         Row: {
@@ -547,6 +561,7 @@ export interface Database {
           created_by?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       meal_generation_log: {
         Row: {
@@ -576,6 +591,7 @@ export interface Database {
           tokens_used?: number | null;
           created_at?: string | null;
         };
+        Relationships: [];
       };
       meal_plans: {
         Row: {
@@ -617,6 +633,7 @@ export interface Database {
           created_by?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       meal_rsvps: {
         Row: {
@@ -643,6 +660,7 @@ export interface Database {
           created_at?: string | null;
           updated_at?: string | null;
         };
+        Relationships: [];
       };
       pantry_items: {
         Row: {
@@ -681,6 +699,7 @@ export interface Database {
           created_by?: string | null;
           source_grocery_item_id?: string | null;
         };
+        Relationships: [];
       };
       post_comments: {
         Row: {
@@ -704,6 +723,7 @@ export interface Database {
           content?: string;
           created_at?: string;
         };
+        Relationships: [];
       };
       post_likes: {
         Row: {
@@ -724,6 +744,7 @@ export interface Database {
           kitchen_id?: string;
           created_at?: string;
         };
+        Relationships: [];
       };
       processed_webhook_events: {
         Row: {
@@ -741,6 +762,7 @@ export interface Database {
           event_type?: string;
           processed_at?: string | null;
         };
+        Relationships: [];
       };
       profiles: {
         Row: {
@@ -767,6 +789,7 @@ export interface Database {
           handle_changed_at?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       push_tokens: {
         Row: {
@@ -793,6 +816,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       recipe_comments: {
         Row: {
@@ -819,6 +843,7 @@ export interface Database {
           body?: string;
           created_at?: string | null;
         };
+        Relationships: [];
       };
       recipe_notes: {
         Row: {
@@ -842,6 +867,7 @@ export interface Database {
           content?: string;
           created_at?: string;
         };
+        Relationships: [];
       };
       recipe_ratings: {
         Row: {
@@ -868,6 +894,7 @@ export interface Database {
           is_favorite?: boolean;
           created_at?: string;
         };
+        Relationships: [];
       };
       recipes: {
         Row: {
@@ -945,6 +972,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       reported_content: {
         Row: {
@@ -974,6 +1002,7 @@ export interface Database {
           reason?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       saved_recipes: {
         Row: {
@@ -1000,6 +1029,7 @@ export interface Database {
           feed_post_id?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       subscriptions: {
         Row: {
@@ -1041,6 +1071,7 @@ export interface Database {
           created_at?: string | null;
           updated_at?: string | null;
         };
+        Relationships: [];
       };
       waitlist: {
         Row: {
@@ -1058,6 +1089,7 @@ export interface Database {
           email?: string;
           created_at?: string | null;
         };
+        Relationships: [];
       };
     };
     Views: {
@@ -1068,6 +1100,7 @@ export interface Database {
           display_name: string | null;
           avatar_url: string | null;
         };
+        Relationships: [];
       };
     };
     Functions: {
