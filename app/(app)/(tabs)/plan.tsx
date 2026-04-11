@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { KitchenSearchBar } from '../../../src/components/social/KitchenSearchBar';
 import { FeedList } from '../../../src/components/social/FeedList';
 import { WeekHeader } from '../../../src/components/plan/WeekHeader';
@@ -10,6 +11,8 @@ import { DaySection } from '../../../src/components/plan/DayCard';
 import { PlanEditSheet } from '../../../src/components/plan/PlanEditSheet';
 import { SurpriseMe } from '../../../src/components/plan/SurpriseMe';
 import { SuggestionCard } from '../../../src/components/plan/SuggestionCard';
+import { PastMealBanner } from '../../../src/components/plan/PastMealBanner';
+import { CookLogSheet } from '../../../src/components/cook-log/CookLogSheet';
 import { DateStrip } from '../../../src/components/ui/DateStrip';
 import { HeroDinnerCard } from '../../../src/components/plan/HeroDinnerCard';
 import { DayViewMealSlot } from '../../../src/components/plan/DayViewMealSlot';
@@ -22,6 +25,7 @@ import { useSocialStore } from '../../../src/stores/socialStore';
 import { useGroceryStore } from '../../../src/stores/groceryStore';
 import { useRsvpStore } from '../../../src/stores/rsvpStore';
 import { useAuthStore } from '../../../src/stores/authStore';
+import { useCookLogStore } from '../../../src/stores/cookLogStore';
 import { UpgradePrompt } from '../../../src/components/premium/UpgradePrompt';
 import { toDateString, makePlanKey } from '../../../src/lib/dates';
 import { generateSuggestions } from '../../../src/lib/suggestions';
@@ -63,6 +67,73 @@ export default function PlanScreen() {
   const [selectedMealType, setSelectedMealType] = useState<MealType>('dinner');
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+
+  // Cook log banner state
+  const { unloggedMeals, fetchUnloggedMeals } = useCookLogStore();
+  const userId = currentUser?.id;
+  const householdId = activeHouseholdId;
+  const [dismissedMealIds, setDismissedMealIds] = useState<Set<string>>(new Set());
+  const [cookLogSheetState, setCookLogSheetState] = useState<{
+    isOpen: boolean;
+    recipeId: string;
+    recipeName: string;
+  }>({ isOpen: false, recipeId: '', recipeName: '' });
+  const dismissedLoaded = useRef(false);
+
+  // Get yesterday's date string for AsyncStorage key
+  const getYesterdayStr = useCallback(() => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    return toDateString(yesterday);
+  }, []);
+
+  // Load dismissed IDs from AsyncStorage on mount
+  useEffect(() => {
+    const loadDismissed = async () => {
+      try {
+        const yesterdayStr = getYesterdayStr();
+        const key = `dismissed_meal_banners_${yesterdayStr}`;
+        const stored = await AsyncStorage.getItem(key);
+        if (stored) {
+          const ids: string[] = JSON.parse(stored);
+          setDismissedMealIds(new Set(ids));
+        }
+      } catch {
+        // ignore storage errors
+      }
+      dismissedLoaded.current = true;
+    };
+    loadDismissed();
+  }, [getYesterdayStr]);
+
+  // Fetch unlogged meals on mount
+  useEffect(() => {
+    if (householdId && userId) {
+      fetchUnloggedMeals(householdId, userId);
+    }
+  }, [householdId, userId, fetchUnloggedMeals]);
+
+  // Filter unlogged meals excluding dismissed ones
+  const filteredUnloggedMeals = useMemo(
+    () => unloggedMeals.filter((m) => !dismissedMealIds.has(m.plan_id)),
+    [unloggedMeals, dismissedMealIds]
+  );
+
+  // Persist dismissed ID to AsyncStorage
+  const handleDismissMeal = useCallback(
+    async (planId: string) => {
+      const updated = new Set([...dismissedMealIds, planId]);
+      setDismissedMealIds(updated);
+      try {
+        const yesterdayStr = getYesterdayStr();
+        const key = `dismissed_meal_banners_${yesterdayStr}`;
+        await AsyncStorage.setItem(key, JSON.stringify([...updated]));
+      } catch {
+        // ignore storage errors
+      }
+    },
+    [dismissedMealIds, getYesterdayStr]
+  );
 
   const days = weekDays();
   const label = weekLabel();
@@ -227,6 +298,14 @@ export default function PlanScreen() {
 
                 {/* Day View Content */}
                 <View style={styles.dayViewContent}>
+                  {/* Past meal banner -- first inside dayViewContent */}
+                  <PastMealBanner
+                    meals={filteredUnloggedMeals}
+                    onLogCook={(recipeId, recipeName) =>
+                      setCookLogSheetState({ isOpen: true, recipeId, recipeName })
+                    }
+                    onDismiss={handleDismissMeal}
+                  />
                   {loading && mealPlan.size === 0 ? (
                     <>
                       <Skeleton width="100%" height={220} borderRadius={borderRadius.lg} />
@@ -406,6 +485,18 @@ export default function PlanScreen() {
         visible={showUpgradePrompt}
         onDismiss={() => setShowUpgradePrompt(false)}
         feature="advanced_suggestions"
+      />
+
+      {/* Cook Log Sheet for past meal banner */}
+      <CookLogSheet
+        isOpen={cookLogSheetState.isOpen}
+        onClose={() => {
+          setCookLogSheetState({ isOpen: false, recipeId: '', recipeName: '' });
+          // Re-fetch unlogged meals so the banner disappears for logged ones
+          if (householdId && userId) fetchUnloggedMeals(householdId, userId);
+        }}
+        recipeId={cookLogSheetState.recipeId}
+        recipeName={cookLogSheetState.recipeName}
       />
     </View>
   );
