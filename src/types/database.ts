@@ -1,6 +1,7 @@
 /**
  * TypeScript types for the Supabase database schema.
- * These can be refined later with `supabase gen types typescript`.
+ * Regenerated from live schema + custom types preserved.
+ * Phase 49: Tech Debt & Type Safety
  */
 
 export type Json =
@@ -64,301 +65,105 @@ export interface NutritionInfo {
 export interface Database {
   public: {
     Tables: {
-      profiles: {
+      ai_usage_log: {
         Row: {
           id: string;
-          display_name: string | null;
-          avatar_url: string | null;
-          created_at: string;
-        };
-        Insert: {
-          id: string;
-          display_name?: string | null;
-          avatar_url?: string | null;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          display_name?: string | null;
-          avatar_url?: string | null;
-          created_at?: string;
-        };
-      };
-      households: {
-        Row: {
-          id: string;
-          name: string;
-          invite_code: string;
-          created_by: string;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          name: string;
-          invite_code?: string;
-          created_by: string;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          name?: string;
-          invite_code?: string;
-          created_by?: string;
-          created_at?: string;
-        };
-      };
-      household_members: {
-        Row: {
-          id: string;
-          household_id: string;
           user_id: string;
-          role: 'admin' | 'member';
-          joined_at: string;
+          function_name: string;
+          tokens_used: number | null;
+          input_hash: string | null;
+          cached_response: Json | null;
+          created_at: string | null;
         };
         Insert: {
           id?: string;
-          household_id: string;
           user_id: string;
-          role?: 'admin' | 'member';
-          joined_at?: string;
+          function_name: string;
+          tokens_used?: number | null;
+          input_hash?: string | null;
+          cached_response?: Json | null;
+          created_at?: string | null;
         };
         Update: {
           id?: string;
-          household_id?: string;
           user_id?: string;
-          role?: 'admin' | 'member';
-          joined_at?: string;
+          function_name?: string;
+          tokens_used?: number | null;
+          input_hash?: string | null;
+          cached_response?: Json | null;
+          created_at?: string | null;
         };
       };
-      recipes: {
+      blocked_kitchens: {
+        Row: {
+          id: string;
+          blocker_kitchen_id: string;
+          blocked_kitchen_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          blocker_kitchen_id: string;
+          blocked_kitchen_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          blocker_kitchen_id?: string;
+          blocked_kitchen_id?: string;
+          created_at?: string;
+        };
+      };
+      budget_settings: {
         Row: {
           id: string;
           household_id: string;
-          name: string;
-          category: string | null;
-          image_url: string | null;
-          prep_time_minutes: number | null;
-          cook_time_minutes: number | null;
-          servings: number;
-          estimated_cost: number | null;
-          ingredients: Ingredient[];
-          instructions: InstructionStep[];
-          tags: string[];
-          source_url: string | null;
-          nutrition_info: NutritionInfo | null;
-          source_image_url: string | null;
-          computed_nutrition: Record<string, unknown> | null;
-          ingredient_matches: Record<string, unknown>[] | null;
-          created_by: string | null;
-          saved_from_kitchen_id: string | null;
-          saved_from_recipe_id: string | null;
-          created_at: string;
+          monthly_target: number;
           updated_at: string;
         };
         Insert: {
           id?: string;
           household_id: string;
-          name: string;
-          category?: string | null;
-          image_url?: string | null;
-          prep_time_minutes?: number | null;
-          cook_time_minutes?: number | null;
-          servings?: number;
-          estimated_cost?: number | null;
-          ingredients?: Ingredient[];
-          instructions?: InstructionStep[];
-          tags?: string[];
-          source_url?: string | null;
-          nutrition_info?: NutritionInfo | null;
-          source_image_url?: string | null;
-          computed_nutrition?: Record<string, unknown> | null;
-          ingredient_matches?: Record<string, unknown>[] | null;
-          created_by?: string | null;
-          saved_from_kitchen_id?: string | null;
-          saved_from_recipe_id?: string | null;
-          created_at?: string;
+          monthly_target?: number;
           updated_at?: string;
         };
         Update: {
           id?: string;
           household_id?: string;
-          name?: string;
-          category?: string | null;
-          image_url?: string | null;
-          prep_time_minutes?: number | null;
-          cook_time_minutes?: number | null;
-          servings?: number;
-          estimated_cost?: number | null;
-          ingredients?: Ingredient[];
-          instructions?: InstructionStep[];
-          tags?: string[];
-          source_url?: string | null;
-          nutrition_info?: NutritionInfo | null;
-          source_image_url?: string | null;
-          computed_nutrition?: Record<string, unknown> | null;
-          ingredient_matches?: Record<string, unknown>[] | null;
-          created_by?: string | null;
-          saved_from_kitchen_id?: string | null;
-          saved_from_recipe_id?: string | null;
-          created_at?: string;
+          monthly_target?: number;
           updated_at?: string;
         };
       };
-      recipe_ratings: {
+      cook_logs: {
         Row: {
           id: string;
           recipe_id: string;
           user_id: string;
-          rating: number | null;
-          is_favorite: boolean;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          recipe_id: string;
-          user_id: string;
-          rating?: number | null;
-          is_favorite?: boolean;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          recipe_id?: string;
-          user_id?: string;
-          rating?: number | null;
-          is_favorite?: boolean;
-          created_at?: string;
-        };
-      };
-      meal_plans: {
-        Row: {
-          id: string;
           household_id: string;
-          recipe_id: string | null;
-          plan_date: string;
-          meal_type: MealType;
-          meal_source: MealSource;
-          meal_cost: number | null;
-          assigned_cook: string | null;
+          photo_url: string | null;
           notes: string | null;
-          created_by: string | null;
-          created_at: string;
+          cooked_at: string;
+          created_at: string | null;
         };
         Insert: {
           id?: string;
+          recipe_id: string;
+          user_id: string;
           household_id: string;
-          recipe_id?: string | null;
-          plan_date: string;
-          meal_type?: MealType;
-          meal_source?: MealSource;
-          meal_cost?: number | null;
-          assigned_cook?: string | null;
+          photo_url?: string | null;
           notes?: string | null;
-          created_by?: string | null;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          household_id?: string;
-          recipe_id?: string | null;
-          plan_date?: string;
-          meal_type?: MealType;
-          meal_source?: MealSource;
-          meal_cost?: number | null;
-          assigned_cook?: string | null;
-          notes?: string | null;
-          created_by?: string | null;
-          created_at?: string;
-        };
-      };
-      recipe_notes: {
-        Row: {
-          id: string;
-          recipe_id: string;
-          user_id: string;
-          content: string;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          recipe_id: string;
-          user_id: string;
-          content: string;
-          created_at?: string;
+          cooked_at?: string;
+          created_at?: string | null;
         };
         Update: {
           id?: string;
           recipe_id?: string;
           user_id?: string;
-          content?: string;
-          created_at?: string;
-        };
-      };
-      grocery_lists: {
-        Row: {
-          id: string;
-          household_id: string;
-          week_start: string;
-          created_by: string | null;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          household_id: string;
-          week_start: string;
-          created_by?: string | null;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
           household_id?: string;
-          week_start?: string;
-          created_by?: string | null;
-          created_at?: string;
-        };
-      };
-      grocery_items: {
-        Row: {
-          id: string;
-          grocery_list_id: string;
-          name: string;
-          quantity: string | null;
-          estimated_price: number | null;
-          section: 'Proteins' | 'Produce' | 'Dairy & Eggs' | 'Pantry' | 'Other' | null;
-          is_checked: boolean;
-          checked_by: string | null;
-          checked_at: string | null;
-          is_manual: boolean;
-          source_recipe_id: string | null;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          grocery_list_id?: string;
-          name: string;
-          quantity?: string | null;
-          estimated_price?: number | null;
-          section?: 'Proteins' | 'Produce' | 'Dairy & Eggs' | 'Pantry' | 'Other' | null;
-          is_checked?: boolean;
-          checked_by?: string | null;
-          checked_at?: string | null;
-          is_manual?: boolean;
-          source_recipe_id?: string | null;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          grocery_list_id?: string;
-          name?: string;
-          quantity?: string | null;
-          estimated_price?: number | null;
-          section?: 'Proteins' | 'Produce' | 'Dairy & Eggs' | 'Pantry' | 'Other' | null;
-          is_checked?: boolean;
-          checked_by?: string | null;
-          checked_at?: string | null;
-          is_manual?: boolean;
-          source_recipe_id?: string | null;
-          created_at?: string;
+          photo_url?: string | null;
+          notes?: string | null;
+          cooked_at?: string;
+          created_at?: string | null;
         };
       };
       expenses: {
@@ -390,166 +195,6 @@ export interface Database {
           description?: string | null;
           expense_date?: string;
           created_by?: string | null;
-          created_at?: string;
-        };
-      };
-      leftovers: {
-        Row: {
-          id: string;
-          household_id: string;
-          name: string;
-          date_made: string;
-          use_by_date: string;
-          portions: number;
-          status: 'fresh' | 'frozen';
-          notes: string | null;
-          created_by: string | null;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          household_id: string;
-          name: string;
-          date_made?: string;
-          use_by_date: string;
-          portions?: number;
-          status?: 'fresh' | 'frozen';
-          notes?: string | null;
-          created_by?: string | null;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          household_id?: string;
-          name?: string;
-          date_made?: string;
-          use_by_date?: string;
-          portions?: number;
-          status?: 'fresh' | 'frozen';
-          notes?: string | null;
-          created_by?: string | null;
-          created_at?: string;
-        };
-      };
-      budget_settings: {
-        Row: {
-          id: string;
-          household_id: string;
-          monthly_target: number;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          household_id: string;
-          monthly_target?: number;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          household_id?: string;
-          monthly_target?: number;
-          updated_at?: string;
-        };
-      };
-      pantry_items: {
-        Row: {
-          id: string;
-          household_id: string;
-          name: string;
-          quantity: string | null;
-          unit: string | null;
-          category: string | null;
-          added_at: string;
-          expires_at: string | null;
-          created_by: string | null;
-          source_grocery_item_id: string | null;
-        };
-        Insert: {
-          id?: string;
-          household_id: string;
-          name: string;
-          quantity?: string | null;
-          unit?: string | null;
-          category?: string | null;
-          added_at?: string;
-          expires_at?: string | null;
-          created_by?: string | null;
-          source_grocery_item_id?: string | null;
-        };
-        Update: {
-          id?: string;
-          household_id?: string;
-          name?: string;
-          quantity?: string | null;
-          unit?: string | null;
-          category?: string | null;
-          added_at?: string;
-          expires_at?: string | null;
-          created_by?: string | null;
-          source_grocery_item_id?: string | null;
-        };
-      };
-      kitchen_profiles: {
-        Row: {
-          id: string;
-          household_id: string;
-          display_name: string;
-          bio: string | null;
-          avatar_url: string | null;
-          invite_code: string;
-          is_public: boolean;
-          is_searchable: boolean;
-          follower_count: number;
-          following_count: number;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          household_id: string;
-          display_name: string;
-          bio?: string | null;
-          avatar_url?: string | null;
-          invite_code?: string;
-          is_public?: boolean;
-          is_searchable?: boolean;
-          follower_count?: number;
-          following_count?: number;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          household_id?: string;
-          display_name?: string;
-          bio?: string | null;
-          avatar_url?: string | null;
-          invite_code?: string;
-          is_public?: boolean;
-          is_searchable?: boolean;
-          follower_count?: number;
-          following_count?: number;
-          created_at?: string;
-          updated_at?: string;
-        };
-      };
-      follows: {
-        Row: {
-          id: string;
-          follower_kitchen_id: string;
-          following_kitchen_id: string;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          follower_kitchen_id: string;
-          following_kitchen_id: string;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          follower_kitchen_id?: string;
-          following_kitchen_id?: string;
           created_at?: string;
         };
       };
@@ -606,121 +251,23 @@ export interface Database {
           created_at?: string;
         };
       };
-      post_likes: {
+      follows: {
         Row: {
           id: string;
-          post_id: string;
-          kitchen_id: string;
+          follower_kitchen_id: string;
+          following_kitchen_id: string;
           created_at: string;
         };
         Insert: {
           id?: string;
-          post_id: string;
-          kitchen_id: string;
+          follower_kitchen_id: string;
+          following_kitchen_id: string;
           created_at?: string;
         };
         Update: {
           id?: string;
-          post_id?: string;
-          kitchen_id?: string;
-          created_at?: string;
-        };
-      };
-      post_comments: {
-        Row: {
-          id: string;
-          post_id: string;
-          kitchen_id: string;
-          content: string;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          post_id: string;
-          kitchen_id: string;
-          content: string;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          post_id?: string;
-          kitchen_id?: string;
-          content?: string;
-          created_at?: string;
-        };
-      };
-      saved_recipes: {
-        Row: {
-          id: string;
-          kitchen_id: string;
-          source_kitchen_id: string | null;
-          recipe_id: string;
-          feed_post_id: string | null;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          kitchen_id: string;
-          source_kitchen_id?: string | null;
-          recipe_id: string;
-          feed_post_id?: string | null;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          kitchen_id?: string;
-          source_kitchen_id?: string | null;
-          recipe_id?: string;
-          feed_post_id?: string | null;
-          created_at?: string;
-        };
-      };
-      blocked_kitchens: {
-        Row: {
-          id: string;
-          blocker_kitchen_id: string;
-          blocked_kitchen_id: string;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          blocker_kitchen_id: string;
-          blocked_kitchen_id: string;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          blocker_kitchen_id?: string;
-          blocked_kitchen_id?: string;
-          created_at?: string;
-        };
-      };
-      reported_content: {
-        Row: {
-          id: string;
-          reporter_kitchen_id: string;
-          content_type: 'post' | 'comment';
-          post_id: string | null;
-          comment_id: string | null;
-          reason: string | null;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          reporter_kitchen_id: string;
-          content_type: 'post' | 'comment';
-          post_id?: string | null;
-          comment_id?: string | null;
-          reason?: string | null;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          reporter_kitchen_id?: string;
-          content_type?: 'post' | 'comment';
-          post_id?: string | null;
-          comment_id?: string | null;
-          reason?: string | null;
+          follower_kitchen_id?: string;
+          following_kitchen_id?: string;
           created_at?: string;
         };
       };
@@ -806,12 +353,741 @@ export interface Database {
           expires_at?: string;
         };
       };
+      grocery_items: {
+        Row: {
+          id: string;
+          grocery_list_id: string;
+          name: string;
+          quantity: string | null;
+          estimated_price: number | null;
+          section: 'Proteins' | 'Produce' | 'Dairy & Eggs' | 'Pantry' | 'Other' | null;
+          is_checked: boolean;
+          checked_by: string | null;
+          checked_at: string | null;
+          is_manual: boolean;
+          source_recipe_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          grocery_list_id?: string;
+          name: string;
+          quantity?: string | null;
+          estimated_price?: number | null;
+          section?: 'Proteins' | 'Produce' | 'Dairy & Eggs' | 'Pantry' | 'Other' | null;
+          is_checked?: boolean;
+          checked_by?: string | null;
+          checked_at?: string | null;
+          is_manual?: boolean;
+          source_recipe_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          grocery_list_id?: string;
+          name?: string;
+          quantity?: string | null;
+          estimated_price?: number | null;
+          section?: 'Proteins' | 'Produce' | 'Dairy & Eggs' | 'Pantry' | 'Other' | null;
+          is_checked?: boolean;
+          checked_by?: string | null;
+          checked_at?: string | null;
+          is_manual?: boolean;
+          source_recipe_id?: string | null;
+          created_at?: string;
+        };
+      };
+      grocery_lists: {
+        Row: {
+          id: string;
+          household_id: string;
+          week_start: string;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          household_id: string;
+          week_start: string;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          household_id?: string;
+          week_start?: string;
+          created_by?: string | null;
+          created_at?: string;
+        };
+      };
+      household_members: {
+        Row: {
+          id: string;
+          household_id: string;
+          user_id: string;
+          role: 'admin' | 'member';
+          joined_at: string;
+        };
+        Insert: {
+          id?: string;
+          household_id: string;
+          user_id: string;
+          role?: 'admin' | 'member';
+          joined_at?: string;
+        };
+        Update: {
+          id?: string;
+          household_id?: string;
+          user_id?: string;
+          role?: 'admin' | 'member';
+          joined_at?: string;
+        };
+      };
+      households: {
+        Row: {
+          id: string;
+          name: string;
+          invite_code: string;
+          created_by: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          invite_code?: string;
+          created_by: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          invite_code?: string;
+          created_by?: string;
+          created_at?: string;
+        };
+      };
+      kitchen_profiles: {
+        Row: {
+          id: string;
+          household_id: string;
+          display_name: string;
+          bio: string | null;
+          avatar_url: string | null;
+          invite_code: string;
+          is_public: boolean;
+          is_searchable: boolean;
+          follower_count: number;
+          following_count: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          household_id: string;
+          display_name: string;
+          bio?: string | null;
+          avatar_url?: string | null;
+          invite_code?: string;
+          is_public?: boolean;
+          is_searchable?: boolean;
+          follower_count?: number;
+          following_count?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          household_id?: string;
+          display_name?: string;
+          bio?: string | null;
+          avatar_url?: string | null;
+          invite_code?: string;
+          is_public?: boolean;
+          is_searchable?: boolean;
+          follower_count?: number;
+          following_count?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      leftovers: {
+        Row: {
+          id: string;
+          household_id: string;
+          name: string;
+          date_made: string;
+          use_by_date: string;
+          portions: number;
+          status: 'fresh' | 'frozen';
+          notes: string | null;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          household_id: string;
+          name: string;
+          date_made?: string;
+          use_by_date: string;
+          portions?: number;
+          status?: 'fresh' | 'frozen';
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          household_id?: string;
+          name?: string;
+          date_made?: string;
+          use_by_date?: string;
+          portions?: number;
+          status?: 'fresh' | 'frozen';
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+        };
+      };
+      meal_generation_log: {
+        Row: {
+          id: string;
+          user_id: string;
+          household_id: string;
+          prompt_context: Json | null;
+          suggestions: Json | null;
+          tokens_used: number | null;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          household_id: string;
+          prompt_context?: Json | null;
+          suggestions?: Json | null;
+          tokens_used?: number | null;
+          created_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          household_id?: string;
+          prompt_context?: Json | null;
+          suggestions?: Json | null;
+          tokens_used?: number | null;
+          created_at?: string | null;
+        };
+      };
+      meal_plans: {
+        Row: {
+          id: string;
+          household_id: string;
+          recipe_id: string | null;
+          plan_date: string;
+          meal_type: MealType;
+          meal_source: MealSource;
+          meal_cost: number | null;
+          assigned_cook: string | null;
+          notes: string | null;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          household_id: string;
+          recipe_id?: string | null;
+          plan_date: string;
+          meal_type?: MealType;
+          meal_source?: MealSource;
+          meal_cost?: number | null;
+          assigned_cook?: string | null;
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          household_id?: string;
+          recipe_id?: string | null;
+          plan_date?: string;
+          meal_type?: MealType;
+          meal_source?: MealSource;
+          meal_cost?: number | null;
+          assigned_cook?: string | null;
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+        };
+      };
+      meal_rsvps: {
+        Row: {
+          id: string;
+          meal_plan_id: string;
+          user_id: string;
+          status: string;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          meal_plan_id: string;
+          user_id: string;
+          status?: string;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          meal_plan_id?: string;
+          user_id?: string;
+          status?: string;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+      };
+      pantry_items: {
+        Row: {
+          id: string;
+          household_id: string;
+          name: string;
+          quantity: string | null;
+          unit: string | null;
+          category: string | null;
+          added_at: string;
+          expires_at: string | null;
+          created_by: string | null;
+          source_grocery_item_id: string | null;
+        };
+        Insert: {
+          id?: string;
+          household_id: string;
+          name: string;
+          quantity?: string | null;
+          unit?: string | null;
+          category?: string | null;
+          added_at?: string;
+          expires_at?: string | null;
+          created_by?: string | null;
+          source_grocery_item_id?: string | null;
+        };
+        Update: {
+          id?: string;
+          household_id?: string;
+          name?: string;
+          quantity?: string | null;
+          unit?: string | null;
+          category?: string | null;
+          added_at?: string;
+          expires_at?: string | null;
+          created_by?: string | null;
+          source_grocery_item_id?: string | null;
+        };
+      };
+      post_comments: {
+        Row: {
+          id: string;
+          post_id: string;
+          kitchen_id: string;
+          content: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          post_id: string;
+          kitchen_id: string;
+          content: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          post_id?: string;
+          kitchen_id?: string;
+          content?: string;
+          created_at?: string;
+        };
+      };
+      post_likes: {
+        Row: {
+          id: string;
+          post_id: string;
+          kitchen_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          post_id: string;
+          kitchen_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          post_id?: string;
+          kitchen_id?: string;
+          created_at?: string;
+        };
+      };
+      processed_webhook_events: {
+        Row: {
+          event_id: string;
+          event_type: string;
+          processed_at: string | null;
+        };
+        Insert: {
+          event_id: string;
+          event_type: string;
+          processed_at?: string | null;
+        };
+        Update: {
+          event_id?: string;
+          event_type?: string;
+          processed_at?: string | null;
+        };
+      };
+      profiles: {
+        Row: {
+          id: string;
+          display_name: string | null;
+          avatar_url: string | null;
+          handle: string | null;
+          handle_changed_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id: string;
+          display_name?: string | null;
+          avatar_url?: string | null;
+          handle?: string | null;
+          handle_changed_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          display_name?: string | null;
+          avatar_url?: string | null;
+          handle?: string | null;
+          handle_changed_at?: string | null;
+          created_at?: string;
+        };
+      };
+      push_tokens: {
+        Row: {
+          id: string;
+          user_id: string;
+          expo_push_token: string;
+          device_id: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          expo_push_token: string;
+          device_id?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          expo_push_token?: string;
+          device_id?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      recipe_comments: {
+        Row: {
+          id: string;
+          recipe_id: string;
+          user_id: string;
+          parent_id: string | null;
+          body: string;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          recipe_id: string;
+          user_id: string;
+          parent_id?: string | null;
+          body: string;
+          created_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          recipe_id?: string;
+          user_id?: string;
+          parent_id?: string | null;
+          body?: string;
+          created_at?: string | null;
+        };
+      };
+      recipe_notes: {
+        Row: {
+          id: string;
+          recipe_id: string;
+          user_id: string;
+          content: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          recipe_id: string;
+          user_id: string;
+          content: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          recipe_id?: string;
+          user_id?: string;
+          content?: string;
+          created_at?: string;
+        };
+      };
+      recipe_ratings: {
+        Row: {
+          id: string;
+          recipe_id: string;
+          user_id: string;
+          rating: number | null;
+          is_favorite: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          recipe_id: string;
+          user_id: string;
+          rating?: number | null;
+          is_favorite?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          recipe_id?: string;
+          user_id?: string;
+          rating?: number | null;
+          is_favorite?: boolean;
+          created_at?: string;
+        };
+      };
+      recipes: {
+        Row: {
+          id: string;
+          household_id: string;
+          name: string;
+          category: string | null;
+          image_url: string | null;
+          prep_time_minutes: number | null;
+          cook_time_minutes: number | null;
+          servings: number;
+          estimated_cost: number | null;
+          ingredients: Ingredient[];
+          instructions: InstructionStep[];
+          tags: string[];
+          source_url: string | null;
+          nutrition_info: NutritionInfo | null;
+          source_image_url: string | null;
+          computed_nutrition: Record<string, unknown> | null;
+          ingredient_matches: Record<string, unknown>[] | null;
+          comment_count: number | null;
+          created_by: string | null;
+          saved_from_kitchen_id: string | null;
+          saved_from_recipe_id: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          household_id: string;
+          name: string;
+          category?: string | null;
+          image_url?: string | null;
+          prep_time_minutes?: number | null;
+          cook_time_minutes?: number | null;
+          servings?: number;
+          estimated_cost?: number | null;
+          ingredients?: Ingredient[];
+          instructions?: InstructionStep[];
+          tags?: string[];
+          source_url?: string | null;
+          nutrition_info?: NutritionInfo | null;
+          source_image_url?: string | null;
+          computed_nutrition?: Record<string, unknown> | null;
+          ingredient_matches?: Record<string, unknown>[] | null;
+          comment_count?: number | null;
+          created_by?: string | null;
+          saved_from_kitchen_id?: string | null;
+          saved_from_recipe_id?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          household_id?: string;
+          name?: string;
+          category?: string | null;
+          image_url?: string | null;
+          prep_time_minutes?: number | null;
+          cook_time_minutes?: number | null;
+          servings?: number;
+          estimated_cost?: number | null;
+          ingredients?: Ingredient[];
+          instructions?: InstructionStep[];
+          tags?: string[];
+          source_url?: string | null;
+          nutrition_info?: NutritionInfo | null;
+          source_image_url?: string | null;
+          computed_nutrition?: Record<string, unknown> | null;
+          ingredient_matches?: Record<string, unknown>[] | null;
+          comment_count?: number | null;
+          created_by?: string | null;
+          saved_from_kitchen_id?: string | null;
+          saved_from_recipe_id?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      reported_content: {
+        Row: {
+          id: string;
+          reporter_kitchen_id: string;
+          content_type: 'post' | 'comment';
+          post_id: string | null;
+          comment_id: string | null;
+          reason: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          reporter_kitchen_id: string;
+          content_type: 'post' | 'comment';
+          post_id?: string | null;
+          comment_id?: string | null;
+          reason?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          reporter_kitchen_id?: string;
+          content_type?: 'post' | 'comment';
+          post_id?: string | null;
+          comment_id?: string | null;
+          reason?: string | null;
+          created_at?: string;
+        };
+      };
+      saved_recipes: {
+        Row: {
+          id: string;
+          kitchen_id: string;
+          source_kitchen_id: string | null;
+          recipe_id: string;
+          feed_post_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          kitchen_id: string;
+          source_kitchen_id?: string | null;
+          recipe_id: string;
+          feed_post_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          kitchen_id?: string;
+          source_kitchen_id?: string | null;
+          recipe_id?: string;
+          feed_post_id?: string | null;
+          created_at?: string;
+        };
+      };
+      subscriptions: {
+        Row: {
+          id: string;
+          user_id: string;
+          stripe_customer_id: string | null;
+          stripe_subscription_id: string | null;
+          status: string;
+          price_id: string | null;
+          current_period_start: string | null;
+          current_period_end: string | null;
+          cancel_at_period_end: boolean | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          stripe_customer_id?: string | null;
+          stripe_subscription_id?: string | null;
+          status?: string;
+          price_id?: string | null;
+          current_period_start?: string | null;
+          current_period_end?: string | null;
+          cancel_at_period_end?: boolean | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          stripe_customer_id?: string | null;
+          stripe_subscription_id?: string | null;
+          status?: string;
+          price_id?: string | null;
+          current_period_start?: string | null;
+          current_period_end?: string | null;
+          cancel_at_period_end?: boolean | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+      };
+      waitlist: {
+        Row: {
+          id: string;
+          email: string;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          email: string;
+          created_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          email?: string;
+          created_at?: string | null;
+        };
+      };
     };
     Views: {
-      [_ in never]: never;
+      public_profiles: {
+        Row: {
+          id: string;
+          handle: string | null;
+          display_name: string | null;
+          avatar_url: string | null;
+        };
+      };
     };
     Functions: {
-      [_ in never]: never;
+      clone_recipe_to_household: {
+        Args: {
+          p_created_by: string;
+          p_source_kitchen_id: string;
+          p_source_recipe_id: string;
+          p_target_household_id: string;
+        };
+        Returns: string;
+      };
+      is_household_admin: {
+        Args: { p_household_id: string; p_user_id: string };
+        Returns: boolean;
+      };
+      is_household_member: {
+        Args: { p_household_id: string; p_user_id: string };
+        Returns: boolean;
+      };
     };
     Enums: {
       [_ in never]: never;
@@ -868,6 +1144,13 @@ export type FoodItemRow = Database['public']['Tables']['food_items']['Row'];
 export type FoodItemInsert = Database['public']['Tables']['food_items']['Insert'];
 export type FoodItemUpdate = Database['public']['Tables']['food_items']['Update'];
 export type FoodSearchCacheRow = Database['public']['Tables']['food_search_cache']['Row'];
+
+export type Subscription = Database['public']['Tables']['subscriptions']['Row'];
+export type PushToken = Database['public']['Tables']['push_tokens']['Row'];
+export type AiUsageLog = Database['public']['Tables']['ai_usage_log']['Row'];
+export type MealRsvp = Database['public']['Tables']['meal_rsvps']['Row'];
+export type RecipeCommentRow = Database['public']['Tables']['recipe_comments']['Row'];
+export type CookLogRow = Database['public']['Tables']['cook_logs']['Row'];
 
 export interface KitchenProfileWithRecipeCount extends KitchenProfile {
   recipe_count: number;

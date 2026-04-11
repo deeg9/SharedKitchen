@@ -24,7 +24,7 @@ export function useHandleForm(displayName: string | undefined) {
   const checkAvailability = useCallback(async (handle: string) => {
     try {
       const { data, error } = await supabase
-        .from('profiles')
+        .from('public_profiles')
         .select('id')
         .eq('handle', handle)
         .maybeSingle();

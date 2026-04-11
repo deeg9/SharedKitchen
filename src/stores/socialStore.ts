@@ -258,7 +258,7 @@ export const useSocialStore = create<SocialState>((set, get) => ({
     set({ peopleLoading: true });
     try {
       const { data, error } = await supabase
-        .from('profiles')
+        .from('public_profiles')
         .select('id, handle, display_name, avatar_url')
         .or(`handle.ilike.%${query}%,display_name.ilike.%${query}%`)
         .not('handle', 'is', null)
