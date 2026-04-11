@@ -162,9 +162,9 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
   2. Calling authStore.updateHandle with a reserved word (e.g., "admin", "support") is rejected at the store level before any DB call
   3. Calling authStore.updateHandle within 30 days of the last handle change is rejected at the store level with a clear cooldown message
   4. Running `npx tsc --noEmit` produces zero errors related to `never` type inference on database type definitions
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
-- [ ] 49-01-PLAN.md — Store-level handle validation with reserved words and 30-day cooldown
+- [x] 49-01-PLAN.md — Store-level handle validation with reserved words and 30-day cooldown
 - [ ] 49-02-PLAN.md — public_profiles VIEW, database.ts type regeneration, and schema push
 
 ### Phase 50: Cooking Mode Redesign
@@ -257,7 +257,7 @@ Plans:
 | 46. Cook Log with Photos | v8.0 | 3/3 | Complete | 2026-04-11 |
 | 47. Recipe Comments | v8.0 | 2/2 | Complete | 2026-04-11 |
 | 48. Feed Integration & Save to Collection | v8.0 | 3/3 | Complete | 2026-04-11 |
-| 49. Tech Debt & Type Safety | v9.0 | 0/2 | Not started | - |
+| 49. Tech Debt & Type Safety | v9.0 | 1/2 | In Progress|  |
 | 50. Cooking Mode Redesign | v9.0 | 0/0 | Not started | - |
 | 51. Comment Photo Attachments | v9.0 | 0/0 | Not started | - |
 | 52. Co-Cook Tagging | v9.0 | 0/0 | Not started | - |
