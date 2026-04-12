@@ -67,7 +67,7 @@ export function WeekHeader({
             <MaterialCommunityIcons
               name="calendar-today"
               size={20}
-              color={viewMode === 'day' ? colors.primary : colors.onSurfaceVariant}
+              color={viewMode === 'day' ? colors.onPrimary : colors.onSurfaceVariant}
             />
           </Pressable>
           <Pressable
@@ -82,7 +82,7 @@ export function WeekHeader({
             <MaterialCommunityIcons
               name="calendar-week"
               size={20}
-              color={viewMode === 'week' ? colors.primary : colors.onSurfaceVariant}
+              color={viewMode === 'week' ? colors.onPrimary : colors.onSurfaceVariant}
             />
           </Pressable>
         </View>
@@ -135,6 +135,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   toggleIconActive: {
-    backgroundColor: colors.primaryContainer,
+    backgroundColor: colors.primary,
   },
 });

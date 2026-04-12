@@ -321,11 +321,6 @@ export default function PlanScreen() {
 
                       return (
                         <>
-                          <HeroDinnerCard
-                            plan={dinnerPlan}
-                            onPress={() => handleMealPress(selectedDayDate, 'dinner')}
-                            onStartCooking={dinnerPlan?.recipe_id ? () => router.push(`/(app)/cooking/${dinnerPlan.recipe_id}` as any) : undefined}
-                          />
                           <DayViewMealSlot
                             mealType="breakfast"
                             plan={breakfastPlan}
@@ -343,6 +338,15 @@ export default function PlanScreen() {
                             householdMembers={householdMemberProps}
                             rsvps={lunchPlan?.id ? rsvpStore.rsvps.get(lunchPlan.id) ?? [] : []}
                             onToggleRsvp={lunchPlan?.id ? (userId) => rsvpStore.toggleRsvp(lunchPlan.id, userId) : undefined}
+                          />
+                          <DayViewMealSlot
+                            mealType="dinner"
+                            plan={dinnerPlan}
+                            onEditPress={() => handleMealPress(selectedDayDate, 'dinner')}
+                            onViewRecipe={dinnerPlan?.recipes ? () => handleViewRecipe(dinnerPlan.recipes!.id) : undefined}
+                            householdMembers={householdMemberProps}
+                            rsvps={dinnerPlan?.id ? rsvpStore.rsvps.get(dinnerPlan.id) ?? [] : []}
+                            onToggleRsvp={dinnerPlan?.id ? (userId) => rsvpStore.toggleRsvp(dinnerPlan.id, userId) : undefined}
                           />
                           <GroceryShortcutCard
                             itemCount={groceryItems.length}
@@ -438,7 +442,6 @@ export default function PlanScreen() {
             testID="plan-surprise-me"
           >
             <MaterialCommunityIcons name="dice-multiple" size={24} color={colors.onPrimary} />
-            <Text style={styles.fabText}>Surprise Me</Text>
           </Pressable>
 
           {/* Edit Sheet */}
