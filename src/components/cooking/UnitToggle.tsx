@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { colors } from '../../theme/colors';
-import { borderRadius, spacing } from '../../theme/spacing';
 import { UnitSystem } from '../../lib/unit-conversion';
 
 interface UnitToggleProps {
@@ -12,22 +11,21 @@ interface UnitToggleProps {
 export function UnitToggle({ value, onChange }: UnitToggleProps) {
   return (
     <View style={s.container} accessibilityRole="radiogroup">
-      {(['metric', 'imperial'] as const).map((system) => {
-        const active = value === system;
-        return (
-          <Pressable
-            key={system}
-            onPress={() => onChange(system)}
-            style={[s.segment, active && s.segmentActive]}
-            accessibilityRole="radio"
-            accessibilityState={{ checked: active }}
-          >
-            <Text style={[s.label, active && s.labelActive]}>
-              {system.toUpperCase()}
-            </Text>
-          </Pressable>
-        );
-      })}
+      <Pressable
+        onPress={() => onChange('metric')}
+        accessibilityRole="radio"
+        accessibilityState={{ checked: value === 'metric' }}
+      >
+        <Text style={[s.label, value === 'metric' && s.labelActive]}>Metric</Text>
+      </Pressable>
+      <Text style={s.separator}>/</Text>
+      <Pressable
+        onPress={() => onChange('imperial')}
+        accessibilityRole="radio"
+        accessibilityState={{ checked: value === 'imperial' }}
+      >
+        <Text style={[s.label, value === 'imperial' && s.labelActive]}>Imperial</Text>
+      </Pressable>
     </View>
   );
 }
@@ -35,25 +33,19 @@ export function UnitToggle({ value, onChange }: UnitToggleProps) {
 const s = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: colors.surfaceContainerLow,
-    borderRadius: borderRadius.sm,
-    padding: 2,
-  },
-  segment: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs + 2,
-    borderRadius: borderRadius.sm,
     alignItems: 'center',
-  },
-  segmentActive: {
-    backgroundColor: colors.primaryFixed,
+    gap: 4,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '400',
+    fontSize: 13,
     color: colors.onSurfaceVariant,
   },
   labelActive: {
-    color: colors.primary,
+    color: colors.onSurface,
+    fontWeight: '600',
+  },
+  separator: {
+    fontSize: 13,
+    color: colors.outlineVariant,
   },
 });

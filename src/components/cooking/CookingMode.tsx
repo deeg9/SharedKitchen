@@ -173,41 +173,41 @@ export function CookingMode({ recipe, onClose, onCookComplete }: CookingModeProp
             />
           </ScrollView>
 
-          {/* Nav buttons — small, bottom-right of content column */}
+          {/* Nav buttons — congruent, small, bottom-right */}
           <View style={[s.bottomNav, { paddingBottom: insets.bottom + spacing.xs }]}>
             <Pressable
               onPress={handlePrev}
-              style={[s.navBtn, s.navBtnSecondary, currentStep === 0 && s.btnDisabled]}
+              style={[s.navBtn, currentStep === 0 && s.btnDisabled]}
               disabled={currentStep === 0}
               accessibilityRole="button"
               accessibilityLabel="Previous step"
               testID="cooking-prev-step"
             >
-              <MaterialCommunityIcons name="chevron-left" size={16} color={colors.onSurface} />
-              <Text style={s.navBtnSecondaryText}>Previous</Text>
+              <MaterialCommunityIcons name="chevron-left" size={14} color={colors.onPrimary} />
+              <Text style={s.navBtnText}>Previous</Text>
             </Pressable>
 
             {isLastStep ? (
               <Pressable
                 onPress={onCookComplete ?? onClose}
-                style={[s.navBtn, s.navBtnPrimary]}
+                style={s.navBtn}
                 accessibilityRole="button"
                 accessibilityLabel="Done cooking"
                 testID="cooking-done-button"
               >
-                <Text style={s.navBtnPrimaryText}>Done Cooking</Text>
-                <MaterialCommunityIcons name="check" size={16} color={colors.onPrimary} />
+                <Text style={s.navBtnText}>Done Cooking</Text>
+                <MaterialCommunityIcons name="check" size={14} color={colors.onPrimary} />
               </Pressable>
             ) : (
               <Pressable
                 onPress={handleNext}
-                style={[s.navBtn, s.navBtnPrimary]}
+                style={s.navBtn}
                 accessibilityRole="button"
                 accessibilityLabel="Next step"
                 testID="cooking-next-step"
               >
-                <Text style={s.navBtnPrimaryText}>Next Step</Text>
-                <MaterialCommunityIcons name="chevron-right" size={16} color={colors.onPrimary} />
+                <Text style={s.navBtnText}>Next Step</Text>
+                <MaterialCommunityIcons name="chevron-right" size={14} color={colors.onPrimary} />
               </Pressable>
             )}
           </View>
@@ -312,22 +312,12 @@ const s = StyleSheet.create({
     borderRadius: borderRadius.full,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-  },
-  navBtnPrimary: {
     backgroundColor: colors.primary,
   },
-  navBtnPrimaryText: {
-    fontSize: 13,
+  navBtnText: {
+    fontSize: 12,
     fontFamily: fontFamily.bodySemiBold,
     color: colors.onPrimary,
-  },
-  navBtnSecondary: {
-    backgroundColor: colors.surfaceContainerLow,
-  },
-  navBtnSecondaryText: {
-    fontSize: 13,
-    fontFamily: fontFamily.bodySemiBold,
-    color: colors.onSurface,
   },
   btnDisabled: {
     opacity: 0.3,
