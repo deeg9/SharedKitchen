@@ -148,7 +148,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 
 - [x] **Phase 49: Tech Debt & Type Safety** - RLS scoping, store-level validation enforcement, and TypeScript type fixes from v8.0 (gap closure in progress) (completed 2026-04-11)
 - [x] **Phase 50: Cooking Mode Redesign** - Recipe hero image, step categories, per-step ingredients, progress bar, and enhanced navigation (completed 2026-04-11)
-- [ ] **Phase 51: Comment Photo Attachments** - Camera icon in comment input, thumbnail display, tap-to-expand, Supabase Storage
+- [x] **Phase 51: Comment Photo Attachments** - Camera icon in comment input, thumbnail display, tap-to-expand, Supabase Storage (completed 2026-04-12)
 - [ ] **Phase 52: Co-Cook Tagging** - "Who did you cook with?" @handle mentions on cook log posts with feed display
 
 ## Phase Details
@@ -194,11 +194,11 @@ Plans:
   2. Comments with photos display a thumbnail image inline within the comment body
   3. Tapping a comment photo thumbnail opens a full-size view of the image
   4. Comment photos are compressed client-side and stored in Supabase Storage with CDN-backed URLs
-**Plans:** 1/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [x] 51-01-PLAN.md — Migration, types, upload helper, and store changes for photo support
-- [ ] 51-02-PLAN.md — Schema push and storage bucket creation (blocking checkpoint)
-- [ ] 51-03-PLAN.md — CommentInput photo picker, CommentItem thumbnail, full-size viewer
+- [x] 51-02-PLAN.md — Schema push and storage bucket creation (blocking checkpoint)
+- [x] 51-03-PLAN.md — CommentInput photo picker, CommentItem thumbnail, full-size viewer
 **UI hint**: yes
 
 ### Phase 52: Co-Cook Tagging
@@ -268,7 +268,7 @@ Plans:
 | 48. Feed Integration & Save to Collection | v8.0 | 3/3 | Complete | 2026-04-11 |
 | 49. Tech Debt & Type Safety | v9.0 | 4/4 | Complete    | 2026-04-11 |
 | 50. Cooking Mode Redesign | v9.0 | 2/2 | Complete    | 2026-04-11 |
-| 51. Comment Photo Attachments | v9.0 | 1/3 | In Progress|  |
+| 51. Comment Photo Attachments | v9.0 | 3/3 | Complete   | 2026-04-12 |
 | 52. Co-Cook Tagging | v9.0 | 0/0 | Not started | - |
 
 ---

@@ -11,9 +11,9 @@
 
 ## Comment Photo Attachments
 
-- [ ] **CMNT-P01**: Comment input bar includes a camera/media icon button for attaching a photo
-- [ ] **CMNT-P02**: Attached photos display as thumbnails within the comment body
-- [ ] **CMNT-P03**: Tapping a comment photo thumbnail expands it to full-size view
+- [x] **CMNT-P01**: Comment input bar includes a camera/media icon button for attaching a photo
+- [x] **CMNT-P02**: Attached photos display as thumbnails within the comment body
+- [x] **CMNT-P03**: Tapping a comment photo thumbnail expands it to full-size view
 - [x] **CMNT-P04**: Comment photos are compressed and stored in Supabase Storage
 
 ## Co-Cook Tagging
@@ -39,9 +39,9 @@
 | COOK-R04 | Phase 50 | Pending |
 | COOK-R05 | Phase 50 | Pending |
 | COOK-R06 | Phase 50 | Complete |
-| CMNT-P01 | Phase 51 | Pending |
-| CMNT-P02 | Phase 51 | Pending |
-| CMNT-P03 | Phase 51 | Pending |
+| CMNT-P01 | Phase 51 | Complete |
+| CMNT-P02 | Phase 51 | Complete |
+| CMNT-P03 | Phase 51 | Complete |
 | CMNT-P04 | Phase 51 | Complete |
 | COCOOK-01 | Phase 52 | Pending |
 | COCOOK-02 | Phase 52 | Pending |
