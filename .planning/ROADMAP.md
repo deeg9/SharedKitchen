@@ -194,9 +194,9 @@ Plans:
   2. Comments with photos display a thumbnail image inline within the comment body
   3. Tapping a comment photo thumbnail opens a full-size view of the image
   4. Comment photos are compressed client-side and stored in Supabase Storage with CDN-backed URLs
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 Plans:
-- [ ] 51-01-PLAN.md — Migration, types, upload helper, and store changes for photo support
+- [x] 51-01-PLAN.md — Migration, types, upload helper, and store changes for photo support
 - [ ] 51-02-PLAN.md — Schema push and storage bucket creation (blocking checkpoint)
 - [ ] 51-03-PLAN.md — CommentInput photo picker, CommentItem thumbnail, full-size viewer
 **UI hint**: yes
@@ -268,7 +268,7 @@ Plans:
 | 48. Feed Integration & Save to Collection | v8.0 | 3/3 | Complete | 2026-04-11 |
 | 49. Tech Debt & Type Safety | v9.0 | 4/4 | Complete    | 2026-04-11 |
 | 50. Cooking Mode Redesign | v9.0 | 2/2 | Complete    | 2026-04-11 |
-| 51. Comment Photo Attachments | v9.0 | 0/3 | In progress | - |
+| 51. Comment Photo Attachments | v9.0 | 1/3 | In Progress|  |
 | 52. Co-Cook Tagging | v9.0 | 0/0 | Not started | - |
 
 ---
