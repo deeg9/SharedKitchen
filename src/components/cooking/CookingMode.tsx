@@ -105,57 +105,67 @@ export function CookingMode({ recipe, onClose, onCookComplete }: CookingModeProp
   const isLastStep = currentStep === totalSteps - 1;
 
   return (
-    <View style={s.container}>
-      {/* Hero image section with overlaid controls */}
-      <View style={s.heroContainer}>
-        <Image
-          source={{ uri: imageUrl }}
-          style={s.heroImage}
-          contentFit="cover"
-          transition={200}
-        />
-        {/* Top gradient for readability */}
-        <LinearGradient
-          colors={['rgba(0,0,0,0.5)', 'transparent']}
-          style={[s.topGradient, { paddingTop: insets.top }]}
+    <View style={[s.container, { paddingTop: insets.top }]}>
+      {/* Top bar: close, unit toggle, ingredients */}
+      <View style={s.topBar}>
+        <Pressable
+          onPress={onClose}
+          style={s.closeBtn}
+          accessibilityRole="button"
+          accessibilityLabel="Close cooking mode"
         >
-          {/* Top bar: close, unit toggle, ingredients */}
-          <View style={s.overlayHeader}>
-            <Pressable
-              onPress={onClose}
-              style={s.closeBtn}
-              accessibilityRole="button"
-              accessibilityLabel="Close cooking mode"
-            >
-              <MaterialCommunityIcons name="close" size={22} color="#fff" />
-            </Pressable>
-            <View style={s.overlayHeaderRight}>
-              <UnitToggle value={unitSystem} onChange={handleUnitChange} />
-              <Pressable
-                onPress={() => setSidebarVisible(true)}
-                style={s.ingredientPillOverlay}
-                accessibilityRole="button"
-                accessibilityLabel="Show ingredients"
-              >
-                <MaterialCommunityIcons name="food-variant" size={16} color="#fff" />
-                <Text style={s.ingredientPillOverlayText}>Ingredients</Text>
-              </Pressable>
-            </View>
-          </View>
-        </LinearGradient>
+          <MaterialCommunityIcons name="close" size={22} color={colors.onSurfaceVariant} />
+        </Pressable>
+        <View style={s.topBarRight}>
+          <UnitToggle value={unitSystem} onChange={handleUnitChange} />
+          <Pressable
+            onPress={() => setSidebarVisible(true)}
+            style={s.ingredientPill}
+            accessibilityRole="button"
+            accessibilityLabel="Show ingredients"
+          >
+            <MaterialCommunityIcons name="food-variant" size={16} color={colors.onSurfaceVariant} />
+            <Text style={s.ingredientPillText}>Ingredients</Text>
+          </Pressable>
+        </View>
+      </View>
 
-        {/* Bottom gradient with step counter */}
-        <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.55)']}
-          style={s.bottomGradient}
+      {/* Main content: two-column layout — image left, steps right */}
+      <View style={s.splitContainer}>
+        {/* Left column: hero image */}
+        <View style={s.imageColumn}>
+          <Image
+            source={{ uri: imageUrl }}
+            style={s.heroImage}
+            contentFit="cover"
+            transition={200}
+          />
+        </View>
+
+        {/* Right column: step content */}
+        <ScrollView
+          style={s.contentColumn}
+          contentContainerStyle={s.contentColumnInner}
+          showsVerticalScrollIndicator={false}
+          key={`step-${currentStep}`}
         >
-          <Text style={s.heroStepLabel}>
+          {/* Step counter + recipe name */}
+          <Text style={s.stepCounter}>
             Step {currentStep + 1} of {totalSteps}:
           </Text>
-          <Text style={s.heroRecipeName} numberOfLines={1}>
+          <Text style={s.recipeName} numberOfLines={1}>
             {recipe.name.toUpperCase()}
           </Text>
-        </LinearGradient>
+
+          {/* Step card (instruction + badge + ingredients) */}
+          <StepCard
+            step={instructions[currentStep]}
+            stepIndex={currentStep}
+            totalSteps={totalSteps}
+            unitSystem={unitSystem}
+            ingredients={stepIngredients}
+          />
+        </ScrollView>
       </View>
 
       {/* Progress bar */}
@@ -163,22 +173,6 @@ export function CookingMode({ recipe, onClose, onCookComplete }: CookingModeProp
         currentStep={currentStep}
         totalSteps={totalSteps}
       />
-
-      {/* Step content */}
-      <ScrollView
-        style={s.scrollView}
-        contentContainerStyle={s.scrollContent}
-        showsVerticalScrollIndicator={false}
-        key={`step-${currentStep}`}
-      >
-        <StepCard
-          step={instructions[currentStep]}
-          stepIndex={currentStep}
-          totalSteps={totalSteps}
-          unitSystem={unitSystem}
-          ingredients={stepIngredients}
-        />
-      </ScrollView>
 
       {/* Bottom navigation — pill buttons */}
       <View style={[s.bottomNav, { paddingBottom: insets.bottom + spacing.sm }]}>
@@ -236,29 +230,14 @@ const s = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.surface,
   },
-  heroContainer: {
-    height: HERO_HEIGHT,
-    position: 'relative',
-  },
-  heroImage: {
-    width: '100%',
-    height: '100%',
-  },
-  topGradient: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.lg,
-  },
-  overlayHeader: {
+  topBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
-  overlayHeaderRight: {
+  topBarRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
@@ -267,55 +246,60 @@ const s = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: borderRadius.full,
-    backgroundColor: 'rgba(0,0,0,0.3)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  ingredientPillOverlay: {
+  ingredientPill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.full,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: colors.surfaceContainerLow,
   },
-  ingredientPillOverlayText: {
+  ingredientPillText: {
     fontSize: 13,
     fontFamily: fontFamily.bodySemiBold,
-    color: '#fff',
+    color: colors.onSurfaceVariant,
   },
-  bottomGradient: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.md,
-    paddingTop: spacing.xl,
+  splitContainer: {
+    flex: 1,
+    flexDirection: 'row',
   },
-  heroStepLabel: {
-    fontSize: 14,
-    fontFamily: fontFamily.bodySemiBold,
-    color: 'rgba(255,255,255,0.85)',
+  imageColumn: {
+    width: '42%',
+    padding: spacing.sm,
   },
-  heroRecipeName: {
-    fontSize: 13,
-    fontFamily: fontFamily.bodySemiBold,
-    color: 'rgba(255,255,255,0.7)',
-    letterSpacing: 1,
-    marginTop: 2,
+  heroImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: borderRadius.lg,
   },
-  scrollView: {
+  contentColumn: {
     flex: 1,
   },
-  scrollContent: {
+  contentColumnInner: {
+    paddingRight: spacing.md,
+    paddingTop: spacing.sm,
     paddingBottom: spacing.md,
+  },
+  stepCounter: {
+    fontSize: 13,
+    fontFamily: fontFamily.bodySemiBold,
+    color: colors.onSurfaceVariant,
+  },
+  recipeName: {
+    fontSize: 11,
+    fontFamily: fontFamily.bodySemiBold,
+    color: colors.primary,
+    letterSpacing: 0.5,
+    marginTop: 2,
   },
   bottomNav: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     gap: spacing.sm,
@@ -326,8 +310,7 @@ const s = StyleSheet.create({
     gap: spacing.xs,
     borderRadius: borderRadius.full,
     paddingHorizontal: spacing.lg,
-    paddingVertical: 14,
-    flex: 1,
+    paddingVertical: 12,
     justifyContent: 'center',
   },
   navPillPrimary: {

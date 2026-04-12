@@ -118,8 +118,7 @@ export function StepCard({
 
 const s = StyleSheet.create({
   container: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.xs,
   },
   badge: {
     paddingHorizontal: spacing.sm + 2,
@@ -135,11 +134,11 @@ const s = StyleSheet.create({
   },
   instruction: {
     fontFamily: fontFamily.headlineBold,
-    fontSize: 22,
-    lineHeight: 30,
+    fontSize: 20,
+    lineHeight: 28,
     letterSpacing: -0.25,
     color: colors.onSurface,
-    marginTop: spacing.md,
+    marginTop: spacing.sm,
   },
   tipCard: {
     backgroundColor: colors.secondaryFixed,
