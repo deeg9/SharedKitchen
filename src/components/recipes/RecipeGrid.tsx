@@ -8,6 +8,7 @@ import { Skeleton } from '../ui/Skeleton';
 import { EditorialRecipeCard } from './EditorialRecipeCard';
 import { FilterBar } from './FilterBar';
 import { useRecipeStore } from '../../stores/recipeStore';
+import { useAuthStore } from '../../stores/authStore';
 import { colors } from '../../theme/colors';
 import { typography, fontFamily } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
@@ -32,24 +33,24 @@ export function RecipeGrid({ favorites, ratings }: RecipeGridProps) {
 
   const [selectedFilter, setSelectedFilter] = useState('All');
 
+  const userId = useAuthStore((s) => s.session?.user?.id);
   const allRecipes = filteredRecipes();
   const favMap = favorites ?? new Map();
 
   const recipes = selectedFilter === 'Favorites'
     ? allRecipes.filter((r) => favMap.get(r.id))
+    : selectedFilter === 'Created by you'
+    ? allRecipes.filter((r) => r.created_by === userId)
     : allRecipes;
 
   const filtersActive = hasActiveFilters() || selectedFilter !== 'All';
 
   const handleFilterChange = useCallback((filter: string) => {
     setSelectedFilter(filter);
-    if (filter === 'All') {
+    if (filter === 'All' || filter === 'Created by you') {
       resetFilters();
-    } else if (filter === 'Quick Meals') {
-      resetFilters();
-      setMaxPrepTime(30);
     }
-  }, [resetFilters, setMaxPrepTime]);
+  }, [resetFilters]);
 
   const getRating = useCallback((recipeId: string): number | undefined => {
     if (!ratings) return undefined;

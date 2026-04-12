@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { FilterChips } from '../ui/FilterChips';
 import { spacing } from '../../theme/spacing';
 
-const FILTER_CHIPS = ['All', 'Quick Meals', 'Favorites'];
+const FILTER_CHIPS = ['All', 'Created by you', 'Favorites'];
 
 interface FilterBarProps {
   selectedFilter: string;

@@ -190,20 +190,6 @@ export default function RecipesScreen() {
               style={styles.menuItem}
               onPress={() => {
                 setShowMenu(false);
-                setShowGenerator(true);
-              }}
-              testID="recipe-generator-button"
-            >
-              <MaterialCommunityIcons name="chef-hat" size={22} color={colors.primary} />
-              <Text style={styles.menuText}>What should we cook?</Text>
-            </Pressable>
-
-            <View style={styles.menuDivider} />
-
-            <Pressable
-              style={styles.menuItem}
-              onPress={() => {
-                setShowMenu(false);
                 handleIdentifyDish();
               }}
               testID="recipe-identify-dish-button"
