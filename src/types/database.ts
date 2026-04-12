@@ -170,6 +170,27 @@ export interface Database {
         };
         Relationships: [];
       };
+      cook_log_participants: {
+        Row: {
+          id: string;
+          cook_log_id: string;
+          user_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          cook_log_id: string;
+          user_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          cook_log_id?: string;
+          user_id?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       expenses: {
         Row: {
           id: string;
@@ -1232,6 +1253,19 @@ export interface CookLogInsert {
 
 export interface CookLogWithProfile extends CookLog {
   profiles: { handle: string | null; avatar_url: string | null } | null;
+}
+
+export interface CookLogParticipant {
+  id: string;
+  cook_log_id: string;
+  user_id: string;
+  created_at: string;
+}
+
+export interface CookLogParticipantWithProfile extends CookLogParticipant {
+  handle: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
 }
 
 /** Recipe comment types */
