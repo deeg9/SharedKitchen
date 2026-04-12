@@ -55,6 +55,7 @@ function makeComment(overrides: Partial<RecipeCommentWithProfile> = {}): RecipeC
     user_id: 'u1',
     parent_id: null,
     body: 'Hello',
+    photo_url: null,
     created_at: '2026-01-01T00:00:00Z',
     profiles: { handle: 'alice', avatar_url: null },
     ...overrides,

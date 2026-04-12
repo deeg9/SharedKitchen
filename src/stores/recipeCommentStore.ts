@@ -121,6 +121,7 @@ export const useRecipeCommentStore = create<RecipeCommentState>((set, get) => ({
       user_id: params.userId,
       parent_id: params.parentId ?? null,
       body: params.body,
+      photo_url: null,
       created_at: new Date().toISOString(),
       profiles: null,
     };

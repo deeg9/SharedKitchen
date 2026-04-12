@@ -825,6 +825,7 @@ export interface Database {
           user_id: string;
           parent_id: string | null;
           body: string;
+          photo_url: string | null;
           created_at: string | null;
         };
         Insert: {
@@ -833,6 +834,7 @@ export interface Database {
           user_id: string;
           parent_id?: string | null;
           body: string;
+          photo_url?: string | null;
           created_at?: string | null;
         };
         Update: {
@@ -841,6 +843,7 @@ export interface Database {
           user_id?: string;
           parent_id?: string | null;
           body?: string;
+          photo_url?: string | null;
           created_at?: string | null;
         };
         Relationships: [];
@@ -1238,6 +1241,7 @@ export interface RecipeComment {
   user_id: string;
   parent_id: string | null;
   body: string;
+  photo_url: string | null;
   created_at: string;
 }
 
@@ -1246,6 +1250,7 @@ export interface RecipeCommentInsert {
   user_id: string;
   parent_id?: string | null;
   body: string;
+  photo_url?: string | null;
 }
 
 export interface RecipeCommentWithProfile extends RecipeComment {
