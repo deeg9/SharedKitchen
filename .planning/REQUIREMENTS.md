@@ -19,7 +19,7 @@
 ## Co-Cook Tagging
 
 - [x] **COCOOK-01**: Cook log sheet includes a "Who did you cook with?" field for tagging @handles
-- [ ] **COCOOK-02**: Tagged co-cooks appear on the cook log feed post
+- [x] **COCOOK-02**: Tagged co-cooks appear on the cook log feed post
 - [x] **COCOOK-03**: Co-cook tags are stored in a cook_log_participants table linking cook_logs to user profiles
 
 ## Tech Debt Cleanup
@@ -44,7 +44,7 @@
 | CMNT-P03 | Phase 51 | Complete |
 | CMNT-P04 | Phase 51 | Complete |
 | COCOOK-01 | Phase 52 | Complete |
-| COCOOK-02 | Phase 52 | Pending |
+| COCOOK-02 | Phase 52 | Complete |
 | COCOOK-03 | Phase 52 | Complete |
 | DEBT-01 | Phase 49 | Pending |
 | DEBT-02 | Phase 49 | Complete |

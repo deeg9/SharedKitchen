@@ -149,7 +149,7 @@ SharedKitchen delivers a collaborative dinner planning app for households. v1.0 
 - [x] **Phase 49: Tech Debt & Type Safety** - RLS scoping, store-level validation enforcement, and TypeScript type fixes from v8.0 (gap closure in progress) (completed 2026-04-11)
 - [x] **Phase 50: Cooking Mode Redesign** - Recipe hero image, step categories, per-step ingredients, progress bar, and enhanced navigation (completed 2026-04-11)
 - [x] **Phase 51: Comment Photo Attachments** - Camera icon in comment input, thumbnail display, tap-to-expand, Supabase Storage (completed 2026-04-12)
-- [ ] **Phase 52: Co-Cook Tagging** - "Who did you cook with?" @handle mentions on cook log posts with feed display
+- [x] **Phase 52: Co-Cook Tagging** - "Who did you cook with?" @handle mentions on cook log posts with feed display (completed 2026-04-12)
 
 ## Phase Details
 
@@ -209,11 +209,11 @@ Plans:
   1. Cook log sheet includes a "Who did you cook with?" field where the user can search and tag other users by @handle
   2. Tagged co-cooks appear on the cook log feed post (e.g., "cooked with @alice and @bob")
   3. Co-cook relationships are stored in a cook_log_participants table linking cook log entries to user profiles
-**Plans:** 1/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [x] 52-01-PLAN.md — Migration, types, and store logic for cook_log_participants
-- [ ] 52-02-PLAN.md — Schema push to Supabase (blocking checkpoint)
-- [ ] 52-03-PLAN.md — CoCookPicker UI in cook log sheet and feed display
+- [x] 52-02-PLAN.md — Schema push to Supabase (blocking checkpoint)
+- [x] 52-03-PLAN.md — CoCookPicker UI in cook log sheet and feed display
 **UI hint**: yes
 
 ## Progress
@@ -273,7 +273,7 @@ Plans:
 | 49. Tech Debt & Type Safety | v9.0 | 4/4 | Complete    | 2026-04-11 |
 | 50. Cooking Mode Redesign | v9.0 | 2/2 | Complete    | 2026-04-11 |
 | 51. Comment Photo Attachments | v9.0 | 3/3 | Complete    | 2026-04-12 |
-| 52. Co-Cook Tagging | v9.0 | 1/3 | In Progress|  |
+| 52. Co-Cook Tagging | v9.0 | 3/3 | Complete   | 2026-04-12 |
 
 ---
 *Last updated: 2026-04-11 after Phase 51 planning*
