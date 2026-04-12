@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Pressable, Alert, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -8,6 +8,7 @@ import { RecipeCommentWithProfile } from '../../types/database';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
+import { CommentPhotoViewer } from './CommentPhotoViewer';
 
 interface CommentItemProps {
   comment: RecipeCommentWithProfile;
@@ -24,6 +25,8 @@ export function CommentItem({
   onReply,
   onDelete,
 }: CommentItemProps) {
+  const [viewerVisible, setViewerVisible] = useState(false);
+
   const handle = comment.profiles?.handle ?? 'user';
   const avatarUrl = comment.profiles?.avatar_url ?? null;
   const timestamp = formatDistanceToNow(new Date(comment.created_at), { addSuffix: true });
@@ -61,6 +64,11 @@ export function CommentItem({
           <Text style={s.timestamp}>{timestamp}</Text>
         </View>
         <Text style={s.body}>{comment.body}</Text>
+        {comment.photo_url && (
+          <Pressable onPress={() => setViewerVisible(true)} accessibilityRole="imagebutton" accessibilityLabel="View full photo">
+            <Image source={{ uri: comment.photo_url }} style={s.photoThumb} contentFit="cover" transition={200} />
+          </Pressable>
+        )}
         <Pressable
           onPress={() => onReply(comment)}
           style={s.replyAction}
@@ -71,6 +79,9 @@ export function CommentItem({
           <Text style={s.replyText}>Reply</Text>
         </Pressable>
       </View>
+      {comment.photo_url && viewerVisible && (
+        <CommentPhotoViewer visible={viewerVisible} photoUrl={comment.photo_url} onClose={() => setViewerVisible(false)} />
+      )}
     </Pressable>
   );
 }
@@ -128,5 +139,11 @@ const s = StyleSheet.create({
   replyText: {
     ...typography.labelMd,
     color: colors.primary,
+  },
+  photoThumb: {
+    width: 200,
+    height: 150,
+    borderRadius: 8,
+    marginTop: spacing.xs,
   },
 });

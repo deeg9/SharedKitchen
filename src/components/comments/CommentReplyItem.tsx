@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Pressable, Alert, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
@@ -7,6 +7,7 @@ import { RecipeCommentWithProfile } from '../../types/database';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
+import { CommentPhotoViewer } from './CommentPhotoViewer';
 
 interface CommentReplyItemProps {
   reply: RecipeCommentWithProfile;
@@ -21,6 +22,8 @@ export function CommentReplyItem({
   isRecipeCreator,
   onDelete,
 }: CommentReplyItemProps) {
+  const [viewerVisible, setViewerVisible] = useState(false);
+
   const handle = reply.profiles?.handle ?? 'user';
   const avatarUrl = reply.profiles?.avatar_url ?? null;
   const timestamp = formatDistanceToNow(new Date(reply.created_at), { addSuffix: true });
@@ -58,7 +61,15 @@ export function CommentReplyItem({
           <Text style={s.timestamp}>{timestamp}</Text>
         </View>
         <Text style={s.body}>{reply.body}</Text>
+        {reply.photo_url && (
+          <Pressable onPress={() => setViewerVisible(true)} accessibilityRole="imagebutton" accessibilityLabel="View full photo">
+            <Image source={{ uri: reply.photo_url }} style={s.photoThumb} contentFit="cover" transition={200} />
+          </Pressable>
+        )}
       </View>
+      {reply.photo_url && viewerVisible && (
+        <CommentPhotoViewer visible={viewerVisible} photoUrl={reply.photo_url} onClose={() => setViewerVisible(false)} />
+      )}
     </Pressable>
   );
 }
@@ -110,5 +121,11 @@ const s = StyleSheet.create({
   body: {
     ...typography.bodyMd,
     color: colors.onSurface,
+  },
+  photoThumb: {
+    width: 200,
+    height: 150,
+    borderRadius: 8,
+    marginTop: spacing.xs,
   },
 });
