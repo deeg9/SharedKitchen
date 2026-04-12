@@ -456,6 +456,7 @@ const styles = StyleSheet.create({
   nameGroup: {},
   nameInput: {
     fontSize: 24,
+    lineHeight: 36,
     fontFamily: fontFamily.headlineBold,
     fontWeight: '700',
     color: colors.onSurface,
@@ -464,7 +465,7 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
     paddingBottom: spacing.sm,
     paddingHorizontal: 2,
-    minHeight: 48,
+    minHeight: 56,
   },
   categoryGroup: {},
   chipRow: {
