@@ -46,6 +46,7 @@ export function FeedList({ myKitchenId }: FeedListProps) {
   const { activeHouseholdId } = useHouseholdStore();
 
   const [kitchenProfiles, setKitchenProfiles] = useState<KitchenProfileLookup>(new Map());
+  const [postParticipants, setPostParticipants] = useState<Map<string, Array<{ handle: string | null; user_id: string }>>>(new Map());
   const [refreshing, setRefreshing] = useState(false);
   const [cameraSheetOpen, setCameraSheetOpen] = useState(false);
   const [activePostId, setActivePostId] = useState<string | null>(null);
@@ -69,6 +70,45 @@ export function FeedList({ myKitchenId }: FeedListProps) {
       fetchFollowing(myKitchenId);
     }
   }, [myKitchenId]);
+
+  // Batch-fetch co-cook participants for cook_log posts
+  useEffect(() => {
+    const cookLogIds = feedPosts
+      .filter((p) => p.post_type === 'cook_log' && p.cook_log_id)
+      .map((p) => p.cook_log_id as string);
+
+    if (cookLogIds.length === 0) return;
+
+    const missingIds = cookLogIds.filter((id) => !postParticipants.has(id));
+    if (missingIds.length === 0) return;
+
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('cook_log_participants')
+          .select('cook_log_id, user_id, profiles:user_id(handle)')
+          .in('cook_log_id', missingIds);
+
+        if (error || !data) return;
+
+        setPostParticipants((prev) => {
+          const newMap = new Map(prev);
+          for (const row of data) {
+            const clId = row.cook_log_id;
+            if (!newMap.has(clId)) newMap.set(clId, []);
+            const profileData = row.profiles as unknown as { handle: string | null } | null;
+            newMap.get(clId)!.push({
+              handle: profileData?.handle ?? null,
+              user_id: row.user_id,
+            });
+          }
+          return newMap;
+        });
+      } catch {
+        // Non-critical: feed cards will render without co-cook line
+      }
+    })();
+  }, [feedPosts]);
 
   // Batch-fetch kitchen profiles for all unique kitchen_ids in feed
   useEffect(() => {
@@ -251,9 +291,11 @@ export function FeedList({ myKitchenId }: FeedListProps) {
         onLongPress={() => handleLongPress(item)}
         onCookThisToo={item.kitchen_id !== myKitchenId ? () => handleCookThisToo(item) : undefined}
         onPhotoAttach={() => handlePhotoAttach(item.id)}
+        participants={item.cook_log_id ? postParticipants.get(item.cook_log_id) : undefined}
+        onProfilePress={(userId) => router.push(`/user/${userId}` as any)}
       />
     ),
-    [kitchenProfiles, myKitchenId, router, handlePhotoAttach, likedPostIds, toggleLike, saveRecipeFromPost, householdId, handleLongPress, handleCookThisToo]
+    [kitchenProfiles, myKitchenId, router, handlePhotoAttach, likedPostIds, toggleLike, saveRecipeFromPost, householdId, handleLongPress, handleCookThisToo, postParticipants]
   );
 
   const keyExtractor = useCallback((item: FeedPost) => item.id, []);

@@ -21,6 +21,8 @@ interface FeedCardProps {
   onLongPress?: () => void;
   onPhotoAttach?: () => void;
   onCookThisToo?: () => void;
+  participants?: Array<{ handle: string | null; user_id: string }>;
+  onProfilePress?: (userId: string) => void;
 }
 
 function getInitials(name: string): string {
@@ -70,6 +72,8 @@ export function FeedCard({
   onLongPress,
   onPhotoAttach,
   onCookThisToo,
+  participants,
+  onProfilePress,
 }: FeedCardProps) {
   const displayName = kitchenProfile?.display_name ?? 'Kitchen';
   const handleText = kitchenProfile?.handle ? `@${kitchenProfile.handle}` : null;
@@ -163,6 +167,25 @@ export function FeedCard({
             {isCookLog ? ' cooked ' : ' made '}
             <Text style={s.mealContextBold}>{post.recipe_name}</Text>
           </Text>
+
+          {/* Co-cook attribution */}
+          {participants && participants.length > 0 && (
+            <Text style={s.coCookLine}>
+              cooked with{' '}
+              {participants.map((p, i) => (
+                <React.Fragment key={p.user_id}>
+                  {i > 0 && i < participants.length - 1 ? ', ' : ''}
+                  {i > 0 && i === participants.length - 1 ? (participants.length === 2 ? ' and ' : ', and ') : ''}
+                  <Text
+                    style={s.coCookHandle}
+                    onPress={() => onProfilePress?.(p.user_id)}
+                  >
+                    @{p.handle ?? 'user'}
+                  </Text>
+                </React.Fragment>
+              ))}
+            </Text>
+          )}
 
           {/* Quoted description */}
           {isCookLog && post.caption ? (
@@ -343,6 +366,15 @@ const s = StyleSheet.create({
   mealContextBold: {
     ...typography.labelLg,
     color: colors.onSurface,
+  },
+  coCookLine: {
+    ...typography.bodyMd,
+    color: colors.onSurfaceVariant,
+    marginBottom: spacing.sm,
+  },
+  coCookHandle: {
+    ...typography.labelMd,
+    color: colors.primary,
   },
   quoteContainer: {
     paddingLeft: spacing.md,
