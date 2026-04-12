@@ -1,5 +1,26 @@
 # Milestones
 
+## v9.0 Cooking Experience (Shipped: 2026-04-12)
+
+**Phases completed:** 4 phases, 12 plans, 17 tasks
+
+**Key accomplishments:**
+
+- Store-level reserved word rejection and 30-day cooldown enforcement in authStore.updateHandle via validateHandle utility and date math guards
+- public_profiles VIEW restricts cross-user profile access to safe columns (id, handle, display_name, avatar_url), database.ts regenerated with 9 previously missing tables
+- Added Relationships: [] to all 32 tables and 1 view in database.ts, eliminating 231 never-type inference errors; updated 6 test fixture files with missing required columns
+- Schema push deferred — requires manual `supabase db push` with database authentication
+- 7-category step classification (PREP/GRILLING/SIMMERING/BAKING/MIXING/MARINATING/COOK) with per-step ingredient unit conversion and empty state
+- Fixed 180px hero image header, 4px progress bar gaps, and "Previous Step" / "Done Cooking" navigation copy
+- Nullable photo_url column on recipe_comments with upload helper compressing to 1200px JPEG 0.7 and storing in comment-photos bucket
+- Schema push and storage bucket creation deferred — requires manual Supabase authentication
+- Camera icon in comment input with expo-image-picker, 5MB limit, preview thumbnail, photo display in comments (200px/8px radius), and full-size modal viewer
+- cook_log_participants junction table with RLS, TypeScript types, and store-level participant insertion (max 5) on cook log creation
+- Schema push deferred — requires manual `supabase db push` with database authentication
+- CoCookPicker component with debounced handle search, chip selection (max 5), and co-cook attribution line on feed posts with tappable profile links
+
+---
+
 ## v8.0 v8.0 (Shipped: 2026-04-11)
 
 **Phases completed:** 5 phases, 15 plans, 31 tasks

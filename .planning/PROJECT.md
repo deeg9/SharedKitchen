@@ -10,18 +10,15 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 
 ## Current State
 
-**Shipped:** v8.0 Social Recipes (2026-04-11)
-**Codebase:** ~50,000 LOC across 310+ source files (TypeScript, SQL, YAML)
+**Shipped:** v9.0 Cooking Experience (2026-04-12)
+**Codebase:** ~31,600 LOC across 320+ source files (TypeScript, SQL, YAML)
 
-## Current Milestone: v9.0 Cooking Experience
+**v9.0 Delivered:**
+- Cooking Mode Redesign: fixed hero image, 7-category step badges, per-step ingredients with unit conversion, segmented progress bar
+- Comment Photo Attachments: camera icon, client-side compression, Supabase Storage, thumbnail + full-size viewer
+- Co-Cook Tagging: @handle search picker, cook_log_participants junction table, feed attribution
+- Tech Debt: public_profiles VIEW (column-level security), store-level handle validation, zero TypeScript never errors
 
-**Goal:** Redesign the cooking mode into a beautiful step-by-step experience and enhance social cooking features with photo comments and co-cook tagging.
-
-**Target features:**
-- Cooking Mode Redesign (recipe photo, step categories, per-step ingredients, Metric/Imperial toggle, progress bar)
-- Comment Photo Attachments (camera icon in comment input, thumbnail display, tap to expand)
-- Co-Cook Tagging ("Who did you cook with?" @handle mentions on cook log posts)
-- v8.0 Tech Debt Cleanup (profiles RLS scoping, reserved word validation at store level, TypeScript type fixes)
 **Tech stack:** React Native + Expo (iOS), Supabase (Postgres, Auth, Realtime, Storage, Edge Functions), Gemini 2.5 Flash (vision + text + ingredient matching), USDA FoodData Central, Open Food Facts, FatSecret, Supadata, Serper.dev, Stripe, react-native-svg, expo-linear-gradient, expo-share-intent, expo-image-manipulator, expo-image, expo-camera, expo-notifications, Maestro E2E
 
 ## Requirements
@@ -144,19 +141,34 @@ Households can collaboratively plan, shop for, and cook dinners together in real
 - ✓ Social feed with following strip, hero photos, Try Recipe CTAs — v7.0
 - ✓ Premium upgrade with feature comparison table, monthly/yearly pricing — v7.0
 
+- ✓ Unique @handle identity system with reserved word blocking and 30-day cooldown — v8.0
+- ✓ Recipe attribution with creator name/avatar and "Saved from Kitchen X" provenance — v8.0
+- ✓ Cook log with photo capture, social post feel, "Post to feed" CTA — v8.0
+- ✓ Threaded recipe comments with nested replies — v8.0
+- ✓ Feed integration with save-to-collection and attribution — v8.0
+
+- ✓ Profiles RLS scoped to safe columns via public_profiles VIEW — v9.0
+- ✓ Store-level handle validation (reserved words + 30-day cooldown) — v9.0
+- ✓ Zero TypeScript never-type inference errors on database types — v9.0
+- ✓ Cooking mode redesign with hero photo, 7 category badges, per-step ingredients, segmented progress — v9.0
+- ✓ Metric/Imperial toggle converting ingredient amounts in cooking view — v9.0
+- ✓ Comment photo attachments with client-side compression and Supabase Storage — v9.0
+- ✓ Comment photo full-size modal viewer — v9.0
+- ✓ Co-cook tagging with @handle search, cook_log_participants table, feed attribution — v9.0
+
 ### Active
 
 (None — planning next milestone)
 
-## Current Milestone: v7.0 Stitch UI Redesign (SHIPPED)
+## Previous Milestone: v9.0 Cooking Experience (SHIPPED)
 
-**Shipped:** 2026-04-09
+**Shipped:** 2026-04-12
 
 **Delivered features:**
-- 5 reusable shared UI components (DonutChart, ProgressBar, InsightCard, FilterChips, DateStrip)
-- Day-focused meal planner with hero card and DateStrip navigation
-- 14 screens redesigned to match Google Stitch reference designs
-- All existing functionality preserved (real-time sync, presence, camera, barcode scanning)
+- Cooking mode redesign: fixed 180px hero image, 7-category step badges, per-step ingredients with unit conversion, segmented progress bar
+- Comment photo attachments: camera icon, expo-image-picker, client-side compression, thumbnail + full-size modal viewer
+- Co-cook tagging: CoCookPicker with @handle search, max 5 co-cooks, "cooked with @handle" feed attribution
+- Tech debt: public_profiles VIEW (column-level RLS), store-level handle validation, zero never-type errors
 
 ### Out of Scope
 
