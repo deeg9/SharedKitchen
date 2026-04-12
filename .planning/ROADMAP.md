@@ -209,7 +209,11 @@ Plans:
   1. Cook log sheet includes a "Who did you cook with?" field where the user can search and tag other users by @handle
   2. Tagged co-cooks appear on the cook log feed post (e.g., "cooked with @alice and @bob")
   3. Co-cook relationships are stored in a cook_log_participants table linking cook log entries to user profiles
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 52-01-PLAN.md — Migration, types, and store logic for cook_log_participants
+- [ ] 52-02-PLAN.md — Schema push to Supabase (blocking checkpoint)
+- [ ] 52-03-PLAN.md — CoCookPicker UI in cook log sheet and feed display
 **UI hint**: yes
 
 ## Progress
@@ -269,7 +273,7 @@ Plans:
 | 49. Tech Debt & Type Safety | v9.0 | 4/4 | Complete    | 2026-04-11 |
 | 50. Cooking Mode Redesign | v9.0 | 2/2 | Complete    | 2026-04-11 |
 | 51. Comment Photo Attachments | v9.0 | 3/3 | Complete    | 2026-04-12 |
-| 52. Co-Cook Tagging | v9.0 | 0/0 | Not started | - |
+| 52. Co-Cook Tagging | v9.0 | 0/3 | Not started | - |
 
 ---
 *Last updated: 2026-04-11 after Phase 51 planning*
