@@ -105,9 +105,9 @@ export function CookingMode({ recipe, onClose, onCookComplete }: CookingModeProp
   const isLastStep = currentStep === totalSteps - 1;
 
   return (
-    <View style={[s.container, { paddingTop: insets.top }]}>
+    <View style={s.container}>
       {/* Top bar: close, unit toggle, ingredients */}
-      <View style={s.topBar}>
+      <View style={[s.topBar, { paddingTop: insets.top + spacing.xs }]}>
         <Pressable
           onPress={onClose}
           style={s.closeBtn}
@@ -130,9 +130,9 @@ export function CookingMode({ recipe, onClose, onCookComplete }: CookingModeProp
         </View>
       </View>
 
-      {/* Main content: two-column layout — image left, steps right */}
+      {/* Two-column layout: image left (full height to bottom), content right */}
       <View style={s.splitContainer}>
-        {/* Left column: hero image */}
+        {/* Left column: hero image — extends to bottom of screen */}
         <View style={s.imageColumn}>
           <Image
             source={{ uri: imageUrl }}
@@ -142,75 +142,76 @@ export function CookingMode({ recipe, onClose, onCookComplete }: CookingModeProp
           />
         </View>
 
-        {/* Right column: step content */}
-        <ScrollView
-          style={s.contentColumn}
-          contentContainerStyle={s.contentColumnInner}
-          showsVerticalScrollIndicator={false}
-          key={`step-${currentStep}`}
-        >
-          {/* Step counter + recipe name */}
-          <Text style={s.stepCounter}>
-            Step {currentStep + 1} of {totalSteps}:
-          </Text>
-          <Text style={s.recipeName} numberOfLines={1}>
-            {recipe.name.toUpperCase()}
-          </Text>
-
-          {/* Step card (instruction + badge + ingredients) */}
-          <StepCard
-            step={instructions[currentStep]}
-            stepIndex={currentStep}
-            totalSteps={totalSteps}
-            unitSystem={unitSystem}
-            ingredients={stepIngredients}
-          />
-        </ScrollView>
-      </View>
-
-      {/* Progress bar */}
-      <CookingProgress
-        currentStep={currentStep}
-        totalSteps={totalSteps}
-      />
-
-      {/* Bottom navigation — pill buttons */}
-      <View style={[s.bottomNav, { paddingBottom: insets.bottom + spacing.sm }]}>
-        <Pressable
-          onPress={handlePrev}
-          style={[s.navPill, s.navPillSecondary, currentStep === 0 && s.btnDisabled]}
-          disabled={currentStep === 0}
-          accessibilityRole="button"
-          accessibilityLabel="Previous step"
-          testID="cooking-prev-step"
-        >
-          <MaterialCommunityIcons name="chevron-left" size={20} color={colors.onSurface} />
-          <Text style={s.navPillSecondaryText}>Previous</Text>
-        </Pressable>
-
-        {isLastStep ? (
-          <Pressable
-            onPress={onCookComplete ?? onClose}
-            style={[s.navPill, s.navPillPrimary]}
-            accessibilityRole="button"
-            accessibilityLabel="Done cooking"
-            testID="cooking-done-button"
+        {/* Right column: progress → step counter → recipe → badge → text → ingredients → nav */}
+        <View style={s.contentColumn}>
+          <ScrollView
+            contentContainerStyle={s.contentScrollInner}
+            showsVerticalScrollIndicator={false}
+            key={`step-${currentStep}`}
           >
-            <Text style={s.navPillPrimaryText}>Done Cooking</Text>
-            <MaterialCommunityIcons name="check" size={20} color={colors.onPrimary} />
-          </Pressable>
-        ) : (
-          <Pressable
-            onPress={handleNext}
-            style={[s.navPill, s.navPillPrimary]}
-            accessibilityRole="button"
-            accessibilityLabel="Next step"
-            testID="cooking-next-step"
-          >
-            <Text style={s.navPillPrimaryText}>Next Step</Text>
-            <MaterialCommunityIcons name="chevron-right" size={20} color={colors.onPrimary} />
-          </Pressable>
-        )}
+            {/* Progress bar at top of right column */}
+            <CookingProgress
+              currentStep={currentStep}
+              totalSteps={totalSteps}
+            />
+
+            {/* Step counter below progress bar */}
+            <Text style={s.stepCounter}>
+              Step {currentStep + 1} of {totalSteps}:
+            </Text>
+            <Text style={s.recipeName} numberOfLines={1}>
+              {recipe.name.toUpperCase()}
+            </Text>
+
+            {/* Step card: badge → instruction → ingredients */}
+            <StepCard
+              step={instructions[currentStep]}
+              stepIndex={currentStep}
+              totalSteps={totalSteps}
+              unitSystem={unitSystem}
+              ingredients={stepIngredients}
+            />
+          </ScrollView>
+
+          {/* Nav buttons — small, bottom-right of content column */}
+          <View style={[s.bottomNav, { paddingBottom: insets.bottom + spacing.xs }]}>
+            <Pressable
+              onPress={handlePrev}
+              style={[s.navBtn, s.navBtnSecondary, currentStep === 0 && s.btnDisabled]}
+              disabled={currentStep === 0}
+              accessibilityRole="button"
+              accessibilityLabel="Previous step"
+              testID="cooking-prev-step"
+            >
+              <MaterialCommunityIcons name="chevron-left" size={16} color={colors.onSurface} />
+              <Text style={s.navBtnSecondaryText}>Previous</Text>
+            </Pressable>
+
+            {isLastStep ? (
+              <Pressable
+                onPress={onCookComplete ?? onClose}
+                style={[s.navBtn, s.navBtnPrimary]}
+                accessibilityRole="button"
+                accessibilityLabel="Done cooking"
+                testID="cooking-done-button"
+              >
+                <Text style={s.navBtnPrimaryText}>Done Cooking</Text>
+                <MaterialCommunityIcons name="check" size={16} color={colors.onPrimary} />
+              </Pressable>
+            ) : (
+              <Pressable
+                onPress={handleNext}
+                style={[s.navBtn, s.navBtnPrimary]}
+                accessibilityRole="button"
+                accessibilityLabel="Next step"
+                testID="cooking-next-step"
+              >
+                <Text style={s.navBtnPrimaryText}>Next Step</Text>
+                <MaterialCommunityIcons name="chevron-right" size={16} color={colors.onPrimary} />
+              </Pressable>
+            )}
+          </View>
+        </View>
       </View>
 
       {/* Ingredient sidebar */}
@@ -235,7 +236,7 @@ const s = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingBottom: spacing.sm,
   },
   topBarRight: {
     flexDirection: 'row',
@@ -269,25 +270,25 @@ const s = StyleSheet.create({
   },
   imageColumn: {
     width: '42%',
-    padding: spacing.sm,
   },
   heroImage: {
     width: '100%',
     height: '100%',
-    borderRadius: borderRadius.lg,
   },
   contentColumn: {
     flex: 1,
+    justifyContent: 'space-between',
   },
-  contentColumnInner: {
-    paddingRight: spacing.md,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.md,
+  contentScrollInner: {
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.xs,
+    paddingBottom: spacing.sm,
   },
   stepCounter: {
     fontSize: 13,
     fontFamily: fontFamily.bodySemiBold,
     color: colors.onSurfaceVariant,
+    marginTop: spacing.sm,
   },
   recipeName: {
     fontSize: 11,
@@ -298,33 +299,34 @@ const s = StyleSheet.create({
   },
   bottomNav: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'flex-end',
+    alignItems: 'center',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     gap: spacing.sm,
   },
-  navPill: {
+  navBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
+    gap: 4,
     borderRadius: borderRadius.full,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: 12,
-    justifyContent: 'center',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
-  navPillPrimary: {
+  navBtnPrimary: {
     backgroundColor: colors.primary,
   },
-  navPillPrimaryText: {
-    ...typography.titleMd,
+  navBtnPrimaryText: {
+    fontSize: 13,
+    fontFamily: fontFamily.bodySemiBold,
     color: colors.onPrimary,
   },
-  navPillSecondary: {
+  navBtnSecondary: {
     backgroundColor: colors.surfaceContainerLow,
   },
-  navPillSecondaryText: {
-    ...typography.titleMd,
+  navBtnSecondaryText: {
+    fontSize: 13,
+    fontFamily: fontFamily.bodySemiBold,
     color: colors.onSurface,
   },
   btnDisabled: {
