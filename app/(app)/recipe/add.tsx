@@ -207,7 +207,7 @@ export default function AddRecipeScreen() {
       <View style={styles.importSection}>
         <View style={styles.importHeader}>
           <MaterialCommunityIcons name="link-variant" size={20} color={colors.primary} />
-          <Text style={styles.importTitle}>Import from URL</Text>
+          <Text style={styles.importTitle}>Import from URL (optional)</Text>
         </View>
         <View style={styles.importRow}>
           <TextInput

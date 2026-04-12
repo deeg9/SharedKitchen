@@ -461,8 +461,10 @@ const styles = StyleSheet.create({
     color: colors.onSurface,
     borderBottomWidth: 2,
     borderBottomColor: colors.outlineVariant,
-    paddingVertical: spacing.sm,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
     paddingHorizontal: 2,
+    minHeight: 48,
   },
   categoryGroup: {},
   chipRow: {
