@@ -55,6 +55,7 @@ export async function createCookLogFeedPost(params: {
   cookLogId: string;
   caption: string | null;
   photoUrl: string | null;
+  participantIds?: string[];
 }): Promise<FeedPost | null> {
   try {
     const insert: FeedPostInsert = {

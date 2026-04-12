@@ -30,6 +30,7 @@ interface CookLogState {
     recipeName: string;
     recipeImageUrl?: string;
     kitchenId?: string;
+    participantIds?: string[];
   }) => Promise<CookLog | null>;
   fetchUnloggedMeals: (householdId: string, userId: string) => Promise<void>;
   deleteCookLog: (logId: string, photoUrl: string | null) => Promise<void>;
@@ -104,6 +105,21 @@ export const useCookLogStore = create<CookLogState>((set, get) => ({
 
       if (error) throw error;
 
+      // Insert co-cook participants (max 5, fire-and-forget on individual failures)
+      if (params.participantIds && params.participantIds.length > 0) {
+        const limitedIds = params.participantIds.slice(0, 5);
+        const participantRows = limitedIds.map((uid) => ({
+          cook_log_id: (data as CookLog).id,
+          user_id: uid,
+        }));
+        const { error: partError } = await supabase
+          .from('cook_log_participants')
+          .insert(participantRows);
+        if (partError) {
+          console.warn('[cookLogStore] participant insert error:', partError.message);
+        }
+      }
+
       // Fire-and-forget feed post for social feed (FEED-01)
       if (params.kitchenId) {
         const { createCookLogFeedPost } = await import('../lib/feedHelpers');
@@ -115,6 +131,7 @@ export const useCookLogStore = create<CookLogState>((set, get) => ({
           cookLogId: (data as CookLog).id,
           caption: params.notes ?? null,
           photoUrl: photoUrl,
+          participantIds: params.participantIds ?? [],
         });
       }
 
