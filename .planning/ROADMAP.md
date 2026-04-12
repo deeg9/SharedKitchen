@@ -268,7 +268,7 @@ Plans:
 | 48. Feed Integration & Save to Collection | v8.0 | 3/3 | Complete | 2026-04-11 |
 | 49. Tech Debt & Type Safety | v9.0 | 4/4 | Complete    | 2026-04-11 |
 | 50. Cooking Mode Redesign | v9.0 | 2/2 | Complete    | 2026-04-11 |
-| 51. Comment Photo Attachments | v9.0 | 3/3 | Complete   | 2026-04-12 |
+| 51. Comment Photo Attachments | v9.0 | 3/3 | Complete    | 2026-04-12 |
 | 52. Co-Cook Tagging | v9.0 | 0/0 | Not started | - |
 
 ---
