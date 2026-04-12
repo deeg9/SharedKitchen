@@ -12,6 +12,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheet } from '../ui/BottomSheet';
 import { CameraSheet } from '../camera/CameraSheet';
+import { CoCookPicker } from './CoCookPicker';
 import { useCookLogStore } from '../../stores/cookLogStore';
 import { useAuthStore } from '../../stores/authStore';
 import { useHouseholdStore } from '../../stores/householdStore';
@@ -41,6 +42,7 @@ export function CookLogSheet({
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [cameraOpen, setCameraOpen] = useState(false);
+  const [coCooks, setCoCooks] = useState<Array<{ id: string; handle: string | null; avatar_url: string | null }>>([]);
 
   const userId = useAuthStore((s) => s.user?.id);
   const activeHousehold = useHouseholdStore((s) => s.activeHousehold);
@@ -61,11 +63,13 @@ export function CookLogSheet({
         recipeName,
         recipeImageUrl: recipeImageUrl ?? undefined,
         kitchenId,
+        participantIds: coCooks.map((u) => u.id),
       });
 
       if (result) {
         setPhotoUri(null);
         setNotes('');
+        setCoCooks([]);
         onClose();
       } else {
         const errorMsg = useCookLogStore.getState().error;
@@ -91,12 +95,13 @@ export function CookLogSheet({
   const handleClose = () => {
     setPhotoUri(null);
     setNotes('');
+    setCoCooks([]);
     onClose();
   };
 
   return (
     <>
-      <BottomSheet isOpen={isOpen} onClose={handleClose} snapPoints={['55%']}>
+      <BottomSheet isOpen={isOpen} onClose={handleClose} snapPoints={['70%']}>
         <View style={styles.container}>
           {contextMessage ? (
             <Text style={styles.contextMessage}>{contextMessage}</Text>
@@ -140,6 +145,17 @@ export function CookLogSheet({
             textAlignVertical="top"
             accessibilityLabel="Caption"
           />
+
+          {/* Co-cook picker */}
+          <Text style={styles.coCookLabel}>Who did you cook with?</Text>
+          {userId ? (
+            <CoCookPicker
+              selectedUsers={coCooks}
+              onSelectionChange={setCoCooks}
+              currentUserId={userId}
+              disabled={submitting}
+            />
+          ) : null}
 
           {/* Submit */}
           <Pressable
@@ -224,6 +240,12 @@ const styles = StyleSheet.create({
     ...typography.labelLg,
     color: colors.primary,
     marginTop: spacing.xs,
+  },
+  coCookLabel: {
+    ...typography.labelMd,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.md,
+    marginBottom: spacing.xs,
   },
   notesInput: {
     ...typography.bodyLg,
