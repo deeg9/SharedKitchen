@@ -54,13 +54,14 @@ export function RecipeCommentsSection({
     deleteComment(commentId, recipeId);
   };
 
-  const handleSubmit = async (body: string, parentId?: string | null): Promise<boolean> => {
+  const handleSubmit = async (body: string, parentId?: string | null, photoUri?: string | null): Promise<boolean> => {
     if (!currentUserId) return false;
     const success = await addComment({
       recipeId,
       userId: currentUserId,
       body,
       parentId: parentId ?? null,
+      photoUri: photoUri ?? null,
     });
     if (success) {
       setReplyingTo(null);
