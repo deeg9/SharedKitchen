@@ -106,33 +106,9 @@ export function CookingMode({ recipe, onClose, onCookComplete }: CookingModeProp
 
   return (
     <View style={s.container}>
-      {/* Top bar: close, unit toggle, ingredients */}
-      <View style={[s.topBar, { paddingTop: insets.top + spacing.xs }]}>
-        <Pressable
-          onPress={onClose}
-          style={s.closeBtn}
-          accessibilityRole="button"
-          accessibilityLabel="Close cooking mode"
-        >
-          <MaterialCommunityIcons name="close" size={22} color={colors.onSurfaceVariant} />
-        </Pressable>
-        <View style={s.topBarRight}>
-          <UnitToggle value={unitSystem} onChange={handleUnitChange} />
-          <Pressable
-            onPress={() => setSidebarVisible(true)}
-            style={s.ingredientPill}
-            accessibilityRole="button"
-            accessibilityLabel="Show ingredients"
-          >
-            <MaterialCommunityIcons name="food-variant" size={16} color={colors.onSurfaceVariant} />
-            <Text style={s.ingredientPillText}>Ingredients</Text>
-          </Pressable>
-        </View>
-      </View>
-
-      {/* Two-column layout: image left (full height to bottom), content right */}
+      {/* Full-screen split: image left from top to bottom, content right */}
       <View style={s.splitContainer}>
-        {/* Left column: hero image — extends to bottom of screen */}
+        {/* Left column: hero image — full bleed top to bottom */}
         <View style={s.imageColumn}>
           <Image
             source={{ uri: imageUrl }}
@@ -140,22 +116,46 @@ export function CookingMode({ recipe, onClose, onCookComplete }: CookingModeProp
             contentFit="cover"
             transition={200}
           />
+          {/* Close button overlaid on image */}
+          <Pressable
+            onPress={onClose}
+            style={[s.closeBtn, { top: insets.top + spacing.xs }]}
+            accessibilityRole="button"
+            accessibilityLabel="Close cooking mode"
+          >
+            <MaterialCommunityIcons name="close" size={20} color="#fff" />
+          </Pressable>
         </View>
 
-        {/* Right column: progress → step counter → recipe → badge → text → ingredients → nav */}
-        <View style={s.contentColumn}>
+        {/* Right column */}
+        <View style={[s.contentColumn, { paddingTop: insets.top }]}>
+          {/* Top controls: unit toggle + ingredients — compact, right-aligned */}
+          <View style={s.topControls}>
+            <UnitToggle value={unitSystem} onChange={handleUnitChange} />
+            <Pressable
+              onPress={() => setSidebarVisible(true)}
+              style={s.ingredientPill}
+              accessibilityRole="button"
+              accessibilityLabel="Show ingredients"
+            >
+              <MaterialCommunityIcons name="food-variant" size={14} color={colors.onSurfaceVariant} />
+              <Text style={s.ingredientPillText}>Ingredients</Text>
+            </Pressable>
+          </View>
+
+          {/* Content area — vertically centered */}
           <ScrollView
             contentContainerStyle={s.contentScrollInner}
             showsVerticalScrollIndicator={false}
             key={`step-${currentStep}`}
           >
-            {/* Progress bar at top of right column */}
+            {/* Progress bar */}
             <CookingProgress
               currentStep={currentStep}
               totalSteps={totalSteps}
             />
 
-            {/* Step counter below progress bar */}
+            {/* Step counter */}
             <Text style={s.stepCounter}>
               Step {currentStep + 1} of {totalSteps}:
             </Text>
@@ -173,7 +173,7 @@ export function CookingMode({ recipe, onClose, onCookComplete }: CookingModeProp
             />
           </ScrollView>
 
-          {/* Nav buttons — congruent, small, bottom-right */}
+          {/* Nav buttons — compact, bottom-right */}
           <View style={[s.bottomNav, { paddingBottom: insets.bottom + spacing.xs }]}>
             <Pressable
               onPress={handlePrev}
@@ -183,7 +183,7 @@ export function CookingMode({ recipe, onClose, onCookComplete }: CookingModeProp
               accessibilityLabel="Previous step"
               testID="cooking-prev-step"
             >
-              <MaterialCommunityIcons name="chevron-left" size={14} color={colors.onPrimary} />
+              <MaterialCommunityIcons name="chevron-left" size={12} color={colors.onPrimary} />
               <Text style={s.navBtnText}>Previous</Text>
             </Pressable>
 
@@ -195,8 +195,8 @@ export function CookingMode({ recipe, onClose, onCookComplete }: CookingModeProp
                 accessibilityLabel="Done cooking"
                 testID="cooking-done-button"
               >
-                <Text style={s.navBtnText}>Done Cooking</Text>
-                <MaterialCommunityIcons name="check" size={14} color={colors.onPrimary} />
+                <Text style={s.navBtnText}>Done</Text>
+                <MaterialCommunityIcons name="check" size={12} color={colors.onPrimary} />
               </Pressable>
             ) : (
               <Pressable
@@ -207,7 +207,7 @@ export function CookingMode({ recipe, onClose, onCookComplete }: CookingModeProp
                 testID="cooking-next-step"
               >
                 <Text style={s.navBtnText}>Next Step</Text>
-                <MaterialCommunityIcons name="chevron-right" size={14} color={colors.onPrimary} />
+                <MaterialCommunityIcons name="chevron-right" size={12} color={colors.onPrimary} />
               </Pressable>
             )}
           </View>
@@ -231,67 +231,64 @@ const s = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.surface,
   },
-  topBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.sm,
-  },
-  topBarRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  closeBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: borderRadius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  ingredientPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.surfaceContainerLow,
-  },
-  ingredientPillText: {
-    fontSize: 13,
-    fontFamily: fontFamily.bodySemiBold,
-    color: colors.onSurfaceVariant,
-  },
   splitContainer: {
     flex: 1,
     flexDirection: 'row',
   },
   imageColumn: {
-    width: '42%',
+    width: '40%',
+    position: 'relative',
   },
   heroImage: {
     width: '100%',
     height: '100%',
   },
+  closeBtn: {
+    position: 'absolute',
+    left: spacing.sm,
+    width: 32,
+    height: 32,
+    borderRadius: borderRadius.full,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   contentColumn: {
     flex: 1,
     justifyContent: 'space-between',
   },
+  topControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    gap: spacing.sm,
+  },
+  ingredientPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+  ingredientPillText: {
+    fontSize: 12,
+    fontFamily: fontFamily.bodySemiBold,
+    color: colors.onSurfaceVariant,
+  },
   contentScrollInner: {
+    flexGrow: 1,
+    justifyContent: 'center',
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.xs,
-    paddingBottom: spacing.sm,
+    paddingVertical: spacing.sm,
   },
   stepCounter: {
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: fontFamily.bodySemiBold,
     color: colors.onSurfaceVariant,
     marginTop: spacing.sm,
   },
   recipeName: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: fontFamily.bodySemiBold,
     color: colors.primary,
     letterSpacing: 0.5,
@@ -301,21 +298,21 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    gap: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    gap: spacing.xs,
   },
   navBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 3,
     borderRadius: borderRadius.full,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 6,
     backgroundColor: colors.primary,
   },
   navBtnText: {
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: fontFamily.bodySemiBold,
     color: colors.onPrimary,
   },
