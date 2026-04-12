@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { RecipeCommentWithProfile, ThreadedComment } from '../types/database';
 import { getErrorMessage } from '../lib/errors';
+import { uploadCommentPhoto } from '../lib/commentPhotoHelpers';
 
 /**
  * Groups a flat list of comments into threaded structure.
@@ -67,6 +68,7 @@ interface RecipeCommentState {
     userId: string;
     body: string;
     parentId?: string | null;
+    photoUri?: string | null;
   }) => Promise<boolean>;
   deleteComment: (commentId: string, recipeId: string) => Promise<void>;
   setReplyingTo: (comment: RecipeCommentWithProfile | null) => void;
@@ -133,6 +135,12 @@ export const useRecipeCommentStore = create<RecipeCommentState>((set, get) => ({
     });
 
     try {
+      // Upload photo if provided (non-blocking — returns null on failure)
+      let photoUrl: string | null = null;
+      if (params.photoUri) {
+        photoUrl = await uploadCommentPhoto(params.userId, params.photoUri);
+      }
+
       const { data, error } = await supabase
         .from('recipe_comments')
         .insert({
@@ -140,6 +148,7 @@ export const useRecipeCommentStore = create<RecipeCommentState>((set, get) => ({
           user_id: params.userId,
           parent_id: params.parentId ?? null,
           body: params.body,
+          photo_url: photoUrl,
         })
         .select('*, profiles(handle, avatar_url)')
         .single();
