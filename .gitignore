@@ -16,3 +16,6 @@ android/
 
 # Local dev screenshots
 /*.png
+
+# Local tool output
+.playwright-mcp/
